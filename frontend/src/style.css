@@ -1,0 +1,154 @@
+
+
+/* General Reset */
+body, html, ul, li, p, h1 {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Montserrat', sans-serif;
+  line-height: 1.6;
+  background-color: #fdfbf5;
+}
+
+/* Navbar Styles */
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 2rem; 
+  font-weight: 100;
+  margin-top: 8px;
+  font-size: 20px;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: #333333;
+}
+
+.logo img {
+  width: 200px;
+  margin-top: 6px;
+  margin-right: 8px;
+}
+
+.nav-links {
+  display: flex;
+  list-style: none;
+}
+
+.nav-links li {
+  margin-left: 2rem;
+}
+
+.nav-links a {
+  text-decoration: none;
+  color: #333333;
+  font-weight: bold;
+}
+
+.nav-links a:hover {
+  color: #005a5b;
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+}
+
+.register-btn {
+  background-color: #005a5b;
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.register-btn:hover {
+  background-color: #007d7d;
+}
+
+.menu-icon {
+  font-size: 1.5rem;
+  margin-left: 1rem;
+  cursor: pointer;
+}
+
+/* General Styling for Main Section */
+.hero {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 4rem 2rem;
+  background-color: #fdfbf5;
+}
+
+.text-content {
+  max-width: 50%;
+}
+
+.text-content h1 {
+  font-size: 2.5rem;
+  color: #005a5b;
+}
+
+.text-content p {
+  margin-top: 1rem;
+  font-size: 1rem;
+  color: #333333;
+}
+
+.search-bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 1.5rem 0;
+}
+
+.search-input {
+  padding: 0.5rem 1rem;
+  border: 1px solid #dddddd;
+  border-radius: 5px 0 0 5px;
+  flex: 1;
+}
+
+.search-btn {
+  background-color: #005a5b;
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 0 5px 5px 0;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.search-btn:hover {
+  background-color: #007d7d;
+}
+
+/* Styling the Orange Bar */
+.orange-bar {
+  position: relative;
+  width: 100%; /* Full width of the screen */
+  height: 30vh; /* Takes up 30% of the screen height */
+  background-color: #ff743e;
+  margin-top: 2rem; /* Space between the hero and the bar */
+  z-index: 1;
+}
+
+/* Optional: Add some padding or content inside the orange bar */
+.orange-bar::before {
+  content: "";
+  display: block;
+  width: 100%;
+  height: 100%;
+  opacity: 0.9;
+}
