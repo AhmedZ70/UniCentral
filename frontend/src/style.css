@@ -1,5 +1,3 @@
-
-
 /* General Reset */
 body, html, ul, li, p, h1 {
   margin: 0;
@@ -10,7 +8,7 @@ body, html, ul, li, p, h1 {
 body {
   font-family: 'Montserrat', sans-serif;
   line-height: 1.6;
-  background-color: #fdfbf5;
+  background-color: #FAF8F0;
 }
 
 /* Navbar Styles */
@@ -18,9 +16,8 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 1rem 2rem; 
+  padding: 1rem 2rem;
   font-weight: 100;
-  margin-top: 8px;
   font-size: 20px;
 }
 
@@ -34,7 +31,6 @@ body {
 
 .logo img {
   width: 200px;
-  margin-top: 6px;
   margin-right: 8px;
 }
 
@@ -64,7 +60,7 @@ body {
 
 .register-btn {
   background-color: #005a5b;
-  color: white;
+  color: #FAF8F0;
   border: none;
   padding: 0.5rem 1rem;
   border-radius: 20px;
@@ -82,13 +78,12 @@ body {
   cursor: pointer;
 }
 
-/* General Styling for Main Section */
+/* Hero Section */
 .hero {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 4rem 2rem;
-  background-color: #fdfbf5;
+  padding: 3rem 2rem; /* Reduced padding */
 }
 
 .text-content {
@@ -96,28 +91,36 @@ body {
 }
 
 .text-content h1 {
-  font-size: 2.5rem;
+  font-size: 2.5rem; /* Reduced font size */
   color: #005a5b;
+  margin-bottom: 0.5rem; /* Reduce spacing below h1 */
 }
 
 .text-content p {
-  margin-top: 1rem;
+  margin-top: 0.5rem; /* Adjusted spacing */
   font-size: 1rem;
   color: #333333;
 }
 
+/* Search Bar */
 .search-bar {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 10px; /* Space between input and button */
   margin: 1.5rem 0;
+  position: relative; /* Necessary for background alignment */
+  padding: 0.5rem; /* Add padding to ensure the background fits well */
+  background-color: #ff743e;
+  border-radius: 10px;
+  z-index: 1;
 }
 
 .search-input {
   padding: 0.5rem 1rem;
-  border: 1px solid #dddddd;
+  border: none;
   border-radius: 5px 0 0 5px;
   flex: 1;
+  z-index: 2;
 }
 
 .search-btn {
@@ -128,27 +131,26 @@ body {
   border-radius: 0 5px 5px 0;
   cursor: pointer;
   font-weight: bold;
+  z-index: 2;
 }
 
 .search-btn:hover {
   background-color: #007d7d;
 }
 
-/* Styling the Orange Bar */
-.orange-bar {
-  position: relative;
-  width: 100%; /* Full width of the screen */
-  height: 30vh; /* Takes up 30% of the screen height */
-  background-color: #ff743e;
-  margin-top: 2rem; /* Space between the hero and the bar */
-  z-index: 1;
+
+/* Illustration */
+.illustrations img {
+  width: 500px;
+  height: auto;
 }
 
-/* Optional: Add some padding or content inside the orange bar */
-.orange-bar::before {
-  content: "";
-  display: block;
+/* Orange Bar */
+.orange-bar {
+  position: relative;
   width: 100%;
-  height: 100%;
-  opacity: 0.9;
+  height: 10vh; /* Reduced height */
+  background-color: #ff743e;
+  margin-top: 1rem; /* Reduced space between hero and bar */
+  z-index: 1;
 }
