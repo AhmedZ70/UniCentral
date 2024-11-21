@@ -1,4 +1,5 @@
 from rest_framework import generics
+from django.shortcuts import render
 from .models import Department, User, Course, Professor, Review
 from .serializers import (
     DepartmentSerializer,
@@ -8,6 +9,8 @@ from .serializers import (
     ReviewSerializer,
 )
 
+def home(request):
+    return render(request, 'index.html')
 # Departments
 class DepartmentListCreateView(generics.ListCreateAPIView):
     queryset = Department.objects.all()

@@ -15,7 +15,7 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 
-from django.contrib import admin
+# uni_central/urls.py
 from django.urls import path
 from .views import (
     DepartmentListCreateView,
@@ -24,10 +24,12 @@ from .views import (
     CourseDetailView,
     ProfessorListCreateView,
     ReviewListCreateView,
+    home,
 )
 
 urlpatterns = [
-    path("admin/", admin.site.urls),
+    path('', home, name='home'),  # Home page route (renders index.html)
+
     path('departments/', DepartmentListCreateView.as_view(), name='department-list'),
     path('departments/<int:pk>/', DepartmentDetailView.as_view(), name='department-detail'),
     path('courses/', CourseListCreateView.as_view(), name='course-list'),
