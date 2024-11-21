@@ -74,10 +74,19 @@ WSGI_APPLICATION = "uni_central.wsgi.application"
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
 DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',  # Use PostgreSQL
+        'NAME': 'UniCentral',              # Replace with your database name
+        'USER': 'Admin',              # Replace with your PostgreSQL username
+        'PASSWORD': 'your_password',               # Replace with your PostgreSQL password
+        'HOST': 'localhost',                       # Use 'localhost' for local dev or the database server's IP
+        'PORT': '5432',                            # Default PostgreSQL port
     }
+
+    # "default": {
+    #     "ENGINE": "django.db.backends.sqlite3",
+    #     "NAME": BASE_DIR / "db.sqlite3",
+    # }
 }
 
 
