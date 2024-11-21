@@ -1,10 +1,12 @@
+{% load static %}
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>UniCentral Login</title>
-  <link rel="stylesheet" href="../src/style.css">
+  <link rel="stylesheet" href="{% static 'css/login.css' %}">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Corben:wght@400;700&family=Montserrat:ital,wght@0,100..900;1,100..900&family=Sigmar&family=Sniglet:wght@400;800&display=swap" rel="stylesheet">
@@ -15,7 +17,7 @@
     <section class="hero">
       <div class="text-content">
         <div class="logo-container">
-            <img src="../assets/logo_no_slogan.png" alt="UniCentral Logo">
+            <img src="{% static 'assets/logo_no_slogan.png' %}" alt="UniCentral Logo">
         </div>
         <div class="login-box"> 
             <h2>Log in</h2>
@@ -57,13 +59,15 @@
 
         <div class="create-account">
             <span>No account?</span>
-            <a href="register_signup.html">
+            <a href="{% url 'register_signup' %}">
                 <button type="button" class="create-account-btn">CREATE ACCOUNT</button>
             </a>
         </div>
       </div>
     </section>
   </main>
+
+  <!-- <script src="{% static 'js/login.js' %}"></script>" -->
 
   <!-- Add all the JavaScript here, at the bottom of the body -->
   <script type="module">
@@ -134,7 +138,7 @@
         try {
           const result = await signInWithPopup(auth, provider);
           console.log('Google sign in successful:', result.user);
-          window.location.href = './index.html'; // Changed path
+          window.location.href = '/'; // Changed path
         } catch (error) {
           console.error('Google sign in error:', error);
           const loginError = document.getElementById('login-error');
@@ -166,7 +170,7 @@
           console.log('User logged in successfully!', user);
           
           // Redirect to home page after successful login
-          window.location.href = './index.html'; // Changed path
+          window.location.href = '/'; // Changed path
         } catch (error) {
           console.error('Login error:', error);
           // Handle specific error cases
@@ -208,7 +212,7 @@
         // TODO: Implement password reset functionality
         console.log('Password reset requested for:', email);
       });
-    });
+    }); 
   </script>
 </body>
 </html>

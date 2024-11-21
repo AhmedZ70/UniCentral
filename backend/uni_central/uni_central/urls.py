@@ -29,10 +29,14 @@ from .views import (
     DepartmentCoursesView,  # Import the DepartmentCoursesView
     home,
     courses,
+    signup_page,
+    login_page
 )
 
 urlpatterns = [
     path('', home, name='home'),  # Home page route (renders index.html)
+    path('signup/', signup_page, name='register_signup'),
+    path('login/', login_page, name='register_login'),
     path('courses/', courses, name='courses'),  # Render courses.html (user-facing view)
     
     # API URLs

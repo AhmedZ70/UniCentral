@@ -15,6 +15,10 @@ from .serializers import (
 
 def home(request):
     return render(request, 'index.html')
+def signup_page(request):
+    return render(request, 'register_signup.html')
+def login_page(request):
+    return render(request, 'register_login.html')
 def courses(request):
     return render(request, 'courses.html')  
 class DepartmentCoursesView(APIView):
