@@ -3,21 +3,24 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>UniCentral</title>
-  <link rel="stylesheet" href="../src/style.css">
+  <title>Courses - UniCentral</title>
+  <!-- CSS paths -->
+  <link rel="stylesheet" href="../src/css/style.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Corben:wght@400;700&family=Montserrat:ital,wght@0,100..900;1,100..900&family=Sigmar&family=Sniglet:wght@400;800&display=swap" rel="stylesheet">
 </head>
 <body>
+  <!-- Navbar -->
   <header class="navbar">
     <div class="logo">
+      <!-- Corrected image path -->
       <img src="../assets/logo_horizontal.png" alt="UniCentral Logo">
     </div>
     <nav>
       <ul class="nav-links">
-        <li><a href="#">Home</a></li>
-        <li><a href="#">Courses</a></li>
+        <li><a href="../index.html">Home</a></li>
+        <li><a href="courses.html" class="active">Courses</a></li>
         <li><a href="#">Professors</a></li>
         <li><a href="#">Course Filtering</a></li>
         <li><a href="#">About</a></li>
@@ -29,24 +32,25 @@
     </div>
   </header>
 
-  <main class="main-content">
-    <section class="hero">
-      <div class="text-content">
-        <h1>Everything you need to know about your courses in one place</h1>
-        <p>Empowering students, one class at a time.</p>
-        <div class="search-bar">
-          <input type="text" placeholder="University of ..." class="search-input">
-          <button class="search-btn">SEARCH &#10140;</button>
-        </div>
-        <p class="subtext">Search for your university to find course information. Aims to redefine the way that college students research and ultimately choose their courses each term.</p>
-      </div>
-      <div class="illustrations">
-        <img src="student-illustration.png" alt="Student Illustration">
-      </div>
-    </section>
-    <div class="orange-bar"></div>
-  </main>
-
+  <main class="main-content courses-page">
+    <div class="courses-header">
+      <h1>Courses @</h1>
+      <select id="university" class="university-select">
+        <option value="University of Utah">University of Utah</option>
+        <option value="Stanford University">Stanford University</option>
+        <option value="MIT">MIT</option>
+      </select>
+    </div>
   
+    <h2>Departments</h2>
+    <div class="departments" id="departments">
+      <!-- Dynamic content will be loaded here via JavaScript -->
+      <p class="loading-message">Loading departments...</p>
+    </div>
+  </main>
+  
+
+  <!--  JavaScript file path -->
+  <script src="../src/js/courses.js"></script>
 </body>
 </html>
