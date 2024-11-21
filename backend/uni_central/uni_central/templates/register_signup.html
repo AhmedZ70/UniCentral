@@ -1,10 +1,12 @@
+{% load static %}
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>UniCentral Signup</title>
-  <link rel="stylesheet" href="../src/style.css">
+  <link rel="stylesheet" href="{% static 'css/signup.css' %}">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Corben:wght@400;700&family=Montserrat:ital,wght@0,100..900;1,100..900&family=Sigmar&family=Sniglet:wght@400;800&display=swap" rel="stylesheet">
@@ -15,7 +17,7 @@
     <section class="hero">
       <div class="text-content">
         <div class="logo-container">
-            <img src="../assets/logo_no_slogan.png" alt="UniCentral Logo">
+            <img src="{% static 'assets/logo_no_slogan.png' %}" alt="UniCentral Logo">
         </div>
         <div class="signup-box"> 
             <h2>Sign up</h2>
@@ -70,13 +72,13 @@
             <button type="button" class="google-signup-btn" id="google-signup">SIGN UP WITH GOOGLE</button>
             
             <div class="already-have-account">
-                <span>Already have an account?</span>
-                <a href="register_login.html" class="sign-in">Sign in</a> 
-            </div>
+              <p>Already have an account? <a href="{% url 'register_login' %}">Sign in</a></p>            </div>
         </div>
       </div>
     </section>
   </main>
+
+  <!-- <script src="{% static 'js/signup.js' %}"></script>" -->
 
   <!-- All JavaScript code goes here -->
   <script type="module">
@@ -225,5 +227,6 @@
         });
     });
   </script>
+  <script src="{% static 'js/signup.js' %}"></script>
 </body>
 </html>
