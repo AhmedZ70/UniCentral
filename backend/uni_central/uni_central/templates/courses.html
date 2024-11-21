@@ -1,0 +1,63 @@
+{% load static %}  <!-- Add this line at the top of the file -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Courses - UniCentral</title>
+  <!-- Corrected CSS path using Django static template tag -->
+  <link rel="stylesheet" href="{% static 'css/style.css' %}">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Corben:wght@400;700&family=Montserrat:ital,wght@0,100..900;1,100..900&family=Sigmar&family=Sniglet:wght@400;800&display=swap" rel="stylesheet">
+</head>
+<body>
+  <!-- Navbar -->
+  <header class="navbar">
+    <div class="logo">
+      <!-- Corrected image path using Django static template tag -->
+      <img src="{% static 'assets/logo_horizontal.png' %}" alt="UniCentral Logo">
+    </div>
+    <nav>
+      <ul class="nav-links">
+        <li><a href="{% url 'home' %}">Home</a></li>
+        <li><a href="{% url 'courses' %}" class="active">Courses</a></li>
+        <li><a href="#">Professors</a></li>
+        <li><a href="#">Course Filtering</a></li>
+        <li><a href="#">About</a></li>
+      </ul>
+    </nav>
+    <div class="actions">
+      <button class="register-btn">REGISTER</button>
+      <div class="menu-icon">&#9776;</div>
+    </div>
+  </header>
+
+  <main class="main-content courses-page">
+    <div class="courses-header">
+      <h1>Courses @</h1>
+      <select id="university" class="university-select">
+        <option value="University of Utah">University of Utah</option>
+        <option value="Stanford University">Stanford University</option>
+        <option value="MIT">MIT</option>
+      </select>
+    </div>
+  
+    <h2>Departments</h2>
+    <div class="departments" id="departments">
+      <!-- Dynamic content will be loaded here via JavaScript -->
+      <p class="loading-message">Loading departments...</p>
+    </div>
+
+    <h2>Courses</h2>
+    <div class="courses" id="courses">
+      <!-- Dynamic content for courses will be loaded here -->
+      <p class="loading-message">Select a department to view its courses.</p>
+    </div>
+  </main>
+
+  <!-- Corrected JavaScript path using Django static template tag -->
+  <script src="{% static 'js/courses.js' %}"></script>
+</body>
+</html>

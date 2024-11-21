@@ -15,9 +15,34 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 
-from django.contrib import admin
+# uni_central/urls.py
+# uni_central/urls.py
 from django.urls import path
+from . import views
+from .views import (
+    DepartmentListCreateView,
+    DepartmentDetailView,
+    CourseListCreateView,
+    CourseDetailView,
+    ProfessorListCreateView,
+    ReviewListCreateView,
+    DepartmentCoursesView,  # Import the DepartmentCoursesView
+    home,
+    courses,
+)
 
 urlpatterns = [
-    path("admin/", admin.site.urls),
+    path('', home, name='home'),  # Home page route (renders index.html)
+    path('courses/', courses, name='courses'),  # Render courses.html (user-facing view)
+    
+    # API URLs
+    path('api/departments/', DepartmentListCreateView.as_view(), name='department-list'),
+    path('api/departments/<int:pk>/', DepartmentDetailView.as_view(), name='department-detail'),
+    path('api/courses/', CourseListCreateView.as_view(), name='course-list'),  # API route for courses
+    path('api/courses/<int:pk>/', CourseDetailView.as_view(), name='course-detail'),
+    path('api/professors/', ProfessorListCreateView.as_view(), name='professor-list'),
+    path('api/reviews/', ReviewListCreateView.as_view(), name='review-list'),
+    
+    # Department courses URL
+    path('api/departments/<int:department_id>/courses/', DepartmentCoursesView.as_view(), name='department-courses'),
 ]
