@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>UniCentral Login</title>
+  <link rel="stylesheet" href="../src/style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Corben:wght@400;700&family=Montserrat:ital,wght@0,100..900;1,100..900&family=Sigmar&family=Sniglet:wght@400;800&display=swap" rel="stylesheet">
+</head>
+<body>
+
+  <main class="register_login">
+    <section class="hero">
+      <div class="text-content">
+        <div class="logo-container">
+            <img src="../assets/logo_no_slogan.png" alt="UniCentral Logo">
+        </div>
+        <div class="login-box"> 
+            <h2>Log in</h2>
+
+            <button class="google-login-btn">LOG IN WITH GOOGLE</google-login-btn>
+            </button>
+
+            <div class="separator">
+                <hr>
+                <span>OR</span>
+                <hr>
+            </div>
+            <div class="login-entry">
+                <div>
+                    <div class="login-box-labels">
+                        <label for="email">Email</label>
+                    </div>
+                    <input type="email" id="email" class="email-input">
+                </div>
+                <div>
+                    <div class="login-box-labels">
+                        <label for="password">Password</label>
+                    </div>
+                    <input type="password" id="password" class="password-input">
+                </div>
+                    <button class="login-btn">LOG IN &#10140;</login-btn>
+                </div>
+                <div>
+                    <a href="#" class="forgot-password">Forgot password</a> 
+                </div>
+            </div>
+
+            <div class="create-account">
+                <span>No account?</span>
+                <button class="create-account-btn">CREATE ACCOUNT</create-account-btn>
+            </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script type="module" src="../src/login.js"></script>
+  <script type="module" src="../src/signup.js"></script>
+
+</body>
+</html>
