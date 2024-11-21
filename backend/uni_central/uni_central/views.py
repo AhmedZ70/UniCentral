@@ -1,5 +1,9 @@
 from rest_framework import generics
 from django.shortcuts import render
+from rest_framework.response import Response
+from rest_framework import status
+from rest_framework.views import APIView
+from django.shortcuts import get_object_or_404
 from .models import Department, User, Course, Professor, Review
 from .serializers import (
     DepartmentSerializer,
@@ -13,7 +17,12 @@ def home(request):
     return render(request, 'index.html')
 def courses(request):
     return render(request, 'courses.html')  
-
+class DepartmentCoursesView(APIView):
+    def get(self, request, department_id):
+        department = get_object_or_404(Department, id=department_id)
+        courses = department.courses.all()  # Assuming a ForeignKey relationship from Course to Department
+        serializer = CourseSerializer(courses, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 # Departments
 class DepartmentListCreateView(generics.ListCreateAPIView):
