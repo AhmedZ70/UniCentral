@@ -25,15 +25,19 @@ from .views import (
     ProfessorListCreateView,
     ReviewListCreateView,
     home,
+    courses,
 )
 
 urlpatterns = [
     path('', home, name='home'),  # Home page route (renders index.html)
-
-    path('departments/', DepartmentListCreateView.as_view(), name='department-list'),
-    path('departments/<int:pk>/', DepartmentDetailView.as_view(), name='department-detail'),
-    path('courses/', CourseListCreateView.as_view(), name='course-list'),
-    path('courses/<int:pk>/', CourseDetailView.as_view(), name='course-detail'),
-    path('professors/', ProfessorListCreateView.as_view(), name='professor-list'),
-    path('reviews/', ReviewListCreateView.as_view(), name='review-list'),
+    path('courses/', courses, name='courses'),  # Render courses.html (user-facing view)
+    
+    # API URLs
+    path('api/departments/', DepartmentListCreateView.as_view(), name='department-list'),
+    path('api/departments/<int:pk>/', DepartmentDetailView.as_view(), name='department-detail'),
+    path('api/courses/', CourseListCreateView.as_view(), name='course-list'),  # API route for courses
+    path('api/courses/<int:pk>/', CourseDetailView.as_view(), name='course-detail'),
+    path('api/professors/', ProfessorListCreateView.as_view(), name='professor-list'),
+    path('api/reviews/', ReviewListCreateView.as_view(), name='review-list'),
 ]
+

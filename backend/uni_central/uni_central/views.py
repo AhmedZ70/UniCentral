@@ -11,6 +11,10 @@ from .serializers import (
 
 def home(request):
     return render(request, 'index.html')
+def courses(request):
+    return render(request, 'courses.html')  
+
+
 # Departments
 class DepartmentListCreateView(generics.ListCreateAPIView):
     queryset = Department.objects.all()

@@ -1,11 +1,13 @@
+{% load static %}  <!-- Add this line at the top of the file -->
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Courses - UniCentral</title>
-  <!-- CSS paths -->
-  <link rel="stylesheet" href="../src/css/style.css">
+  <!-- Corrected CSS path using Django static template tag -->
+  <link rel="stylesheet" href="{% static 'css/style.css' %}">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Corben:wght@400;700&family=Montserrat:ital,wght@0,100..900;1,100..900&family=Sigmar&family=Sniglet:wght@400;800&display=swap" rel="stylesheet">
@@ -14,13 +16,13 @@
   <!-- Navbar -->
   <header class="navbar">
     <div class="logo">
-      <!-- Corrected image path -->
-      <img src="../assets/logo_horizontal.png" alt="UniCentral Logo">
+      <!-- Corrected image path using Django static template tag -->
+      <img src="{% static 'assets/logo_horizontal.png' %}" alt="UniCentral Logo">
     </div>
     <nav>
       <ul class="nav-links">
-        <li><a href="../index.html">Home</a></li>
-        <li><a href="courses.html" class="active">Courses</a></li>
+        <li><a href="{% url 'home' %}">Home</a></li>
+        <li><a href="{% url 'courses' %}" class="active">Courses</a></li>
         <li><a href="#">Professors</a></li>
         <li><a href="#">Course Filtering</a></li>
         <li><a href="#">About</a></li>
@@ -48,9 +50,8 @@
       <p class="loading-message">Loading departments...</p>
     </div>
   </main>
-  
 
-  <!--  JavaScript file path -->
-  <script src="../src/js/courses.js"></script>
+  <!-- Corrected JavaScript path using Django static template tag -->
+  <script src="{% static 'js/courses.js' %}"></script>
 </body>
 </html>
