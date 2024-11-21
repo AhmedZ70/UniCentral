@@ -15,8 +15,6 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 
-# uni_central/urls.py
-# uni_central/urls.py
 from django.urls import path
 from . import views
 from .views import (
@@ -26,11 +24,12 @@ from .views import (
     CourseDetailView,
     ProfessorListCreateView,
     ReviewListCreateView,
-    DepartmentCoursesView,  # Import the DepartmentCoursesView
+    DepartmentCoursesView,
     home,
     courses,
     signup_page,
-    login_page
+    login_page,
+    course_detail,
 )
 
 urlpatterns = [
@@ -38,11 +37,12 @@ urlpatterns = [
     path('signup/', signup_page, name='register_signup'),
     path('login/', login_page, name='register_login'),
     path('courses/', courses, name='courses'),  # Render courses.html (user-facing view)
+    path('courses/<int:course_id>/', course_detail, name='course-detail'),  # New route for course detail page
     
     # API URLs
     path('api/departments/', DepartmentListCreateView.as_view(), name='department-list'),
     path('api/departments/<int:pk>/', DepartmentDetailView.as_view(), name='department-detail'),
-    path('api/courses/', CourseListCreateView.as_view(), name='course-list'),  # API route for courses
+    path('api/courses/', CourseListCreateView.as_view(), name='course-list'),
     path('api/courses/<int:pk>/', CourseDetailView.as_view(), name='course-detail'),
     path('api/professors/', ProfessorListCreateView.as_view(), name='professor-list'),
     path('api/reviews/', ReviewListCreateView.as_view(), name='review-list'),

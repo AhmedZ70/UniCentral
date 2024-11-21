@@ -17,7 +17,6 @@ document.addEventListener("DOMContentLoaded", () => {
           return response.json();
       })
       .then(data => {
-          // Clear the loading message
           departmentsContainer.innerHTML = "";
 
           if (data.length === 0) {
@@ -57,50 +56,54 @@ document.addEventListener("DOMContentLoaded", () => {
           departmentsContainer.innerHTML = "<p>Failed to load departments. Please try again later.</p>";
       });
 
+    // Fetch and display courses for a specific department
     function fetchCoursesForDepartment(departmentId) {
-      const coursesApiUrl = `http://127.0.0.1:8000/api/departments/${departmentId}/courses/`;
+        const coursesApiUrl = `http://127.0.0.1:8000/api/departments/${departmentId}/courses/`;
+    
+        fetch(coursesApiUrl)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error("Network response was not ok");
+                }
+                return response.json();
+            })
+            .then(courses => {
+                // Clear any existing courses
+                coursesContainer.innerHTML = "";
+    
+                if (courses.length === 0) {
+                    coursesContainer.innerHTML = "<p>No courses available for this department.</p>";
+                } else {
+                    courses.forEach(course => {
+                        const courseLink = document.createElement("a");
+                        courseLink.href = `/courses/${course.id}/`;
+                        courseLink.classList.add("course-link");
+                        courseLink.style.textDecoration = "none"; // Ensure no underline
+                        courseLink.style.color = "#333";
+    
+                        const courseDiv = document.createElement("div");
+                        courseDiv.classList.add("course-item");
+                        courseDiv.style.margin = "0"; // Reset margin
+                        courseDiv.style.padding = "1.5rem"; // Ensure consistent padding
+                        courseDiv.style.boxShadow = "0 2px 4px rgba(0, 0, 0, 0.1)"; // Subtle shadow
 
-      fetch(coursesApiUrl)
-          .then(response => {
-              if (!response.ok) {
-                  throw new Error("Network response was not ok");
-              }
-              return response.json();
-          })
-          .then(courses => {
-              // Clear any existing courses
-              coursesContainer.innerHTML = "";
-
-              if (courses.length === 0) {
-                  coursesContainer.innerHTML = "<p>No courses available for this department.</p>";
-              } else {
-                  const coursesList = document.createElement("ul");
-                  coursesList.classList.add("courses-list");
-
-                  courses.forEach(course => {
-                      // Update these fields based on the API response
-                      const courseTitle = course.title ? course.title : "No course title available";
-                      const courseSubject = course.subject ? course.subject : "No course subject available";
-                      const courseNumber = course.number ? course.number : "N/A";
-
-                      const courseItem = document.createElement("li");
-                      courseItem.classList.add("course-item");
-                      courseItem.innerHTML = `
-                          <a href="#" class="course-link">
-                              <h4>${courseTitle}</h4>
-                              <p>Subject: ${courseSubject} ${courseNumber}</p>
-                          </a>
-                      `;
-                      coursesList.appendChild(courseItem);
-                  });
-
-                  coursesContainer.appendChild(coursesList);
-              }
-          })
-          .catch(error => {
-              console.error("There was an error fetching the courses:", error);
-              coursesContainer.innerHTML = "<p>Failed to load courses. Please try again later.</p>";
-          });
+    
+                        courseDiv.innerHTML = `
+                            <h4>${course.title}</h4>
+                            <p>Subject: ${course.subject} ${course.number}</p>
+                        `;
+    
+                        courseLink.appendChild(courseDiv);
+                        coursesContainer.appendChild(courseLink);
+                    });
+                }
+            })
+            .catch(error => {
+                console.error("There was an error fetching the courses:", error);
+                coursesContainer.innerHTML = "<p>Failed to load courses. Please try again later.</p>";
+            });
     }
+    
+
 
 });

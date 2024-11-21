@@ -170,7 +170,6 @@ body {
   margin-top: 5px;
 }
 
-
 /* Courses Page Specific Styles */
 .courses-page h1 {
   font-size: 2.5rem;
@@ -191,7 +190,6 @@ body {
   color: #333333;
   margin: 2rem 0 1rem 20px; /* Add left margin for alignment */
 }
-
 
 .department {
   width: 180px;
@@ -220,7 +218,6 @@ body {
   margin: 2rem auto; /* Center the grid horizontally */
   padding: 0 20px; /* Add horizontal padding */
 }
-
 
 .department:hover {
   background-color: #2ecc71;
@@ -251,6 +248,7 @@ footer {
   margin: 0; /* Remove default margin for proper alignment */
   line-height: 1; /* Ensure consistent text height */
 }
+
 .department-link {
   text-decoration: none; /* Removes the underline */
   color: inherit; /* Ensures the link text color matches its container */
@@ -261,7 +259,6 @@ footer {
   cursor: pointer;
 }
 
-
 .university-select {
   padding: 0.5rem 1rem;
   font-size: 1rem;
@@ -271,38 +268,42 @@ footer {
   margin: 0; /* Remove extra margin */
   line-height: 1.5; /* Match the dropdown's height to the text */
 }
+
 /* Styling for Courses Container */
 .courses {
   max-width: 800px; /* Set a maximum width to prevent it from expanding too much */
   margin: 0 auto; /* Center horizontally */
   padding: 0 20px; /* Add padding for a balanced spacing */
+  overflow: hidden; 
 }
 
 /* Styling for Courses List */
 .courses-list {
-  list-style: none; /* Remove bullet points */
+  list-style: none;
   padding: 0;
-  margin: 2rem 0; /* Add space above and below */
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem; /* Space between items */
 }
 
+
 .course-item {
-  margin-bottom: 1.5rem;
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  transition: background-color 0.3s ease, color 0.3s ease; /* No scale transform, just color change */
-  overflow: hidden;
+  margin: 0; /* Remove margins */
 }
+
 
 .course-link {
   text-decoration: none;
   color: #333;
-  padding: 1rem;
   display: block;
 }
 
 .course-link:hover {
-  background-color: #f1f1f1; /* Lighter background color on hover */
-  color: #005a5b; /* Change text color to match brand color */
+  background-color: #f0f0f0;
+  color: #005a5b;
+  box-shadow: none; /* Ensure no shadow changes size */
+  border: none; /* Ensure no border change causes resizing */
 }
 
 .course-item h4 {
@@ -316,3 +317,25 @@ footer {
   color: #666;
 }
 
+.course-item {
+  margin: 0; /* Remove margin to eliminate extra space */
+  border-radius: 8px;
+  background-color: #fff;
+  transition: background-color 0.3s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+  overflow: hidden; /* Ensure no child elements create overflow */
+}
+
+.course-link {
+  text-decoration: none;
+  color: #333;
+  display: block;
+  padding: 1.5rem; /* Consistent padding inside the link */
+}
+
+.course-link:hover {
+  background-color: #f0f0f0;
+  color: #005a5b;
+  box-shadow: none; /* Ensure no shadow change causes overflow */
+  margin: 0; /* Prevent margin from hover effect */
+}

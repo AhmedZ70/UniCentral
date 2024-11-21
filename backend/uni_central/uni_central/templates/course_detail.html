@@ -1,0 +1,153 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ course.title }} - Course Details</title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Corben:wght@400;700&family=Montserrat:ital,wght@0,100..900;1,100..900&family=Sigmar&family=Sniglet:wght@400;800&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Navbar -->
+    <header class="navbar">
+        <div class="logo">
+            <img src="{% static 'assets/logo_horizontal.png' %}" alt="UniCentral Logo">
+        </div>
+        <nav>
+            <ul class="nav-links">
+                <li><a href="{% url 'home' %}">Home</a></li>
+                <li><a href="{% url 'courses' %}" class="active">Courses</a></li>
+                <li><a href="#">Professors</a></li>
+                <li><a href="#">Course Filtering</a></li>
+                <li><a href="#">About</a></li>
+            </ul>
+        </nav>
+        <div class="actions">
+            <a href="{% url 'register_signup' %}"><button class="register-btn">REGISTER</button></a>
+            <div class="menu-icon">&#9776;</div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content course-detail-page">
+        <!-- Course Information Section -->
+        <section class="course-info">
+            <h1 class="course-title">{{ course.title }}</h1>
+            <div class="course-details">
+                <p><strong>Subject:</strong> {{ course.subject }} {{ course.number }}</p>
+                <p><strong>Credits:</strong> {{ course.credits }}</p>
+                <p><strong>Semester:</strong> {{ course.semester }}</p>
+                <p><strong>Average Rating:</strong> {{ course.avg_rating }}</p>
+                <p><strong>Average Difficulty:</strong> {{ course.avg_difficulty }}</p>
+            </div>
+        </section>
+
+        <!-- Reviews Section -->
+        <section class="course-reviews">
+            <h2 class="reviews-title">Reviews</h2>
+            {% if reviews %}
+                <ul class="reviews-list">
+                    {% for review in reviews %}
+                        <li class="review-item">
+                            <div class="review-header">
+                                <strong>Review by: anonymous</strong>
+                            </div>
+                            <div class="review-content">
+                                <p>{{ review.review }}</p>
+                            </div>
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p class="no-reviews-message">No reviews available for this course.</p>
+            {% endif %}
+        </section>
+    </main>
+
+    <!-- Styling to match the overall look and feel -->
+    <style>
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background-color: #FAF8F0;
+            color: #333333;
+            line-height: 1.6;
+        }
+
+        .course-detail-page {
+            max-width: 1000px;
+            margin: 2rem auto;
+            padding: 0 20px;
+        }
+
+        .course-info {
+            background: #fff;
+            padding: 20px;
+            border: 1px solid #e0e0e0;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
+            margin-bottom: 2rem;
+        }
+
+        .course-title {
+            font-size: 2.2rem;
+            color: #005a5b;
+            margin-bottom: 1rem;
+        }
+
+        .course-details p {
+            font-size: 1rem;
+            margin: 10px 0;
+        }
+
+        .course-reviews {
+            background: #fff;
+            padding: 20px;
+            border: 1px solid #e0e0e0;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .reviews-title {
+            font-size: 1.8rem;
+            color: #005a5b;
+            margin-bottom: 1rem;
+        }
+
+        .reviews-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .review-item {
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .review-header {
+            font-weight: bold;
+            color: #333333;
+            margin-bottom: 5px;
+        }
+
+        .review-content p {
+            font-size: 1rem;
+            color: #666666;
+        }
+
+        .no-reviews-message {
+            font-size: 1rem;
+            color: #666666;
+        }
+    </style>
+
+    <!-- Script to handle navigation and other functions -->
+    <script src="{% static 'js/index.js' %}"></script>
+</body>
+</html>
