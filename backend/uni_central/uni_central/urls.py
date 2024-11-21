@@ -17,7 +17,21 @@ Including another URLconf
 
 from django.contrib import admin
 from django.urls import path
+from .views import (
+    DepartmentListCreateView,
+    DepartmentDetailView,
+    CourseListCreateView,
+    CourseDetailView,
+    ProfessorListCreateView,
+    ReviewListCreateView,
+)
 
 urlpatterns = [
     path("admin/", admin.site.urls),
+    path('departments/', DepartmentListCreateView.as_view(), name='department-list'),
+    path('departments/<int:pk>/', DepartmentDetailView.as_view(), name='department-detail'),
+    path('courses/', CourseListCreateView.as_view(), name='course-list'),
+    path('courses/<int:pk>/', CourseDetailView.as_view(), name='course-detail'),
+    path('professors/', ProfessorListCreateView.as_view(), name='professor-list'),
+    path('reviews/', ReviewListCreateView.as_view(), name='review-list'),
 ]
