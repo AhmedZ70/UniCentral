@@ -254,7 +254,7 @@ body {
   border: 1px solid black; /* Black border */
   padding: 20px;
   border-radius: 5px 5px 5px 5px;
-  height: 485px;
+  height: 575px;
   width: 300px;
   text-align: center;
 }
@@ -280,6 +280,37 @@ body {
   margin-top: -15px;
 }
 
+.password-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.password-toggle {
+  position: absolute;
+  right: 10px;
+  cursor: pointer;
+  background: none;
+  border: none;
+  padding: 0;
+}
+
+.password-error {
+  color: red;
+  font-size: 12px;
+  margin-top: 5px;
+  display: none;
+}
+
+/* Optional: Style the icon */
+.password-toggle i {
+  color: #005a5b;
+}
+
+.password-toggle:hover i {
+  color: #007d7d;
+}
+
 .signup-btn {
   background-color: #005a5b;
   color: white;
@@ -290,7 +321,7 @@ body {
   cursor: pointer;
   font-weight: bold;
   margin-top: 10px;
-  margin-bottom: 15px;
+  margin-bottom: 20px;
 }
 
 .google-signup-btn {
@@ -305,7 +336,14 @@ body {
 }
 
 .already-have-account {
-  margin-top: 10px;
+  margin-top: 20px;
   margin-bottom: 20px;
   text-align: center;
+}
+
+.error-message {
+  font-size: 12px; /* Adjust this value as needed */
+  color: red;
+  margin-top: 5px;
+  margin-bottom: 5px;
 }
