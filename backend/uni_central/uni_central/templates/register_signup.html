@@ -196,12 +196,12 @@
             console.log('User signed up successfully!');
             
             // Verification Email (optional)
-            await sendEmailVerification(user);
-            console.log('Verification email sent');
+            // await sendEmailVerification(user);
+            // console.log('Verification email sent');
             
             // Redirect to home page after successful signup
             alert('Account created successfully! Please check your email for verification.');
-            window.location.href = '../public/index.html'; // Adjust this path to your home page
+            window.location.href = '/'; 
 
         } catch (error) {
             console.error('Detailed error:', error); // More detailed error logging
