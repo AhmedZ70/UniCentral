@@ -152,3 +152,94 @@ body {
   height: 100%;
   opacity: 0.9;
 }
+body {
+  display: flex;
+  flex-direction: column; /* Align items vertically */
+  min-height: 100vh; /* Ensure body takes full viewport height */
+  margin: 0;
+}
+
+/* .register {
+  display: flex;
+  flex-grow: 1; /* Allow .register to take up available space 
+  align-items: center; /* Center vertically 
+  justify-content: center; /* Center horizontally 
+} */
+
+.hero {
+  display: flex;
+  flex-direction: column; /* Align items vertically in the hero section */
+  align-items: center; 
+  justify-content: center; 
+  height: 85vh;
+}
+
+.logo-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 5px;
+}
+
+.logo-container img {
+  width: 200px;
+  height: auto;
+}
+
+.login-box {
+  border: 1px solid black; /* Black border */
+  padding: 20px;
+  border-radius: 5px 5px 5px 5px;
+  height: 400px;
+  width: 300px;
+  text-align: center;
+}
+
+.google-login-btn {
+  color: #005a5b;
+  border: 1px solid #005a5b;
+  background-color: transparent;
+  width: 100%;
+  padding: 0.5rem 1rem;
+  border-radius: 5px 5px 5px 5px;
+  margin-bottom: 10px;
+  cursor: pointer;
+}
+
+.login-box-labels {
+  text-align: left;
+  color: gray;
+  font-size: 12px;
+}
+
+.login-entry div {
+  margin-bottom: 10px;
+}
+
+.login-entry label {
+  display: block;
+}
+
+.login-entry input {
+  width: 100%; /* Make text boxes longer (full width) */
+  padding: 0.5rem; /* Add some padding to the text boxes */
+  box-sizing: border-box; 
+  margin-top: -15px;
+}
+
+.login-btn {
+  background-color: #005a5b;
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 5px 5px 5px 5px;
+  cursor: pointer;
+  font-weight: bold;
+  margin-top: 10px;
+  margin-bottom: 15px;
+}
+
+.create-account {
+  margin-top: 20px;
+  text-align: center;
+}
