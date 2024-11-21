@@ -16,7 +16,9 @@ Including another URLconf
 """
 
 # uni_central/urls.py
+# uni_central/urls.py
 from django.urls import path
+from . import views
 from .views import (
     DepartmentListCreateView,
     DepartmentDetailView,
@@ -24,6 +26,7 @@ from .views import (
     CourseDetailView,
     ProfessorListCreateView,
     ReviewListCreateView,
+    DepartmentCoursesView,  # Import the DepartmentCoursesView
     home,
     courses,
 )
@@ -39,5 +42,7 @@ urlpatterns = [
     path('api/courses/<int:pk>/', CourseDetailView.as_view(), name='course-detail'),
     path('api/professors/', ProfessorListCreateView.as_view(), name='professor-list'),
     path('api/reviews/', ReviewListCreateView.as_view(), name='review-list'),
+    
+    # Department courses URL
+    path('api/departments/<int:department_id>/courses/', DepartmentCoursesView.as_view(), name='department-courses'),
 ]
-
