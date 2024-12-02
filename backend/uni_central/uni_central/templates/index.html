@@ -54,7 +54,12 @@
       </div>
     </section>
     <div class="orange-bar"></div>
+    <!-- React Root Element -->
+    <div id="react-root"></div>
   </main>
+
+  <!-- Include the React Bundle -->
+  <script src="{% static 'frontend/bundle.js' %}"></script>
 
   <!-- Corrected JavaScript file path with Django static tag -->
   <script src="{% static 'js/index.js' %}"></script>

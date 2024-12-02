@@ -55,6 +55,11 @@ MIDDLEWARE = [
 
 CORS_ALLOW_ALL_ORIGINS = True  # Allow requests from all origins (development only)
 
+# Might be redundent due to the state above
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:3000",
+]
+
 # Correct this to point to the project-level `urls.py`
 ROOT_URLCONF = "uni_central.urls"  
 
@@ -123,7 +128,8 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
 STATIC_URL = "/static/"
-STATICFILES_DIRS = [os.path.join(BASE_DIR, "uni_central", "static")]  # Update the path to point to the correct static files
+STATICFILES_DIRS = [os.path.join(BASE_DIR, "uni_central", "static"),
+                    os.path.join(BASE_DIR, 'frontend', 'static')]  # Update the path to point to the correct static files
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
