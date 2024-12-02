@@ -1,0 +1,74 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>UniCentral Login</title>
+  <link rel="stylesheet" href="{% static 'css/login.css' %}">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Corben:wght@400;700&family=Montserrat:ital,wght@0,100..900;1,100..900&family=Sigmar&family=Sniglet:wght@400;800&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/lucide@0.359.0/dist/umd/lucide.min.js"></script>
+  <script type="module" src="{% static 'js/login.js' %}"></script>
+
+</head>
+<body>
+  <main class="login">
+    <section class="hero">
+      <div class="text-content">
+        <div class="logo-container">
+          <a href="{% url 'home' %}">
+            <img src="{% static 'assets/logo_no_slogan.png' %}" alt="UniCentral Logo">
+          </a>
+        </div>
+        <div class="login-box"> 
+            <h2>Log in</h2>
+
+            <button type="button" class="google-login-btn" id="google-login">LOG IN WITH GOOGLE</button>
+
+            <div class="separator">
+                <hr>
+                <span>OR</span>
+                <hr>
+            </div>
+
+            <form class="login-entry" id="login-form">
+                <div>
+                    <div class="login-box-labels">
+                        <label for="email">Email</label>
+                    </div>
+                    <input type="email" id="email" class="email-input" required>
+                </div>
+                <div>
+                    <div class="login-box-labels">
+                        <label for="password">Password</label>
+                    </div>
+                    <div class="password-container">
+                        <input type="password" id="password" class="password-input" required>
+                        <button type="button" class="password-toggle" id="toggle-password">
+                            <i data-lucide="eye"></i>
+                        </button>
+                    </div>
+                </div>
+                <div id="login-error" style="display: none; color: red;"></div>
+                <button type="submit" class="login-btn">LOG IN &#10140;</button>
+            </form>
+
+            <div>
+                <a href="#" class="forgot-password">Forgot password</a>
+            </div>
+        </div>
+
+        <div class="create-account">
+            <span>No account?</span>
+            <a href="{% url 'signup' %}">
+                <button type="button" class="create-account-btn">CREATE ACCOUNT</button>
+            </a>
+        </div>
+      </div>
+    </section>
+  </main>
+</body>
+</html>

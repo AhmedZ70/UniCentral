@@ -13,6 +13,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Corben:wght@400;700&family=Montserrat:ital,wght@0,100..900;1,100..900&family=Sigmar&family=Sniglet:wght@400;800&display=swap" rel="stylesheet">
+  <script type="module" src="{% static 'js/auth.js' %}"></script>
 </head>
 <body>
   <!-- Navbar -->
@@ -31,7 +32,7 @@
       </ul>
     </nav>
     <div class="actions">
-      <a href="{% url 'register_signup' %}"><button class="register-btn">REGISTER</button></a>
+      <a href="{% url 'signup' %}"><button class="register-btn">REGISTER</button></a>
       <div class="menu-icon">&#9776;</div>
     </div>
   </header>
@@ -60,3 +61,5 @@
   <script src="{% static 'js/index.js' %}"></script>
 </body>
 </html>
+
+

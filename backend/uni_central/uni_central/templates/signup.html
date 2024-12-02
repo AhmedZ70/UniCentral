@@ -1,0 +1,84 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>UniCentral Signup</title>
+  <link rel="stylesheet" href="{% static 'css/signup.css' %}">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Corben:wght@400;700&family=Montserrat:ital,wght@0,100..900;1,100..900&family=Sigmar&family=Sniglet:wght@400;800&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/lucide@0.359.0/dist/umd/lucide.min.js"></script>
+</head>
+<body>
+  <main class="signup">
+    <section class="hero">
+      <div class="text-content">
+        <div class="logo-container">
+          <a href="{% url 'home' %}">
+            <img src="{% static 'assets/logo_no_slogan.png' %}" alt="UniCentral Logo">
+          </a>       
+        </div>
+        <div class="signup-box"> 
+            <h2>Sign up</h2>
+            <form class="signup-entry" id="signup-form">
+                <div>
+                    <div class="signup-box-labels">
+                        <label for="name">Name</label>
+                    </div>
+                    <input type="text" id="name" class="name-input" required>
+                </div>
+                <div>
+                    <div class="signup-box-labels">
+                        <label for="email">Email</label>
+                    </div>
+                    <input type="email" id="email" class="email-input" required>
+                </div>
+                <div>
+                    <div class="signup-box-labels">
+                        <label for="password">Password</label>
+                    </div>
+                    <div class="password-container">
+                        <input type="password" id="password" class="password-input" required>
+                        <button type="button" class="password-toggle" id="toggle-password">
+                            <i data-lucide="eye"></i>
+                        </button>
+                    </div>
+                </div>
+                <div>
+                    <div class="signup-box-labels">
+                        <label for="re-enter-password">Re-enter password</label>
+                    </div>
+                    <div class="password-container">
+                        <input type="password" id="re-enter-password" class="password-input" required>
+                        <button type="button" class="password-toggle" id="toggle-confirm-password">
+                            <i data-lucide="eye"></i>
+                        </button> 
+                    </div>
+                    <div class="password-error" id="password-error">Passwords do not match</div>
+                </div>
+                <div id="signup-error" class="error-message" style="display: none;"></div>                
+                <button type="submit" class="signup-btn">SIGN UP &#10140;</button>
+            </form>
+            <div>
+                <input type="checkbox" id="remember-me" name="remember-me">
+                <label for="remember-me">Remember me</label>
+            </div>
+            <div class="separator">
+                <hr>
+                <span>OR</span>
+                <hr>
+            </div>
+
+            <button type="button" class="google-signup-btn" id="google-signup">SIGN UP WITH GOOGLE</button>
+            
+            <div class="already-have-account">
+              <p>Already have an account? <a href="{% url 'login' %}">Sign in</a></p>            </div>
+        </div>
+      </div>
+    </section>
+  </main>
+</body>
+</html>

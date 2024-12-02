@@ -72,6 +72,19 @@ body {
   background-color: #007d7d;
 }
 
+.welcome-message {
+  color: #005a5b;
+  font-weight: bold;
+  margin-right: 1rem;
+  display: inline-block;
+  font-family: 'Montserrat', sans-serif;
+}
+
+.actions {
+  display: flex;
+  align-items: left;
+}
+
 .menu-icon {
   font-size: 1.5rem;
   margin-left: 1rem;

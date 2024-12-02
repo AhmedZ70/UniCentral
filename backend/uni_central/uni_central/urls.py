@@ -34,8 +34,8 @@ from .views import (
 
 urlpatterns = [
     path('', home, name='home'),  # Home page route (renders index.html)
-    path('signup/', signup_page, name='register_signup'),
-    path('login/', login_page, name='register_login'),
+    path('signup/', signup_page, name='signup'),
+    path('login/', login_page, name='login'),
     path('courses/', courses, name='courses'),  # Render courses.html (user-facing view)
     path('courses/<int:course_id>/', course_detail, name='course-detail'),  # New route for course detail page
     
