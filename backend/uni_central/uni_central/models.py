@@ -13,17 +13,19 @@ class User(models.Model):
         fname (CharField): The first name of the user.
         lname (CharField): The last name of the user.
     """
-
+    
     id = models.AutoField(primary_key=True)
     email_address = models.EmailField(max_length=255, unique=True)
     fname = models.CharField(max_length=100)
     lname = models.CharField(max_length=100)
+    courses = models.ManyToManyField('Course', related_name='students')
 
     class Meta:
         db_table = 'users'
 
     def __str__(self):
         return f"{self.fname} {self.lname} ({self.email_address})"
+
 
 
 ################
@@ -54,12 +56,15 @@ class Course(models.Model):
     avg_rating = models.FloatField(default=0)
     credits = models.PositiveIntegerField()
     semester = models.CharField(max_length=100, blank=True, null=True)
+    professors = models.ManyToManyField('Professor', related_name='courses')
 
     class Meta:
         db_table = 'courses'
 
     def __str__(self):
         return f"{self.title} ({self.subject} {self.number})"
+
+
 
 
 ###################
@@ -123,51 +128,51 @@ class Review(models.Model):
     A model to store reviews for courses and professors written by users.
 
     Attributes:
-        id (AutoField): The primary key of the review. Automatically generated.
-        user (ForeignKey): The user who created the review. References the `users` table.
-        course_subject (CharField): The subject of the course (e.g., 'CS'). Optional.
-        course_num (IntegerField): The course number (e.g., '101'). Optional.
-        course (ForeignKey): The course this review is about. References the `courses` table. Optional.
-        professor_fname (CharField): The first name of the professor. Optional.
-        professor (ForeignKey): The professor this review is about. References the `professors` table. Optional.
-        review (TextField): The content of the review provided by the user. Optional.
+        user (ForeignKey): The user who created the review.
+        course (ForeignKey): The course this review is about. Optional.
+        professor (ForeignKey): The professor this review is about. Optional.
+        review (TextField): The content of the review provided by the user.
+        rating (FloatField): The overall rating given by the user (out of 5).
+        difficulty (IntegerField): The difficulty level (out of 6).
+        estimated_hours (FloatField): Estimated weekly hours spent on the course.
+        grade (CharField): The grade received in the course (e.g., 'A', 'B', etc.).
+        would_take_again (BooleanField): Indicates if the user would take the course again.
+        for_credit (BooleanField): Indicates if the course was taken for credit.
+        mandatory_attendance (BooleanField): Indicates if attendance was mandatory.
+        required_course (BooleanField): Indicates if the course is required for the user's program.
+        is_gened (BooleanField): Indicates if the course is a general education requirement.
+        in_person (BooleanField): Indicates if the course was conducted in person.
+        online (BooleanField): Indicates if the course was conducted online.
+        hybrid (BooleanField): Indicates if the course was a hybrid format.
+        no_exams (BooleanField): Indicates if the course had no exams.
+        presentations (BooleanField): Indicates if the course involved presentations.
     """
-
+    
     id = models.AutoField(primary_key=True)
     user = models.ForeignKey('User', on_delete=models.CASCADE)
-    course_subject = models.CharField(max_length=100, blank=True, null=True)
-    course_num = models.IntegerField(blank=True, null=True)
-    course = models.ForeignKey('Course', on_delete=models.CASCADE, blank=True, null=True)
-    professor_fname = models.CharField(max_length=100, blank=True, null=True)
+    course = models.ForeignKey('Course', on_delete=models.CASCADE, related_name='reviews', blank=True, null=True)
     professor = models.ForeignKey('Professor', on_delete=models.CASCADE, blank=True, null=True)
     review = models.TextField(blank=True, null=True)
+    rating = models.FloatField(null=True, blank=True)
+    difficulty = models.IntegerField(null=True, blank=True)
+    estimated_hours = models.FloatField(null=True, blank=True)
+    grade = models.CharField(max_length=2, null=True, blank=True)
+    
+    # Boolean fields
+    would_take_again = models.BooleanField(default=False)
+    for_credit = models.BooleanField(default=False)
+    mandatory_attendance = models.BooleanField(default=False)
+    required_course = models.BooleanField(default=False)
+    is_gened = models.BooleanField(default=False)
+    in_person = models.BooleanField(default=False)
+    online = models.BooleanField(default=False)
+    hybrid = models.BooleanField(default=False)
+    no_exams = models.BooleanField(default=False)
+    presentations = models.BooleanField(default=False)
 
     class Meta:
         db_table = 'reviews'
 
     def __str__(self):
-        return f"Review by {self.user} for Course: {self.course} and Professor: {self.professor}"
-
-
-##########################
-# COURSE_PROFESSOR MODEL #
-##########################
-class CourseProfessor(models.Model):
-    """
-    A model representing the many-to-many relationship between courses and professors.
-
-    Attributes:
-        course (ForeignKey): The course in the relationship. References the `courses` table.
-        professor (ForeignKey): The professor in the relationship. References the `professors` table.
-    """
-
-    course = models.ForeignKey('Course', on_delete=models.CASCADE)
-    professor = models.ForeignKey('Professor', on_delete=models.CASCADE)
-
-    class Meta:
-        db_table = 'courses_professors'
-        # Ensure no duplicate relationships
-        unique_together = ('course', 'professor')
-
-    def __str__(self):
-        return f"{self.course.title} - {self.professor.fname} {self.professor.lname}"
+        course_name = self.course.title if self.course else "No Course"
+        return f"Review by {self.user.fname} for {course_name}"
