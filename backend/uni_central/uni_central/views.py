@@ -57,7 +57,7 @@ class CourseReviewsView(APIView):
         serializer = ReviewSerializer(reviews, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
-# API Views for Departments
+# Departments pages
 class DepartmentListCreateView(generics.ListCreateAPIView):
     queryset = Department.objects.all()
     serializer_class = DepartmentSerializer
@@ -66,21 +66,87 @@ class DepartmentDetailView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Department.objects.all()
     serializer_class = DepartmentSerializer
 
-# API Views for Courses
+# Course pages
 class CourseListCreateView(generics.ListCreateAPIView):
+    """
+    API View for returning course list view
+    """
     queryset = Course.objects.all()
     serializer_class = CourseSerializer
 
 class CourseDetailView(generics.RetrieveUpdateDestroyAPIView):
+    """
+    API View for returning course detail view
+    """
     queryset = Course.objects.all()
     serializer_class = CourseSerializer
 
-# API Views for Professors
+# Professor page
 class ProfessorListCreateView(generics.ListCreateAPIView):
+    """
+    API View for returning professor list view
+    """
     queryset = Professor.objects.all()
     serializer_class = ProfessorSerializer
 
-# API Views for Reviews
+# Review page
 class ReviewListCreateView(generics.ListCreateAPIView):
+    """
+    API View for returning review list view.
+    """
     queryset = Review.objects.all()
     serializer_class = ReviewSerializer
+
+# Course Filtering page
+class CourseFilteringCreateView(generics.ListAPIView):
+    """
+    API View for filtering courses based on query parameters.
+    """
+    queryset = Course.objects.all()
+    serializer_class = CourseSerializer
+
+    def get_queryset(self):
+        """
+        Dynamically filters courses based on query parameters.
+        """
+        queryset = super().get_queryset()
+        department_code = self.request.query_params.get('department', None)
+        min_number = self.request.query_params.get('min_number', None)
+        max_number = self.request.query_params.get('max_number', None)
+        title_contains = self.request.query_params.get('title', None)
+        min_difficulty = self.request.query_params.get('min_difficulty', None)
+        max_difficulty = self.request.query_params.get('max_difficulty', None)
+        min_rating = self.request.query_params.get('min_rating', None)
+        max_rating = self.request.query_params.get('max_rating', None)
+        credits = self.request.query_params.get('credits', None)
+        semester = self.request.query_params.get('semester', None)
+        professor_name = self.request.query_params.get('professor', None)
+
+        # Apply filters dynamically
+        if department_code:
+            queryset = queryset.filter(department__code__icontains=department_code)
+        if min_number:
+            queryset = queryset.filter(number__gte=min_number)
+        if max_number:
+            queryset = queryset.filter(number__lte=max_number)
+        if title_contains:
+            queryset = queryset.filter(title__icontains=title_contains)
+        if min_difficulty:
+            queryset = queryset.filter(avg_difficulty__gte=min_difficulty)
+        if max_difficulty:
+            queryset = queryset.filter(avg_difficulty__lte=max_difficulty)
+        if min_rating:
+            queryset = queryset.filter(avg_rating__gte=min_rating)
+        if max_rating:
+            queryset = queryset.filter(avg_rating__lte=max_rating)
+        if credits:
+            queryset = queryset.filter(credits=credits)
+        if semester:
+            queryset = queryset.filter(semester__icontains=semester)
+        if professor_name:
+            queryset = queryset.filter(
+                Q(professors__fname__icontains=professor_name) |
+                Q(professors__lname__icontains=professor_name)
+            )
+
+        return queryset
