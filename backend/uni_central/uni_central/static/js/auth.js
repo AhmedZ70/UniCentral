@@ -20,12 +20,14 @@ function handleAuthStateChange() {
   onAuthStateChanged(auth, (user) => {
     const actionsDiv = document.querySelector('.actions');
     const registerLinkAndBtn = document.querySelector('.actions a');
+    const welcomeMessage = document.querySelector('.welcome-message');
     const logoutBtn = document.querySelector('.logout-btn');
 
     if (user) {
       console.log('User is signed in:', user);
       if (registerLinkAndBtn && actionsDiv) {
         if (logoutBtn) {
+          logoutBtn
           logoutBtn.addEventListener('click', (event) => {
             event.preventDefault(); // Prevent default link behavior
             signOut(auth)
@@ -43,9 +45,21 @@ function handleAuthStateChange() {
         registerLinkAndBtn.replaceWith(welcomeText);
       }
     } else {
+      const loginLink = document.createElement('a');
+      const loginBtn = document.querySelector('.logout-btn');
       // User is signed out
       console.log('User is signed out');
-      const welcomeMessage = document.querySelector('.welcome-message');
+      // Initial home page state
+      if (!welcomeMessage && actionsDiv) {
+        loginLink.href = '/login/';
+        loginBtn.className = 'login-btn';
+        loginBtn.textContent = 'Log In';
+        loginBtn.addEventListener('click', () => {
+          window.location.href = '/login/';
+        });
+        actionsDiv.appendChild(loginLink);
+      }
+
       if (welcomeMessage && actionsDiv) {
         const registerLink = document.createElement('a');
         const registerBtn = document.createElement('button');
@@ -54,8 +68,7 @@ function handleAuthStateChange() {
         registerBtn.textContent = 'REGISTER';
         registerLink.appendChild(registerBtn);
         welcomeMessage.replaceWith(registerLink);
-        const loginLink = document.createElement('a');
-        const loginBtn = document.querySelector('.logout-btn');
+
         loginLink.href = '/login/';
         loginBtn.className = 'login-btn';
         loginBtn.textContent = 'Log In';
