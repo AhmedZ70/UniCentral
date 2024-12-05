@@ -3,7 +3,9 @@ from django.shortcuts import render, get_object_or_404
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.views import APIView
+from rest_framework.decorators import api_view
 from .models import Department, User, Course, Professor, Review
+from .services import UserService
 from .serializers import (
     DepartmentSerializer,
     UserSerializer,
@@ -56,6 +58,45 @@ class CourseReviewsView(APIView):
         reviews = Review.objects.filter(course=course)
         serializer = ReviewSerializer(reviews, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
+
+class CreateUserView(APIView):
+    # def post(self, request):
+    #     email_address = request.data.get("email_address")
+    #     fname = request.data.get("fname")
+    #     lname = request.data.get("lname")
+        
+    #     # Call the create_user method from UserService
+    #     user = UserService.create_user(email_address, fname, lname)
+
+    #     if user:
+    #         return Response({"message": "User created successfully."}, status=status.HTTP_201_CREATED)
+    #     else:
+    #         return Response({"message": "Email already exists."}, status=status.HTTP_400_BAD_REQUEST)
+        
+    @api_view(['POST'])
+    def create_user(request):
+        """
+        Endpoint to create a new user.
+        """
+        if request.method == 'POST':
+            # Retrieve user data from the request body
+            email = request.data.get('email')
+            fname = request.data.get('fname')
+            lname = request.data.get('lname')
+
+            # Validate that necessary fields are provided
+            if not email or not fname or not lname:
+                return Response({"error": "Missing required fields."}, status=status.HTTP_400_BAD_REQUEST)
+
+            # Create the user using the UserService
+            user = UserService.create_user(email, fname, lname)
+
+            if user:
+                serializer = UserSerializer(user)
+                return Response(serializer.data, status=status.HTTP_201_CREATED)
+            else:
+                return Response({"error": "Error creating user."}, status=status.HTTP_400_BAD_REQUEST)
+
 
 # Departments pages
 class DepartmentListCreateView(generics.ListCreateAPIView):

@@ -180,6 +180,30 @@ document.addEventListener('DOMContentLoaded', () => {
         alert('Account created successfully! Please check your email for verification.');
         window.location.href = '/'; 
 
+        // User creation for sqlite3
+        fetch('/api/create_user/', {
+            method: 'POST', // Use POST method
+            headers: {
+            'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                email: email,
+                fname: name,
+                lname: "Doe"
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.message === "User created successfully.") {
+            console.log("User created:", data);
+            } else {
+            console.log("Error:", data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+        });
+
     } catch (error) {
         console.error('Detailed error:', error); // More detailed error logging
         // Handle specific error cases
