@@ -13,27 +13,10 @@
   <link href="https://fonts.googleapis.com/css2?family=Corben:wght@400;700&family=Montserrat:ital,wght@0,100..900;1,100..900&family=Sigmar&family=Sniglet:wght@400;800&display=swap" rel="stylesheet">
 </head>
 <body>
-  <!-- Navbar -->
-  <header class="navbar">
-    <div class="logo">
-      <!-- Corrected image path using Django static template tag -->
-      <img src="{% static 'assets/logo_horizontal.png' %}" alt="UniCentral Logo">
-    </div>
-    <nav>
-      <ul class="nav-links">
-        <li><a href="{% url 'home' %}">Home</a></li>
-        <li><a href="{% url 'courses' %}" class="active">Courses</a></li>
-        <li><a href="#">Professors</a></li>
-        <li><a href="#">Course Filtering</a></li>
-        <li><a href="#">About</a></li>
-      </ul>
-    </nav>
-    <div class="actions">
-      <button class="register-btn">REGISTER</button>
-      <div class="menu-icon">&#9776;</div>
-    </div>
-  </header>
+  <!-- Include Navbar Partial -->
+  {% include 'partials/navbar.html' %}
 
+  <!-- Main Content -->
   <main class="main-content courses-page">
     <div class="courses-header">
       <h1>Courses @</h1>
