@@ -1,173 +1,192 @@
 body, html, ul, li, p, h1 {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-  }
-  
-body {
-  font-family: 'Montserrat', sans-serif;
-  line-height: 1.6;
-  background-color: #fdfbf5;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
 
 body {
-  min-height: 100vh;
-  margin: 0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  background-color: #fdfbf5;
+font-family: 'Montserrat', sans-serif;
+line-height: 1.6;
+background-color: #fdfbf5;
+}
+
+body {
+min-height: 100vh;
+margin: 0;
+display: flex;
+flex-direction: column;
+align-items: center;
+justify-content: center;
+background-color: #fdfbf5;
 }
 
 /* Center the main content */
 .register_login {
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
+width: 100%;
+display: flex;
+flex-direction: column;
+align-items: center;
+justify-content: center;
 }
 
 
 .hero {
-    display: flex;
-    flex-direction: column; /* Align items vertically in the hero section */
-    align-items: center; 
-    justify-content: center; 
-    height: 85vh;
-  }
-  
-  .logo-container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-  }
-  
-  .logo-container img {
-    width: 200px;
-    height: auto;
-  }
+  display: flex;
+  flex-direction: column; /* Align items vertically in the hero section */
+  align-items: center; 
+  justify-content: center; 
+  height: 85vh;
+}
+
+.logo-container {
+display: flex;
+justify-content: center;
+align-items: center;
+}
+
+.logo-container img {
+width: 200px;
+height: auto;
+}
 
 .signup-box {
-    border: 1px solid black; /* Black border */
-    padding: 20px;
-    border-radius: 5px 5px 5px 5px;
-    height: 595px;
-    width: 300px;
-    text-align: center;
-  }
-  
-  .signup-box-labels {
-    text-align: left;
-    color: gray;
-    font-size: 12px;
-  }
-  
-  .signup-entry div {
-    margin-bottom: 10px;
-  }
-  
-  .signup-entry label {
-    display: block;
-  }
-  
-  .signup-entry input {
-    width: 100%; /* Make text boxes longer (full width) */
-    padding: 0.5rem; /* Add some padding to the text boxes */
-    box-sizing: border-box; 
-    margin-top: -15px;
-  }
-  
-  .password-container {
-    position: relative;
-    width: 100%;
+border: 1px solid black; /* Black border */
+padding: 20px;
+border-radius: 5px 5px 5px 5px;
+height: 595px;
+width: 400px;
+text-align: center;
+}
+
+.signup-box-labels {
+text-align: left;
+margin-bottom: 10px;
+color: gray;
+font-size: 12px;
+}
+
+.signup-entry div {
+margin-bottom: 10px;
+}
+
+.signup-entry label {
+display: block;
+}
+
+.signup-entry input {
+width: 100%; 
+padding: 0.5rem; 
+box-sizing: border-box; 
+margin-top: -15px;
+}
+
+/* Align first and last name fields side by side */
+.name-fields {
+display: flex; 
+justify-content: space-between; 
+gap: 15px; 
+margin-bottom: 20px; 
+}
+
+/* Style the input fields to be equal width */
+.name-fields input {
+flex: 1; 
+padding: 0.5rem;
+font-size: 16px;
+border: 1px solid rgb(124, 124, 124);
+border-radius: 3px;
+box-sizing: border-box;
+}
+
+.password-container {
+  position: relative;
+  width: 100%;
 }
 
 .password-container input {
-    width: 100%;
-    padding: 0.5rem;
-    padding-right: 40px; /* Make room for the icon */
-    box-sizing: border-box;
+  width: 100%;
+  padding: 0.5rem;
+  padding-right: 40px; /* Make room for the icon */
+  box-sizing: border-box;
 }
 
 .password-toggle {
-    position: absolute;
-    right: 10px;
-    top: 50%;
-    transform: translateY(-50%);
-    background: none;
-    border: none;
-    cursor: pointer;
-    padding: 0;
-    display: flex;
-    align-items: center;
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  display: flex;
+  align-items: center;
 }
 
 .password-toggle i {
-    width: 20px;
-    height: 20px;
-    color: #666; /* You can adjust this color */
+  width: 20px;
+  height: 20px;
+  color: #666; /* You can adjust this color */
 }
 
 /* Optional: Add hover effect */
 .password-toggle:hover i {
-    color: #333;
+  color: #333;
 }
-  
+
 .password-error {
-  color: red;
-  font-size: 12px;
-  display: none;
+color: red;
+font-size: 12px;
+display: none;
 }
 
 .signup-btn {
-  background-color: #005a5b;
-  color: #fdfbf5;
-  border: none;
-  width: 100%;
-  padding: 0.5rem 1rem;
-  border-radius: 5px 5px 5px 5px;
-  cursor: pointer;
-  font-weight: bold;
-  margin-top: 10px;
-  margin-bottom: 20px;
+background-color: #005a5b;
+color: #fdfbf5;
+border: none;
+width: 100%;
+padding: 0.5rem 1rem;
+border-radius: 5px 5px 5px 5px;
+cursor: pointer;
+font-weight: bold;
+margin-top: 10px;
+margin-bottom: 20px;
 }
 
 .google-signup-btn {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 100%;
-  padding: 0.5rem 1rem;
-  border: 1px solid #005a5b;
-  border-radius: 5px;
-  background-color: transparent;
-  color: #005a5b;
-  font-size: 14px;
-  cursor: pointer;
-  margin-top: 15px;
-  position: relative;
+display: flex;
+align-items: center;
+justify-content: center;
+width: 100%;
+padding: 0.5rem 1rem;
+border: 1px solid #005a5b;
+border-radius: 5px;
+background-color: transparent;
+color: #005a5b;
+font-size: 14px;
+cursor: pointer;
+margin-top: 15px;
+position: relative;
 }
 
 .google-signup-btn img {
-  width: 18px;
-  height: 18px;
-  position: absolute; 
-  left: 10px; 
-  top: 50%; 
-  transform: translateY(-50%);
+width: 18px;
+height: 18px;
+position: absolute; 
+left: 10px; 
+top: 50%; 
+transform: translateY(-50%);
 }
 
 .already-have-account {
-  margin-top: 20px;
-  margin-bottom: 20px;
-  text-align: center;
+margin-top: 20px;
+margin-bottom: 20px;
+text-align: center;
 }
 
 .error-message {
-  font-size: 12px; /* Adjust this value as needed */
-  color: red;
-  margin-top: 5px;
-  margin-bottom: 5px;
+font-size: 12px; /* Adjust this value as needed */
+color: red;
+margin-top: 5px;
+margin-bottom: 0px;
 }
