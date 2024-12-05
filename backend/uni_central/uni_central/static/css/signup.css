@@ -115,9 +115,15 @@ body {
     color: #333;
 }
   
+.password-error {
+  color: red;
+  font-size: 12px;
+  display: none;
+}
+
 .signup-btn {
   background-color: #005a5b;
-  color: white;
+  color: #fdfbf5;
   border: none;
   width: 100%;
   padding: 0.5rem 1rem;
@@ -129,14 +135,28 @@ body {
 }
 
 .google-signup-btn {
-  color: #005a5b;
-  border: 1px solid #005a5b;
-  background-color: transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   width: 100%;
   padding: 0.5rem 1rem;
-  border-radius: 5px 5px 5px 5px;
-  margin-top: 15px;
+  border: 1px solid #005a5b;
+  border-radius: 5px;
+  background-color: transparent;
+  color: #005a5b;
+  font-size: 14px;
   cursor: pointer;
+  margin-top: 15px;
+  position: relative;
+}
+
+.google-signup-btn img {
+  width: 18px;
+  height: 18px;
+  position: absolute; 
+  left: 10px; 
+  top: 50%; 
+  transform: translateY(-50%);
 }
 
 .already-have-account {

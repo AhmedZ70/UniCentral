@@ -13,6 +13,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Corben:wght@400;700&family=Montserrat:ital,wght@0,100..900;1,100..900&family=Sigmar&family=Sniglet:wght@400;800&display=swap" rel="stylesheet">
+  <script type="module" src="{% static 'js/auth.js' %}"></script>
 </head>
 <body>
   <!-- Navbar -->
@@ -31,8 +32,39 @@
       </ul>
     </nav>
     <div class="actions">
-      <a href="{% url 'register_signup' %}"><button class="register-btn">REGISTER</button></a>
-      <div class="menu-icon">&#9776;</div>
+      <a href="{% url 'signup' %}"><button class="register-btn">REGISTER</button></a>
+      <div class="dropdown-menu">
+        <button class="dropdown-menu-btn">&#9776;</button>
+        <div class="dropdown-menu-content">
+          <div class="icons">
+            <img src="{% static 'assets/my_account_icon.png' %}" alt="UniCentral Logo">
+            <a href="#">My Account</a>
+          </div>
+          <div class="icons">
+            <img src="{% static 'assets/my_courses_icon.png' %}" alt="UniCentral Logo">
+            <a href="#">My Courses</a>
+          </div>
+          <div class="icons">
+            <img src="{% static 'assets/my_professors_icon.png' %}" alt="UniCentral Logo">
+            <a href="#">My Professors</a>
+          </div>
+          <div class="icons">
+            <img src="{% static 'assets/my_reviews_icon.png' %}" alt="UniCentral Logo">
+            <a href="#">My Reviews</a>
+          </div>
+          <div class="icons">
+            <img src="{% static 'assets/course_planner_icon.png' %}" alt="UniCentral Logo">
+            <a href="#">Course Planner</a>
+          </div>
+          <div class="separator">
+            <hr>
+            <button class="logout-btn">Log Out</button>
+            <hr>
+          </div>
+          <li><a href="#">Privacy Policy</a></li>
+          <li><a href="#">Help & Feedback</a></li>
+        </div>
+      </div>
     </div>
   </header>
 
@@ -65,3 +97,5 @@
   <script src="{% static 'js/index.js' %}"></script>
 </body>
 </html>
+
+
