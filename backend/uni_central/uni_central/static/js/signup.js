@@ -2,7 +2,9 @@ import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.8.0/firebas
 import { 
     getAuth, 
     createUserWithEmailAndPassword,
-    updateProfile 
+    updateProfile,
+    GoogleAuthProvider,
+    signInWithPopup 
 } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js';
 
 // Firebase configuration
@@ -19,26 +21,75 @@ const firebaseConfig = {
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
+const provider = new GoogleAuthProvider();
 
 // Wait for DOM to be fully loaded
 document.addEventListener('DOMContentLoaded', () => {
     console.log('DOM Content Loaded'); // Debug log
 
-    // Initialize Lucide icons
     lucide.createIcons();
 
-    // Get form elements
     const form = document.getElementById('signup-form');
     const passwordInput = document.getElementById('password');
     const confirmPasswordInput = document.getElementById('re-enter-password');
     const togglePassword = document.getElementById('toggle-password');
     const toggleConfirmPassword = document.getElementById('toggle-confirm-password');
-    const passwordError = document.getElementById('password-error');
+    const passwordError = document.getElementById('password-error');    
+    const googleSignUpBtn = document.getElementById('google-signup');
+
+    if (googleSignUpBtn) {
+        console.log('Google sign up button found'); // Debug log
+        
+        googleSignUpBtn.addEventListener('click', async () => {
+            console.log('Google sign up button clicked'); // Debug log
+            
+            const originalText = googleSignUpBtn.textContent;
+            
+            try {
+                // Disable button and show loading state
+                googleSignUpBtn.disabled = true;
+                googleSignUpBtn.textContent = 'Signing in...';
+                
+                const result = await signInWithPopup(auth, provider);
+                const user = result.user;
+                console.log('Google sign in successful:', user);
+                
+                alert('Successfully signed in with Google!');
+                window.location.href = '/';
+                
+            } catch (error) {
+                console.error('Google sign in error:', error);
+                const signupError = document.getElementById('signup-error');
+                
+                switch (error.code) {
+                    case 'auth/popup-blocked':
+                        signupError.textContent = 'Please allow popups for this website';
+                        break;
+                    case 'auth/popup-closed-by-user':
+                        signupError.textContent = 'Sign in was cancelled';
+                        break;
+                    case 'auth/account-exists-with-different-credential':
+                        signupError.textContent = 'An account already exists with this email';
+                        break;
+                    default:
+                        signupError.textContent = 'Error signing in with Google. Please try again.';
+                }
+                signupError.style.display = 'block';
+            } finally {
+                // Reset button state
+                googleSignUpBtn.disabled = false;
+                googleSignUpBtn.textContent = originalText;
+            }
+        });
+    } else {
+        console.error('Google sign up button not found'); // Debug log
+    }
 
     // Check if all elements exist
     if (!form || !passwordInput || !confirmPasswordInput || !togglePassword || !toggleConfirmPassword) {
     console.error('One or more elements not found');
     return;
+    
     }
 
     // Password visibility toggle function
@@ -64,13 +115,23 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Check if passwords match
     function checkPasswords() {
-    if (passwordInput.value !== confirmPasswordInput.value) {
-        passwordError.style.display = 'block';
-        return false;
+        // Only check and show error if the first password field has content
+        if (passwordInput.value.length > 0) {
+            if (passwordInput.value !== confirmPasswordInput.value) {
+                passwordError.style.display = 'block';
+                return false;
+            }
+            passwordError.style.display = 'none';
+            return true;
+        }
+        // If first password is empty, hide error and return true
+        passwordError.style.display = 'none';
+        return true;
     }
-    passwordError.style.display = 'none';
-    return true;
-    }
+
+    // Add input listeners for both password fields
+    passwordInput.addEventListener('input', checkPasswords);
+    confirmPasswordInput.addEventListener('input', checkPasswords);
 
     // Add input listener for password confirmation
     confirmPasswordInput.addEventListener('input', checkPasswords);

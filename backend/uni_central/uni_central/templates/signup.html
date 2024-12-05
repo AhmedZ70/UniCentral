@@ -11,6 +11,9 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Corben:wght@400;700&family=Montserrat:ital,wght@0,100..900;1,100..900&family=Sigmar&family=Sniglet:wght@400;800&display=swap" rel="stylesheet">
   <script src="https://unpkg.com/lucide@0.359.0/dist/umd/lucide.min.js"></script>
+  <script type="module" src="{% static 'js/signup.js' %}"></script>
+  <script src="{% static 'js/dropdown.js' %}"></script>
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
 </head>
 <body>
   <main class="signup">
@@ -57,7 +60,7 @@
                             <i data-lucide="eye"></i>
                         </button> 
                     </div>
-                    <div class="password-error" id="password-error">Passwords do not match</div>
+                    <div class="error-message" id="password-error" style="display: none;">Passwords do not match</div>
                 </div>
                 <div id="signup-error" class="error-message" style="display: none;"></div>                
                 <button type="submit" class="signup-btn">SIGN UP &#10140;</button>
@@ -72,7 +75,10 @@
                 <hr>
             </div>
 
-            <button type="button" class="google-signup-btn" id="google-signup">SIGN UP WITH GOOGLE</button>
+            <button type="button" class="google-signup-btn" id="google-signup">
+                <img src="{% static 'assets/google_icon.png' %}" alt="Google">
+                SIGN UP WITH GOOGLE
+            </button>
             
             <div class="already-have-account">
               <p>Already have an account? <a href="{% url 'login' %}">Sign in</a></p>            </div>

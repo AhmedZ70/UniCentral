@@ -85,9 +85,72 @@ body {
   align-items: left;
 }
 
-.menu-icon {
-  font-size: 1.5rem;
+.dropdown-menu {
+  position: relative;
+  font-size: 16px;
   margin-left: 1rem;
+  cursor: pointer;
+  border-color: black;
+  border-width: 5px;
+  width: 50px;
+  height: 80px;
+}
+
+.dropdown-menu-btn {
+  color: black;
+  background-color: #FAF8F0;
+  padding: none;
+  margin-top: 16px;
+  font-size: 35px;
+  border: none;
+}
+
+.dropdown-menu-content {
+  position: absolute;
+  font-size: 23px;
+  margin-left: 10px;
+  background-color: #f1f1f1;
+  min-width: 250px;
+  min-height: 350px;
+  box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.2);
+  z-index: 100;
+  top: 100%;
+  right: 0;
+  list-style: none; 
+  padding: 10px 20px;
+  font-weight: bold;
+}
+
+/* Links inside the dropdown */
+.dropdown-menu-content a {
+  display: block;
+  text-decoration: none;
+  color: black;
+}
+
+/* Change color of dropdown links on hover */
+.dropdown-menu-content a:hover {
+  background-color: #333333;
+}
+
+.dropdown-menu-btn:hover + .dropdown-menu-content {
+  display: block;
+}
+
+/* Change the background color of the dropdown button when the dropdown content is shown */
+.dropdown-menu:hover .dropdown-menu-btn {
+  background-color: #005a5b;
+  color: white;
+}
+
+.logout-btn {
+  color: black;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 23px;
+  font-weight: bold;
   cursor: pointer;
 }
 

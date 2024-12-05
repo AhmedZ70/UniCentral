@@ -18,11 +18,11 @@ def home(request):
 
 # Render Signup Page
 def signup_page(request):
-    return render(request, 'register_signup.html')
+    return render(request, 'signup.html')
 
 # Render Login Page
 def login_page(request):
-    return render(request, 'register_login.html')
+    return render(request, 'login.html')
 
 # Render Courses Page
 def courses(request):

@@ -33,7 +33,24 @@
     </nav>
     <div class="actions">
       <a href="{% url 'signup' %}"><button class="register-btn">REGISTER</button></a>
-      <div class="menu-icon">&#9776;</div>
+      <div class="dropdown-menu">
+        <button class="dropdown-menu-btn">&#9776;</button>
+        <div class="dropdown-menu-content">
+          <li><a href="#">My Account</a></li>
+          <li><a href="#">My Courses</a></li>
+          <li><a href="#">My Professors</a></li>
+          <li><a href="#">My Classmates</a></li>
+          <li><a href="#">My Ratings</a></li>
+          <li><a href="#">Course Planner</a></li>
+          <div class="separator">
+            <hr>
+            <button class="logout-btn">Log Out</button>
+            <hr>
+          </div>
+          <li><a href="#">Privacy Policy</a></li>
+          <li><a href="#">Help & Feedback</a></li>
+        </div>
+      </div>
     </div>
   </header>
 

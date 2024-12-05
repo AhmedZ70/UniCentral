@@ -25,6 +25,19 @@ function handleAuthStateChange() {
       // User is signed in
       console.log('User is signed in:', user);
       if (registerLinkAndBtn && actionsDiv) {
+        const logoutBtn = document.querySelector('.logout-btn');
+        if (logoutBtn) {
+          logoutBtn.addEventListener('click', (event) => {
+            event.preventDefault(); // Prevent default link behavior
+            signOut(auth)
+              .then(() => {
+                console.log('User signed out successfully');
+              })
+              .catch((error) => {
+                console.error('Error signing out:', error);
+              });
+          });
+        }
         const welcomeText = document.createElement('div');
         welcomeText.className = 'welcome-message';
         welcomeText.textContent = `Welcome, ${user.displayName || user.email}`;
@@ -36,12 +49,17 @@ function handleAuthStateChange() {
       const welcomeMessage = document.querySelector('.welcome-message');
       if (welcomeMessage && actionsDiv) {
         const registerLink = document.createElement('a');
-        registerLink.href = '/register_signup/';
         const registerBtn = document.createElement('button');
+        registerLink.href = '/signup/';
         registerBtn.className = 'register-btn';
         registerBtn.textContent = 'REGISTER';
         registerLink.appendChild(registerBtn);
         welcomeMessage.replaceWith(registerLink);
+        const loginLink = document.createElement('a');
+        const loginBtn = document.createElement('button');
+        loginBtn.className = 'login-btn';
+        logoutBtn.textContent = 'Log In';
+        loginLink.href = '/login/';
       }
     }
   });
