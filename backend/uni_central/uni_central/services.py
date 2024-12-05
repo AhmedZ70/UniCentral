@@ -48,8 +48,8 @@ class UserService:
                 lname=lname
             )
             return user
-        except IntegrityError:
-            # Handle case where the email address already exists
+        except Exception as e:
+            print(f"Error creating user: {e}")
             return None
 
     @staticmethod
