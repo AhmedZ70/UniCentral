@@ -109,6 +109,7 @@ body {
   position: absolute;
   font-size: 23px;
   margin-left: 10px;
+  border-color: black;
   background-color: #f1f1f1;
   min-width: 250px;
   min-height: 350px;
@@ -130,7 +131,7 @@ body {
 
 /* Change color of dropdown links on hover */
 .dropdown-menu-content a:hover {
-  background-color: #333333;
+  color:#333333;
 }
 
 .dropdown-menu-btn:hover + .dropdown-menu-content {
@@ -143,7 +144,39 @@ body {
   color: white;
 }
 
+.dropdown-menu.active .dropdown-menu-content {
+  display: block;
+}
+
+.icons {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 15px;
+}
+
+.icons img {
+  width: 35px;
+}
+
+.icons a {
+  text-decoration: none;
+  color: black;
+  font-weight: bold;
+}
+
 .logout-btn {
+  color: black;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 23px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.login-btn {
   color: black;
   border: none;
   padding: 0.5rem 1rem;

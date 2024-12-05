@@ -1,5 +1,5 @@
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js';
-import { getAuth, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js';
+import { getAuth, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js';
 
 const firebaseConfig = {
   apiKey: "AIzaSyD0wF4R9GdY2m7eAwVL_j_mihLit4rRZ5Q",
@@ -11,7 +11,6 @@ const firebaseConfig = {
   measurementId: "G-M4L04508RH"
 };
 
-// Initialize Firebase
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 
@@ -20,7 +19,7 @@ function handleAuthStateChange() {
   onAuthStateChanged(auth, (user) => {
     const actionsDiv = document.querySelector('.actions');
     const registerLinkAndBtn = document.querySelector('.actions a');
-    
+
     if (user) {
       // User is signed in
       console.log('User is signed in:', user);
@@ -56,10 +55,14 @@ function handleAuthStateChange() {
         registerLink.appendChild(registerBtn);
         welcomeMessage.replaceWith(registerLink);
         const loginLink = document.createElement('a');
-        const loginBtn = document.createElement('button');
-        loginBtn.className = 'login-btn';
-        logoutBtn.textContent = 'Log In';
+        const loginBtn = document.querySelector('.logout-btn');
         loginLink.href = '/login/';
+        loginBtn.className = 'login-btn';
+        loginBtn.textContent = 'Log In';
+        loginBtn.addEventListener('click', () => {
+          window.location.href = '/login/';
+        });
+        actionsDiv.appendChild(loginLink);
       }
     }
   });
