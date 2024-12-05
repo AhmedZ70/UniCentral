@@ -1,4 +1,4 @@
-{% load static %} 
+{% load static %}
 
 <!DOCTYPE html>
 <html lang="en">
@@ -6,17 +6,14 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Courses - UniCentral</title>
-  <!-- Corrected CSS path using Django static template tag -->
   <link rel="stylesheet" href="{% static 'css/style.css' %}">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Corben:wght@400;700&family=Montserrat:ital,wght@0,100..900;1,100..900&family=Sigmar&family=Sniglet:wght@400;800&display=swap" rel="stylesheet">
 </head>
 <body>
-  <!-- Include Navbar Partial -->
   {% include 'partials/navbar.html' %}
 
-  <!-- Main Content -->
   <main class="main-content courses-page">
     <div class="courses-header">
       <h1>Courses @</h1>
@@ -27,20 +24,20 @@
       </select>
     </div>
   
-    <h2>Departments</h2>
+    <h2 id="departments-title">Departments</h2>
     <div class="departments" id="departments">
-      <!-- Dynamic content will be loaded here via JavaScript -->
       <p class="loading-message">Loading departments...</p>
     </div>
 
-    <h2>Courses</h2>
+    <!-- Breadcrumb container -->
+    <div id="breadcrumb">Departments</div>
+
+    <h2 id="courses-title">Courses</h2>
     <div class="courses" id="courses">
-      <!-- Dynamic content for courses will be loaded here -->
       <p class="loading-message">Select a department to view its courses.</p>
     </div>
   </main>
 
-  <!-- Corrected JavaScript path using Django static template tag -->
   <script src="{% static 'js/courses.js' %}"></script>
 </body>
 </html>

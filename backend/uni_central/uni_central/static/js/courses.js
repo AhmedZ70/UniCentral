@@ -1,109 +1,134 @@
 document.addEventListener("DOMContentLoaded", () => {
     const departmentsApiUrl = "/api/departments/";
     const departmentsContainer = document.getElementById("departments");
+    const coursesContainer = document.getElementById("courses");
+    const breadcrumbContainer = document.getElementById("breadcrumb");
 
-    // Fetch and display departments
+    // Set initial visibility
+    departmentsContainer.classList.add("visible");
+    coursesContainer.classList.add("hidden");
+
+    // Fetch departments
     fetch(departmentsApiUrl)
-        .then(response => {
-            if (!response.ok) {
-                throw new Error("Network response was not ok");
-            }
-            return response.json();
-        })
-        .then(data => {
-            departmentsContainer.innerHTML = "";
-
-            if (data.length === 0) {
-                departmentsContainer.innerHTML = "<p>No departments available.</p>";
-            } else {
-                // Sort and group departments alphabetically
-                const sortedDepartments = data.sort((a, b) => a.name.localeCompare(b.name));
-                const groupedDepartments = sortedDepartments.reduce((groups, department) => {
-                    const firstLetter = department.name.charAt(0).toUpperCase();
-                    if (!groups[firstLetter]) {
-                        groups[firstLetter] = [];
-                    }
-                    groups[firstLetter].push(department);
-                    return groups;
-                }, {});
-
-                // Render the grouped departments
-                for (const [letter, departments] of Object.entries(groupedDepartments)) {
-                    // Letter Header
-                    const letterGroup = document.createElement("div");
-                    letterGroup.classList.add("letter-group");
-
-                    const letterHeader = document.createElement("h3");
-                    letterHeader.classList.add("letter-header");
-                    letterHeader.textContent = letter;
-
-                    // Departments Container
-                    const departmentContainer = document.createElement("div");
-                    departmentContainer.classList.add("department-container");
-
-                    // Add departments under the letter
-                    departments.forEach(department => {
-                        const departmentLink = document.createElement("a");
-                        departmentLink.href = "#";
-                        departmentLink.classList.add("department-link");
-
-                        const departmentDiv = document.createElement("div");
-                        departmentDiv.classList.add("department");
-                        departmentDiv.textContent = department.name;
-
-                        departmentLink.appendChild(departmentDiv);
-                        departmentContainer.appendChild(departmentLink);
-                    });
-
-                    // Append the letter header and departments
-                    letterGroup.appendChild(letterHeader);
-                    letterGroup.appendChild(departmentContainer);
-                    departmentsContainer.appendChild(letterGroup);
-                }
-            }
-        })
-        .catch(error => {
+        .then((response) => response.json())
+        .then((data) => renderDepartments(data))
+        .catch((error) => {
             console.error("Error fetching departments:", error);
-            departmentsContainer.innerHTML = "<p>Failed to load departments. Please try again later.</p>";
+            departmentsContainer.innerHTML =
+                "<p>Failed to load departments. Please try again later.</p>";
         });
 
-    // Fetch and display courses for a specific department
-    function fetchCoursesForDepartment(departmentId) {
-        const coursesApiUrl = `/api/departments/${departmentId}/courses/`;
+    function renderDepartments(departments) {
+        if (!departments || departments.length === 0) {
+            departmentsContainer.innerHTML = "<p>No departments available.</p>";
+            return;
+        }
 
-        fetch(coursesApiUrl)
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error("Network response was not ok");
-                }
-                return response.json();
-            })
-            .then(courses => {
-                coursesContainer.innerHTML = "";
+        departmentsContainer.innerHTML = "";
+        const sortedDepts = departments.sort((a, b) =>
+            a.name.localeCompare(b.name)
+        );
+        const grouped = sortedDepts.reduce((acc, dept) => {
+            const letter = dept.name.charAt(0).toUpperCase();
+            acc[letter] = acc[letter] || [];
+            acc[letter].push(dept);
+            return acc;
+        }, {});
 
-                if (courses.length === 0) {
-                    coursesContainer.innerHTML = "<p>No courses available for this department.</p>";
-                } else {
-                    courses.forEach(course => {
-                        const courseLink = document.createElement("a");
-                        courseLink.href = `/courses/${course.id}/`;
-                        courseLink.classList.add("course-link");
+        for (const [letter, depts] of Object.entries(grouped)) {
+            const letterGroup = document.createElement("div");
+            letterGroup.classList.add("letter-group");
 
-                        const courseDiv = document.createElement("div");
-                        courseDiv.classList.add("course-item");
-                        courseDiv.innerHTML = `
-                            <h4>${course.title}</h4>
-                            <p>Subject: ${course.subject} ${course.number}</p>
-                        `;
+            // Add the letter header
+            const letterHeader = document.createElement("h3");
+            letterHeader.classList.add("letter-header");
+            letterHeader.textContent = letter;
+            letterGroup.appendChild(letterHeader);
 
-                        courseLink.appendChild(courseDiv);
-                        coursesContainer.appendChild(courseLink);
-                    });
-                }
-            })
-            .catch(error => {
-                console.error("There was an error fetching the courses:", error);
-                coursesContainer.innerHTML = "<p>Failed to load courses. Please try again later.</p>";
+            const deptContainer = document.createElement("div");
+            deptContainer.classList.add("department-container");
+
+            depts.forEach((dept) => {
+                const link = document.createElement("a");
+                link.href = "#";
+                link.classList.add("department-link");
+
+                link.addEventListener("click", (e) => {
+                    e.preventDefault();
+                    showCourses(dept.id, dept.name);
+                });
+
+                const deptDiv = document.createElement("div");
+                deptDiv.classList.add("department");
+                deptDiv.textContent = dept.name; // Only this shows the name inside the card.
+
+                link.appendChild(deptDiv);
+                deptContainer.appendChild(link);
             });
+
+            letterGroup.appendChild(deptContainer);
+            departmentsContainer.appendChild(letterGroup);
+        }
+    }
+
+    function showCourses(departmentId, departmentName) {
+        const coursesApiUrl = `/api/departments/${departmentId}/courses/`;
+        fetch(coursesApiUrl)
+            .then((resp) => resp.json())
+            .then((courses) => {
+                renderCourses(courses, departmentName);
+            })
+            .catch((err) => {
+                console.error("Error fetching courses:", err);
+                coursesContainer.innerHTML = "<p>Failed to load courses.</p>";
+            });
+    }
+
+    function renderCourses(courses, departmentName) {
+        breadcrumbContainer.innerHTML = `<a href="#" id="show-departments" class="breadcrumb-link">Departments</a> / ${departmentName}`;
+        coursesContainer.innerHTML = "";
+
+        if (!courses || courses.length === 0) {
+            coursesContainer.innerHTML =
+                "<p>No courses available for this department.</p>";
+        } else {
+            courses.forEach((course) => {
+                const courseLink = document.createElement("a");
+                courseLink.href = `/courses/${course.id}/`;
+                courseLink.classList.add("course-link");
+
+                const courseDiv = document.createElement("div");
+                courseDiv.classList.add("course-item");
+                courseDiv.innerHTML = `
+                    <h4>${course.title}</h4>
+                    <p>Subject: ${course.subject} ${course.number}</p>
+                `;
+                courseLink.appendChild(courseDiv);
+                coursesContainer.appendChild(courseLink);
+            });
+        }
+
+        // Show courses, hide departments
+        departmentsContainer.classList.remove("visible");
+        departmentsContainer.classList.add("hidden");
+        coursesContainer.classList.remove("hidden");
+        coursesContainer.classList.add("visible");
+
+        const showDeptsLink = document.getElementById("show-departments");
+        showDeptsLink.addEventListener("click", (e) => {
+            e.preventDefault();
+            showDepartmentsView();
+        });
+    }
+
+    function showDepartmentsView() {
+        // Update breadcrumb
+        breadcrumbContainer.textContent = "Departments";
+
+        // Show departments, hide courses
+        coursesContainer.classList.remove("visible");
+        coursesContainer.classList.add("hidden");
+        departmentsContainer.classList.remove("hidden");
+        departmentsContainer.classList.add("visible");
     }
 });
