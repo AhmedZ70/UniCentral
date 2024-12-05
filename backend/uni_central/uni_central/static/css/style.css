@@ -1,4 +1,6 @@
-/* General Reset */
+/* ============================================= */
+/* General                                       */
+/* ============================================= */
 body, html, ul, li, p, h1, h2, select {
   margin: 0;
   padding: 0;
@@ -11,7 +13,9 @@ body {
   background-color: #FAF8F0;
 }
 
-/* Navbar Styles */
+/* ============================================= */
+/* Navbar Styles                                  */
+/* ============================================= */
 .navbar {
   display: flex;
   justify-content: space-between;
@@ -86,7 +90,9 @@ body {
   align-items: left;
 }
 
-/* Styling for Dropdown Menu */
+/* ============================================= */
+/* Dropdown Menu Styles                           */
+/* ============================================= */
 .dropdown-menu {
   position: relative;
   font-size: 16px;
@@ -138,31 +144,30 @@ body {
   color: #313131;
 }
 
-/* Links inside the dropdown */
+/* ============================================= */
+/* Links Inside the Dropdown                     */
+/* ============================================= */
 .dropdown-menu-content a {
   display: block;
   text-decoration: none;
   color: black;
 }
 
-/* Change color of dropdown links on hover */
 .dropdown-menu-content a:hover {
-  color:#3c3c3c;
+  color: #3c3c3c;
 }
 
 .dropdown-menu-btn:hover + .dropdown-menu-content {
   display: block;
 }
 
-/* Change the background color of the dropdown button when the dropdown content is shown */
 .dropdown-menu:hover .dropdown-menu-btn {
   color: #3c3c3c;
 }
 
-.dropdown-menu.active .dropdown-menu-content {
-  display: block;
-}
-
+/* ============================================= */
+/* Icon Styles                                    */
+/* ============================================= */
 .icons {
   display: flex;
   align-items: center;
@@ -180,7 +185,10 @@ body {
   font-weight: bold;
 }
 
-.logout-btn {
+/* ============================================= */
+/* Button Styles                                  */
+/* ============================================= */
+.logout-btn, .login-btn {
   color: black;
   border: none;
   padding: 0.5rem 1rem;
@@ -191,26 +199,13 @@ body {
   cursor: pointer;
 }
 
-.logout-btn:hover {
+.logout-btn:hover, .login-btn:hover {
   color: #3c3c3c;
 }
 
-.login-btn {
-  color: black;
-  border: none;
-  padding: 0.5rem 1rem;
-  border-radius: 20px;
-  font-family: 'Montserrat', sans-serif;
-  font-size: 23px;
-  font-weight: bold;
-  cursor: pointer;
-}
-
-.login-btn:hover {
-  color: #3c3c3c;
-}
-
-/* Hero Section (index page specific) */
+/* ============================================= */
+/* Hero Section                                   */
+/* ============================================= */
 .hero {
   display: flex;
   justify-content: space-between;
@@ -234,7 +229,9 @@ body {
   color: #3c3c3c;
 }
 
-/* Search Bar */
+/* ============================================= */
+/* Search Bar                                     */
+/* ============================================= */
 .search-bar {
   display: flex;
   align-items: center;
@@ -270,13 +267,17 @@ body {
   background-color: #007d7d;
 }
 
-/* Illustration */
+/* ============================================= */
+/* Illustration Section                           */
+/* ============================================= */
 .illustrations img {
   width: 500px;
   height: auto;
 }
 
-/* Orange Bar */
+/* ============================================= */
+/* Orange Bar                                     */
+/* ============================================= */
 .orange-bar {
   position: relative;
   width: 100%;
@@ -285,54 +286,118 @@ body {
   margin-top: 1rem;
   z-index: 1;
 }
-/* Active Link Styling */
+
+/* ============================================= */
+/* Active Link Styling                            */
+/* ============================================= */
 .nav-links a.active {
-  color: #005a5b; /* Highlighted color for the active page */
+  color: #005a5b;
   font-weight: bold;
   position: relative;
 }
 
-/* Underline Effect */
 .nav-links a.active::after {
   content: "";
   display: block;
   width: 100%;
   height: 2px;
-  background-color: #005a5b; /* Match the highlighted color */
+  background-color: #005a5b;
   margin-top: 5px;
 }
 
-/* Courses Page Specific Styles */
+/* ============================================= */
+/* Courses Page Styles                            */
+/* ============================================= */
+
+/* Header Styles */
+.courses-header {
+  display: flex;
+  justify-content: center;
+  align-items: baseline;
+  gap: 10px;
+  margin-top: 2rem;
+}
+
+.courses-header h1 {
+  font-size: 2.5rem;
+  color: #fa743e;
+  margin: 0;
+  line-height: 1;
+}
+
+.university-select {
+  padding: 0.5rem 1rem;
+  font-size: 1rem;
+  border: 2px solid #fa743e;
+  border-radius: 5px;
+  max-width: 300px;
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* Section Headers */
 .courses-page h1 {
   font-size: 2.5rem;
   color: #fa743e;
   margin-bottom: 1rem;
 }
 
-.courses-page select {
-  padding: 10px;
-  border: 2px solid #fa743e;
-  border-radius: 5px;
-  font-size: 16px;
-  margin-top: 10px;
-}
-
 .courses-page h2 {
   font-size: 1.8rem;
   color: #333333;
-  margin: 2rem 0 1rem 20px; 
+  margin: 2rem 0 1rem 0; /* Align the header closer to the left */
 }
 
+/* Department Link Styling */
+.department-link {
+  text-decoration: none;
+  color: inherit;
+}
+
+.department-link:hover .department {
+  background-color: #e8f5e9;
+  cursor: pointer;
+}
+
+/* Departments Container */
+.departments {
+  max-width: 100%; /* Allow full width for alignment */
+  margin: 2rem auto;
+  padding: 0 20px;
+}
+
+/* Alphabetical Grouping Styles */
+.letter-group {
+  margin-bottom: 40px;
+}
+
+.letter-header {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #fa743e;
+  margin-bottom: 10px;
+  margin-left: 20px; /* Align the letter header to the left */
+}
+
+/* Departments under each letter */
+.department-container {
+  display: flex; /* Use flexbox for horizontal alignment */
+  flex-wrap: wrap; /* Allow wrapping to the next row */
+  gap: 10px; /* Reduce gap for more departments per row */
+  align-items: flex-start; /* Align items to the top */
+  margin-left: 20px; /* Align closer to the left */
+}
+
+/* Individual Department Card */
 .department {
-  width: 180px;
-  height: 150px;
-  padding: 10px 15px;
+  width: 160px; /* Adjust width to fit more departments */
+  height: 130px; /* Adjust height to fit more rows */
+  padding: 10px;
   border: 2px solid #2ecc71;
   border-radius: 8px;
   text-align: center;
-  font-size: 16px;
+  font-size: 14px; /* Slightly reduce font size */
   color: #2ecc71;
-  font-weight: 500;
   background-color: #fff;
   cursor: pointer;
   transition: all 0.3s ease;
@@ -342,21 +407,15 @@ body {
   align-items: center;
 }
 
-.departments {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-  gap: 20px;
-  max-width: 900px;
-  margin: 2rem auto; 
-  padding: 0 20px; 
-}
-
 .department:hover {
   background-color: #2ecc71;
   color: #fff;
 }
 
-/* Footer */
+
+/* ============================================= */
+/* Footer                                         */
+/* ============================================= */
 footer {
   margin-top: 2rem;
   padding: 1rem;
@@ -365,62 +424,30 @@ footer {
   color: #333333;
 }
 
-/* Courses Page Specific Styles */
-.courses-header {
-  display: flex;
-  justify-content: center; 
-  align-items: baseline; 
-  gap: 10px; 
-  margin-top: 2rem; 
-}
-
-.courses-header h1 {
-  font-size: 2.5rem;
-  color: #fa743e;
-  margin: 0; 
-  line-height: 1; 
-}
-
-.department-link {
-  text-decoration: none;
-  color: inherit; 
-}
-
-.department-link:hover .department {
-  background-color: #e8f5e9; 
-  cursor: pointer;
-}
-
-.university-select {
-  padding: 0.5rem 1rem;
-  font-size: 1rem;
-  border: 2px solid #fa743e;
-  border-radius: 5px;
-  max-width: 300px;
-  margin: 0; 
-  line-height: 1.5; 
-}
-
-/* Styling for Courses Container */
+/* ============================================= */
+/* Courses Container                              */
+/* ============================================= */
 .courses {
-  max-width: 800px; 
-  margin: 0 auto; 
-  padding: 0 20px; 
-  overflow: hidden; 
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 0 20px;
+  overflow: hidden;
 }
 
-/* Styling for Courses List */
+/* ============================================= */
+/* Courses List                                   */
+/* ============================================= */
 .courses-list {
   list-style: none;
   padding: 0;
   margin: 0;
   display: flex;
   flex-direction: column;
-  gap: 1.5rem; 
+  gap: 1.5rem;
 }
 
 .course-item {
-  margin: 0; 
+  margin: 0;
 }
 
 .course-link {
@@ -432,8 +459,8 @@ footer {
 .course-link:hover {
   background-color: #f0f0f0;
   color: #005a5b;
-  box-shadow: none; 
-  border: none; 
+  box-shadow: none;
+  border: none;
 }
 
 .course-item h4 {
@@ -448,12 +475,12 @@ footer {
 }
 
 .course-item {
-  margin: 0; 
+  margin: 0;
   border-radius: 8px;
   background-color: #fff;
   transition: background-color 0.3s ease;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); 
-  overflow: hidden; 
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
 }
 
 .course-link {
@@ -467,5 +494,5 @@ footer {
   background-color: #f0f0f0;
   color: #005a5b;
   box-shadow: none;
-  margin: 0; 
+  margin: 0;
 }

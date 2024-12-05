@@ -1,13 +1,7 @@
 document.addEventListener("DOMContentLoaded", () => {
-    const departmentsApiUrl = "/api/departments/";  // Use a relative URL
+    const departmentsApiUrl = "/api/departments/";
     const departmentsContainer = document.getElementById("departments");
-    const coursesContainer = document.getElementById("courses");
-  
-    if (!coursesContainer) {
-        console.error("The courses container element is not found.");
-        return;
-    }
-  
+
     // Fetch and display departments
     fetch(departmentsApiUrl)
         .then(response => {
@@ -18,48 +12,65 @@ document.addEventListener("DOMContentLoaded", () => {
         })
         .then(data => {
             departmentsContainer.innerHTML = "";
-  
+
             if (data.length === 0) {
                 departmentsContainer.innerHTML = "<p>No departments available.</p>";
             } else {
-                data.forEach(department => {
-                    // Create an anchor element to wrap the department card
-                    const departmentLink = document.createElement("a");
-                    departmentLink.href = "#";
-                    departmentLink.classList.add("department-link");
-                    departmentLink.dataset.departmentId = department.id;
-  
-                    const departmentDiv = document.createElement("div");
-                    departmentDiv.classList.add("department");
-                    departmentDiv.innerHTML = `
-                        <h3>${department.name}</h3>
-                        <p>${department.code || "No description available."}</p>
-                    `;
-  
-                    // Append the department div inside the link
-                    departmentLink.appendChild(departmentDiv);
-                    departmentsContainer.appendChild(departmentLink);
-                });
-  
-                // Attach click event listeners to department links
-                document.querySelectorAll('.department-link').forEach(link => {
-                    link.addEventListener('click', (event) => {
-                        event.preventDefault(); // Prevent default anchor behavior
-                        const departmentId = event.currentTarget.dataset.departmentId;
-                        fetchCoursesForDepartment(departmentId);
+                // Sort and group departments alphabetically
+                const sortedDepartments = data.sort((a, b) => a.name.localeCompare(b.name));
+                const groupedDepartments = sortedDepartments.reduce((groups, department) => {
+                    const firstLetter = department.name.charAt(0).toUpperCase();
+                    if (!groups[firstLetter]) {
+                        groups[firstLetter] = [];
+                    }
+                    groups[firstLetter].push(department);
+                    return groups;
+                }, {});
+
+                // Render the grouped departments
+                for (const [letter, departments] of Object.entries(groupedDepartments)) {
+                    // Letter Header
+                    const letterGroup = document.createElement("div");
+                    letterGroup.classList.add("letter-group");
+
+                    const letterHeader = document.createElement("h3");
+                    letterHeader.classList.add("letter-header");
+                    letterHeader.textContent = letter;
+
+                    // Departments Container
+                    const departmentContainer = document.createElement("div");
+                    departmentContainer.classList.add("department-container");
+
+                    // Add departments under the letter
+                    departments.forEach(department => {
+                        const departmentLink = document.createElement("a");
+                        departmentLink.href = "#";
+                        departmentLink.classList.add("department-link");
+
+                        const departmentDiv = document.createElement("div");
+                        departmentDiv.classList.add("department");
+                        departmentDiv.textContent = department.name;
+
+                        departmentLink.appendChild(departmentDiv);
+                        departmentContainer.appendChild(departmentLink);
                     });
-                });
+
+                    // Append the letter header and departments
+                    letterGroup.appendChild(letterHeader);
+                    letterGroup.appendChild(departmentContainer);
+                    departmentsContainer.appendChild(letterGroup);
+                }
             }
         })
         .catch(error => {
-            console.error("There was an error fetching the departments:", error);
+            console.error("Error fetching departments:", error);
             departmentsContainer.innerHTML = "<p>Failed to load departments. Please try again later.</p>";
         });
-  
+
     // Fetch and display courses for a specific department
     function fetchCoursesForDepartment(departmentId) {
-        const coursesApiUrl = `/api/departments/${departmentId}/courses/`; // Use a relative URL
-  
+        const coursesApiUrl = `/api/departments/${departmentId}/courses/`;
+
         fetch(coursesApiUrl)
             .then(response => {
                 if (!response.ok) {
@@ -68,9 +79,8 @@ document.addEventListener("DOMContentLoaded", () => {
                 return response.json();
             })
             .then(courses => {
-                // Clear any existing courses
                 coursesContainer.innerHTML = "";
-  
+
                 if (courses.length === 0) {
                     coursesContainer.innerHTML = "<p>No courses available for this department.</p>";
                 } else {
@@ -78,17 +88,14 @@ document.addEventListener("DOMContentLoaded", () => {
                         const courseLink = document.createElement("a");
                         courseLink.href = `/courses/${course.id}/`;
                         courseLink.classList.add("course-link");
-                        courseLink.style.textDecoration = "none";
-                        courseLink.style.color = "#333";
-  
+
                         const courseDiv = document.createElement("div");
                         courseDiv.classList.add("course-item");
-  
                         courseDiv.innerHTML = `
                             <h4>${course.title}</h4>
                             <p>Subject: ${course.subject} ${course.number}</p>
                         `;
-  
+
                         courseLink.appendChild(courseDiv);
                         coursesContainer.appendChild(courseLink);
                     });
@@ -99,5 +106,4 @@ document.addEventListener("DOMContentLoaded", () => {
                 coursesContainer.innerHTML = "<p>Failed to load courses. Please try again later.</p>";
             });
     }
-  });
-  
+});
