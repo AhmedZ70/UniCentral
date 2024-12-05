@@ -50,7 +50,7 @@ body, html, ul, li, p, h1 {
     border: 1px solid black; /* Black border */
     padding: 20px;
     border-radius: 5px 5px 5px 5px;
-    height: 400px;
+    height: 415px;
     width: 300px;
     text-align: center;
     margin-bottom: 20px;
@@ -103,9 +103,8 @@ body, html, ul, li, p, h1 {
   }
 
   .password-container {
-    position: relative; /* This makes .password-toggle position relative to this container */
-    display: flex; /* Aligns input and icon in the same row */
-    align-items: center;
+    position: relative; 
+    display: flex;
 }
 
 .password-toggle {

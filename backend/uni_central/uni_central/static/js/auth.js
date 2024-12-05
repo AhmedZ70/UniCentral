@@ -39,7 +39,7 @@ function handleAuthStateChange() {
         }
         const welcomeText = document.createElement('div');
         welcomeText.className = 'welcome-message';
-        welcomeText.textContent = `Welcome, ${user.displayName || user.email}`;
+        welcomeText.textContent = `Welcome, ${user.displayName}`;
         registerLinkAndBtn.replaceWith(welcomeText);
       }
     } else {

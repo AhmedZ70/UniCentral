@@ -148,10 +148,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const email = document.getElementById('email').value;
     const password = document.getElementById('password').value;
-    const name = document.getElementById('name').value;
+    const fname = document.getElementById('fname').value;
+    const lname = document.getElementById('lname').value;
+    const fullName = fname + ' ' + lname;
     const signupError = document.getElementById('signup-error');
 
-    console.log('Attempting to create user with:', { email, name }); // Debug log
+    console.log('Attempting to create user with:', { email, fullName }); // Debug log
 
     try {
         // Create user with email and password
@@ -165,7 +167,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // Update user profile with name
         console.log('Updating user profile with name');
         await updateProfile(user, {
-        displayName: name
+            displayName: fullName
         });
         console.log('Profile updated successfully');
 
@@ -185,7 +187,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // Handle specific error cases
         switch (error.code) {
         case 'auth/email-already-in-use':
-            signupError.textContent = 'This email is already registered. Please use a different email or sign in.';
+            signupError.textContent = 'This email is already registered. Use a different email or sign in.';
             break;
         case 'auth/invalid-email':
             signupError.textContent = 'Please enter a valid email address.';
