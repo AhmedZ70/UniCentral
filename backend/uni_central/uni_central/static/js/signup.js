@@ -15,7 +15,8 @@ const firebaseConfig = {
     storageBucket: "unicentral-b6c23.firebasestorage.app",
     messagingSenderId: "554502030441",
     appId: "1:554502030441:web:6dccab580dbcfdb974cef8",
-    measurementId: "G-M4L04508RH"
+    measurementId: "G-M4L04508RH",
+    clientId: "554502030441-g68f3tti18fiip1hpr6ehn6q6u5sn8fh.apps.googleusercontent.com"
 };
 
 // Initialize Firebase

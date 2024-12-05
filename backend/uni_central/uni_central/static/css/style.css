@@ -62,6 +62,7 @@ body {
   background-color: #005a5b;
   color: #FAF8F0;
   border: none;
+  font-size: 18px;
   padding: 0.5rem 1rem;
   border-radius: 20px;
   font-weight: bold;
@@ -85,13 +86,12 @@ body {
   align-items: left;
 }
 
+/* Styling for Dropdown Menu */
 .dropdown-menu {
   position: relative;
   font-size: 16px;
   margin-left: 1rem;
   cursor: pointer;
-  border-color: black;
-  border-width: 5px;
   width: 50px;
   height: 80px;
 }
@@ -100,16 +100,16 @@ body {
   color: black;
   background-color: #FAF8F0;
   padding: none;
-  margin-top: 16px;
-  font-size: 35px;
+  margin-top: 13px;
+  font-size: 40px;
   border: none;
+  border-radius: 4px;
 }
 
 .dropdown-menu-content {
+  display: none;
   position: absolute;
   font-size: 23px;
-  margin-left: 10px;
-  border-color: black;
   background-color: #f1f1f1;
   min-width: 250px;
   min-height: 350px;
@@ -117,9 +117,25 @@ body {
   z-index: 100;
   top: 100%;
   right: 0;
-  list-style: none; 
+  list-style: none;
   padding: 10px 20px;
   font-weight: bold;
+  border: 3px solid black;
+  border-radius: 4px;
+}
+
+.dropdown-menu.active .dropdown-menu-content {
+  display: block;
+}
+
+.dropdown-menu-btn:focus + .dropdown-menu-content,
+.dropdown-menu:hover .dropdown-menu-content {
+  display: block;
+}
+
+.dropdown-menu-btn:focus,
+.dropdown-menu:hover .dropdown-menu-btn {
+  color: #313131;
 }
 
 /* Links inside the dropdown */
@@ -131,7 +147,7 @@ body {
 
 /* Change color of dropdown links on hover */
 .dropdown-menu-content a:hover {
-  color:#333333;
+  color:#3c3c3c;
 }
 
 .dropdown-menu-btn:hover + .dropdown-menu-content {
@@ -140,8 +156,7 @@ body {
 
 /* Change the background color of the dropdown button when the dropdown content is shown */
 .dropdown-menu:hover .dropdown-menu-btn {
-  background-color: #005a5b;
-  color: white;
+  color: #3c3c3c;
 }
 
 .dropdown-menu.active .dropdown-menu-content {
@@ -176,6 +191,10 @@ body {
   cursor: pointer;
 }
 
+.logout-btn:hover {
+  color: #3c3c3c;
+}
+
 .login-btn {
   color: black;
   border: none;
@@ -185,6 +204,10 @@ body {
   font-size: 23px;
   font-weight: bold;
   cursor: pointer;
+}
+
+.login-btn:hover {
+  color: #3c3c3c;
 }
 
 /* Hero Section (index page specific) */
@@ -208,7 +231,7 @@ body {
 .text-content p {
   margin-top: 0.5rem;
   font-size: 1rem;
-  color: #333333;
+  color: #3c3c3c;
 }
 
 /* Search Bar */
@@ -297,7 +320,7 @@ body {
 .courses-page h2 {
   font-size: 1.8rem;
   color: #333333;
-  margin: 2rem 0 1rem 20px; /* Add left margin for alignment */
+  margin: 2rem 0 1rem 20px; 
 }
 
 .department {
@@ -324,8 +347,8 @@ body {
   grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
   gap: 20px;
   max-width: 900px;
-  margin: 2rem auto; /* Center the grid horizontally */
-  padding: 0 20px; /* Add horizontal padding */
+  margin: 2rem auto; 
+  padding: 0 20px; 
 }
 
 .department:hover {
@@ -345,26 +368,26 @@ footer {
 /* Courses Page Specific Styles */
 .courses-header {
   display: flex;
-  justify-content: center; /* Align horizontally */
-  align-items: baseline; /* Align text and dropdown on the same baseline */
-  gap: 10px; /* Add space between the text and dropdown */
-  margin-top: 2rem; /* Add some spacing above */
+  justify-content: center; 
+  align-items: baseline; 
+  gap: 10px; 
+  margin-top: 2rem; 
 }
 
 .courses-header h1 {
   font-size: 2.5rem;
   color: #fa743e;
-  margin: 0; /* Remove default margin for proper alignment */
-  line-height: 1; /* Ensure consistent text height */
+  margin: 0; 
+  line-height: 1; 
 }
 
 .department-link {
-  text-decoration: none; /* Removes the underline */
-  color: inherit; /* Ensures the link text color matches its container */
+  text-decoration: none;
+  color: inherit; 
 }
 
 .department-link:hover .department {
-  background-color: #e8f5e9; /* Optional hover effect */
+  background-color: #e8f5e9; 
   cursor: pointer;
 }
 
@@ -374,15 +397,15 @@ footer {
   border: 2px solid #fa743e;
   border-radius: 5px;
   max-width: 300px;
-  margin: 0; /* Remove extra margin */
-  line-height: 1.5; /* Match the dropdown's height to the text */
+  margin: 0; 
+  line-height: 1.5; 
 }
 
 /* Styling for Courses Container */
 .courses {
-  max-width: 800px; /* Set a maximum width to prevent it from expanding too much */
-  margin: 0 auto; /* Center horizontally */
-  padding: 0 20px; /* Add padding for a balanced spacing */
+  max-width: 800px; 
+  margin: 0 auto; 
+  padding: 0 20px; 
   overflow: hidden; 
 }
 
@@ -393,14 +416,12 @@ footer {
   margin: 0;
   display: flex;
   flex-direction: column;
-  gap: 1.5rem; /* Space between items */
+  gap: 1.5rem; 
 }
-
 
 .course-item {
-  margin: 0; /* Remove margins */
+  margin: 0; 
 }
-
 
 .course-link {
   text-decoration: none;
@@ -411,8 +432,8 @@ footer {
 .course-link:hover {
   background-color: #f0f0f0;
   color: #005a5b;
-  box-shadow: none; /* Ensure no shadow changes size */
-  border: none; /* Ensure no border change causes resizing */
+  box-shadow: none; 
+  border: none; 
 }
 
 .course-item h4 {
@@ -427,24 +448,24 @@ footer {
 }
 
 .course-item {
-  margin: 0; /* Remove margin to eliminate extra space */
+  margin: 0; 
   border-radius: 8px;
   background-color: #fff;
   transition: background-color 0.3s ease;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Subtle shadow */
-  overflow: hidden; /* Ensure no child elements create overflow */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); 
+  overflow: hidden; 
 }
 
 .course-link {
   text-decoration: none;
   color: #333;
   display: block;
-  padding: 1.5rem; /* Consistent padding inside the link */
+  padding: 1.5rem;
 }
 
 .course-link:hover {
   background-color: #f0f0f0;
   color: #005a5b;
-  box-shadow: none; /* Ensure no shadow change causes overflow */
-  margin: 0; /* Prevent margin from hover effect */
+  box-shadow: none;
+  margin: 0; 
 }

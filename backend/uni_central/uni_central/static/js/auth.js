@@ -8,7 +8,8 @@ const firebaseConfig = {
   storageBucket: "unicentral-b6c23.firebasestorage.app",
   messagingSenderId: "554502030441",
   appId: "1:554502030441:web:6dccab580dbcfdb974cef8",
-  measurementId: "G-M4L04508RH"
+  measurementId: "G-M4L04508RH",
+  clientId: "554502030441-g68f3tti18fiip1hpr6ehn6q6u5sn8fh.apps.googleusercontent.com"
 };
 
 const app = initializeApp(firebaseConfig);
@@ -19,12 +20,11 @@ function handleAuthStateChange() {
   onAuthStateChanged(auth, (user) => {
     const actionsDiv = document.querySelector('.actions');
     const registerLinkAndBtn = document.querySelector('.actions a');
+    const logoutBtn = document.querySelector('.logout-btn');
 
     if (user) {
-      // User is signed in
       console.log('User is signed in:', user);
       if (registerLinkAndBtn && actionsDiv) {
-        const logoutBtn = document.querySelector('.logout-btn');
         if (logoutBtn) {
           logoutBtn.addEventListener('click', (event) => {
             event.preventDefault(); // Prevent default link behavior
