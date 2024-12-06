@@ -1,4 +1,6 @@
-/* General Reset */
+/* ============================================= */
+/* General                                       */
+/* ============================================= */
 body, html, ul, li, p, h1, h2, select {
   margin: 0;
   padding: 0;
@@ -11,7 +13,9 @@ body {
   background-color: #FAF8F0;
 }
 
-/* Navbar Styles */
+/* ============================================= */
+/* Navbar Styles                                  */
+/* ============================================= */
 .navbar {
   display: flex;
   justify-content: space-between;
@@ -55,7 +59,7 @@ body {
 
 .actions {
   display: flex;
-  align-items: center;
+  align-items: center; /* Changed from 'left' to 'center' for proper alignment */
 }
 
 .register-btn {
@@ -81,12 +85,9 @@ body {
   font-family: 'Montserrat', sans-serif;
 }
 
-.actions {
-  display: flex;
-  align-items: left;
-}
-
-/* Styling for Dropdown Menu */
+/* ============================================= */
+/* Dropdown Menu Styles                           */
+/* ============================================= */
 .dropdown-menu {
   position: relative;
   font-size: 16px;
@@ -99,7 +100,7 @@ body {
 .dropdown-menu-btn {
   color: black;
   background-color: #FAF8F0;
-  padding: none;
+  padding: 0; /* Changed from 'none' to '0' for valid CSS */
   margin-top: 13px;
   font-size: 40px;
   border: none;
@@ -138,31 +139,27 @@ body {
   color: #313131;
 }
 
-/* Links inside the dropdown */
 .dropdown-menu-content a {
   display: block;
   text-decoration: none;
   color: black;
 }
 
-/* Change color of dropdown links on hover */
 .dropdown-menu-content a:hover {
-  color:#3c3c3c;
+  color: #3c3c3c;
 }
 
 .dropdown-menu-btn:hover + .dropdown-menu-content {
   display: block;
 }
 
-/* Change the background color of the dropdown button when the dropdown content is shown */
 .dropdown-menu:hover .dropdown-menu-btn {
   color: #3c3c3c;
 }
 
-.dropdown-menu.active .dropdown-menu-content {
-  display: block;
-}
-
+/* ============================================= */
+/* Icon Styles                                    */
+/* ============================================= */
 .icons {
   display: flex;
   align-items: center;
@@ -180,7 +177,10 @@ body {
   font-weight: bold;
 }
 
-.logout-btn {
+/* ============================================= */
+/* Button Styles                                  */
+/* ============================================= */
+.logout-btn, .login-btn {
   color: black;
   border: none;
   padding: 0.5rem 1rem;
@@ -191,26 +191,13 @@ body {
   cursor: pointer;
 }
 
-.logout-btn:hover {
+.logout-btn:hover, .login-btn:hover {
   color: #3c3c3c;
 }
 
-.login-btn {
-  color: black;
-  border: none;
-  padding: 0.5rem 1rem;
-  border-radius: 20px;
-  font-family: 'Montserrat', sans-serif;
-  font-size: 23px;
-  font-weight: bold;
-  cursor: pointer;
-}
-
-.login-btn:hover {
-  color: #3c3c3c;
-}
-
-/* Hero Section (index page specific) */
+/* ============================================= */
+/* Hero Section                                   */
+/* ============================================= */
 .hero {
   display: flex;
   justify-content: space-between;
@@ -234,7 +221,9 @@ body {
   color: #3c3c3c;
 }
 
-/* Search Bar */
+/* ============================================= */
+/* Search Bar                                     */
+/* ============================================= */
 .search-bar {
   display: flex;
   align-items: center;
@@ -270,13 +259,17 @@ body {
   background-color: #007d7d;
 }
 
-/* Illustration */
+/* ============================================= */
+/* Illustration Section                           */
+/* ============================================= */
 .illustrations img {
   width: 500px;
   height: auto;
 }
 
-/* Orange Bar */
+/* ============================================= */
+/* Orange Bar                                     */
+/* ============================================= */
 .orange-bar {
   position: relative;
   width: 100%;
@@ -285,70 +278,188 @@ body {
   margin-top: 1rem;
   z-index: 1;
 }
-/* Active Link Styling */
+
+/* ============================================= */
+/* Active Link Styling                            */
+/* ============================================= */
 .nav-links a.active {
-  color: #005a5b; /* Highlighted color for the active page */
+  color: #005a5b;
   font-weight: bold;
   position: relative;
 }
 
-/* Underline Effect */
 .nav-links a.active::after {
   content: "";
   display: block;
   width: 100%;
   height: 2px;
-  background-color: #005a5b; /* Match the highlighted color */
+  background-color: #005a5b;
   margin-top: 5px;
 }
 
-/* Courses Page Specific Styles */
+/* ============================================= */
+/* Courses Page Styles                            */
+/* ============================================= */
+
+/* Base Styles for Containers */
+#departments-title, #courses-title {
+  margin-top: 2rem;
+  font-size: 1.5rem;
+  font-weight: bold;
+  padding-left: 50px; /* Ensure proper spacing from the left */
+}
+
+/* Visibility Classes */
+.hidden {
+  display: none;
+}
+
+.visible {
+  display: block;
+  opacity: 1;
+  transition: opacity 0.3s ease;
+}
+
+/* Fade Transitions */
+.fade-in {
+  opacity: 1;
+  transition: opacity 0.3s ease;
+}
+
+.fade-out {
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+/* Letter Headers */
+.letter-header {
+  display: block;
+  font-weight: bold;
+  font-size: 1.2rem;
+  margin-bottom: 10px;
+  color: #fa743e;
+}
+
+/* Letter Group */
+.letter-group {
+  margin-bottom: 0;
+}
+
+/* Breadcrumb Link Styles */
+.breadcrumb-link {
+  color: #fa743e;
+  text-decoration: none;
+  font-weight: bold;
+  padding-left: 50px;
+  margin-right: 5px;
+}
+
+.breadcrumb-link:hover {
+  text-decoration: underline;
+}
+
+/* Course Item Styles */
+.course-item {
+  border: 2px solid #fa743e;
+  border-radius: 8px;
+  padding: 10px;
+  margin-bottom: 20px; /* Consistent bottom margin */
+  color: #333;
+  transition: background-color 0.3s ease;
+  background-color: #fff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+}
+
+.course-item:hover {
+  background-color: #fa743e;
+  color: #fff;
+}
+
+/* Courses Header */
+.courses-header {
+  display: flex;
+  justify-content: center;
+  align-items: baseline;
+  gap: 10px;
+  margin-top: 2rem;
+}
+
+.courses-header h1 {
+  font-size: 2.5rem;
+  color: #fa743e;
+  margin: 0;
+  line-height: 1;
+}
+
+/* University Select Dropdown */
+.university-select {
+  padding: 0.5rem 1rem;
+  font-size: 1rem;
+  border: 2px solid #fa743e;
+  border-radius: 5px;
+  max-width: 300px;
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* Section Headers */
 .courses-page h1 {
   font-size: 2.5rem;
   color: #fa743e;
   margin-bottom: 1rem;
 }
 
-.courses-page select {
-  padding: 10px;
-  border: 2px solid #fa743e;
-  border-radius: 5px;
-  font-size: 16px;
-  margin-top: 10px;
-}
-
 .courses-page h2 {
   font-size: 1.8rem;
-  color: #333333;
-  margin: 2rem 0 1rem 20px; 
+  color: #333;
+  margin: 2rem 0 1rem 0;
 }
 
+/* Department Link Styling */
+.department-link {
+  text-decoration: none;
+  color: inherit;
+}
+
+.department-link:hover .department {
+  background-color: #e8f5e9;
+  cursor: pointer;
+}
+
+/* Departments Container */
+.departments {
+  max-width: 100%;
+  margin: 2rem auto;
+  padding: 1rem 20px;
+  padding-left: 50px;
+}
+
+/* Departments Grouping */
+.department-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: flex-start;
+  margin-left: 0;
+}
+
+/* Department Card */
 .department {
-  width: 180px;
-  height: 150px;
-  padding: 10px 15px;
+  width: 160px;
+  height: 130px;
+  padding: 10px;
   border: 2px solid #2ecc71;
   border-radius: 8px;
   text-align: center;
-  font-size: 16px;
+  font-size: 18px;
   color: #2ecc71;
-  font-weight: 500;
   background-color: #fff;
   cursor: pointer;
   transition: all 0.3s ease;
   display: flex;
-  flex-direction: column;
   justify-content: center;
   align-items: center;
-}
-
-.departments {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-  gap: 20px;
-  max-width: 900px;
-  margin: 2rem auto; 
-  padding: 0 20px; 
 }
 
 .department:hover {
@@ -356,7 +467,9 @@ body {
   color: #fff;
 }
 
-/* Footer */
+/* ============================================= */
+/* Footer                                         */
+/* ============================================= */
 footer {
   margin-top: 2rem;
   padding: 1rem;
@@ -365,75 +478,39 @@ footer {
   color: #333333;
 }
 
-/* Courses Page Specific Styles */
-.courses-header {
-  display: flex;
-  justify-content: center; 
-  align-items: baseline; 
-  gap: 10px; 
-  margin-top: 2rem; 
-}
-
-.courses-header h1 {
-  font-size: 2.5rem;
-  color: #fa743e;
-  margin: 0; 
-  line-height: 1; 
-}
-
-.department-link {
-  text-decoration: none;
-  color: inherit; 
-}
-
-.department-link:hover .department {
-  background-color: #e8f5e9; 
-  cursor: pointer;
-}
-
-.university-select {
-  padding: 0.5rem 1rem;
-  font-size: 1rem;
-  border: 2px solid #fa743e;
-  border-radius: 5px;
-  max-width: 300px;
-  margin: 0; 
-  line-height: 1.5; 
-}
-
-/* Styling for Courses Container */
+/* ============================================= */
+/* Courses Container                              */
+/* ============================================= */
 .courses {
-  max-width: 800px; 
-  margin: 0 auto; 
-  padding: 0 20px; 
-  overflow: hidden; 
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 0 20px;
+  overflow: hidden;
 }
 
-/* Styling for Courses List */
+/* ============================================= */
+/* Courses List                                   */
+/* ============================================= */
 .courses-list {
   list-style: none;
   padding: 0;
   margin: 0;
   display: flex;
   flex-direction: column;
-  gap: 1.5rem; 
-}
-
-.course-item {
-  margin: 0; 
+  gap: 20px; /* Creates a 20px gap between each .course-item */
 }
 
 .course-link {
   text-decoration: none;
   color: #333;
-  display: block;
+  padding-bottom: 1em;
 }
 
 .course-link:hover {
   background-color: #f0f0f0;
   color: #005a5b;
-  box-shadow: none; 
-  border: none; 
+  box-shadow: none;
+  margin: 0;
 }
 
 .course-item h4 {
@@ -447,25 +524,45 @@ footer {
   color: #666;
 }
 
-.course-item {
-  margin: 0; 
-  border-radius: 8px;
-  background-color: #fff;
-  transition: background-color 0.3s ease;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); 
-  overflow: hidden; 
-}
+/* Additional Responsive Styles */
+@media (max-width: 768px) {
+  .navbar {
+    flex-direction: column;
+    align-items: flex-start;
+  }
 
-.course-link {
-  text-decoration: none;
-  color: #333;
-  display: block;
-  padding: 1.5rem;
-}
+  .logo img {
+    width: 150px;
+  }
 
-.course-link:hover {
-  background-color: #f0f0f0;
-  color: #005a5b;
-  box-shadow: none;
-  margin: 0; 
+  .nav-links {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .nav-links li {
+    margin-left: 0;
+    margin-top: 1rem;
+  }
+
+  .hero {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .text-content {
+    max-width: 100%;
+  }
+
+  .illustrations img {
+    width: 100%;
+  }
+
+  .department-container {
+    justify-content: center;
+  }
+
+  .courses-header {
+    flex-direction: column;
+  }
 }
