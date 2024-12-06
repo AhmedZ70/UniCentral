@@ -49,7 +49,7 @@
                 <p class="no-reviews-message">No reviews available for this course.</p>
             {% endif %}
 
-            <a href="{% url 'review-create' course.id %}" class="leave-review-button">Leave a Review</a>
+            <a id="leave-review-btn" href="#" class="leave-review-button">Leave a Review</a>
         </section>
     </main>
 
@@ -145,6 +145,6 @@
         }
     </style>
 
-    <script src="{% static 'js/index.js' %}"></script>
+    <script type="module" src="{% static 'js/auth.js' %}"></script>
 </body>
 </html>

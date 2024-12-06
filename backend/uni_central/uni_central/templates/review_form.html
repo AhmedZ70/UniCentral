@@ -6,6 +6,145 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Leave a Review</title>
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <style>
+        /* General Styles */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f6f8;
+            margin: 0;
+            padding: 0;
+            color: #333;
+        }
+
+        /* Main Content */
+        .main-content.review-form-page {
+            max-width: 700px;
+            margin: 3rem auto;
+            padding: 30px;
+            background: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .main-content.review-form-page h1 {
+            text-align: center;
+            margin-bottom: 25px;
+            font-size: 2rem;
+            color: #005a5b;
+        }
+
+        /* Form Styles */
+        form {
+            display: flex;
+            flex-direction: column;
+        }
+
+        form label {
+            margin-top: 20px;
+            font-weight: 600;
+            font-size: 1rem;
+            color: #333;
+        }
+
+        form textarea,
+        form input[type="number"],
+        form input[type="text"] {
+            width: 100%;
+            padding: 12px 15px;
+            margin-top: 8px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+
+        form textarea:focus,
+        form input[type="number"]:focus,
+        form input[type="text"]:focus {
+            border-color: #005a5b;
+            outline: none;
+            box-shadow: 0 0 5px rgba(0, 90, 91, 0.2);
+        }
+
+        /* Fieldset Styles */
+        fieldset {
+            margin-top: 25px;
+            border: 1px solid #ddd;
+            padding: 20px;
+            border-radius: 8px;
+            background-color: #fafafa;
+        }
+
+        fieldset legend {
+            font-weight: 700;
+            font-size: 1.1rem;
+            color: #005a5b;
+        }
+
+        /* Checkbox Styles */
+        .checkbox-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .checkbox-group label {
+            display: flex;
+            align-items: center;
+            font-weight: 500;
+            color: #555;
+            cursor: pointer;
+        }
+
+        .checkbox-group input[type="checkbox"] {
+            margin-right: 8px;
+            width: 18px;
+            height: 18px;
+            accent-color: #005a5b;
+            cursor: pointer;
+        }
+
+        /* Submit Button */
+        .submit-review-button {
+            margin-top: 30px;
+            padding: 14px 20px;
+            background-color: #005a5b;
+            color: #ffffff;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+        }
+
+        .submit-review-button:hover {
+            background-color: #004e4f;
+            transform: translateY(-2px);
+        }
+
+        .submit-review-button:active {
+            transform: translateY(0);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .main-content.review-form-page {
+                margin: 2rem 1rem;
+                padding: 25px;
+            }
+
+            .main-content.review-form-page h1 {
+                font-size: 1.75rem;
+            }
+
+            .submit-review-button {
+                font-size: 1rem;
+                padding: 12px 18px;
+            }
+        }
+    </style>
 </head>
 <body>
     {% include 'partials/navbar.html' %}
@@ -13,54 +152,64 @@
         <h1>Leave a Review for {{ course.title }}</h1>
         <form method="POST" action="{% url 'review-create' course.id %}">
             {% csrf_token %}
-            <label for="review">Review:</label>
-            <textarea id="review" name="review" required></textarea>
 
+            <!-- Text-based review -->
+            <label for="review">Review:</label>
+            <textarea id="review" name="review" placeholder="Write your review here..." rows="5" required></textarea>
+
+            <!-- Rating fields -->
             <label for="rating">Rating (out of 5):</label>
             <input type="number" id="rating" name="rating" step="0.1" min="0" max="5" required>
 
             <label for="difficulty">Difficulty (out of 6):</label>
             <input type="number" id="difficulty" name="difficulty" min="1" max="6" required>
 
+            <label for="estimated_hours">Estimated Weekly Hours:</label>
+            <input type="number" id="estimated_hours" name="estimated_hours" step="0.1" min="0" required>
+
+            <label for="grade">Grade Received (e.g., A, B):</label>
+            <input type="text" id="grade" name="grade" maxlength="2" required>
+
+            <!-- Boolean fields -->
+            <fieldset>
+                <legend>Course Details:</legend>
+                <div class="checkbox-group">
+                    <label>
+                        <input type="checkbox" name="would_take_again"> Would take again
+                    </label>
+                    <label>
+                        <input type="checkbox" name="for_credit"> For credit
+                    </label>
+                    <label>
+                        <input type="checkbox" name="mandatory_attendance"> Mandatory attendance
+                    </label>
+                    <label>
+                        <input type="checkbox" name="required_course"> Required course
+                    </label>
+                    <label>
+                        <input type="checkbox" name="is_gened"> General education requirement
+                    </label>
+                    <label>
+                        <input type="checkbox" name="in_person"> In person
+                    </label>
+                    <label>
+                        <input type="checkbox" name="online"> Online
+                    </label>
+                    <label>
+                        <input type="checkbox" name="hybrid"> Hybrid
+                    </label>
+                    <label>
+                        <input type="checkbox" name="no_exams"> No exams
+                    </label>
+                    <label>
+                        <input type="checkbox" name="presentations"> Presentations
+                    </label>
+                </div>
+            </fieldset>
+
+            <!-- Submit button -->
             <button type="submit" class="submit-review-button">Submit Review</button>
         </form>
     </main>
-
-    <style>
-        .review-form-page {
-            max-width: 600px;
-            margin: 2rem auto;
-            padding: 20px;
-            background: #fff;
-            border-radius: 10px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-        }
-
-        form label {
-            display: block;
-            margin-top: 15px;
-        }
-
-        form textarea,
-        form input {
-            width: 100%;
-            padding: 8px;
-            margin-top: 5px;
-        }
-
-        .submit-review-button {
-            margin-top: 20px;
-            padding: 10px 15px;
-            background-color: #005a5b;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-
-        .submit-review-button:hover {
-            background-color: #004e4f;
-        }
-    </style>
 </body>
 </html>

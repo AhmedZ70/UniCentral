@@ -50,26 +50,53 @@ def course_detail(request, course_id):
 def create_review(request, course_id):
     if request.method == 'POST':
         course = get_object_or_404(Course, id=course_id)
+        user = request.user  # Assuming the user is logged in
+
+        # Collecting data from the form
         review_text = request.POST.get('review')
         rating = request.POST.get('rating')
         difficulty = request.POST.get('difficulty')
+        estimated_hours = request.POST.get('estimated_hours')
+        grade = request.POST.get('grade')
 
-        if not review_text or not rating or not difficulty:
-            return HttpResponseBadRequest("Missing required fields.")
+        # Boolean fields
+        would_take_again = request.POST.get('would_take_again') == 'on'
+        for_credit = request.POST.get('for_credit') == 'on'
+        mandatory_attendance = request.POST.get('mandatory_attendance') == 'on'
+        required_course = request.POST.get('required_course') == 'on'
+        is_gened = request.POST.get('is_gened') == 'on'
+        in_person = request.POST.get('in_person') == 'on'
+        online = request.POST.get('online') == 'on'
+        hybrid = request.POST.get('hybrid') == 'on'
+        no_exams = request.POST.get('no_exams') == 'on'
+        presentations = request.POST.get('presentations') == 'on'
 
         # Create the review
         Review.objects.create(
-            user=request.user,
+            user=user,
             course=course,
             review=review_text,
-            rating=float(rating),
-            difficulty=int(difficulty),
+            rating=float(rating) if rating else None,
+            difficulty=int(difficulty) if difficulty else None,
+            estimated_hours=float(estimated_hours) if estimated_hours else None,
+            grade=grade,
+            would_take_again=would_take_again,
+            for_credit=for_credit,
+            mandatory_attendance=mandatory_attendance,
+            required_course=required_course,
+            is_gened=is_gened,
+            in_person=in_person,
+            online=online,
+            hybrid=hybrid,
+            no_exams=no_exams,
+            presentations=presentations,
         )
 
         return redirect('course-detail', course_id=course_id)
     else:
         course = get_object_or_404(Course, id=course_id)
         return render(request, 'review_form.html', {'course': course})
+
 
 # API View for Getting Courses in a Specific Department
 class DepartmentCoursesView(APIView):

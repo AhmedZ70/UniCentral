@@ -27,7 +27,6 @@ function handleAuthStateChange() {
       console.log('User is signed in:', user);
       if (registerLinkAndBtn && actionsDiv) {
         if (logoutBtn) {
-          logoutBtn
           logoutBtn.addEventListener('click', (event) => {
             event.preventDefault(); // Prevent default link behavior
             signOut(auth)
@@ -81,9 +80,34 @@ function handleAuthStateChange() {
   });
 }
 
-// Initialize auth state handling when DOM is loaded
+// Function to handle the "Leave a Review" button behavior
+function handleLeaveReviewButton() {
+  const leaveReviewBtn = document.getElementById('leave-review-btn');
+  if (!leaveReviewBtn) {
+    console.warn("Leave Review button not found.");
+    return;
+  }
+
+  onAuthStateChanged(auth, (user) => {
+    if (user) {
+      console.log('User is signed in:', user);
+      // Redirect to the review form for the current course
+      const courseId = window.location.pathname.split('/')[2]; // Extract course ID from URL
+      leaveReviewBtn.href = `/courses/${courseId}/review/`;
+      leaveReviewBtn.textContent = 'Leave a Review';
+    } else {
+      console.log('User is signed out');
+      // Redirect to the signup page
+      leaveReviewBtn.href = '/signup/';
+      leaveReviewBtn.textContent = 'Sign Up to Leave a Review';
+    }
+  });
+}
+
+// Initialize auth state handling and "Leave a Review" button handling when DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
   handleAuthStateChange();
+  handleLeaveReviewButton();
 });
 
-export { auth, handleAuthStateChange };
+export { auth, handleAuthStateChange, handleLeaveReviewButton };
