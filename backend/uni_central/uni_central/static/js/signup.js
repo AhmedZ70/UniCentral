@@ -148,10 +148,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const email = document.getElementById('email').value;
     const password = document.getElementById('password').value;
-    const name = document.getElementById('name').value;
+    const fname = document.getElementById('fname').value;
+    const lname = document.getElementById('lname').value;
+    const fullName = fname + ' ' + lname;
     const signupError = document.getElementById('signup-error');
 
-    console.log('Attempting to create user with:', { email, name }); // Debug log
+    console.log('Attempting to create user with:', { email, fullName }); // Debug log
 
     try {
         // Create user with email and password
@@ -165,7 +167,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // Update user profile with name
         console.log('Updating user profile with name');
         await updateProfile(user, {
-        displayName: name
+            displayName: fullName
         });
         console.log('Profile updated successfully');
 
@@ -180,12 +182,36 @@ document.addEventListener('DOMContentLoaded', () => {
         alert('Account created successfully! Please check your email for verification.');
         window.location.href = '/'; 
 
+        // User creation for sqlite3
+        fetch('/api/create_user/', {
+            method: 'POST', // Use POST method
+            headers: {
+            'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                email: email,
+                fname: name,
+                lname: "Doe"
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.message === "User created successfully.") {
+            console.log("User created:", data);
+            } else {
+            console.log("Error:", data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+        });
+
     } catch (error) {
         console.error('Detailed error:', error); // More detailed error logging
         // Handle specific error cases
         switch (error.code) {
         case 'auth/email-already-in-use':
-            signupError.textContent = 'This email is already registered. Please use a different email or sign in.';
+            signupError.textContent = 'This email is already registered. Use a different email or sign in.';
             break;
         case 'auth/invalid-email':
             signupError.textContent = 'Please enter a valid email address.';
