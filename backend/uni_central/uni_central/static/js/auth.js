@@ -14,6 +14,7 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
+const currentUrl = window.location.href;
 
 // Function to handle auth state changes
 function handleAuthStateChange() {
@@ -40,7 +41,12 @@ function handleAuthStateChange() {
         }
         const welcomeText = document.createElement('div');
         welcomeText.className = 'welcome-message';
-        welcomeText.textContent = `Welcome, ${user.displayName}`;
+        if (currentUrl == "http://127.0.0.1:8000/courses/") {
+          welcomeText.textContent = `${user.displayName}`;
+        }
+        else {
+          welcomeText.textContent = `Welcome, ${user.displayName}`;
+        }
         registerLinkAndBtn.replaceWith(welcomeText);
       }
     } else {
