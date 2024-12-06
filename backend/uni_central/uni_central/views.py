@@ -7,7 +7,7 @@ from rest_framework.decorators import api_view
 from django.shortcuts import redirect
 from django.http import HttpResponseBadRequest
 from .models import Department, User, Course, Professor, Review
-from .services import UserService
+from .services import UserService, ReviewService
 from .serializers import (
     DepartmentSerializer,
     UserSerializer,
@@ -115,19 +115,6 @@ class CourseReviewsView(APIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 class CreateUserView(APIView):
-    # def post(self, request):
-    #     email_address = request.data.get("email_address")
-    #     fname = request.data.get("fname")
-    #     lname = request.data.get("lname")
-        
-    #     # Call the create_user method from UserService
-    #     user = UserService.create_user(email_address, fname, lname)
-
-    #     if user:
-    #         return Response({"message": "User created successfully."}, status=status.HTTP_201_CREATED)
-    #     else:
-    #         return Response({"message": "Email already exists."}, status=status.HTTP_400_BAD_REQUEST)
-        
     @api_view(['POST'])
     def create_user(request):
         """
@@ -192,6 +179,53 @@ class ReviewListCreateView(generics.ListCreateAPIView):
     """
     queryset = Review.objects.all()
     serializer_class = ReviewSerializer
+    
+class CreateReviewView(APIView):
+    def create_review(request):
+        """
+        Creates a review for a course, and updates the course's avg_rating and avg_difficulty.
+        """
+        if request.method == 'POST':
+            try:
+                data = request.POST  # Retrieve data from the request body
+
+                # Extract the necessary data from the request
+                user = request.user  # Assuming the user is authenticated
+                course_id = data.get('course_id')
+                professor_id = data.get('professor_id')
+                review_text = data.get('review')
+                rating = float(data.get('rating'))
+                difficulty = int(data.get('difficulty'))
+                estimated_hours = float(data.get('estimated_hours', 0))  # Optional
+                grade = data.get('grade', '')  # Optional
+
+                # Get the course and professor objects
+                course = get_object_or_404(Course, id=course_id)
+                professor = get_object_or_404(Professor, id=professor_id) if professor_id else None
+
+                # Create the review using ReviewService
+                review = ReviewService.create_review(
+                    user=user,
+                    course=course,
+                    rating=rating,
+                    difficulty=difficulty,
+                    professor=professor,
+                    review=review_text,
+                    estimated_hours=estimated_hours,
+                    grade=grade
+                )
+
+                # If review creation was successful, return success response
+                if review:
+                    return Response({"message": "Review created successfully."}, status=201)
+                else:
+                    return Response({"message": "Error creating review."}, status=400)
+
+            except Exception as e:
+                return Response({"message": f"Error creating review: {e}"}, status=400)
+
+        else:
+            return Response({"message": "Invalid request method."}, status=405)
 
 # Course Filtering page
 class CourseFilteringCreateView(generics.ListAPIView):
