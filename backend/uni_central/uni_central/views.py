@@ -26,6 +26,9 @@ def signup_page(request):
 def login_page(request):
     return render(request, 'login.html')
 
+def my_classmates(request):
+    return render(request, 'my_classmates.html')
+
 # Render Courses Page
 def courses(request):
     return render(request, 'courses.html')

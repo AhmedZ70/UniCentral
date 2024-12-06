@@ -32,6 +32,7 @@ from .views import (
     signup_page,
     login_page,
     course_detail,
+    my_classmates
 )
 
 urlpatterns = [
@@ -40,6 +41,8 @@ urlpatterns = [
     path('login/', login_page, name='login'),
     path('courses/', courses, name='courses'),  # Render courses.html (user-facing view)
     path('courses/<int:course_id>/', course_detail, name='course-detail'),  # New route for course detail page
+
+    path('my_classmates/', my_classmates, name='my_classmates'),
     
     # API URLs
     path('api/departments/', DepartmentListCreateView.as_view(), name='department-list'),

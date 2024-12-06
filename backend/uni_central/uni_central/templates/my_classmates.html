@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  {% load static %}
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>UniCentral</title>
+  
+  <!-- Corrected CSS file path with Django static tag -->
+  <link rel="stylesheet" href="{% static 'css/style.css' %}">
+  
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Corben:wght@400;700&family=Montserrat:ital,wght@0,100..900;1,100..900&family=Sigmar&family=Sniglet:wght@400;800&display=swap" rel="stylesheet">
+  <script type="module" src="{% static 'js/auth.js' %}"></script>
+</head>
+<body>
+
+  <div class="my-classmates">
+    <div class="search-add-classmate">
+      <input type="text" placeholder="Search/Add Classmate" class="classmate-search">
+      <select class="classmate-filter">
+        <option value="a-z">A - Z</option>
+      </select>
+    </div>
+  
+    <div class="classmate-grid">
+      <div class="classmate-card">
+        <div class="classmate-avatar">
+            <img src="{%static 'assets/profile_picture.png' %}" alt="John Doe" width="100px">
+        </div>
+        <div class="classmate-info">
+          <h3>John Doe <span class="classmate-status">...</span></h3>
+          <p>Classes in common: CS 2420, THEA 1013</p>
+        </div> 
+      </div> 
+      <div class="classmate-card">
+        <div class="classmate-avatar">
+            <img src="{%static 'assets/profile_picture.png' %}" alt="Johnny Song Zheng" width="100px">
+        </div>
+        <div class="classmate-info">
+          <h3>Johnny Song Zheng <span class="classmate-status">...</span></h3>
+          <p>Classes in common: THEA 1013</p>
+        </div>
+      </div>
+  
+      <div class="classmate-card">
+        <div class="classmate-avatar">
+            <img src="{%static 'assets/profile_picture.png' %}"  alt="Kishan Thambu" width="100px">
+        </div>
+        <div class="classmate-info">
+          <h3>Kishan Thambu <span class="classmate-status">...</span></h3>
+          <p>Classes in common: None</p>
+        </div>
+      </div>
+  
+      <div class="classmate-card">
+        <div class="classmate-avatar">
+            <img src="{%static 'assets/profile_picture.png' %}" alt="Russell Sprout" width="100px">
+        </div>
+        <div class="classmate-info">
+          <h3>Russell Sprout <span class="classmate-status">...</span></h3>
+          <p>Classes in common: CS 2420, CS 2100</p>
+        </div>
+      </div>
+    </div>
+  </div>
