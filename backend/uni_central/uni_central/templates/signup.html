@@ -28,10 +28,17 @@
             <h2>Sign up</h2>
             <form class="signup-entry" id="signup-form">
                 <div>
-                    <div class="signup-box-labels">
-                        <label for="name">Name</label>
+                    <div class="name-fields">
+                        <div>
+                            <label for="fname" class="signup-box-labels">First Name</label>
+                            <input type="text" id="fname" class="name-input" required>
+                        </div>
+                        <div>
+                            <label for="lname" class="signup-box-labels">Last Name</label>
+                            <input type="text" id="lname" class="name-input" required>
+                        </div>
                     </div>
-                    <input type="text" id="name" class="name-input" required>
+                    
                 </div>
                 <div>
                     <div class="signup-box-labels">
@@ -79,10 +86,9 @@
                 <img src="{% static 'assets/google_icon.png' %}" alt="Google">
                 SIGN UP WITH GOOGLE
             </button>
-            
-            <div class="already-have-account">
-              <p>Already have an account? <a href="{% url 'login' %}">Sign in</a></p>            </div>
         </div>
+        <div class="already-have-account">
+            <p>Already have an account? <a href="{% url 'login' %}">Sign in</a></p> 
       </div>
     </section>
   </main>
