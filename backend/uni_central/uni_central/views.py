@@ -4,6 +4,8 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.decorators import api_view
+from django.shortcuts import redirect
+from django.http import HttpResponseBadRequest
 from .models import Department, User, Course, Professor, Review
 from .services import UserService, ReviewService
 from .serializers import (
@@ -42,6 +44,63 @@ def course_detail(request, course_id):
         'reviews': reviews,
     }
     return render(request, 'course_detail.html', context)
+
+
+def create_review(request, course_id):
+    course = get_object_or_404(Course, id=course_id)
+    professors = course.professors.all()  # Fetch professors related to the course
+
+    if request.method == 'POST':
+        user = request.user if request.user.is_authenticated else get_object_or_404(User, id=1)
+
+        professor_id = request.POST.get('professor')
+        professor = get_object_or_404(Professor, id=professor_id) if professor_id else None
+
+        review_text = request.POST.get('review')
+        rating = request.POST.get('rating')
+        difficulty = request.POST.get('difficulty')
+        estimated_hours = request.POST.get('estimated_hours')
+        grade = request.POST.get('grade')
+
+        would_take_again = request.POST.get('would_take_again') == 'on'
+        for_credit = request.POST.get('for_credit') == 'on'
+        mandatory_attendance = request.POST.get('mandatory_attendance') == 'on'
+        required_course = request.POST.get('required_course') == 'on'
+        is_gened = request.POST.get('is_gened') == 'on'
+        in_person = request.POST.get('in_person') == 'on'
+        online = request.POST.get('online') == 'on'
+        hybrid = request.POST.get('hybrid') == 'on'
+        no_exams = request.POST.get('no_exams') == 'on'
+        presentations = request.POST.get('presentations') == 'on'
+
+        # Save the review
+        Review.objects.create(
+            user=user,
+            course=course,
+            professor=professor,
+            review=review_text,
+            rating=float(rating) if rating else None,
+            difficulty=int(difficulty) if difficulty else None,
+            estimated_hours=float(estimated_hours) if estimated_hours else None,
+            grade=grade,
+            would_take_again=would_take_again,
+            for_credit=for_credit,
+            mandatory_attendance=mandatory_attendance,
+            required_course=required_course,
+            is_gened=is_gened,
+            in_person=in_person,
+            online=online,
+            hybrid=hybrid,
+            no_exams=no_exams,
+            presentations=presentations,
+        )
+
+        # Update course averages
+        course.update_averages()
+
+        return redirect('course-detail', course_id=course_id)
+
+    return render(request, 'review_form.html', {'course': course, 'professors': professors})
 
 # API View for Getting Courses in a Specific Department
 class DepartmentCoursesView(APIView):

@@ -1,4 +1,6 @@
 from django.db import models
+from django.db.models import Avg
+
 
 ##############
 # USER MODEL #
@@ -63,6 +65,19 @@ class Course(models.Model):
 
     def __str__(self):
         return f"{self.title} ({self.subject} {self.number})"
+
+    def update_averages(self):
+        """Recalculate and update the average rating and difficulty."""
+        from .models import Review  # Avoid circular import
+
+        # Calculate averages from related reviews
+        averages = Review.objects.filter(course=self).aggregate(
+            avg_rating=Avg('rating'),
+            avg_difficulty=Avg('difficulty')
+        )
+        self.avg_rating = averages['avg_rating'] or 0  # Default to 0 if no reviews
+        self.avg_difficulty = averages['avg_difficulty'] or 0  # Default to 0 if no reviews
+        self.save()
 
 
 
