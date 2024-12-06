@@ -12,6 +12,9 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 
 from pathlib import Path
 import os
+import django_heroku
+import dj_database_url
+from decouple import config
 
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -27,7 +30,7 @@ SECRET_KEY = "django-insecure-=jr6_k9l2*tg)agva^f^3vyh&rn&d@z3wum!k!+)li4@wr_j68
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['https://uni-central-dd84ee9397df.herokuapp.com/', 'uni-central.com', 'localhost', '127.0.0.1']
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -131,10 +134,10 @@ USE_TZ = True
 
 STATIC_URL = "/static/"
 STATIC_ROOT = BASE_DIR / 'staticfiles'
-STATICFILES_DIRS = [os.path.join(BASE_DIR, "uni_central", "static"),
-                    os.path.join(BASE_DIR, 'frontend', 'static')]  # Update the path to point to the correct static files
+STATICFILES_DIRS = [os.path.join(BASE_DIR, "uni_central", "static")]  # Update the path to point to the correct static files
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+django_heroku.settings(locals())
