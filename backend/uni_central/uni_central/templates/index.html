@@ -23,7 +23,10 @@
   <main class="main-content">
     <section class="hero">
       <div class="text-content">
-        <h1>Everything you need to know about your courses in one place</h1>
+        <div class="text-container">
+          <h1><span class="overlap-arrow">Everything you need to know about your courses all in one place</h1>
+        </div>
+        <img src="{%static 'assets/orange_arrow.png' %}" alt="Orange Arrow" class="orange-arrow">
         <p>Empowering students, one class at a time.</p>
         <div class="search-bar">
           <input type="text" placeholder="University of ..." class="search-input">
@@ -33,7 +36,7 @@
       </div>
       <div class="illustrations">
         <!-- Corrected image path with Django static tag -->
-        <img src="{% static 'assets/student_studying_transparent.png' %}" alt="Student Illustration" width="600" height="587">
+        <img src="{% static 'assets/student_studying_transparent.png' %}" alt="Student Illustration">
       </div>
     </section>
     <div class="orange-bar"></div>
