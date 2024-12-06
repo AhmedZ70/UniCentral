@@ -4,6 +4,8 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.decorators import api_view
+from django.shortcuts import redirect
+from django.http import HttpResponseBadRequest
 from .models import Department, User, Course, Professor, Review
 from .services import UserService
 from .serializers import (
@@ -42,6 +44,32 @@ def course_detail(request, course_id):
         'reviews': reviews,
     }
     return render(request, 'course_detail.html', context)
+
+
+
+def create_review(request, course_id):
+    if request.method == 'POST':
+        course = get_object_or_404(Course, id=course_id)
+        review_text = request.POST.get('review')
+        rating = request.POST.get('rating')
+        difficulty = request.POST.get('difficulty')
+
+        if not review_text or not rating or not difficulty:
+            return HttpResponseBadRequest("Missing required fields.")
+
+        # Create the review
+        Review.objects.create(
+            user=request.user,
+            course=course,
+            review=review_text,
+            rating=float(rating),
+            difficulty=int(difficulty),
+        )
+
+        return redirect('course-detail', course_id=course_id)
+    else:
+        course = get_object_or_404(Course, id=course_id)
+        return render(request, 'review_form.html', {'course': course})
 
 # API View for Getting Courses in a Specific Department
 class DepartmentCoursesView(APIView):

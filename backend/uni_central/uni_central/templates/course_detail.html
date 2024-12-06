@@ -48,10 +48,12 @@
             {% else %}
                 <p class="no-reviews-message">No reviews available for this course.</p>
             {% endif %}
+
+            <a href="{% url 'review-create' course.id %}" class="leave-review-button">Leave a Review</a>
         </section>
     </main>
 
-    <!-- Styling to match the overall look and feel -->
+    <!-- Styling -->
     <style>
         body {
             font-family: 'Montserrat', sans-serif;
@@ -127,9 +129,22 @@
             font-size: 1rem;
             color: #666666;
         }
+
+        .leave-review-button {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 10px 15px;
+            background-color: #005a5b;
+            color: #fff;
+            text-decoration: none;
+            border-radius: 5px;
+        }
+
+        .leave-review-button:hover {
+            background-color: #004e4f;
+        }
     </style>
 
-    <!-- Script to handle navigation and other functions -->
     <script src="{% static 'js/index.js' %}"></script>
 </body>
 </html>
