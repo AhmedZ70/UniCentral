@@ -13,8 +13,15 @@ body {
   background-color: #FAF8F0;
 }
 
+@font-face {
+  font-family: 'Agrandir';
+  src: url('../assets/fonts/Agrandir-Regular.otf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
 /* ============================================= */
-/* Navbar Styles                                  */
+/* Navbar Styles                                 */
 /* ============================================= */
 .navbar {
   display: flex;
@@ -59,14 +66,15 @@ body {
 
 .actions {
   display: flex;
-  align-items: center; /* Changed from 'left' to 'center' for proper alignment */
+  align-items: center;
 }
 
 .register-btn {
   background-color: #005a5b;
   color: #FAF8F0;
   border: none;
-  font-size: 18px;
+  font-family: 'Agrandir', sans-serif;
+  font-size: 20px;
   padding: 0.5rem 1rem;
   border-radius: 20px;
   font-weight: bold;
@@ -205,20 +213,41 @@ body {
   padding: 3rem 2rem;
 }
 
+.text-container {
+  position: relative;
+  z-index: 1;
+}
+
 .text-content {
   max-width: 50%;
+  font-family: 'Agrandir', sans-serif;
 }
 
 .text-content h1 {
   font-size: 2.5rem;
+  font-family: 'Agrandir', sans-serif;
+  font-size: 75px;
   color: #005a5b;
-  margin-bottom: 0.5rem;
+  margin-left: 75px;
+  margin-right: -60px;
 }
 
-.text-content p {
+.text-content p:first-of-type {
   margin-top: 0.5rem;
-  font-size: 1rem;
-  color: #3c3c3c;
+  font-family: 'Poppins-light', sans-serif;
+  font-weight: 50;
+  font-size: 25px;
+  color: black;
+  margin-left: 75px;
+}
+
+.orange-arrow {
+  position: absolute;
+  top: 90px;
+  left: 30px;
+  width: 150px;
+  height: auto;
+  z-index: 0;
 }
 
 /* ============================================= */
@@ -227,29 +256,42 @@ body {
 .search-bar {
   display: flex;
   align-items: center;
+  height: 10px;
   gap: 10px;
-  margin: 1.5rem 0;
   position: relative;
   padding: 0.5rem;
-  background-color: #ff743e;
-  border-radius: 10px;
   z-index: 1;
+  margin-left: 65px;
+  margin-top: 100px;
+  margin-bottom: 40px;
 }
 
 .search-input {
+  font-family: 'Agrandir', sans-serif;
+  font-size: 25px;
+  color: #02634f;
   padding: 0.5rem 1rem;
-  border: none;
-  border-radius: 5px 0 0 5px;
-  flex: 1;
+  width: 400px;
+  flex: none;
+  border-radius: 12px;
+  border: 3px solid #005a5b;
   z-index: 2;
+}
+
+.search-input::placeholder {
+  font-family: 'Agrandir', sans-serif;
+  font-size: 25px;
+  color: #02634f;
 }
 
 .search-btn {
   background-color: #005a5b;
+  font-family: 'Agrandir', sans-serif;
+  font-size: 30px;
   color: white;
   border: none;
   padding: 0.5rem 1rem;
-  border-radius: 0 5px 5px 0;
+  border-radius: 10px;
   cursor: pointer;
   font-weight: bold;
   z-index: 2;
@@ -259,25 +301,38 @@ body {
   background-color: #007d7d;
 }
 
-/* ============================================= */
-/* Illustration Section                           */
-/* ============================================= */
+.text-content p:last-of-type {
+  margin-top: 0.5rem;
+  font-family: 'Poppins-light', sans-serif;
+  font-weight: 50;
+  font-size: 25px;
+  color: white;
+  margin-left: 60px;
+  margin-bottom: 20px;
+}
+
+/* Illustration */
 .illustrations img {
-  width: 500px;
+  width: 525px;
   height: auto;
+  margin-right: 50px;
+  margin-bottom: 180px;
 }
 
 /* ============================================= */
 /* Orange Bar                                     */
 /* ============================================= */
 .orange-bar {
-  position: relative;
+  position: absolute;
+  top: 682px;
+  height: 276px;
   width: 100%;
-  height: 10vh;
+  z-index: 0;
   background-color: #ff743e;
-  margin-top: 1rem;
-  z-index: 1;
+  z-index: -1;
 }
+
+
 
 /* ============================================= */
 /* Active Link Styling                            */

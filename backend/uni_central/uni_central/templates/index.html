@@ -23,17 +23,22 @@
   <main class="main-content">
     <section class="hero">
       <div class="text-content">
-        <h1>Everything you need to know about your courses in one place</h1>
+        <div class="text-container">
+          <h1><span class="overlap-arrow">Everything you need to know about your courses all in one place</h1>
+        </div>
+        <img src="{%static 'assets/orange_arrow_transparent.png' %}" alt="Orange Arrow" class="orange-arrow">
         <p>Empowering students, one class at a time.</p>
         <div class="search-bar">
           <input type="text" placeholder="University of ..." class="search-input">
           <button class="search-btn">SEARCH &#10140;</button>
         </div>
-        <p class="subtext">Search for your university to find course information. Aims to redefine the way that college students research and ultimately choose their courses each term.</p>
+        <p class="subtext">Search for your university to find course information. 
+          <br>Aims to redefine the way that college students research and ultimately choose their courses each term.</br>
+        </p>
       </div>
       <div class="illustrations">
         <!-- Corrected image path with Django static tag -->
-        <img src="{% static 'assets/student_studying_transparent.png' %}" alt="Student Illustration" width="600" height="587">
+        <img src="{% static 'assets/student_studying_transparent.png' %}" alt="Student Illustration">
       </div>
     </section>
     <div class="orange-bar"></div>
