@@ -46,20 +46,22 @@ def course_detail(request, course_id):
     return render(request, 'course_detail.html', context)
 
 
-
 def create_review(request, course_id):
-    if request.method == 'POST':
-        course = get_object_or_404(Course, id=course_id)
-        user = request.user  # Assuming the user is logged in
+    course = get_object_or_404(Course, id=course_id)
+    professors = course.professors.all()  # Fetch professors related to the course
 
-        # Collecting data from the form
+    if request.method == 'POST':
+        user = request.user if request.user.is_authenticated else get_object_or_404(User, id=1)
+
+        professor_id = request.POST.get('professor')
+        professor = get_object_or_404(Professor, id=professor_id) if professor_id else None
+
         review_text = request.POST.get('review')
         rating = request.POST.get('rating')
         difficulty = request.POST.get('difficulty')
         estimated_hours = request.POST.get('estimated_hours')
         grade = request.POST.get('grade')
 
-        # Boolean fields
         would_take_again = request.POST.get('would_take_again') == 'on'
         for_credit = request.POST.get('for_credit') == 'on'
         mandatory_attendance = request.POST.get('mandatory_attendance') == 'on'
@@ -71,10 +73,11 @@ def create_review(request, course_id):
         no_exams = request.POST.get('no_exams') == 'on'
         presentations = request.POST.get('presentations') == 'on'
 
-        # Create the review
+        # Save the review
         Review.objects.create(
             user=user,
             course=course,
+            professor=professor,
             review=review_text,
             rating=float(rating) if rating else None,
             difficulty=int(difficulty) if difficulty else None,
@@ -92,11 +95,12 @@ def create_review(request, course_id):
             presentations=presentations,
         )
 
-        return redirect('course-detail', course_id=course_id)
-    else:
-        course = get_object_or_404(Course, id=course_id)
-        return render(request, 'review_form.html', {'course': course})
+        # Update course averages
+        course.update_averages()
 
+        return redirect('course-detail', course_id=course_id)
+
+    return render(request, 'review_form.html', {'course': course, 'professors': professors})
 
 # API View for Getting Courses in a Specific Department
 class DepartmentCoursesView(APIView):

@@ -6,34 +6,43 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Leave a Review</title>
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        /* General Styles */
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f4f6f8;
+            font-family: 'Montserrat', sans-serif;
+            background-color: #FAF8F0;
             margin: 0;
             padding: 0;
             color: #333;
+            line-height: 1.6;
         }
 
-        /* Main Content */
         .main-content.review-form-page {
-            max-width: 700px;
+            max-width: 800px;
             margin: 3rem auto;
-            padding: 30px;
+            padding: 40px;
             background: #ffffff;
-            border-radius: 12px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .main-content.review-form-page:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
         }
 
         .main-content.review-form-page h1 {
             text-align: center;
-            margin-bottom: 25px;
-            font-size: 2rem;
+            margin-bottom: 30px;
+            font-size: 2.5rem;
             color: #005a5b;
+            font-weight: 700;
+            letter-spacing: 1px;
         }
 
-        /* Form Styles */
         form {
             display: flex;
             flex-direction: column;
@@ -42,49 +51,50 @@
         form label {
             margin-top: 20px;
             font-weight: 600;
-            font-size: 1rem;
-            color: #333;
+            font-size: 1.1rem;
+            color: #005a5b;
         }
 
         form textarea,
         form input[type="number"],
-        form input[type="text"] {
+        form input[type="text"],
+        form select {
             width: 100%;
             padding: 12px 15px;
             margin-top: 8px;
             border: 1px solid #ccc;
             border-radius: 8px;
             font-size: 1rem;
-            transition: border-color 0.3s ease;
+            transition: all 0.3s ease;
         }
 
         form textarea:focus,
         form input[type="number"]:focus,
-        form input[type="text"]:focus {
+        form input[type="text"]:focus,
+        form select:focus {
             border-color: #005a5b;
             outline: none;
-            box-shadow: 0 0 5px rgba(0, 90, 91, 0.2);
+            box-shadow: 0 0 10px rgba(0, 90, 91, 0.2);
         }
 
-        /* Fieldset Styles */
         fieldset {
-            margin-top: 25px;
-            border: 1px solid #ddd;
-            padding: 20px;
-            border-radius: 8px;
+            margin-top: 30px;
+            border: 2px solid #e0e0e0;
+            padding: 25px;
+            border-radius: 12px;
             background-color: #fafafa;
         }
 
         fieldset legend {
             font-weight: 700;
-            font-size: 1.1rem;
+            font-size: 1.2rem;
             color: #005a5b;
+            padding: 0 10px;
         }
 
-        /* Checkbox Styles */
         .checkbox-group {
-            display: flex;
-            flex-wrap: wrap;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
             gap: 15px;
             margin-top: 15px;
         }
@@ -93,55 +103,64 @@
             display: flex;
             align-items: center;
             font-weight: 500;
-            color: #555;
+            color: #444;
             cursor: pointer;
+            transition: color 0.3s ease;
+        }
+
+        .checkbox-group label:hover {
+            color: #005a5b;
         }
 
         .checkbox-group input[type="checkbox"] {
-            margin-right: 8px;
+            margin-right: 10px;
             width: 18px;
             height: 18px;
             accent-color: #005a5b;
             cursor: pointer;
         }
 
-        /* Submit Button */
         .submit-review-button {
-            margin-top: 30px;
-            padding: 14px 20px;
+            margin-top: 40px;
+            padding: 15px 25px;
             background-color: #005a5b;
             color: #ffffff;
             border: none;
-            border-radius: 8px;
-            font-size: 1.1rem;
+            border-radius: 30px;
+            font-size: 1.2rem;
             font-weight: 600;
             cursor: pointer;
-            transition: background-color 0.3s ease, transform 0.2s ease;
+            transition: all 0.3s ease;
+            align-self: center;
         }
 
         .submit-review-button:hover {
             background-color: #004e4f;
             transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 90, 91, 0.3);
         }
 
         .submit-review-button:active {
             transform: translateY(0);
         }
 
-        /* Responsive Design */
         @media (max-width: 768px) {
             .main-content.review-form-page {
                 margin: 2rem 1rem;
-                padding: 25px;
+                padding: 30px;
             }
 
             .main-content.review-form-page h1 {
-                font-size: 1.75rem;
+                font-size: 2rem;
             }
 
             .submit-review-button {
-                font-size: 1rem;
-                padding: 12px 18px;
+                font-size: 1.1rem;
+                padding: 12px 20px;
+            }
+
+            .checkbox-group {
+                grid-template-columns: 1fr;
             }
         }
     </style>
@@ -153,11 +172,17 @@
         <form method="POST" action="{% url 'review-create' course.id %}">
             {% csrf_token %}
 
-            <!-- Text-based review -->
-            <label for="review">Review:</label>
-            <textarea id="review" name="review" placeholder="Write your review here..." rows="5" required></textarea>
+            <label for="professor">Professor:</label>
+            <select id="professor" name="professor" required>
+                <option value="">-- Select a Professor --</option>
+                {% for professor in professors %}
+                    <option value="{{ professor.id }}">{{ professor.fname }} {{ professor.lname }}</option>
+                {% endfor %}
+            </select>
 
-            <!-- Rating fields -->
+            <label for="review">Review:</label>
+            <textarea id="review" name="review" placeholder="Share your experience with this course..." rows="5" required></textarea>
+
             <label for="rating">Rating (out of 5):</label>
             <input type="number" id="rating" name="rating" step="0.1" min="0" max="5" required>
 
@@ -167,49 +192,28 @@
             <label for="estimated_hours">Estimated Weekly Hours:</label>
             <input type="number" id="estimated_hours" name="estimated_hours" step="0.1" min="0" required>
 
-            <label for="grade">Grade Received (e.g., A, B):</label>
-            <input type="text" id="grade" name="grade" maxlength="2" required>
+            <label for="grade">Grade Received:</label>
+            <input type="text" id="grade" name="grade" maxlength="2" placeholder="e.g., A, B+" required>
 
-            <!-- Boolean fields -->
             <fieldset>
-                <legend>Course Details:</legend>
+                <legend>Course Details</legend>
                 <div class="checkbox-group">
-                    <label>
-                        <input type="checkbox" name="would_take_again"> Would take again
-                    </label>
-                    <label>
-                        <input type="checkbox" name="for_credit"> For credit
-                    </label>
-                    <label>
-                        <input type="checkbox" name="mandatory_attendance"> Mandatory attendance
-                    </label>
-                    <label>
-                        <input type="checkbox" name="required_course"> Required course
-                    </label>
-                    <label>
-                        <input type="checkbox" name="is_gened"> General education requirement
-                    </label>
-                    <label>
-                        <input type="checkbox" name="in_person"> In person
-                    </label>
-                    <label>
-                        <input type="checkbox" name="online"> Online
-                    </label>
-                    <label>
-                        <input type="checkbox" name="hybrid"> Hybrid
-                    </label>
-                    <label>
-                        <input type="checkbox" name="no_exams"> No exams
-                    </label>
-                    <label>
-                        <input type="checkbox" name="presentations"> Presentations
-                    </label>
+                    <label><input type="checkbox" name="would_take_again"> Would take again</label>
+                    <label><input type="checkbox" name="for_credit"> For credit</label>
+                    <label><input type="checkbox" name="mandatory_attendance"> Mandatory attendance</label>
+                    <label><input type="checkbox" name="required_course"> Required course</label>
+                    <label><input type="checkbox" name="is_gened"> General education requirement</label>
+                    <label><input type="checkbox" name="in_person"> In person</label>
+                    <label><input type="checkbox" name="online"> Online</label>
+                    <label><input type="checkbox" name="hybrid"> Hybrid</label>
+                    <label><input type="checkbox" name="no_exams"> No exams</label>
+                    <label><input type="checkbox" name="presentations"> Presentations</label>
                 </div>
             </fieldset>
 
-            <!-- Submit button -->
             <button type="submit" class="submit-review-button">Submit Review</button>
         </form>
     </main>
+    <script src="{% static 'js/review.js' %}"></script>
 </body>
 </html>
