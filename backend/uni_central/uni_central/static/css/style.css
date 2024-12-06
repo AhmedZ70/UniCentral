@@ -279,6 +279,7 @@ body {
 .search-input {
   font-family: 'Agrandir', sans-serif;
   font-size: 25px;
+  color: #005a5b;
   padding: 0.5rem 1rem;
   width: 400px;
   flex: none;
