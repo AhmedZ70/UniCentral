@@ -20,7 +20,9 @@ body {
   font-style: normal;
 }
 
-/* Navbar Styles */
+/* ============================================= */
+/* Navbar Styles                                 */
+/* ============================================= */
 .navbar {
   display: flex;
   justify-content: space-between;
@@ -266,6 +268,7 @@ body {
 .search-input {
   font-family: 'Agrandir', sans-serif;
   font-size: 25px;
+  color: #02634f;
   padding: 0.5rem 1rem;
   width: 400px;
   flex: none;
