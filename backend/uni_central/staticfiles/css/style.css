@@ -1,0 +1,623 @@
+/* ============================================= */
+/* General                                       */
+/* ============================================= */
+body, html, ul, li, p, h1, h2, select {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Montserrat', sans-serif;
+  line-height: 1.6;
+  background-color: #FAF8F0;
+}
+
+@font-face {
+  font-family: 'Agrandir';
+  src: url('../assets/fonts/Agrandir-Regular.otf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+/* ============================================= */
+/* Navbar Styles                                 */
+/* ============================================= */
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 2rem;
+  font-weight: 100;
+  font-size: 20px;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: #333333;
+}
+
+.logo img {
+  width: 200px;
+  margin-right: 8px;
+}
+
+.nav-links {
+  display: flex;
+  list-style: none;
+}
+
+.nav-links li {
+  margin-left: 2rem;
+}
+
+.nav-links a {
+  text-decoration: none;
+  color: #333333;
+  font-weight: bold;
+}
+
+.nav-links a:hover {
+  color: #005a5b;
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+}
+
+.register-btn {
+  background-color: #005a5b;
+  color: #FAF8F0;
+  border: none;
+  font-family: 'Agrandir', sans-serif;
+  font-size: 20px;
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.register-btn:hover {
+  background-color: #007d7d;
+}
+
+.welcome-message {
+  color: #005a5b;
+  font-weight: bold;
+  margin-right: 1rem;
+  display: inline-block;
+  font-family: 'Montserrat', sans-serif;
+}
+
+/* ============================================= */
+/* Dropdown Menu Styles                           */
+/* ============================================= */
+.dropdown-menu {
+  position: relative;
+  font-size: 16px;
+  margin-left: 1rem;
+  cursor: pointer;
+  width: 50px;
+  height: 80px;
+}
+
+.dropdown-menu-btn {
+  color: black;
+  background-color: #FAF8F0;
+  padding: 0; /* Changed from 'none' to '0' for valid CSS */
+  margin-top: 13px;
+  font-size: 40px;
+  border: none;
+  border-radius: 4px;
+}
+
+.dropdown-menu-content {
+  display: none;
+  position: absolute;
+  font-size: 23px;
+  background-color: #f1f1f1;
+  min-width: 250px;
+  min-height: 350px;
+  box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.2);
+  z-index: 100;
+  top: 100%;
+  right: 0;
+  list-style: none;
+  padding: 10px 20px;
+  font-weight: bold;
+  border: 3px solid black;
+  border-radius: 4px;
+}
+
+.dropdown-menu.active .dropdown-menu-content {
+  display: block;
+}
+
+.dropdown-menu-btn:focus + .dropdown-menu-content,
+.dropdown-menu:hover .dropdown-menu-content {
+  display: block;
+}
+
+.dropdown-menu-btn:focus,
+.dropdown-menu:hover .dropdown-menu-btn {
+  color: #313131;
+}
+
+.dropdown-menu-content a {
+  display: block;
+  text-decoration: none;
+  color: black;
+}
+
+.dropdown-menu-content a:hover {
+  color: #3c3c3c;
+}
+
+.dropdown-menu-btn:hover + .dropdown-menu-content {
+  display: block;
+}
+
+.dropdown-menu:hover .dropdown-menu-btn {
+  color: #3c3c3c;
+}
+
+/* ============================================= */
+/* Icon Styles                                    */
+/* ============================================= */
+.icons {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 15px;
+}
+
+.icons img {
+  width: 35px;
+}
+
+.icons a {
+  text-decoration: none;
+  color: black;
+  font-weight: bold;
+}
+
+/* ============================================= */
+/* Button Styles                                  */
+/* ============================================= */
+.logout-btn, .login-btn {
+  color: black;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 23px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.logout-btn:hover, .login-btn:hover {
+  color: #3c3c3c;
+}
+
+/* ============================================= */
+/* Hero Section                                   */
+/* ============================================= */
+.hero {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 3rem 2rem;
+}
+
+.text-container {
+  position: relative;
+  z-index: 1;
+}
+
+.text-content {
+  max-width: 50%;
+  font-family: 'Agrandir', sans-serif;
+}
+
+.text-content h1 {
+  font-size: 2.5rem;
+  font-family: 'Agrandir', sans-serif;
+  font-size: 75px;
+  color: #005a5b;
+  margin-left: 75px;
+  margin-right: -60px;
+}
+
+.text-content p:first-of-type {
+  margin-top: 0.5rem;
+  font-family: 'Poppins-light', sans-serif;
+  font-weight: 50;
+  font-size: 25px;
+  color: black;
+  margin-left: 75px;
+}
+
+.orange-arrow {
+  position: absolute;
+  top: 90px;
+  left: 30px;
+  width: 150px;
+  height: auto;
+  z-index: 0;
+}
+
+/* ============================================= */
+/* Search Bar                                     */
+/* ============================================= */
+.search-bar {
+  display: flex;
+  align-items: center;
+  height: 10px;
+  gap: 10px;
+  position: relative;
+  padding: 0.5rem;
+  z-index: 1;
+  margin-left: 65px;
+  margin-top: 100px;
+  margin-bottom: 40px;
+}
+
+.search-input {
+  font-family: 'Agrandir', sans-serif;
+  font-size: 25px;
+  color: #02634f;
+  padding: 0.5rem 1rem;
+  width: 400px;
+  flex: none;
+  border-radius: 12px;
+  border: 3px solid #005a5b;
+  z-index: 2;
+}
+
+.search-input::placeholder {
+  font-family: 'Agrandir', sans-serif;
+  font-size: 25px;
+  color: #02634f;
+}
+
+.search-btn {
+  background-color: #005a5b;
+  font-family: 'Agrandir', sans-serif;
+  font-size: 30px;
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: bold;
+  z-index: 2;
+}
+
+.search-btn:hover {
+  background-color: #007d7d;
+}
+
+.text-content p:last-of-type {
+  margin-top: 0.5rem;
+  font-family: 'Poppins-light', sans-serif;
+  font-weight: 50;
+  font-size: 25px;
+  color: white;
+  margin-left: 60px;
+  margin-bottom: 20px;
+}
+
+/* Illustration */
+.illustrations img {
+  width: 525px;
+  height: auto;
+  margin-right: 50px;
+  margin-bottom: 180px;
+}
+
+/* ============================================= */
+/* Orange Bar                                     */
+/* ============================================= */
+.orange-bar {
+  position: absolute;
+  top: 682px;
+  height: 276px;
+  width: 100%;
+  z-index: 0;
+  background-color: #ff743e;
+  z-index: -1;
+}
+
+
+
+/* ============================================= */
+/* Active Link Styling                            */
+/* ============================================= */
+.nav-links a.active {
+  color: #005a5b;
+  font-weight: bold;
+  position: relative;
+}
+
+.nav-links a.active::after {
+  content: "";
+  display: block;
+  width: 100%;
+  height: 2px;
+  background-color: #005a5b;
+  margin-top: 5px;
+}
+
+/* ============================================= */
+/* Courses Page Styles                            */
+/* ============================================= */
+
+/* Base Styles for Containers */
+#departments-title, #courses-title {
+  margin-top: 2rem;
+  font-size: 1.5rem;
+  font-weight: bold;
+  padding-left: 50px; /* Ensure proper spacing from the left */
+}
+
+/* Visibility Classes */
+.hidden {
+  display: none;
+}
+
+.visible {
+  display: block;
+  opacity: 1;
+  transition: opacity 0.3s ease;
+}
+
+/* Fade Transitions */
+.fade-in {
+  opacity: 1;
+  transition: opacity 0.3s ease;
+}
+
+.fade-out {
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+/* Letter Headers */
+.letter-header {
+  display: block;
+  font-weight: bold;
+  font-size: 1.2rem;
+  margin-bottom: 10px;
+  color: #fa743e;
+}
+
+/* Letter Group */
+.letter-group {
+  margin-bottom: 0;
+}
+
+/* Breadcrumb Link Styles */
+.breadcrumb-link {
+  color: #fa743e;
+  text-decoration: none;
+  font-weight: bold;
+  padding-left: 50px;
+  margin-right: 5px;
+}
+
+.breadcrumb-link:hover {
+  text-decoration: underline;
+}
+
+/* Course Item Styles */
+.course-item {
+  border: 2px solid #fa743e;
+  border-radius: 8px;
+  padding: 10px;
+  margin-bottom: 20px; /* Consistent bottom margin */
+  color: #333;
+  transition: background-color 0.3s ease;
+  background-color: #fff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+}
+
+.course-item:hover {
+  background-color: #fa743e;
+  color: #fff;
+}
+
+/* Courses Header */
+.courses-header {
+  display: flex;
+  justify-content: center;
+  align-items: baseline;
+  gap: 10px;
+  margin-top: 2rem;
+}
+
+.courses-header h1 {
+  font-size: 2.5rem;
+  color: #fa743e;
+  margin: 0;
+  line-height: 1;
+}
+
+/* University Select Dropdown */
+.university-select {
+  padding: 0.5rem 1rem;
+  font-size: 1rem;
+  border: 2px solid #fa743e;
+  border-radius: 5px;
+  max-width: 300px;
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* Section Headers */
+.courses-page h1 {
+  font-size: 2.5rem;
+  color: #fa743e;
+  margin-bottom: 1rem;
+}
+
+.courses-page h2 {
+  font-size: 1.8rem;
+  color: #333;
+  margin: 2rem 0 1rem 0;
+}
+
+/* Department Link Styling */
+.department-link {
+  text-decoration: none;
+  color: inherit;
+}
+
+.department-link:hover .department {
+  background-color: #e8f5e9;
+  cursor: pointer;
+}
+
+/* Departments Container */
+.departments {
+  max-width: 100%;
+  margin: 2rem auto;
+  padding: 1rem 20px;
+  padding-left: 50px;
+}
+
+/* Departments Grouping */
+.department-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: flex-start;
+  margin-left: 0;
+}
+
+/* Department Card */
+.department {
+  width: 160px;
+  height: 130px;
+  padding: 10px;
+  border: 2px solid #2ecc71;
+  border-radius: 8px;
+  text-align: center;
+  font-size: 18px;
+  color: #2ecc71;
+  background-color: #fff;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.department:hover {
+  background-color: #2ecc71;
+  color: #fff;
+}
+
+/* ============================================= */
+/* Footer                                         */
+/* ============================================= */
+footer {
+  margin-top: 2rem;
+  padding: 1rem;
+  font-size: 0.9rem;
+  background-color: #fafafa;
+  color: #333333;
+}
+
+/* ============================================= */
+/* Courses Container                              */
+/* ============================================= */
+.courses {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 0 20px;
+  overflow: hidden;
+}
+
+/* ============================================= */
+/* Courses List                                   */
+/* ============================================= */
+.courses-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 20px; /* Creates a 20px gap between each .course-item */
+}
+
+.course-link {
+  text-decoration: none;
+  color: #333;
+  padding-bottom: 1em;
+}
+
+.course-link:hover {
+  background-color: #f0f0f0;
+  color: #005a5b;
+  box-shadow: none;
+  margin: 0;
+}
+
+.course-item h4 {
+  margin-bottom: 0.5rem;
+  font-size: 1.25rem;
+  color: #005a5b;
+}
+
+.course-item p {
+  font-size: 1rem;
+  color: #666;
+}
+
+/* Additional Responsive Styles */
+@media (max-width: 768px) {
+  .navbar {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .logo img {
+    width: 150px;
+  }
+
+  .nav-links {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .nav-links li {
+    margin-left: 0;
+    margin-top: 1rem;
+  }
+
+  .hero {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .text-content {
+    max-width: 100%;
+  }
+
+  .illustrations img {
+    width: 100%;
+  }
+
+  .department-container {
+    justify-content: center;
+  }
+
+  .courses-header {
+    flex-direction: column;
+  }
+}
