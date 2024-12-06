@@ -34,7 +34,7 @@
                     {% for review in reviews %}
                         <li class="review-item">
                             <div class="review-header">
-                                <strong>Review by: {{ review.user.fname|default:"anonymous" }}</strong>
+                                <strong>Review by: anonymous</strong>
                                 <span>{% if review.grade %}Grade: {{ review.grade }}{% else %}Grade: Not provided{% endif %}</span>
                             </div>
                             <div class="review-content">
