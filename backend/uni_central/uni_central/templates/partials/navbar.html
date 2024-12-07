@@ -11,6 +11,7 @@
         <li><a href="#" class="{% if request.resolver_match.url_name == 'professors' %}active{% endif %}">Professors</a></li>
         <li><a href="#" class="{% if request.resolver_match.url_name == 'course_filtering' %}active{% endif %}">Course Filtering</a></li>
         <li><a href="#" class="{% if request.resolver_match.url_name == 'about' %}active{% endif %}">About</a></li>
+        <script type="module" src="{% static 'js/auth.js' %}"></script>
       </ul>
     </nav>
     <div class="actions">
