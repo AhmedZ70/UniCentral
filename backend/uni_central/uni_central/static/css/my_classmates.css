@@ -2,95 +2,375 @@
 /* General                                       */
 /* ============================================= */
 body, html, ul, li, p, h1, h2, select {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-  }
-  
-  body {
-    font-family: 'Montserrat', sans-serif;
-    line-height: 1.6;
-    background-color: #FAF8F0;
-  }
-  
-  @font-face {
-    font-family: 'Agrandir';
-    src: url('../assets/fonts/Agrandir-Regular.otf') format('truetype');
-    font-weight: normal;
-    font-style: normal;
-  }
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
 
-  .my-classmates {
-    width: 100%;
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 2rem;
-  }
-  
-  .search-add-classmate {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 1.5rem;
-  }
-  
-  .classmate-search {
-    flex: 1;
-    padding: 0.5rem 1rem;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-  }
-  
-  .classmate-filter {
-    padding: 0.5rem 1rem;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    background-color: #fff;
-    font-size: 1rem;
-  }
-  
-  .classmate-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 1.5rem;
-  }
-  
-  .classmate-card {
-    background-color: #f5f5f5;
-    border-width: 3px;
-    border-color: black;
-    border-radius: 8px;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-    padding: 1.5rem;
-    display: flex;
-    align-items: center;
-  }
-  
-  .classmate-avatar {
-    width: 60px;
-    height: 60px;
-    border-radius: 50%;
-    overflow: hidden;
-    margin-right: 1.5rem;
-  }
-  
-  .classmate-avatar img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-  }
-  
-  .classmate-info h3 {
-    font-size: 1.1rem;
-    margin-bottom: 0.5rem;
-  }
-  
-  .classmate-status {
-    font-size: 0.9rem;
-    color: #666;
-  }
-  
-  .classmate-info p {
-    font-size: 0.9rem;
-    color: #666;
-  }
+body {
+  font-family: 'Montserrat', sans-serif;
+  line-height: 1.6;
+  background-color: #FAF8F0;
+}
+
+@font-face {
+  font-family: 'Agrandir';
+  src: url('../assets/fonts/Agrandir-Regular.otf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+/* ============================================= */
+/* Navbar Styles                                 */
+/* ============================================= */
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 2rem;
+  font-weight: 100;
+  font-size: 20px;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: #333333;
+}
+
+.logo img {
+  width: 200px;
+  margin-right: 8px;
+}
+
+.nav-links {
+  display: flex;
+  list-style: none;
+}
+
+.nav-links li {
+  margin-left: 2rem;
+}
+
+.nav-links a {
+  text-decoration: none;
+  color: #333333;
+  font-weight: bold;
+}
+
+.nav-links a:hover {
+  color: #005a5b;
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+}
+
+.register-btn {
+  background-color: #005a5b;
+  color: #FAF8F0;
+  border: none;
+  font-family: 'Agrandir', sans-serif;
+  font-size: 20px;
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.register-btn:hover {
+  background-color: #007d7d;
+}
+
+.welcome-message {
+  color: #005a5b;
+  font-weight: bold;
+  margin-right: 1rem;
+  display: inline-block;
+  font-family: 'Montserrat', sans-serif;
+}
+
+/* ============================================= */
+/* Dropdown Menu Styles                           */
+/* ============================================= */
+.dropdown-menu {
+  position: relative;
+  font-size: 16px;
+  margin-left: 1rem;
+  cursor: pointer;
+  width: 50px;
+  height: 80px;
+}
+
+.dropdown-menu-btn {
+  color: black;
+  background-color: #FAF8F0;
+  padding: 0; /* Changed from 'none' to '0' for valid CSS */
+  margin-top: 13px;
+  font-size: 40px;
+  border: none;
+  border-radius: 4px;
+}
+
+.dropdown-menu-content {
+  display: none;
+  position: absolute;
+  font-size: 23px;
+  background-color: #f1f1f1;
+  min-width: 250px;
+  min-height: 350px;
+  box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.2);
+  z-index: 100;
+  top: 100%;
+  right: 0;
+  list-style: none;
+  padding: 10px 20px;
+  font-weight: bold;
+  border: 3px solid black;
+  border-radius: 4px;
+}
+
+.dropdown-menu.active .dropdown-menu-content {
+  display: block;
+}
+
+.dropdown-menu-btn:focus + .dropdown-menu-content,
+.dropdown-menu:hover .dropdown-menu-content {
+  display: block;
+}
+
+.dropdown-menu-btn:focus,
+.dropdown-menu:hover .dropdown-menu-btn {
+  color: #313131;
+}
+
+.dropdown-menu-content a {
+  display: block;
+  text-decoration: none;
+  color: black;
+}
+
+.dropdown-menu-content a:hover {
+  color: #3c3c3c;
+}
+
+.dropdown-menu-btn:hover + .dropdown-menu-content {
+  display: block;
+}
+
+.dropdown-menu:hover .dropdown-menu-btn {
+  color: #3c3c3c;
+}
+
+/* ============================================= */
+/* Icon Styles                                    */
+/* ============================================= */
+.icons {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 15px;
+}
+
+.icons img {
+  width: 35px;
+}
+
+.icons a {
+  text-decoration: none;
+  color: black;
+  font-weight: bold;
+}
+
+/* ============================================= */
+/* Button Styles                                  */
+/* ============================================= */
+.logout-btn, .login-btn {
+  color: black;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 23px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.logout-btn:hover, .login-btn:hover {
+  color: #3c3c3c;
+}
+
+/* ============================================= */
+/* Hero Section                                   */
+/* ============================================= */
+.hero {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 3rem 2rem;
+}
+
+.text-container {
+  position: relative;
+  z-index: 1;
+}
+
+.text-content {
+  max-width: 100%;
+  font-family: 'Agrandir', sans-serif;
+}
+
+.text-content h1 {
+  font-family: 'Agrandir', sans-serif;
+  font-weight: 100;
+  font-size: 75px;
+  color: #ff743e;
+  margin-left: 8px;
+  margin-top: -50px;
+}
+
+.text-content p {
+  margin-top: 0.5rem;
+  font-family: 'Poppins-light', sans-serif;
+  font-weight: 50;
+  font-size: 25px;
+  color: black;
+}
+
+/* ============================================= */
+/* Search Bar                                     */
+/* ============================================= */
+.search-bar {
+  display: flex;
+  align-items: center;
+  gap: 20px; /* Spacing between elements */
+  position: relative;
+  padding: 0.5rem;
+  z-index: 1;
+  margin-left: 65px;
+  margin-top: 10px;
+  margin-bottom: 40px;
+}
+
+.search-bar p {
+  font-family: 'Agrandir', sans-serif;
+  font-size: 35px;
+  color: black;
+  white-space: nowrap; /* Prevents text from wrapping */
+  margin-left: -60px; /* Remove default paragraph margins */
+}
+
+.search-input {
+  font-family: 'Agrandir', sans-serif;
+  font-size: 25px;
+  color: #02634f;
+  padding: 0.5rem 1rem;
+  width: 800px;
+  border-radius: 12px;
+  border: 3px solid #005a5b;
+  z-index: 2;
+}
+
+.search-btn {
+  background-color: #005a5b;
+  font-family: 'Agrandir', sans-serif;
+  font-size: 25px;
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: bold;
+  z-index: 2;
+}
+
+.search-input::placeholder {
+  font-family: 'Agrandir', sans-serif;
+  font-size: 25px;
+  color: #02634f;
+}
+
+.search-btn:hover {
+  background-color: #007d7d;
+}
+
+
+.my-classmates {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+.search-add-classmate {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.5rem;
+}
+
+.classmate-search {
+  flex: 1;
+  padding: 0.5rem 1rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.classmate-filter {
+  padding: 0.5rem 1rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  background-color: #fff;
+  font-size: 1rem;
+}
+
+.classmate-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1.5rem;
+}
+
+.classmate-card {
+  background-color: #f5f5f5;
+  border-width: 3px;
+  border-color: black;
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  padding: 1.5rem;
+  display: flex;
+  align-items: center;
+  width: 500px;
+  height: 200px;
+}
+
+.classmate-avatar {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  overflow: hidden;
+  margin-right: 1.5rem;
+}
+
+.classmate-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.classmate-info h3 {
+  font-size: 1.1rem;
+  margin-bottom: 0.5rem;
+}
+
+.classmate-status {
+  font-size: 0.9rem;
+  color: #666;
+}
+
+.classmate-info p {
+  font-size: 0.9rem;
+  color: #666;
+}
