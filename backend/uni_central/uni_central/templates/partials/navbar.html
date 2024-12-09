@@ -2,7 +2,11 @@
 {% load static %}
 <header class="navbar">
     <div class="logo">
-      <img src="{% static 'assets/logo_horizontal.png' %}" alt="UniCentral Logo">
+      <button class="logo-home-btn">
+        <a href="{% url 'home' %}" class="logo-home-btn">
+          <img src="{% static 'assets/logo_horizontal.png' %}" alt="UniCentral Logo">
+        </a>
+      </button>
     </div>
     <nav>
       <ul class="nav-links">
