@@ -45,6 +45,11 @@ body {
   margin-right: 8px;
 }
 
+.logo-home-btn {
+  border: none;
+  background-color: #FAF8F0;
+}
+
 .nav-links {
   display: flex;
   list-style: none;

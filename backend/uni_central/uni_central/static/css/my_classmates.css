@@ -45,6 +45,11 @@ body {
   margin-right: 8px;
 }
 
+.logo-home-btn {
+  border: none;
+  background-color: #FAF8F0;
+}
+
 .nav-links {
   display: flex;
   list-style: none;
@@ -326,6 +331,7 @@ body {
   background-color: #fff;
   font-size: 1rem;
   margin-top: -100px;
+  margin-left: 20px;
 }
 
 .classmate-grid {

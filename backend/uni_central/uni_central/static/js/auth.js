@@ -41,7 +41,7 @@ function handleAuthStateChange() {
         }
         const welcomeText = document.createElement('div');
         welcomeText.className = 'welcome-message';
-        if (currentUrl == "http://127.0.0.1:8000/courses/") {
+        if (currentUrl != "http://127.0.0.1:8000/") {
           welcomeText.textContent = `${user.displayName}`;
         }
         else {
