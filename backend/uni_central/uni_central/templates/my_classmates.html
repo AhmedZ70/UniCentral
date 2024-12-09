@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  {% load static %}
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>UniCentral</title>
+  
+  <!-- Corrected CSS file path with Django static tag -->
+  <link rel="stylesheet" href="{% static 'css/my_classmates.css' %}">
+  
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Corben:wght@400;700&family=Montserrat:ital,wght@0,100..900;1,100..900&family=Sigmar&family=Sniglet:wght@400;800&display=swap" rel="stylesheet">
+  <script type="module" src="{% static 'js/auth.js' %}"></script>
+</head>
+<body>
+<header class="navbar">
+  <div class="logo">
+    <img src="{% static 'assets/logo_horizontal.png' %}" alt="UniCentral Logo">
+  </div>
+  <div class="actions">
+    <a href="{% url 'signup' %}"><button class="register-btn">REGISTER</button></a>
+    <div class="dropdown-menu">
+      <button class="dropdown-menu-btn">&#9776;</button>
+      <div class="dropdown-menu-content">
+        <div class="icons">
+          <img src="{% static 'assets/my_account_icon.png' %}" alt="UniCentral Logo">
+          <a href="#">My Account</a>
+        </div>
+        <div class="icons">
+          <img src="{% static 'assets/my_courses_icon.png' %}" alt="UniCentral Logo">
+          <a href="#">My Courses</a>
+        </div>
+        <div class="icons">
+          <img src="{% static 'assets/my_professors_icon.png' %}" alt="UniCentral Logo">
+          <a href="#">My Professors</a>
+        </div>
+        <div class="icons">
+          <img src="{% static 'assets/my_classmates_icon.png' %}" alt="UniCentral Logo">
+          <a href="{% url 'my_classmates' %}">My Classmates</a>
+        </div>
+        <div class="icons">
+          <img src="{% static 'assets/my_reviews_icon.png' %}" alt="UniCentral Logo">
+          <a href="#">My Reviews</a>
+        </div>
+        <div class="icons">
+          <img src="{% static 'assets/course_planner_icon.png' %}" alt="UniCentral Logo">
+          <a href="#">Course Planner</a>
+        </div>
+        <div class="separator">
+          <hr>
+          <button class="logout-btn">Log Out</button>
+          <hr>
+        </div>
+        <li><a href="#">Privacy Policy</a></li>
+        <li><a href="#">Help & Feedback</a></li>
+      </div>
+    </div>
+  </div>
+</header>
+
+<main class="main-content">
+  <section class="hero">
+    <div class="text-content">
+        <div class="text-container">
+          <h1>My Classmates</h1>
+        </div>
+        <div class="search-bar">
+          <p>Search for a classmate</p>
+          <input type="text" class="search-input">
+          <button class="search-btn">SEARCH &#10140;</button>
+        </div>
+    </div>
+  </section>
+  <div class="my-classmates">
+    <div class="search-add-classmate">
+      <select class="classmate-filter">
+        <option value="a-z">A - Z</option>
+        <option value="newest-oldest">Newest - oldest</option>
+        <option value="oldest-newest">Oldest - newest</option>    
+      </select>
+    </div>
+    <div class="classmate-grid">
+      <div class="classmate-card">
+        <div class="classmate-avatar">
+            <img src="{%static 'assets/profile_picture.png' %}" alt="Ashley Thompson">
+        </div>
+        <div class="classmate-info">
+          <div class="name-container">
+            <h3>Ashley Thompson </h3>
+            <button class="chat-button">
+              <img src="{%static 'assets/chat_bubble.png' %}" alt="chat" class="chat-bubble">
+            </button>
+          </div>
+          <p>Classes in common: CS 2420, MATH 2250</p>
+        </div>
+      </div>
+      <div class="classmate-card">
+        <div class="classmate-avatar">
+            <img src="{%static 'assets/profile_picture.png' %}" alt="Brandon Miller">
+        </div>
+        <div class="classmate-info">
+          <div class="name-container">
+            <h3>Brandon Miller</h3>
+            <button class="chat-button">
+              <img src="{%static 'assets/chat_bubble.png' %}" alt="chat" class="chat-bubble">
+            </button>
+          </div>
+          <p>Classes in common: WRTG 2010, CS 2100</p>
+        </div>
+      </div>
+      <div class="classmate-card">
+        <div class="classmate-avatar">
+            <img src="{%static 'assets/profile_picture.png' %}" alt="Christopher Wilson">
+        </div>
+        <div class="classmate-info">
+          <div class="name-container">
+            <h3>Christopher Wilson</h3>
+            <button class="chat-button">
+              <img src="{%static 'assets/chat_bubble.png' %}" alt="chat" class="chat-bubble">
+            </button>
+          </div>
+          <p>Classes in common: THEA 1013, MATH 2250</p>
+        </div>
+      </div>
+      <div class="classmate-card">
+        <div class="classmate-avatar">
+            <img src="{%static 'assets/profile_picture.png' %}" alt="Daniel Rodriguez">
+        </div>
+        <div class="classmate-info">
+          <div class="name-container">
+            <h3>Daniel Rodriguez</h3>
+            <button class="chat-button">
+              <img src="{%static 'assets/chat_bubble.png' %}" alt="chat" class="chat-bubble">
+            </button>
+          </div>
+          <p>Classes in common: CS 2420</p>
+        </div>
+      </div>
+      <div class="classmate-card">
+        <div class="classmate-avatar">
+            <img src="{%static 'assets/profile_picture.png' %}" alt="Emily Johnson">
+        </div>
+        <div class="classmate-info">
+          <div class="name-container">
+            <h3>Emily Johnson</h3>
+            <button class="chat-button">
+              <img src="{%static 'assets/chat_bubble.png' %}" alt="chat" class="chat-bubble">
+            </button>
+          </div>
+          <p>Classes in common: THEA 1013, CS 2100</p>
+        </div>
+      </div>
+      <div class="classmate-card">
+        <div class="classmate-avatar">
+            <img src="{%static 'assets/profile_picture.png' %}" alt="Hannah Martinez">
+        </div>
+        <div class="classmate-info">
+          <div class="name-container">
+            <h3>Hannah Martinez</h3>
+            <button class="chat-button">
+              <img src="{%static 'assets/chat_bubble.png' %}" alt="chat" class="chat-bubble">
+            </button>
+          </div>
+          <p>Classes in common: CS 2420, WRTG 2010</p>
+        </div>
+      </div>
+      <div class="classmate-card">
+        <div class="classmate-avatar">
+            <img src="{%static 'assets/profile_picture.png' %}" alt="Isabella Garcia">
+        </div>
+        <div class="classmate-info">
+          <div class="name-container">
+            <h3>Isabella Garcia</h3>
+            <button class="chat-button">
+              <img src="{%static 'assets/chat_bubble.png' %}" alt="chat" class="chat-bubble">
+            </button>
+          </div>
+          <p>Classes in common: MATH 2250</p>
+        </div>
+      </div>
+      <div class="classmate-card">
+        <div class="classmate-avatar">
+            <img src="{%static 'assets/profile_picture.png' %}" alt="James Anderson">
+        </div>
+        <div class="classmate-info">
+          <div class="name-container">
+            <h3>James Anderson</h3>
+            <button class="chat-button">
+              <img src="{%static 'assets/chat_bubble.png' %}" alt="chat" class="chat-bubble">
+            </button>
+          </div>
+          <p>Classes in common: CS 2100, CS 2420</p>
+        </div>
+      </div>
+      <div class="classmate-card">
+        <div class="classmate-avatar">
+            <img src="{%static 'assets/profile_picture.png' %}" alt="Kevin Smith">
+        </div>
+        <div class="classmate-info">
+          <div class="name-container">
+            <h3>Kevin Smith</h3>
+            <button class="chat-button">
+              <img src="{%static 'assets/chat_bubble.png' %}" alt="chat" class="chat-bubble">
+            </button>
+          </div>
+          <p>Classes in common: THEA 1013, WRTG 2010</p>
+        </div>
+      </div>
+      <div class="classmate-card">
+        <div class="classmate-avatar">
+            <img src="{%static 'assets/profile_picture.png' %}" alt="Laura Davis">
+        </div>
+        <div class="classmate-info">
+          <div class="name-container">
+            <h3>Laura Davis</h3>
+            <button class="chat-button">
+              <img src="{%static 'assets/chat_bubble.png' %}" alt="chat" class="chat-bubble">
+            </button>
+          </div>
+          <p>Classes in common: CS 2420, MATH 2250</p>
+        </div>
+      </div>
+      <div class="classmate-card">
+        <div class="classmate-avatar">
+            <img src="{%static 'assets/profile_picture.png' %}" alt="Michael Brown">
+        </div>
+        <div class="classmate-info">
+          <div class="name-container">
+            <h3>Michael Brown</h3>
+            <button class="chat-button">
+              <img src="{%static 'assets/chat_bubble.png' %}" alt="chat" class="chat-bubble">
+            </button>
+          </div>
+          <p>Classes in common: WRTG 2010</p>
+        </div>
+      </div>
+      <div class="classmate-card">
+        <div class="classmate-avatar">
+            <img src="{%static 'assets/profile_picture.png' %}" alt="Nathan Taylor">
+        </div>
+        <div class="classmate-info">
+          <div class="name-container">
+            <h3>Nathan Taylor</h3>
+            <button class="chat-button">
+              <img src="{%static 'assets/chat_bubble.png' %}" alt="chat" class="chat-bubble">
+            </button>
+          </div>
+          <p>Classes in common: CS 2100, THEA 1013</p>
+        </div>
+      </div>
+      <div class="classmate-card">
+        <div class="classmate-avatar">
+            <img src="{%static 'assets/profile_picture.png' %}" alt="Olivia White">
+        </div>
+        <div class="classmate-info">
+          <div class="name-container">
+            <h3>Olivia White</h3>
+            <button class="chat-button">
+              <img src="{%static 'assets/chat_bubble.png' %}" alt="chat" class="chat-bubble">
+            </button>
+          </div>
+          <p>Classes in common: MATH 2250, CS 2420</p>
+        </div>
+      </div>
+      <div class="classmate-card">
+        <div class="classmate-avatar">
+            <img src="{%static 'assets/profile_picture.png' %}" alt="Rachel Moore">
+        </div>
+        <div class="classmate-info">
+          <div class="name-container">
+            <h3>Rachel Moore</h3>
+            <button class="chat-button">
+              <img src="{%static 'assets/chat_bubble.png' %}" alt="chat" class="chat-bubble">
+            </button>
+          </div>
+          <p>Classes in common: CS 2100</p>
+        </div>
+      </div>
+      <div class="classmate-card">
+        <div class="classmate-avatar">
+            <img src="{%static 'assets/profile_picture.png' %}" alt="Sarah Williams">
+        </div>
+        <div class="classmate-info">
+          <div class="name-container">
+            <h3>Sarah Williams</h3>
+            <button class="chat-button">
+              <img src="{%static 'assets/chat_bubble.png' %}" alt="chat" class="chat-bubble">
+            </button>
+          </div>
+          <p>Classes in common: WRTG 2010, THEA 1013</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
