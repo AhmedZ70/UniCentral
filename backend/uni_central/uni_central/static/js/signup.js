@@ -190,8 +190,8 @@ document.addEventListener('DOMContentLoaded', () => {
             },
             body: JSON.stringify({
                 email: email,
-                fname: name,
-                lname: "Doe"
+                fname: fname,
+                lname: lname
             })
         })
         .then(response => response.json())
