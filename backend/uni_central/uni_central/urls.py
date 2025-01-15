@@ -19,14 +19,7 @@ from django.urls import path
 from . import views
 from .views import (
     DepartmentListCreateView,
-    DepartmentDetailView,
-    CourseListCreateView,
-    CourseDetailView,
-    CourseFilteringCreateView,
-    ProfessorListCreateView,
-    ReviewListCreateView,
     DepartmentCoursesView,
-    CreateUserView,
     home,
     courses,
     signup_page,
