@@ -19,14 +19,7 @@ from django.urls import path
 from . import views
 from .views import (
     DepartmentListCreateView,
-    DepartmentDetailView,
-    CourseListCreateView,
-    CourseDetailView,
-    CourseFilteringCreateView,
-    ProfessorListCreateView,
-    ReviewListCreateView,
     DepartmentCoursesView,
-    CreateUserView,
     home,
     courses,
     signup_page,
@@ -47,14 +40,7 @@ urlpatterns = [
     
     # API URLs
     path('api/departments/', DepartmentListCreateView.as_view(), name='department-list'),
-    path('api/departments/<int:pk>/', DepartmentDetailView.as_view(), name='department-detail'),
-    path('api/courses/', CourseListCreateView.as_view(), name='course-list'),
-    path('api/courses/<int:pk>/', CourseDetailView.as_view(), name='course-detail'),
-    path('api/professors/', ProfessorListCreateView.as_view(), name='professor-list'),
-    path('api/reviews/', ReviewListCreateView.as_view(), name='review-list'),
-    path('api/course_filtering/', CourseFilteringCreateView.as_view(), name='course_filtering'),
     path('api/create_user/', views.CreateUserView.create_user, name='create_user'),
-    path('api/create_review/', views.CreateReviewView.create_review, name='create_review'),
     
     # Department courses URL
     path('api/departments/<int:department_id>/courses/', DepartmentCoursesView.as_view(), name='department-courses'),
