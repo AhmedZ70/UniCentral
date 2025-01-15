@@ -1,10 +1,10 @@
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js';
-import { 
-    getAuth, 
+import {
+    getAuth,
     createUserWithEmailAndPassword,
     updateProfile,
     GoogleAuthProvider,
-    signInWithPopup 
+    signInWithPopup
 } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js';
 
 // Firebase configuration
@@ -35,33 +35,33 @@ document.addEventListener('DOMContentLoaded', () => {
     const confirmPasswordInput = document.getElementById('re-enter-password');
     const togglePassword = document.getElementById('toggle-password');
     const toggleConfirmPassword = document.getElementById('toggle-confirm-password');
-    const passwordError = document.getElementById('password-error');    
+    const passwordError = document.getElementById('password-error');
     const googleSignUpBtn = document.getElementById('google-signup');
 
     if (googleSignUpBtn) {
         console.log('Google sign up button found'); // Debug log
-        
+
         googleSignUpBtn.addEventListener('click', async () => {
             console.log('Google sign up button clicked'); // Debug log
-            
+
             const originalText = googleSignUpBtn.textContent;
-            
+
             try {
                 // Disable button and show loading state
                 googleSignUpBtn.disabled = true;
                 googleSignUpBtn.textContent = 'Signing in...';
-                
+
                 const result = await signInWithPopup(auth, provider);
                 const user = result.user;
                 console.log('Google sign in successful:', user);
-                
+
                 alert('Successfully signed in with Google!');
                 window.location.href = '/';
-                
+
             } catch (error) {
                 console.error('Google sign in error:', error);
                 const signupError = document.getElementById('signup-error');
-                
+
                 switch (error.code) {
                     case 'auth/popup-blocked':
                         signupError.textContent = 'Please allow popups for this website';
@@ -88,30 +88,30 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Check if all elements exist
     if (!form || !passwordInput || !confirmPasswordInput || !togglePassword || !toggleConfirmPassword) {
-    console.error('One or more elements not found');
-    return;
-    
+        console.error('One or more elements not found');
+        return;
+
     }
 
     // Password visibility toggle function
     function togglePasswordVisibility(inputField, button) {
-    const type = inputField.type === 'password' ? 'text' : 'password';
-    inputField.type = type;
-    
-    const icon = button.querySelector('i');
-    if (icon) {
-        icon.dataset.lucide = type === 'password' ? 'eye' : 'eye-off';
-        lucide.createIcons();
-    }
+        const type = inputField.type === 'password' ? 'text' : 'password';
+        inputField.type = type;
+
+        const icon = button.querySelector('i');
+        if (icon) {
+            icon.dataset.lucide = type === 'password' ? 'eye' : 'eye-off';
+            lucide.createIcons();
+        }
     }
 
     // Add click listeners for password toggles
     togglePassword.addEventListener('click', () => {
-    togglePasswordVisibility(passwordInput, togglePassword);
+        togglePasswordVisibility(passwordInput, togglePassword);
     });
 
     toggleConfirmPassword.addEventListener('click', () => {
-    togglePasswordVisibility(confirmPasswordInput, toggleConfirmPassword);
+        togglePasswordVisibility(confirmPasswordInput, toggleConfirmPassword);
     });
 
     // Check if passwords match
@@ -139,97 +139,93 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Handle form submission
     form.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    console.log('Form submitted'); // Debug log
+        e.preventDefault();
+        console.log('Form submitted'); // Debug log
 
-    if (!checkPasswords()) {
-        return;
-    }
-
-    const email = document.getElementById('email').value;
-    const password = document.getElementById('password').value;
-    const fname = document.getElementById('fname').value;
-    const lname = document.getElementById('lname').value;
-    const fullName = fname + ' ' + lname;
-    const signupError = document.getElementById('signup-error');
-
-    try {
-        // Create user with email and password
-        console.log('Calling createUserWithEmailAndPassword');
-        const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-        console.log('User credential received:', userCredential);
-        
-        const user = userCredential.user;
-        console.log('User created:', user.uid);
-    
-        // Update user profile with name
-        console.log('Updating user profile with name');
-        await updateProfile(user, {
-            displayName: fullName
-        });
-        console.log('Profile updated successfully');
-        console.log('User signed up successfully!');
-        
-        // User creation for sqlite3
-        console.log("fname: ", fname, ", lname: ", lname, ", email: ", email);
-        const response = await fetch('/api/create_user/', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]')?.value
-            },
-            body: JSON.stringify({
-                email: email,
-                fname: fname,
-                lname: lname
-            })
-        });
-        
-        console.log("Raw response:", response);
-        
-        const data = await response.json();
-        console.log("Server response data:", data);
-        
-        if (response.ok) {
-            alert('Account created successfully! Please check your email for verification.');
-            window.location.href = '/';
-        } else {
-            // If database creation failed, cleanup Firebase user and throw error
-            if (auth.currentUser) {
-                await auth.currentUser.delete();
-            }
-            throw new Error(data.message || 'Failed to create user in database');
+        if (!checkPasswords()) {
+            return;
         }
-    
-    } catch (error) {
-        console.error('Detailed error:', error);
-        
+
+        const email = document.getElementById('email').value;
+        const password = document.getElementById('password').value;
+        const fname = document.getElementById('fname').value;
+        const lname = document.getElementById('lname').value;
+        const fullName = fname + ' ' + lname;
         const signupError = document.getElementById('signup-error');
-        
-        // Handle Firebase Auth specific errors
-        if (error.code) {
-            switch (error.code) {
-                case 'auth/email-already-in-use':
-                    signupError.textContent = 'This email is already registered. Use a different email or sign in.';
-                    break;
-                case 'auth/invalid-email':
-                    signupError.textContent = 'Please enter a valid email address.';
-                    break;
-                case 'auth/operation-not-allowed':
-                    signupError.textContent = 'Email/password accounts are not enabled. Please contact support.';
-                    break;
-                case 'auth/weak-password':
-                    signupError.textContent = 'Please choose a stronger password (at least 6 characters).';
-                    break;
-                default:
-                    signupError.textContent = `An error occurred during signup: ${error.message}`;
+
+        try {
+            // Create user with email and password
+            console.log('Calling createUserWithEmailAndPassword');
+            const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+            console.log('User credential received:', userCredential);
+
+            const user = userCredential.user;
+            console.log('User created:', user.uid);
+
+            // Update user profile with name
+            console.log('Updating user profile with name');
+            await updateProfile(user, {
+                displayName: fullName
+            });
+            console.log('Profile updated successfully');
+            console.log('User signed up successfully!');
+
+            // User creation for sqlite3
+            console.log("fname: ", fname, ", lname: ", lname, ", email: ", email);
+            const response = await fetch('/api/create_user/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+
+                body: JSON.stringify({
+                    email: email,
+                    fname: fname,
+                    lname: lname
+                })
+            });
+
+            const data = await response.json();
+            console.log("Server response data:", data);
+
+            if (response.ok) {
+                alert('Account created successfully! Please check your email for verification.');
+                window.location.href = '/';
+            } else {
+                // If database creation failed, cleanup Firebase user and throw error
+                if (auth.currentUser) {
+                    await auth.currentUser.delete();
+                }
+                throw new Error(data.message || 'Failed to create user in database');
             }
-        } else {
-            // Handle database errors
-            signupError.textContent = `Database Error: ${error.message}`;
-        }
-        
-        signupError.style.display = 'block';
+
+        } catch (error) {
+            const signupError = document.getElementById('signup-error');
+
+            // Handle Firebase Auth specific errors
+            if (error.code) {
+                switch (error.code) {
+                    case 'auth/email-already-in-use':
+                        signupError.textContent = 'This email is already registered. Use a different email or sign in.';
+                        break;
+                    case 'auth/invalid-email':
+                        signupError.textContent = 'Please enter a valid email address.';
+                        break;
+                    case 'auth/operation-not-allowed':
+                        signupError.textContent = 'Email/password accounts are not enabled. Please contact support.';
+                        break;
+                    case 'auth/weak-password':
+                        signupError.textContent = 'Please choose a stronger password (at least 6 characters).';
+                        break;
+                    default:
+                        signupError.textContent = `An error occurred during signup: ${error.message}`;
+                }
+            } else {
+                // Handle database errors
+                signupError.textContent = `Database Error: ${error.message}`;
+            }
+
+            signupError.style.display = 'block';
         }
     });
 });
