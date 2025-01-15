@@ -32,23 +32,25 @@ class UserService:
     def create_user(email_address, fname, lname):
         """
         Creates a new user in the SQLite database.
-        Args:
-            email_address (str): User's email address.
-            fname (str): User's first name.
-            lname (str): User's last name.
-        Returns:
-            User: The created user object.
         """
         try:
+            print(f"Attempting to create user with email: {email_address}, fname: {fname}, lname: {lname}")
+            
             # Attempt to create a new user
             user = User.objects.create(
                 email_address=email_address,
                 fname=fname,
                 lname=lname
             )
+            print(f"Successfully created user: {user}")
             return user
+            
         except Exception as e:
-            print(f"Error creating user: {e}")
+            # Print the full error details
+            print(f"Error creating user in UserService: {str(e)}")
+            print(f"Error type: {type(e)}")
+            import traceback
+            print(f"Full traceback: {traceback.format_exc()}")
             return None
 
     @staticmethod

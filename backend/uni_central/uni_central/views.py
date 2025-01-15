@@ -121,32 +121,84 @@ class CourseReviewsView(APIView):
         serializer = ReviewSerializer(reviews, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
+# class CreateUserView(APIView):
+#     @api_view(['POST'])
+#     def create_user(request):
+#         """
+#         Endpoint to create a new user.
+#         """
+#         if request.method == 'POST':
+#             # Retrieve user data from the request body
+#             email = request.data.get('email')
+#             fname = request.data.get('fname')
+#             lname = request.data.get('lname')
+
+#             # Validate that necessary fields are provided
+#             if not email or not fname or not lname:
+#                 return Response({"error": "Missing required fields."}, status=status.HTTP_400_BAD_REQUEST)
+
+#             # Create the user using the UserService
+#             user = UserService.create_user(email, fname, lname)
+
+#             if user:
+#                 serializer = UserSerializer(user)
+#                 return Response(serializer.data, status=status.HTTP_201_CREATED)
+#             else:
+#                 return Response({"error": "Error creating user."}, status=status.HTTP_400_BAD_REQUEST)
+
 class CreateUserView(APIView):
-    @api_view(['POST'])
-    def create_user(request):
-        """
-        Endpoint to create a new user.
-        """
-        if request.method == 'POST':
-            # Retrieve user data from the request body
-            email = request.data.get('email')
+    def post(self, request):
+        try:
+            # Retrieve and log the request data
+            print("Raw request data:", request.data)
+            
+            email_address = request.data.get('email')
             fname = request.data.get('fname')
             lname = request.data.get('lname')
+            
+            print(f"Parsed data - email: {email_address}, fname: {fname}, lname: {lname}")
 
-            # Validate that necessary fields are provided
-            if not email or not fname or not lname:
-                return Response({"error": "Missing required fields."}, status=status.HTTP_400_BAD_REQUEST)
+            if not email_address or not fname or not lname:
+                print("Missing required fields")
+                return Response({
+                    "success": False,
+                    "message": "Missing required fields.",
+                    "received": {
+                        "email_address": email_address,
+                        "fname": fname,
+                        "lname": lname
+                    }
+                }, status=status.HTTP_400_BAD_REQUEST)
 
-            # Create the user using the UserService
-            user = UserService.create_user(email, fname, lname)
-
+            user = UserService.create_user(email_address, fname, lname)
+            
             if user:
-                serializer = UserSerializer(user)
-                return Response(serializer.data, status=status.HTTP_201_CREATED)
+                print(f"User created successfully: {user}")
+                return Response({
+                    "success": True,
+                    "message": "User created successfully.",
+                    "data": {
+                        "email_address": user.email_address,
+                        "fname": user.fname,
+                        "lname": user.lname
+                    }
+                }, status=status.HTTP_201_CREATED)
             else:
-                return Response({"error": "Error creating user."}, status=status.HTTP_400_BAD_REQUEST)
+                print("UserService.create_user returned None")
+                return Response({
+                    "success": False,
+                    "message": "Error creating user in database"
+                }, status=status.HTTP_400_BAD_REQUEST)
 
-
+        except Exception as e:
+            print(f"Exception in CreateUserView: {str(e)}")
+            import traceback
+            print(f"Full traceback: {traceback.format_exc()}")
+            return Response({
+                "success": False,
+                "message": f"Server error: {str(e)}"
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
 # Departments pages
 class DepartmentListCreateView(generics.ListCreateAPIView):
     queryset = Department.objects.all()

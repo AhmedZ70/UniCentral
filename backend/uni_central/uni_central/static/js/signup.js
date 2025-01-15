@@ -153,8 +153,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const fullName = fname + ' ' + lname;
     const signupError = document.getElementById('signup-error');
 
-    console.log('Attempting to create user with:', { email, fullName }); // Debug log
-
     try {
         // Create user with email and password
         console.log('Calling createUserWithEmailAndPassword');
@@ -163,69 +161,75 @@ document.addEventListener('DOMContentLoaded', () => {
         
         const user = userCredential.user;
         console.log('User created:', user.uid);
-
+    
         // Update user profile with name
         console.log('Updating user profile with name');
         await updateProfile(user, {
             displayName: fullName
         });
         console.log('Profile updated successfully');
-
-        // Store additional user data in Firebase
         console.log('User signed up successfully!');
         
-        // Verification Email (optional)
-        // await sendEmailVerification(user);
-        // console.log('Verification email sent');
-        
-        // Redirect to home page after successful signup
-        alert('Account created successfully! Please check your email for verification.');
-        window.location.href = '/'; 
-
         // User creation for sqlite3
-        fetch('/api/create_user/', {
-            method: 'POST', // Use POST method
+        console.log("fname: ", fname, ", lname: ", lname, ", email: ", email);
+        const response = await fetch('/api/create_user/', {
+            method: 'POST',
             headers: {
-            'Content-Type': 'application/json',
+                'Content-Type': 'application/json',
+                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]')?.value
             },
             body: JSON.stringify({
                 email: email,
                 fname: fname,
                 lname: lname
             })
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.message === "User created successfully.") {
-            console.log("User created:", data);
-            } else {
-            console.log("Error:", data.message);
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
         });
-
-    } catch (error) {
-        console.error('Detailed error:', error); // More detailed error logging
-        // Handle specific error cases
-        switch (error.code) {
-        case 'auth/email-already-in-use':
-            signupError.textContent = 'This email is already registered. Use a different email or sign in.';
-            break;
-        case 'auth/invalid-email':
-            signupError.textContent = 'Please enter a valid email address.';
-            break;
-        case 'auth/operation-not-allowed':
-            signupError.textContent = 'Email/password accounts are not enabled. Please contact support.';
-            break;
-        case 'auth/weak-password':
-            signupError.textContent = 'Please choose a stronger password (at least 6 characters).';
-            break;
-        default:
-            signupError.textContent = `An error occurred during signup: ${error.message}`;
+        
+        console.log("Raw response:", response);
+        
+        const data = await response.json();
+        console.log("Server response data:", data);
+        
+        if (response.ok) {
+            alert('Account created successfully! Please check your email for verification.');
+            window.location.href = '/';
+        } else {
+            // If database creation failed, cleanup Firebase user and throw error
+            if (auth.currentUser) {
+                await auth.currentUser.delete();
+            }
+            throw new Error(data.message || 'Failed to create user in database');
         }
+    
+    } catch (error) {
+        console.error('Detailed error:', error);
+        
+        const signupError = document.getElementById('signup-error');
+        
+        // Handle Firebase Auth specific errors
+        if (error.code) {
+            switch (error.code) {
+                case 'auth/email-already-in-use':
+                    signupError.textContent = 'This email is already registered. Use a different email or sign in.';
+                    break;
+                case 'auth/invalid-email':
+                    signupError.textContent = 'Please enter a valid email address.';
+                    break;
+                case 'auth/operation-not-allowed':
+                    signupError.textContent = 'Email/password accounts are not enabled. Please contact support.';
+                    break;
+                case 'auth/weak-password':
+                    signupError.textContent = 'Please choose a stronger password (at least 6 characters).';
+                    break;
+                default:
+                    signupError.textContent = `An error occurred during signup: ${error.message}`;
+            }
+        } else {
+            // Handle database errors
+            signupError.textContent = `Database Error: ${error.message}`;
+        }
+        
         signupError.style.display = 'block';
-    }
+        }
     });
 });

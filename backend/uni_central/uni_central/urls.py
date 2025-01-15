@@ -53,7 +53,7 @@ urlpatterns = [
     path('api/professors/', ProfessorListCreateView.as_view(), name='professor-list'),
     path('api/reviews/', ReviewListCreateView.as_view(), name='review-list'),
     path('api/course_filtering/', CourseFilteringCreateView.as_view(), name='course_filtering'),
-    path('api/create_user/', views.CreateUserView.create_user, name='create_user'),
+    path('api/create_user/', CreateUserView.as_view(), name='create_user'),
     path('api/create_review/', views.CreateReviewView.create_review, name='create_review'),
     
     # Department courses URL
