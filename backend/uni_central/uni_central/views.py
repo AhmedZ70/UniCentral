@@ -252,7 +252,6 @@ class CourseReviewsView(APIView):
         serializer = ReviewSerializer(reviews, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
-
 class CreateUserView(APIView):
     """
     Handles user creation requests.
@@ -281,6 +280,58 @@ class CreateUserView(APIView):
                 return Response(serializer.data, status=status.HTTP_201_CREATED)
             else:
                 return Response({"error": "Error creating user."}, status=status.HTTP_400_BAD_REQUEST)
+
+    def post(self, request):
+        try:
+            # Retrieve and log the request data
+            print("Raw request data:", request.data)
+            
+            email_address = request.data.get('email')
+            fname = request.data.get('fname')
+            lname = request.data.get('lname')
+            
+            print(f"Parsed data - email: {email_address}, fname: {fname}, lname: {lname}")
+
+            if not email_address or not fname or not lname:
+                print("Missing required fields")
+                return Response({
+                    "success": False,
+                    "message": "Missing required fields.",
+                    "received": {
+                        "email_address": email_address,
+                        "fname": fname,
+                        "lname": lname
+                    }
+                }, status=status.HTTP_400_BAD_REQUEST)
+
+            user = UserService.create_user(email_address, fname, lname)
+            
+            if user:
+                print(f"User created successfully: {user}")
+                return Response({
+                    "success": True,
+                    "message": "User created successfully.",
+                    "data": {
+                        "email_address": user.email_address,
+                        "fname": user.fname,
+                        "lname": user.lname
+                    }
+                }, status=status.HTTP_201_CREATED)
+            else:
+                print("UserService.create_user returned None")
+                return Response({
+                    "success": False,
+                    "message": "Error creating user in database"
+                }, status=status.HTTP_400_BAD_REQUEST)
+
+        except Exception as e:
+            print(f"Exception in CreateUserView: {str(e)}")
+            import traceback
+            print(f"Full traceback: {traceback.format_exc()}")
+            return Response({
+                "success": False,
+                "message": f"Server error: {str(e)}"
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 ####################################
 # Professor-Related Views and APIs #
