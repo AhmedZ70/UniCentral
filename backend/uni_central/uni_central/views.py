@@ -5,7 +5,6 @@ from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.decorators import api_view
 from django.shortcuts import redirect
-from django.http import HttpResponseBadRequest
 from .models import Department, User, Course, Professor, Review
 from .services import UserService, ReviewService
 from .serializers import (
@@ -16,147 +15,84 @@ from .serializers import (
     ReviewSerializer,
 )
 
-# Render Home Page
+######################
+# General Page Views #
+######################
+
 def home(request):
+    """
+    Render the Home page.
+    """
     return render(request, 'index.html')
 
-# Render Signup Page
 def signup_page(request):
+    """
+    Render the Signup page.
+    """
     return render(request, 'signup.html')
 
-# Render Login Page
 def login_page(request):
+    """
+    Render the Login page.
+    """
     return render(request, 'login.html')
 
 def my_classmates(request):
+    """
+    Render the My Classmates page.
+    """
     return render(request, 'my_classmates.html')
 
-# Render Courses Page
 def courses(request):
+    """
+    Render the Courses page.
+    """
     return render(request, 'courses.html')
 
-# Render Course Detail Page with Reviews
-def course_detail(request, course_id):
-    # Get the specific course and related reviews
-    course = get_object_or_404(Course, id=course_id)
-    reviews = Review.objects.filter(course=course)
+def about_page(request):
+    """
+    Render the About page.
+    """
+    return render(request, 'about.html')
 
-    # Pass course and reviews to the template context
-    context = {
-        'course': course,
-        'reviews': reviews,
-    }
-    return render(request, 'course_detail.html', context)
+#####################################
+# Department-Related Views and APIs #
+#####################################
+
+class DepartmentListCreateView(generics.ListCreateAPIView):
+    """
+    Lists all departments or creates a new one.
+    """
+    queryset = Department.objects.all()
+    serializer_class = DepartmentSerializer
 
 
-def create_review(request, course_id):
-    course = get_object_or_404(Course, id=course_id)
-    professors = course.professors.all()  # Fetch professors related to the course
-
-    if request.method == 'POST':
-        user = request.user if request.user.is_authenticated else get_object_or_404(User, id=1)
-
-        professor_id = request.POST.get('professor')
-        professor = get_object_or_404(Professor, id=professor_id) if professor_id else None
-
-        review_text = request.POST.get('review')
-        rating = request.POST.get('rating')
-        difficulty = request.POST.get('difficulty')
-        estimated_hours = request.POST.get('estimated_hours')
-        grade = request.POST.get('grade')
-
-        would_take_again = request.POST.get('would_take_again') == 'on'
-        for_credit = request.POST.get('for_credit') == 'on'
-        mandatory_attendance = request.POST.get('mandatory_attendance') == 'on'
-        required_course = request.POST.get('required_course') == 'on'
-        is_gened = request.POST.get('is_gened') == 'on'
-        in_person = request.POST.get('in_person') == 'on'
-        online = request.POST.get('online') == 'on'
-        hybrid = request.POST.get('hybrid') == 'on'
-        no_exams = request.POST.get('no_exams') == 'on'
-        presentations = request.POST.get('presentations') == 'on'
-
-        # Save the review
-        Review.objects.create(
-            user=user,
-            course=course,
-            professor=professor,
-            review=review_text,
-            rating=float(rating) if rating else None,
-            difficulty=int(difficulty) if difficulty else None,
-            estimated_hours=float(estimated_hours) if estimated_hours else None,
-            grade=grade,
-            would_take_again=would_take_again,
-            for_credit=for_credit,
-            mandatory_attendance=mandatory_attendance,
-            required_course=required_course,
-            is_gened=is_gened,
-            in_person=in_person,
-            online=online,
-            hybrid=hybrid,
-            no_exams=no_exams,
-            presentations=presentations,
-        )
-
-        # Update course averages
-        course.update_averages()
-
-        return redirect('course-detail', course_id=course_id)
-
-    return render(request, 'review_form.html', {'course': course, 'professors': professors})
+class DepartmentDetailView(generics.RetrieveUpdateDestroyAPIView):
+    """
+    Retrieves, updates, or deletes a department by ID.
+    """
+    queryset = Department.objects.all()
+    serializer_class = DepartmentSerializer
 
 # API View for Getting Courses in a Specific Department
 class DepartmentCoursesView(APIView):
+    """
+    Retrieves courses for a specific department by ID.
+    """
     def get(self, request, department_id):
+        """
+        Fetches courses for the given department ID.
+        """
         department = get_object_or_404(Department, id=department_id)
-        courses = department.courses.all()  # Assuming a ForeignKey relationship from Course to Department
+        # ForeignKey relationship from Course to Department
+        courses = department.courses.all()
         serializer = CourseSerializer(courses, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
-# API View for Getting Reviews for a Specific Course
-class CourseReviewsView(APIView):
-    def get(self, request, course_id):
-        course = get_object_or_404(Course, id=course_id)
-        reviews = Review.objects.filter(course=course)
-        serializer = ReviewSerializer(reviews, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+#################################
+# Course-Related Views and APIs #
+#################################
 
-class CreateUserView(APIView):
-    @api_view(['POST'])
-    def create_user(request):
-        """
-        Endpoint to create a new user.
-        """
-        if request.method == 'POST':
-            # Retrieve user data from the request body
-            email = request.data.get('email')
-            fname = request.data.get('fname')
-            lname = request.data.get('lname')
-
-            # Validate that necessary fields are provided
-            if not email or not fname or not lname:
-                return Response({"error": "Missing required fields."}, status=status.HTTP_400_BAD_REQUEST)
-
-            # Create the user using the UserService
-            user = UserService.create_user(email, fname, lname)
-
-            if user:
-                serializer = UserSerializer(user)
-                return Response(serializer.data, status=status.HTTP_201_CREATED)
-            else:
-                return Response({"error": "Error creating user."}, status=status.HTTP_400_BAD_REQUEST)
-
-
-# Departments pages
-class DepartmentListCreateView(generics.ListCreateAPIView):
-    queryset = Department.objects.all()
-    serializer_class = DepartmentSerializer
-
-class DepartmentDetailView(generics.RetrieveUpdateDestroyAPIView):
-    queryset = Department.objects.all()
-    serializer_class = DepartmentSerializer
-
-# Course pages
 class CourseListCreateView(generics.ListCreateAPIView):
     """
     API View for returning course list view
@@ -171,13 +107,21 @@ class CourseDetailView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Course.objects.all()
     serializer_class = CourseSerializer
 
-# Professor page
-class ProfessorListCreateView(generics.ListCreateAPIView):
+def course_detail(request, course_id):
     """
-    API View for returning professor list view
+    Render a Course Detail page with reviews.
     """
-    queryset = Professor.objects.all()
-    serializer_class = ProfessorSerializer
+    
+    # Get the specific course and related reviews
+    course = get_object_or_404(Course, id=course_id)
+    reviews = Review.objects.filter(course=course)
+
+    # Pass course and reviews to the template context
+    context = {
+        'course': course,
+        'reviews': reviews,
+    }
+    return render(request, 'course_detail.html', context)
 
 # Review page
 class ReviewListCreateView(generics.ListCreateAPIView):
@@ -186,7 +130,7 @@ class ReviewListCreateView(generics.ListCreateAPIView):
     """
     queryset = Review.objects.all()
     serializer_class = ReviewSerializer
-    
+
 class CreateReviewView(APIView):
     def create_review(request):
         """
@@ -233,6 +177,125 @@ class CreateReviewView(APIView):
 
         else:
             return Response({"message": "Invalid request method."}, status=405)
+
+def create_review(request, course_id):
+    """
+    Render a form for creating a review for a course and save it.
+    """
+    course = get_object_or_404(Course, id=course_id)
+    # Fetch professors related to the course
+    professors = course.professors.all()
+
+    if request.method == 'POST':
+        user = request.user if request.user.is_authenticated else get_object_or_404(User, id=1)
+        professor_id = request.POST.get('professor')
+        professor = get_object_or_404(Professor, id=professor_id) if professor_id else None
+
+        review_text = request.POST.get('review')
+        rating = request.POST.get('rating')
+        difficulty = request.POST.get('difficulty')
+        estimated_hours = request.POST.get('estimated_hours')
+        grade = request.POST.get('grade')
+
+        # Boolean fields
+        would_take_again = request.POST.get('would_take_again') == 'on'
+        for_credit = request.POST.get('for_credit') == 'on'
+        mandatory_attendance = request.POST.get('mandatory_attendance') == 'on'
+        required_course = request.POST.get('required_course') == 'on'
+        is_gened = request.POST.get('is_gened') == 'on'
+        in_person = request.POST.get('in_person') == 'on'
+        online = request.POST.get('online') == 'on'
+        hybrid = request.POST.get('hybrid') == 'on'
+        no_exams = request.POST.get('no_exams') == 'on'
+        presentations = request.POST.get('presentations') == 'on'
+
+        # Save the review
+        Review.objects.create(
+            user=user,
+            course=course,
+            professor=professor,
+            review=review_text,
+            rating=float(rating) if rating else None,
+            difficulty=int(difficulty) if difficulty else None,
+            estimated_hours=float(estimated_hours) if estimated_hours else None,
+            grade=grade,
+            would_take_again=would_take_again,
+            for_credit=for_credit,
+            mandatory_attendance=mandatory_attendance,
+            required_course=required_course,
+            is_gened=is_gened,
+            in_person=in_person,
+            online=online,
+            hybrid=hybrid,
+            no_exams=no_exams,
+            presentations=presentations,
+        )
+
+        # Update course averages
+        course.update_averages()
+
+        return redirect('course-detail', course_id=course_id)
+
+    return render(request, 'review_form.html', {'course': course, 'professors': professors})
+
+class CourseReviewsView(APIView):
+    """
+    Retrieves reviews for a specific course by ID.
+    """
+
+    def get(self, request, course_id):
+        """
+        Handles GET requests to fetch reviews for the given course ID.
+        """
+        course = get_object_or_404(Course, id=course_id)
+        reviews = Review.objects.filter(course=course)
+        serializer = ReviewSerializer(reviews, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+class CreateUserView(APIView):
+    """
+    Handles user creation requests.
+    """
+
+    @api_view(['POST'])
+    def create_user(request):
+        """
+        Creates a new user based on the provided data.
+        """
+        if request.method == 'POST':
+            # Retrieve user data from the request body
+            email = request.data.get('email')
+            fname = request.data.get('fname')
+            lname = request.data.get('lname')
+
+            # Validate that necessary fields are provided
+            if not email or not fname or not lname:
+                return Response({"error": "Missing required fields."}, status=status.HTTP_400_BAD_REQUEST)
+
+            # Create the user using the UserService
+            user = UserService.create_user(email, fname, lname)
+
+            if user:
+                serializer = UserSerializer(user)
+                return Response(serializer.data, status=status.HTTP_201_CREATED)
+            else:
+                return Response({"error": "Error creating user."}, status=status.HTTP_400_BAD_REQUEST)
+
+####################################
+# Professor-Related Views and APIs #
+####################################
+
+class ProfessorListCreateView(generics.ListCreateAPIView):
+    """
+    API View for returning professor list view
+    """
+    queryset = Professor.objects.all()
+    serializer_class = ProfessorSerializer
+    
+####################################
+# Course-Filtering Views and APIs #
+####################################
 
 # Course Filtering page
 class CourseFilteringCreateView(generics.ListAPIView):
