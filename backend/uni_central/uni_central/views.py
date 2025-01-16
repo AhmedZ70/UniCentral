@@ -6,7 +6,7 @@ from rest_framework.views import APIView
 from rest_framework.decorators import api_view
 from django.shortcuts import redirect
 from .models import Department, User, Course, Professor, Review
-from .services import UserService, DepartmentService, CourseService, RevuewService
+from .services import UserService, DepartmentService, CourseService, ReviewService
 from .serializers import (
     DepartmentSerializer,
     UserSerializer,
