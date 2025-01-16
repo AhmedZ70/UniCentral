@@ -18,7 +18,7 @@ Including another URLconf
 from django.urls import path
 from . import views
 from .views import (
-    DepartmentListCreateView,
+    DepartmentListView,
     DepartmentCoursesView,
     home,
     courses,
@@ -38,11 +38,19 @@ urlpatterns = [
     path('courses/<int:course_id>/review/', create_review, name='review-create'),
     path('my_classmates/', my_classmates, name='my_classmates'),
     
-    # API URLs
-    path('api/departments/', DepartmentListCreateView.as_view(), name='department-list'),
-    path('api/create_user/', views.CreateUserView.as_view(), name='create_user'),
+    ############
+    # API URLs #
+    ############
     
-    # Department courses URL
+    # Department URLs
+    path('api/departments/', DepartmentListView.as_view(), name='department-list'),
+    
+    # Course URLs
     path('api/departments/<int:department_id>/courses/', DepartmentCoursesView.as_view(), name='department-courses'),
-   
+    path('api/courses/<int:course_id>/', course_detail, name='course-detail'), # Course detail page
+    
+    
+    
+    path('api/create_user/', views.CreateUserView.as_view(), name='create_user'),
+     
 ]
