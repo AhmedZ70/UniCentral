@@ -1,5 +1,13 @@
-from .models import User, Review, Course, Professor
+from .models import Department, User, Review, Course, Professor
 from django.db.models import Avg
+from .serializers import (
+    DepartmentSerializer,
+    UserSerializer,
+    CourseSerializer,
+    ProfessorSerializer,
+    ReviewSerializer,
+)
+from django.shortcuts import get_object_or_404
 
 class FirebaseService:
     @staticmethod
@@ -26,6 +34,33 @@ class FirebaseService:
         Delete user from SQL database when deleted from Firebase
         """
         User.objects.filter(firebase_uid=firebase_uid).delete()
+        
+class DepartmentService:
+    @staticmethod
+    def get_all_departments():
+        return Department.objects.all()
+    
+    @staticmethod
+    def get_department(department_id):
+        return get_object_or_404(Department, id=department_id)
+    
+class CourseService:
+    @staticmethod
+    def get_courses_by_department(department_id):
+        department = DepartmentService.get_department(department_id)
+        return Course.objects.filter(department=department)
+    
+    @staticmethod
+    def get_course(course_id):
+        return get_object_or_404(Course, id=course_id)
+    
+class RevuewService:
+    @staticmethod
+    def get_reviews_by_course(course_id):
+        course = CourseService.get_course(course_id)
+        reviews = Review.objects.filter(course=course)
+        return reviews
+        
 
 class UserService:
     @staticmethod
