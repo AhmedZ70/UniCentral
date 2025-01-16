@@ -55,6 +55,21 @@ def about_page(request):
     """
     return render(request, 'about.html')
 
+def course_detail(request, course_id):
+    """
+    Render a Course Detail page with reviews.
+    """
+    
+    # Get the specific course and related reviews
+    course = get_object_or_404(Course, id=course_id)
+    reviews = Review.objects.filter(course=course)
+
+    # Pass course and reviews to the template context
+    context = {
+        'course': course,
+        'reviews': reviews,
+    }
+    return render(request, 'course_detail.html', context)
 #####################################
 # Department-Related Views and APIs #
 #####################################
@@ -103,21 +118,7 @@ class DepartmentCoursesView(APIView):
 #     queryset = Course.objects.all()
 #     serializer_class = CourseSerializer
 
-def course_detail(request, course_id):
-    """
-    Render a Course Detail page with reviews.
-    """
-    
-    # Get the specific course and related reviews
-    course = get_object_or_404(Course, id=course_id)
-    reviews = Review.objects.filter(course=course)
 
-    # Pass course and reviews to the template context
-    context = {
-        'course': course,
-        'reviews': reviews,
-    }
-    return render(request, 'course_detail.html', context)
 
 class CourseDetailView(APIView):
     """
