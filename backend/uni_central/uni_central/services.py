@@ -60,66 +60,73 @@ class ReviewService:
         """
         Fetch all reviews for a given course ID.
         """
-        course = CourseService.get_course(course_id)  
+        course = CourseService.get_course(course_id)
         reviews = Review.objects.filter(course=course)
         return reviews
-    
-    def create_review(request, course_id):
+
+    @staticmethod
+    def create_review(course_id, user, review_data):
         """
-        Creates a review for a course, and updates the course's avg_rating and avg_difficulty.
+        Creates a review for a course and updates the course's avg_rating and avg_difficulty.
+        Args:
+            course_id (int): The ID of the course.
+            user (User): The user creating the review.
+            review_data (dict): A dictionary containing the review details.
+        Returns:
+            Review: The created review object.
         """
-        course = get_object_or_404(Course, id=course_id)
-        # Fetch professors related to the course
-        professors = course.professors.all()
+        # 1. Fetch the course
+        course = CourseService.get_course(course_id)
 
-        if request.method == 'POST':
-            user = request.user if request.user.is_authenticated else get_object_or_404(User, id=1)
-            professor_id = request.POST.get('professor')
-            professor = get_object_or_404(Professor, id=professor_id) if professor_id else None
+        # 2. Fetch the professor if provided
+        professor_id = review_data.get('professor')
+        professor = get_object_or_404(Professor, id=professor_id) if professor_id else None
 
-            review_text = request.POST.get('review')
-            rating = request.POST.get('rating')
-            difficulty = request.POST.get('difficulty')
-            estimated_hours = request.POST.get('estimated_hours')
-            grade = request.POST.get('grade')
+        # 3. Create the Review, carefully converting fields
+        review = Review.objects.create(
+            user=user,
+            course=course,
+            professor=professor,
+            
+            # Text / string fields
+            review=review_data.get('review'),
+            grade=review_data.get('grade'),
 
-            # Boolean fields
-            would_take_again = request.POST.get('would_take_again') == 'on'
-            for_credit = request.POST.get('for_credit') == 'on'
-            mandatory_attendance = request.POST.get('mandatory_attendance') == 'on'
-            required_course = request.POST.get('required_course') == 'on'
-            is_gened = request.POST.get('is_gened') == 'on'
-            in_person = request.POST.get('in_person') == 'on'
-            online = request.POST.get('online') == 'on'
-            hybrid = request.POST.get('hybrid') == 'on'
-            no_exams = request.POST.get('no_exams') == 'on'
-            presentations = request.POST.get('presentations') == 'on'
+            # Numeric fields (convert strings to float/int, or None if empty)
+            rating=float(review_data.get('rating')) if review_data.get('rating') else None,
+            difficulty=int(review_data.get('difficulty')) if review_data.get('difficulty') else None,
+            estimated_hours=float(review_data.get('estimated_hours')) if review_data.get('estimated_hours') else None,
 
-            # Save the review
-            Review.objects.create(
-                user=user,
-                course=course,
-                professor=professor,
-                review=review_text,
-                rating=float(rating) if rating else None,
-                difficulty=int(difficulty) if difficulty else None,
-                estimated_hours=float(estimated_hours) if estimated_hours else None,
-                grade=grade,
-                would_take_again=would_take_again,
-                for_credit=for_credit,
-                mandatory_attendance=mandatory_attendance,
-                required_course=required_course,
-                is_gened=is_gened,
-                in_person=in_person,
-                online=online,
-                hybrid=hybrid,
-                no_exams=no_exams,
-                presentations=presentations,
-            )
+            # Boolean fields (check if the string is 'true')
+            would_take_again=(review_data.get('would_take_again') == 'true'),
+            for_credit=(review_data.get('for_credit') == 'true'),
+            mandatory_attendance=(review_data.get('mandatory_attendance') == 'true'),
+            required_course=(review_data.get('required_course') == 'true'),
+            is_gened=(review_data.get('is_gened') == 'true'),
+            in_person=(review_data.get('in_person') == 'true'),
+            online=(review_data.get('online') == 'true'),
+            hybrid=(review_data.get('hybrid') == 'true'),
+            no_exams=(review_data.get('no_exams') == 'true'),
+            presentations=(review_data.get('presentations') == 'true'),
+        )
 
-            # Update course averages
-            course.update_averages()
+        # 4. Update course averages (assuming your Course model has a method update_averages())
+        course.update_averages()
+
+        return review
         
+class ProfessorService:
+    @staticmethod
+    def get_professors_by_course(course_id):
+        """
+        Fetch all professors associated with a specific course.
+        Args:
+            course_id (int): The ID of the course.
+        Returns:
+            QuerySet: A queryset of professors related to the course.
+        """
+        course = CourseService.get_course(course_id)  # Leverage CourseService
+        return course.professors.all()
 
 class UserService:
     @staticmethod

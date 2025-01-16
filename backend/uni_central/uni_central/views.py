@@ -6,7 +6,7 @@ from rest_framework.views import APIView
 from rest_framework.decorators import api_view
 from django.shortcuts import redirect
 from .models import Department, User, Course, Professor, Review
-from .services import UserService, DepartmentService, CourseService, ReviewService
+from .services import UserService, DepartmentService, CourseService, ReviewService, ProfessorService
 from .serializers import (
     DepartmentSerializer,
     UserSerializer,
@@ -135,75 +135,33 @@ class CreateReviewAPIView(APIView):
     Handle the creation of a Review for a given course (POST).
     """
     def post(self, request, course_id):
-        course = get_object_or_404(Course, id=course_id)
-        
-        # Identify the user
-        # (In production, you'd have a more robust auth check.)
+        # Identify the user. 
+        # If unauthenticated, fallback to a default user with ID=1, or raise 404 if not found.
         user = request.user if request.user.is_authenticated else get_object_or_404(User, id=1)
-        
-        professor_id = request.data.get('professor')
-        professor = get_object_or_404(Professor, id=professor_id) if professor_id else None
 
-        review_text = request.data.get('review')
-        rating = request.data.get('rating')
-        difficulty = request.data.get('difficulty')
-        estimated_hours = request.data.get('estimated_hours')
-        grade = request.data.get('grade')
-
-        # Boolean fields
-        would_take_again = request.data.get('would_take_again') == 'true'
-        for_credit = request.data.get('for_credit') == 'true'
-        mandatory_attendance = request.data.get('mandatory_attendance') == 'true'
-        required_course = request.data.get('required_course') == 'true'
-        is_gened = request.data.get('is_gened') == 'true'
-        in_person = request.data.get('in_person') == 'true'
-        online = request.data.get('online') == 'true'
-        hybrid = request.data.get('hybrid') == 'true'
-        no_exams = request.data.get('no_exams') == 'true'
-        presentations = request.data.get('presentations') == 'true'
-
-        # Create the review
-        review_obj = Review.objects.create(
-            user=user,
-            course=course,
-            professor=professor,
-            review=review_text,
-            rating=float(rating) if rating else None,
-            difficulty=int(difficulty) if difficulty else None,
-            estimated_hours=float(estimated_hours) if estimated_hours else None,
-            grade=grade,
-            would_take_again=would_take_again,
-            for_credit=for_credit,
-            mandatory_attendance=mandatory_attendance,
-            required_course=required_course,
-            is_gened=is_gened,
-            in_person=in_person,
-            online=online,
-            hybrid=hybrid,
-            no_exams=no_exams,
-            presentations=presentations,
-        )
-
-        # Update course averages
-        course.update_averages()
+        # Delegate review creation to the service layer
+        review = ReviewService.create_review(course_id, user, request.data)
 
         return Response(
             {
                 "message": "Review created successfully",
-                "review_id": review_obj.id
+                "review_id": review.id
             },
             status=status.HTTP_201_CREATED
         )
+
 class CourseProfessorsAPIView(APIView):
-    # TODO : Add service layer
     """
     Fetch all professors for a given course (GET /api/courses/<course_id>/professors/).
     """
     def get(self, request, course_id):
-        course = get_object_or_404(Course, id=course_id)
-        professors = course.professors.all() 
+        """
+        Handles GET requests to fetch professors for the given course.
+        """
+        professors = ProfessorService.get_professors_by_course(course_id)
         serialized = ProfessorSerializer(professors, many=True)
         return Response(serialized.data, status=status.HTTP_200_OK)
+
 
 
 

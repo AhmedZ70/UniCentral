@@ -56,7 +56,6 @@ urlpatterns = [
     
     # an endpoint to fetch professors for a given course:
     path('api/courses/<int:course_id>/professors/', CourseProfessorsAPIView.as_view(), name='course-professors'),
-
     path('api/create_user/', views.CreateUserView.as_view(), name='create_user'),
      
 ]
