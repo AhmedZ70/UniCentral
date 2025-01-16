@@ -65,6 +65,18 @@ def course_detail(request, course_id):
     }
     return render(request, 'course_detail.html', context)
 
+def review_form_page(request, course_id):
+    """
+    Renders an empty form (no DB lookups).
+    The frontend will fetch the professors and other course data via API.
+    """
+    context = {
+        'course_id': course_id,
+    }
+    return render(request, 'review_form.html', context)
+
+
+
 #####################################
 # Department-Related Views and APIs #
 #####################################
@@ -98,6 +110,102 @@ class DepartmentCoursesView(APIView):
         courses = CourseService.get_courses_by_department(department_id)
         serializer = CourseSerializer(courses, many=True)
         return Response(serializer.data)
+class CourseReviewListView(APIView):
+    """
+    API View to fetch details of a course and its reviews.
+    """
+    def get(self, request, course_id):
+        # Use service layer to retrieve data
+        course = CourseService.get_course(course_id)
+        reviews = ReviewService.get_reviews_by_course(course_id)
+
+        # Serialize data
+        course_serializer = CourseSerializer(course)
+        review_serializer = ReviewSerializer(reviews, many=True)
+
+        # Combine data
+        data = {
+            'course': course_serializer.data,
+            'reviews': review_serializer.data
+        }
+        return Response(data, status=status.HTTP_200_OK)
+    
+class CreateReviewAPIView(APIView):
+    """
+    Handle the creation of a Review for a given course (POST).
+    """
+    def post(self, request, course_id):
+        course = get_object_or_404(Course, id=course_id)
+        
+        # Identify the user
+        # (In production, you'd have a more robust auth check.)
+        user = request.user if request.user.is_authenticated else get_object_or_404(User, id=1)
+        
+        professor_id = request.data.get('professor')
+        professor = get_object_or_404(Professor, id=professor_id) if professor_id else None
+
+        review_text = request.data.get('review')
+        rating = request.data.get('rating')
+        difficulty = request.data.get('difficulty')
+        estimated_hours = request.data.get('estimated_hours')
+        grade = request.data.get('grade')
+
+        # Boolean fields
+        would_take_again = request.data.get('would_take_again') == 'true'
+        for_credit = request.data.get('for_credit') == 'true'
+        mandatory_attendance = request.data.get('mandatory_attendance') == 'true'
+        required_course = request.data.get('required_course') == 'true'
+        is_gened = request.data.get('is_gened') == 'true'
+        in_person = request.data.get('in_person') == 'true'
+        online = request.data.get('online') == 'true'
+        hybrid = request.data.get('hybrid') == 'true'
+        no_exams = request.data.get('no_exams') == 'true'
+        presentations = request.data.get('presentations') == 'true'
+
+        # Create the review
+        review_obj = Review.objects.create(
+            user=user,
+            course=course,
+            professor=professor,
+            review=review_text,
+            rating=float(rating) if rating else None,
+            difficulty=int(difficulty) if difficulty else None,
+            estimated_hours=float(estimated_hours) if estimated_hours else None,
+            grade=grade,
+            would_take_again=would_take_again,
+            for_credit=for_credit,
+            mandatory_attendance=mandatory_attendance,
+            required_course=required_course,
+            is_gened=is_gened,
+            in_person=in_person,
+            online=online,
+            hybrid=hybrid,
+            no_exams=no_exams,
+            presentations=presentations,
+        )
+
+        # Update course averages
+        course.update_averages()
+
+        return Response(
+            {
+                "message": "Review created successfully",
+                "review_id": review_obj.id
+            },
+            status=status.HTTP_201_CREATED
+        )
+class CourseProfessorsAPIView(APIView):
+    # TODO : Add service layer
+    """
+    Fetch all professors for a given course (GET /api/courses/<course_id>/professors/).
+    """
+    def get(self, request, course_id):
+        course = get_object_or_404(Course, id=course_id)
+        professors = course.professors.all() 
+        serialized = ProfessorSerializer(professors, many=True)
+        return Response(serialized.data, status=status.HTTP_200_OK)
+
+
 
 # class CourseListCreateView(generics.ListCreateAPIView):
 #     """
@@ -113,19 +221,7 @@ class DepartmentCoursesView(APIView):
 #     queryset = Course.objects.all()
 #     serializer_class = CourseSerializer
 
-class CourseReviewListView(APIView):
-    def get(self, request, course_id):
-        course = get_object_or_404(Course, id=course_id)
-        course_serializer = CourseSerializer(course)  # for course details
-        
-        reviews = Review.objects.filter(course=course)
-        review_serializer = ReviewSerializer(reviews, many=True)
-        
-        data = {
-            'course': course_serializer.data,
-            'reviews': review_serializer.data
-        }
-        return Response(data, status=status.HTTP_200_OK)
+
 # class CourseDetailView(APIView):
 #     """
 #     Render a Course Detail page with reviews.
@@ -198,66 +294,6 @@ class CourseReviewListView(APIView):
 
 #         else:
 #             return Response({"message": "Invalid request method."}, status=405)
-
-def create_review(request, course_id):
-    """
-    Render a form for creating a review for a course and save it.
-    """
-    course = get_object_or_404(Course, id=course_id)
-    # Fetch professors related to the course
-    professors = course.professors.all()
-
-    if request.method == 'POST':
-        user = request.user if request.user.is_authenticated else get_object_or_404(User, id=1)
-        professor_id = request.POST.get('professor')
-        professor = get_object_or_404(Professor, id=professor_id) if professor_id else None
-
-        review_text = request.POST.get('review')
-        rating = request.POST.get('rating')
-        difficulty = request.POST.get('difficulty')
-        estimated_hours = request.POST.get('estimated_hours')
-        grade = request.POST.get('grade')
-
-        # Boolean fields
-        would_take_again = request.POST.get('would_take_again') == 'on'
-        for_credit = request.POST.get('for_credit') == 'on'
-        mandatory_attendance = request.POST.get('mandatory_attendance') == 'on'
-        required_course = request.POST.get('required_course') == 'on'
-        is_gened = request.POST.get('is_gened') == 'on'
-        in_person = request.POST.get('in_person') == 'on'
-        online = request.POST.get('online') == 'on'
-        hybrid = request.POST.get('hybrid') == 'on'
-        no_exams = request.POST.get('no_exams') == 'on'
-        presentations = request.POST.get('presentations') == 'on'
-
-        # Save the review
-        Review.objects.create(
-            user=user,
-            course=course,
-            professor=professor,
-            review=review_text,
-            rating=float(rating) if rating else None,
-            difficulty=int(difficulty) if difficulty else None,
-            estimated_hours=float(estimated_hours) if estimated_hours else None,
-            grade=grade,
-            would_take_again=would_take_again,
-            for_credit=for_credit,
-            mandatory_attendance=mandatory_attendance,
-            required_course=required_course,
-            is_gened=is_gened,
-            in_person=in_person,
-            online=online,
-            hybrid=hybrid,
-            no_exams=no_exams,
-            presentations=presentations,
-        )
-
-        # Update course averages
-        course.update_averages()
-
-        return redirect('course-detail', course_id=course_id)
-
-    return render(request, 'review_form.html', {'course': course, 'professors': professors})
 
 # class CourseReviewsView(APIView):
 #     """

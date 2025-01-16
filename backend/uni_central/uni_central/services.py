@@ -57,7 +57,10 @@ class CourseService:
 class ReviewService:
     @staticmethod
     def get_reviews_by_course(course_id):
-        course = CourseService.get_course(course_id)
+        """
+        Fetch all reviews for a given course ID.
+        """
+        course = CourseService.get_course(course_id)  
         reviews = Review.objects.filter(course=course)
         return reviews
     
