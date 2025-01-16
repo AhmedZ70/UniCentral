@@ -40,7 +40,7 @@ urlpatterns = [
     
     # API URLs
     path('api/departments/', DepartmentListCreateView.as_view(), name='department-list'),
-    path('api/create_user/', views.CreateUserView.create_user, name='create_user'),
+    path('api/create_user/', views.CreateUserView.as_view(), name='create_user'),
     
     # Department courses URL
     path('api/departments/<int:department_id>/courses/', DepartmentCoursesView.as_view(), name='department-courses'),
