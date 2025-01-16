@@ -20,6 +20,7 @@ from . import views
 from .views import (
     DepartmentListView,
     DepartmentCoursesView,
+    CourseReviewListView,
     home,
     courses,
     signup_page,
@@ -42,14 +43,12 @@ urlpatterns = [
     # API URLs #
     ############
     
-    # Department URLs
+    # Department URLsç
     path('api/departments/', DepartmentListView.as_view(), name='department-list'),
     
     # Course URLs
     path('api/departments/<int:department_id>/courses/', DepartmentCoursesView.as_view(), name='department-courses'),
-    path('api/courses/<int:course_id>/', course_detail, name='course-detail'), # Course detail page
-    
-    
+    path('api/courses/<int:course_id>/reviews/', CourseReviewListView.as_view(), name='course-reviews'),
     
     path('api/create_user/', views.CreateUserView.as_view(), name='create_user'),
      

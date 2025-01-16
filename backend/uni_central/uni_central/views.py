@@ -55,6 +55,16 @@ def about_page(request):
     """
     return render(request, 'about.html')
 
+def course_detail(request, course_id):
+    """
+    Render the template for a Course Detail page.
+    The frontend (JS) will call the API endpoint below to get course + reviews.
+    """
+    context = {
+        'course_id': course_id, 
+    }
+    return render(request, 'course_detail.html', context)
+
 #####################################
 # Department-Related Views and APIs #
 #####################################
@@ -103,39 +113,36 @@ class DepartmentCoursesView(APIView):
 #     queryset = Course.objects.all()
 #     serializer_class = CourseSerializer
 
-def course_detail(request, course_id):
-    """
-    Render a Course Detail page with reviews.
-    """
-    
-    # Get the specific course and related reviews
-    course = get_object_or_404(Course, id=course_id)
-    reviews = Review.objects.filter(course=course)
-
-    # Pass course and reviews to the template context
-    context = {
-        'course': course,
-        'reviews': reviews,
-    }
-    return render(request, 'course_detail.html', context)
-
-class CourseDetailView(APIView):
-    """
-    Render a Course Detail page with reviews.
-    """
+class CourseReviewListView(APIView):
     def get(self, request, course_id):
-        """
-        Fetches Course Detail page.
-        """        
-        # ForeignKey relationship from Course to Department
-        course = CourseService.get_course(course_id)
-        reviews = RevuewService.get_reviews_by_course(course_id)
+        course = get_object_or_404(Course, id=course_id)
+        course_serializer = CourseSerializer(course)  # for course details
         
-        context = {
-        'course': course,
-        'reviews': reviews,
+        reviews = Review.objects.filter(course=course)
+        review_serializer = ReviewSerializer(reviews, many=True)
+        
+        data = {
+            'course': course_serializer.data,
+            'reviews': review_serializer.data
         }
-        return render(request, 'course_detai;.html', context)
+        return Response(data, status=status.HTTP_200_OK)
+# class CourseDetailView(APIView):
+#     """
+#     Render a Course Detail page with reviews.
+#     """
+#     def get(self, request, course_id):
+#         """
+#         Fetches Course Detail page.
+#         """        
+#         # ForeignKey relationship from Course to Department
+#         course = CourseService.get_course(course_id)
+#         reviews = ReviewService.get_reviews_by_course(course_id)
+        
+#         context = {
+#         'course': course,
+#         'reviews': reviews,
+#         }
+#         return render(request, 'course_detai;.html', context)
 
 # # Review page
 # class ReviewListCreateView(generics.ListCreateAPIView):
