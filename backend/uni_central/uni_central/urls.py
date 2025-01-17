@@ -20,12 +20,15 @@ from . import views
 from .views import (
     DepartmentListView,
     DepartmentCoursesView,
+    CourseReviewListView,
+    CreateReviewAPIView,
+    CourseProfessorsAPIView,
     home,
     courses,
     signup_page,
     login_page,
     course_detail,
-    create_review,
+    review_form_page,
     my_classmates
 )
 
@@ -35,22 +38,24 @@ urlpatterns = [
     path('login/', login_page, name='login'),
     path('courses/', courses, name='courses'),  # Render courses.html (user-facing view)
     path('courses/<int:course_id>/', course_detail, name='course-detail'),  # New route for course detail page
-    path('courses/<int:course_id>/review/', create_review, name='review-create'),
+    path('courses/<int:course_id>/review/', review_form_page, name='review-form-page'),
+
     path('my_classmates/', my_classmates, name='my_classmates'),
     
     ############
     # API URLs #
     ############
     
-    # Department URLs
+    # Department URLsç
     path('api/departments/', DepartmentListView.as_view(), name='department-list'),
     
     # Course URLs
     path('api/departments/<int:department_id>/courses/', DepartmentCoursesView.as_view(), name='department-courses'),
-    path('api/courses/<int:course_id>/', course_detail, name='course-detail'), # Course detail page
+    path('api/courses/<int:course_id>/reviews/', CourseReviewListView.as_view(), name='course-reviews'),
+    path('api/courses/<int:course_id>/reviews/create/', CreateReviewAPIView.as_view(), name='api-review-create'),
     
-    
-    
+    # an endpoint to fetch professors for a given course:
+    path('api/courses/<int:course_id>/professors/', CourseProfessorsAPIView.as_view(), name='course-professors'),
     path('api/create_user/', views.CreateUserView.as_view(), name='create_user'),
      
 ]

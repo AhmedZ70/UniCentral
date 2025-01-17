@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ course.title }} - Course Details</title>
+    <title>Course Details</title>
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -14,71 +14,23 @@
     {% include 'partials/navbar.html' %}
 
     <main class="main-content course-detail-page">
+        <input type="hidden" id="courseId" value="{{ course_id }}">
         <!-- Course Information Section -->
-        <section class="course-info">
-            <h1 class="course-title">{{ course.title }}</h1>
-            <div class="course-details">
-                <p><span class="detail-label">Subject:</span> {{ course.subject }} {{ course.number }}</p>
-                <p><span class="detail-label">Credits:</span> {{ course.credits }}</p>
-                <p><span class="detail-label">Semester:</span> {{ course.semester|default:"Not specified" }}</p>
-                <p><span class="detail-label">Average Rating:</span> <span class="rating">{{ course.avg_rating|floatformat:1 }}</span></p>
-                <p><span class="detail-label">Average Difficulty:</span> <span class="difficulty">{{ course.avg_difficulty|floatformat:1 }}</span></p>
-            </div>
+        <section class="course-info" id="course-info">
+            <!-- Populated by JavaScript -->
+            <h1 class="course-title" id="course-title">Loading course...</h1>
+            <div class="course-details" id="course-details"></div>
         </section>
 
         <!-- Reviews Section -->
-        <section class="course-reviews">
+        <section class="course-reviews" id="course-reviews">
             <h2 class="reviews-title">Reviews</h2>
-            {% if reviews %}
-                <ul class="reviews-list">
-                    {% for review in reviews %}
-                        <li class="review-item">
-                            <div class="review-header">
-                                <strong>Review by: anonymous</strong>
-                                <span>{% if review.grade %}Grade: {{ review.grade }}{% else %}Grade: Not provided{% endif %}</span>
-                            </div>
-                            <div class="review-content">
-                                <p><span class="detail-label">Review:</span> {{ review.review }}</p>
-                                <p><span class="detail-label">Rating:</span> <span class="rating">{{ review.rating }}/5</span></p>
-                                <p><span class="detail-label">Difficulty:</span> <span class="difficulty">{{ review.difficulty }}/6</span></p>
-                                <p><span class="detail-label">Estimated Weekly Hours:</span> {{ review.estimated_hours }}</p>
-                                {% if review.professor %}
-                                    <p><span class="detail-label">Professor:</span> {{ review.professor.fname }} {{ review.professor.lname }}</p>
-                                {% else %}
-                                    <p><span class="detail-label">Professor:</span> Not specified</p>
-                                {% endif %}
-                                <p><span class="detail-label">Would Take Again:</span> 
-                                    {% if review.would_take_again %}Yes{% else %}No{% endif %}
-                                </p>
-                                <p><span class="detail-label">For Credit:</span> 
-                                    {% if review.for_credit %}Yes{% else %}No{% endif %}
-                                </p>
-                                <p><span class="detail-label">Mandatory Attendance:</span> 
-                                    {% if review.mandatory_attendance %}Yes{% else %}No{% endif %}
-                                </p>
-                                <p><span class="detail-label">Required Course:</span> 
-                                    {% if review.required_course %}Yes{% else %}No{% endif %}
-                                </p>
-                                <p><span class="detail-label">General Education Requirement:</span> 
-                                    {% if review.is_gened %}Yes{% else %}No{% endif %}
-                                </p>
-                                <p><span class="detail-label">Class Format:</span> 
-                                    {% if review.in_person %}In Person {% endif %}
-                                    {% if review.online %}Online {% endif %}
-                                    {% if review.hybrid %}Hybrid {% endif %}
-                                </p>
-                                <p><span class="detail-label">Other Notes:</span> 
-                                    {% if review.no_exams %}No Exams{% endif %}
-                                    {% if review.presentations %} Presentations{% endif %}
-                                </p>
-                            </div>
-                        </li>
-                    {% endfor %}
-                </ul>
-            {% else %}
-                <p class="no-reviews-message">No reviews available for this course.</p>
-            {% endif %}
-            <a id="leave-review-btn" href="{% url 'review-create' course.id %}" class="leave-review-button">Leave a Review</a>
+            <!-- The <ul> will be filled by JS. If no reviews, we'll show a "no reviews" message. -->
+            <ul class="reviews-list" id="reviews-list"></ul>
+            <p class="no-reviews-message" id="no-reviews-message" style="display: none;">No reviews available for this course.</p>
+
+            <!-- "Leave a Review" link uses the course_id passed from Django to build the correct URL -->
+            <a id="leave-review-btn" href="{% url 'review-form-page' course_id=course_id %}" class="leave-review-button">Leave a Review</a>
         </section>
     </main>
     <style>
@@ -234,6 +186,7 @@
             }
         }
     </style>
+    <script src="{% static 'js/course_detail.js' %}"></script>
     <script type="module" src="{% static 'js/auth.js' %}"></script>
 </body>
 </html>
