@@ -110,6 +110,7 @@ class DepartmentCoursesView(APIView):
         courses = CourseService.get_courses_by_department(department_id)
         serializer = CourseSerializer(courses, many=True)
         return Response(serializer.data)
+    
 class CourseReviewListView(APIView):
     """
     API View to fetch details of a course and its reviews.
@@ -161,111 +162,6 @@ class CourseProfessorsAPIView(APIView):
         professors = ProfessorService.get_professors_by_course(course_id)
         serialized = ProfessorSerializer(professors, many=True)
         return Response(serialized.data, status=status.HTTP_200_OK)
-
-
-
-
-# class CourseListCreateView(generics.ListCreateAPIView):
-#     """
-#     API View for returning course list view
-#     """
-#     queryset = Course.objects.all()
-#     serializer_class = CourseSerializer
-
-# class CourseDetailView(generics.RetrieveUpdateDestroyAPIView):
-#     """
-#     API View for returning course detail view
-#     """
-#     queryset = Course.objects.all()
-#     serializer_class = CourseSerializer
-
-
-# class CourseDetailView(APIView):
-#     """
-#     Render a Course Detail page with reviews.
-#     """
-#     def get(self, request, course_id):
-#         """
-#         Fetches Course Detail page.
-#         """        
-#         # ForeignKey relationship from Course to Department
-#         course = CourseService.get_course(course_id)
-#         reviews = ReviewService.get_reviews_by_course(course_id)
-        
-#         context = {
-#         'course': course,
-#         'reviews': reviews,
-#         }
-#         return render(request, 'course_detai;.html', context)
-
-# # Review page
-# class ReviewListCreateView(generics.ListCreateAPIView):
-#     """
-#     API View for returning review list view.
-#     """
-#     queryset = Review.objects.all()
-#     serializer_class = ReviewSerializer
-
-# class CreateReviewView(APIView):
-#     def create_review(request):
-#         """
-#         Creates a review for a course, and updates the course's avg_rating and avg_difficulty.
-#         """
-#         if request.method == 'POST':
-#             try:
-#                 data = request.POST  # Retrieve data from the request body
-
-#                 # Extract the necessary data from the request
-#                 user = request.user  # Assuming the user is authenticated
-#                 course_id = data.get('course_id')
-#                 professor_id = data.get('professor_id')
-#                 review_text = data.get('review')
-#                 rating = float(data.get('rating'))
-#                 difficulty = int(data.get('difficulty'))
-#                 estimated_hours = float(data.get('estimated_hours', 0))  # Optional
-#                 grade = data.get('grade', '')  # Optional
-
-#                 # Get the course and professor objects
-#                 course = get_object_or_404(Course, id=course_id)
-#                 professor = get_object_or_404(Professor, id=professor_id) if professor_id else None
-
-#                 # Create the review using ReviewService
-#                 review = ReviewService.create_review(
-#                     user=user,
-#                     course=course,
-#                     rating=rating,
-#                     difficulty=difficulty,
-#                     professor=professor,
-#                     review=review_text,
-#                     estimated_hours=estimated_hours,
-#                     grade=grade
-#                 )
-
-#                 # If review creation was successful, return success response
-#                 if review:
-#                     return Response({"message": "Review created successfully."}, status=201)
-#                 else:
-#                     return Response({"message": "Error creating review."}, status=400)
-
-#             except Exception as e:
-#                 return Response({"message": f"Error creating review: {e}"}, status=400)
-
-#         else:
-#             return Response({"message": "Invalid request method."}, status=405)
-
-# class CourseReviewsView(APIView):
-#     """
-#     Retrieves reviews for a specific course by ID.
-#     """
-
-#     def get(self, request, course_id):
-#         """
-#         Handles GET requests to fetch reviews for the given course ID.
-#         """
-#         course = get_object_or_404(Course, id=course_id)
-#         reviews = Review.objects.filter(course=course)
-#         serializer = ReviewSerializer(reviews, many=True)
-#         return Response(serializer.data, status=status.HTTP_200_OK)
 
 class CreateUserView(APIView):
     """
@@ -352,67 +248,7 @@ class CreateUserView(APIView):
 # Professor-Related Views and APIs #
 ####################################
 
-# class ProfessorListCreateView(generics.ListCreateAPIView):
-#     """
-#     API View for returning professor list view
-#     """
-#     queryset = Professor.objects.all()
-#     serializer_class = ProfessorSerializer
     
 ####################################
 # Course-Filtering Views and APIs #
 ####################################
-
-# Course Filtering page
-# class CourseFilteringCreateView(generics.ListAPIView):
-#     """
-#     API View for filtering courses based on query parameters.
-#     """
-#     queryset = Course.objects.all()
-#     serializer_class = CourseSerializer
-
-#     def get_queryset(self):
-#         """
-#         Dynamically filters courses based on query parameters.
-#         """
-#         queryset = super().get_queryset()
-#         department_code = self.request.query_params.get('department', None)
-#         min_number = self.request.query_params.get('min_number', None)
-#         max_number = self.request.query_params.get('max_number', None)
-#         title_contains = self.request.query_params.get('title', None)
-#         min_difficulty = self.request.query_params.get('min_difficulty', None)
-#         max_difficulty = self.request.query_params.get('max_difficulty', None)
-#         min_rating = self.request.query_params.get('min_rating', None)
-#         max_rating = self.request.query_params.get('max_rating', None)
-#         credits = self.request.query_params.get('credits', None)
-#         semester = self.request.query_params.get('semester', None)
-#         professor_name = self.request.query_params.get('professor', None)
-
-#         # Apply filters dynamically
-#         if department_code:
-#             queryset = queryset.filter(department__code__icontains=department_code)
-#         if min_number:
-#             queryset = queryset.filter(number__gte=min_number)
-#         if max_number:
-#             queryset = queryset.filter(number__lte=max_number)
-#         if title_contains:
-#             queryset = queryset.filter(title__icontains=title_contains)
-#         if min_difficulty:
-#             queryset = queryset.filter(avg_difficulty__gte=min_difficulty)
-#         if max_difficulty:
-#             queryset = queryset.filter(avg_difficulty__lte=max_difficulty)
-#         if min_rating:
-#             queryset = queryset.filter(avg_rating__gte=min_rating)
-#         if max_rating:
-#             queryset = queryset.filter(avg_rating__lte=max_rating)
-#         if credits:
-#             queryset = queryset.filter(credits=credits)
-#         if semester:
-#             queryset = queryset.filter(semester__icontains=semester)
-#         if professor_name:
-#             queryset = queryset.filter(
-#                 Q(professors__fname__icontains=professor_name) |
-#                 Q(professors__lname__icontains=professor_name)
-#             )
-
-#         return queryset

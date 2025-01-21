@@ -1,12 +1,6 @@
 from .models import Department, User, Review, Course, Professor
 from django.db.models import Avg
-from .serializers import (
-    DepartmentSerializer,
-    UserSerializer,
-    CourseSerializer,
-    ProfessorSerializer,
-    ReviewSerializer,
-)
+
 from django.shortcuts import get_object_or_404
 
 class FirebaseService:
