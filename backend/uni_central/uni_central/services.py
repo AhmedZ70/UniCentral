@@ -1,44 +1,36 @@
-from .models import Department, User, Review, Course, Professor
-from django.db.models import Avg
-
+from .models import (
+    Department, 
+    User, 
+    Review, 
+    Course, 
+    Professor
+    )
 from django.shortcuts import get_object_or_404
 
-class FirebaseService:
-    @staticmethod
-    def create_or_update_user(firebase_user):
-        """
-        Sync Firebase user data with SQL database
-        """
-        user, created = User.objects.get_or_create(
-            firebase_uid=firebase_user.uid,
-            defaults={
-                'email': firebase_user.email,
-                'name': firebase_user.display_name or ''
-            }
-        )
-        if not created:
-            user.email = firebase_user.email
-            user.name = firebase_user.display_name or ''
-            user.save()
-        return user
-
-    @staticmethod
-    def delete_user(firebase_uid):
-        """
-        Delete user from SQL database when deleted from Firebase
-        """
-        User.objects.filter(firebase_uid=firebase_uid).delete()
-        
+###############################
+# Department-Related Services #
+###############################
 class DepartmentService:
+    """
+    A service class to handle operations related to the Department model.
+    """
+
     @staticmethod
     def get_all_departments():
         return Department.objects.all()
-    
+
     @staticmethod
     def get_department(department_id):
         return get_object_or_404(Department, id=department_id)
-    
+
+###########################
+# Course-Related Services #
+###########################
 class CourseService:
+    """
+    Provides utility methods for retrieving Course data.
+    """
+    
     @staticmethod
     def get_courses_by_department(department_id):
         department = DepartmentService.get_department(department_id)
@@ -48,7 +40,14 @@ class CourseService:
     def get_course(course_id):
         return get_object_or_404(Course, id=course_id)
     
+###########################
+# Review-Related Services #
+###########################
 class ReviewService:
+    """
+    Provides utility methods for retrieving Review data.
+    """
+
     @staticmethod
     def get_reviews_by_course(course_id):
         """
@@ -57,7 +56,7 @@ class ReviewService:
         course = CourseService.get_course(course_id)
         reviews = Review.objects.filter(course=course)
         return reviews
-
+    
     @staticmethod
     def create_review(course_id, user, review_data):
         """
@@ -108,21 +107,31 @@ class ReviewService:
         course.update_averages()
 
         return review
-        
+
+##############################
+# Professor-Related Services #
+##############################
 class ProfessorService:
+    """
+    Provides utility methods for retrieving Professor data.
+    """
+
     @staticmethod
     def get_professors_by_course(course_id):
         """
         Fetch all professors associated with a specific course.
-        Args:
-            course_id (int): The ID of the course.
-        Returns:
-            QuerySet: A queryset of professors related to the course.
         """
-        course = CourseService.get_course(course_id)  # Leverage CourseService
+        course = CourseService.get_course(course_id)
         return course.professors.all()
-
+    
+#########################
+# User-Related Services #
+#########################
 class UserService:
+    """
+    Provides utility methods for managing User data.
+    """
+    
     @staticmethod
     def create_user(email_address, fname, lname):
         """
@@ -162,3 +171,37 @@ class UserService:
         except User.DoesNotExist:
             # If user is not found, return False
             return False
+    
+class FirebaseService:
+    """
+    Provides utility methods for syncing Firebase user data with the SQL database.
+    """
+    
+    @staticmethod
+    def create_or_update_user(firebase_user):
+        """
+        Sync Firebase user data with SQL database
+        """
+        user, created = User.objects.get_or_create(
+            firebase_uid=firebase_user.uid,
+            defaults={
+                'email': firebase_user.email,
+                'name': firebase_user.display_name or ''
+            }
+        )
+        if not created:
+            user.email = firebase_user.email
+            user.name = firebase_user.display_name or ''
+            user.save()
+        return user
+
+    @staticmethod
+    def delete_user(firebase_uid):
+        """
+        Delete user from SQL database when deleted from Firebase
+        """
+        User.objects.filter(firebase_uid=firebase_uid).delete()
+        
+#####################################
+# Course-Filtering-Related Services #
+#####################################
