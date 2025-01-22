@@ -22,6 +22,7 @@ from .views import (
     CourseReviewListView,
     CreateReviewAPIView,
     CourseProfessorsAPIView,
+    DepartmentProfessorsView,
     CreateUserView,
     home,
     courses,
@@ -29,6 +30,7 @@ from .views import (
     login_page,
     course_detail,
     review_form_page,
+    professors,
     my_classmates
 )
 
@@ -39,6 +41,7 @@ urlpatterns = [
     path('courses/', courses, name='courses'),  # Render courses.html (user-facing view)
     path('courses/<int:course_id>/', course_detail, name='course-detail'),  # New route for course detail page
     path('courses/<int:course_id>/review/', review_form_page, name='review-form-page'),
+    path('professors/', professors, name='professors'),  # Render professors.html (user-facing view)
     path('my_classmates/', my_classmates, name='my_classmates'),
     
     ############
@@ -57,6 +60,8 @@ urlpatterns = [
     
     # Professor URLs
     path('api/courses/<int:course_id>/professors/', CourseProfessorsAPIView.as_view(), name='course-professors'),
+    path('api/departments/<int:department_id>/professors/', DepartmentProfessorsView.as_view(), name='department_professors'),
+
     
     # User URLs
     path('api/create_user/', CreateUserView.as_view(), name='create_user'),

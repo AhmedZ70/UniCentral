@@ -79,6 +79,12 @@ def review_form_page(request, course_id):
     }
     return render(request, 'review_form.html', context)
 
+def professors(request):
+    """
+    Render the Professors page.
+    """
+    return render(request, 'professors.html')
+
 #####################################
 # Department-Related Views and APIs #
 #####################################
@@ -175,6 +181,19 @@ class CourseProfessorsAPIView(APIView):
         professors = ProfessorService.get_professors_by_course(course_id)
         serialized = ProfessorSerializer(professors, many=True)
         return Response(serialized.data, status=status.HTTP_200_OK)
+    
+class DepartmentProfessorsView(APIView):
+    """
+    Retrieves professors for a specific department by ID.
+    """
+    def get(self, request, department_id):
+        """
+        Fetches courses for the given department ID.
+        """        
+        # ForeignKey relationship from Course to Department
+        professors = ProfessorService.get_professors_by_department(department_id)
+        serializer = ProfessorSerializer(professors, many=True)
+        return Response(serializer.data)
     
 ####################################
 # User-Related Views and APIs #

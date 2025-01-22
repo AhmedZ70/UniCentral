@@ -124,6 +124,14 @@ class ProfessorService:
         course = CourseService.get_course(course_id)
         return course.professors.all()
     
+    @staticmethod
+    def get_professors_by_department(department_id):
+        """
+        Fetch all professors associated with a specific course.
+        """
+        department = DepartmentService.get_department(department_id)
+        return department.professors.all()
+    
 #########################
 # User-Related Services #
 #########################
