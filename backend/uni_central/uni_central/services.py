@@ -133,6 +133,10 @@ class UserService:
     """
     
     @staticmethod
+    def get_user(email_address):
+        return get_object_or_404(User, email_address=email_address)
+    
+    @staticmethod
     def create_user(email_address, fname, lname):
         """
         Creates a new user in the SQLite database.

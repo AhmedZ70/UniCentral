@@ -144,6 +144,9 @@ class CreateReviewAPIView(APIView):
     def post(self, request, course_id):
         # Identify the user. 
         # If unauthenticated, fallback to a default user with ID=1, or raise 404 if not found.
+        # Parse email from request.
+        # email_address = request.email
+        # user = UserService.get_user(email_address)
         user = request.user if request.user.is_authenticated else get_object_or_404(User, id=1)
 
         # Delegate review creation to the service layer
@@ -182,41 +185,12 @@ class CreateUserView(APIView):
     Handles user creation requests.
     """
 
-    @api_view(['POST'])
-    def create_user(request):
-        """
-        Creates a new user based on the provided data.
-        """
-        if request.method == 'POST':
-            # Retrieve user data from the request body
-            email = request.data.get('email')
-            fname = request.data.get('fname')
-            lname = request.data.get('lname')
-
-            # Validate that necessary fields are provided
-            if not email or not fname or not lname:
-                return Response({"error": "Missing required fields."}, status=status.HTTP_400_BAD_REQUEST)
-
-            # Create the user using the UserService
-            user = UserService.create_user(email, fname, lname)
-
-            if user:
-                serializer = UserSerializer(user)
-                return Response(serializer.data, status=status.HTTP_201_CREATED)
-            else:
-                return Response({"error": "Error creating user."}, status=status.HTTP_400_BAD_REQUEST)
-
     def post(self, request):
         try:
-            # Retrieve and log the request data
-            print("Raw request data:", request.data)
-            
             email_address = request.data.get('email')
             fname = request.data.get('fname')
             lname = request.data.get('lname')
             
-            print(f"Parsed data - email: {email_address}, fname: {fname}, lname: {lname}")
-
             if not email_address or not fname or not lname:
                 print("Missing required fields")
                 return Response({
