@@ -16,13 +16,13 @@ Including another URLconf
 """
 
 from django.urls import path
-from . import views
 from .views import (
     DepartmentListView,
     DepartmentCoursesView,
     CourseReviewListView,
     CreateReviewAPIView,
     CourseProfessorsAPIView,
+    CreateUserView,
     home,
     courses,
     signup_page,
@@ -45,16 +45,20 @@ urlpatterns = [
     # API URLs #
     ############
     
-    # Department URLsç
+    # Department URLs
     path('api/departments/', DepartmentListView.as_view(), name='department-list'),
     
     # Course URLs
     path('api/departments/<int:department_id>/courses/', DepartmentCoursesView.as_view(), name='department-courses'),
+    
+    # Review URLs
     path('api/courses/<int:course_id>/reviews/', CourseReviewListView.as_view(), name='course-reviews'),
     path('api/courses/<int:course_id>/reviews/create/', CreateReviewAPIView.as_view(), name='api-review-create'),
     
-    # an endpoint to fetch professors for a given course:
+    # Professor URLs
     path('api/courses/<int:course_id>/professors/', CourseProfessorsAPIView.as_view(), name='course-professors'),
-    path('api/create_user/', views.CreateUserView.as_view(), name='create_user'),
+    
+    # User URLs
+    path('api/create_user/', CreateUserView.as_view(), name='create_user'),
      
 ]

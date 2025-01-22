@@ -1,12 +1,16 @@
-from rest_framework import generics
 from django.shortcuts import render, get_object_or_404
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.decorators import api_view
-from django.shortcuts import redirect
-from .models import Department, User, Course, Professor, Review
-from .services import UserService, DepartmentService, CourseService, ReviewService, ProfessorService
+from .models import User
+from .services import (
+    UserService,
+    DepartmentService,
+    CourseService, 
+    ReviewService, 
+    ProfessorService
+    )
 from .serializers import (
     DepartmentSerializer,
     UserSerializer,
@@ -75,8 +79,6 @@ def review_form_page(request, course_id):
     }
     return render(request, 'review_form.html', context)
 
-
-
 #####################################
 # Department-Related Views and APIs #
 #####################################
@@ -130,7 +132,11 @@ class CourseReviewListView(APIView):
             'reviews': review_serializer.data
         }
         return Response(data, status=status.HTTP_200_OK)
-    
+            
+####################################
+# Review-Related Views and APIs #
+####################################
+
 class CreateReviewAPIView(APIView):
     """
     Handle the creation of a Review for a given course (POST).
@@ -151,6 +157,10 @@ class CreateReviewAPIView(APIView):
             status=status.HTTP_201_CREATED
         )
 
+####################################
+# Professor-Related Views and APIs #
+####################################
+
 class CourseProfessorsAPIView(APIView):
     """
     Fetch all professors for a given course (GET /api/courses/<course_id>/professors/).
@@ -162,7 +172,11 @@ class CourseProfessorsAPIView(APIView):
         professors = ProfessorService.get_professors_by_course(course_id)
         serialized = ProfessorSerializer(professors, many=True)
         return Response(serialized.data, status=status.HTTP_200_OK)
-
+    
+####################################
+# User-Related Views and APIs #
+####################################
+    
 class CreateUserView(APIView):
     """
     Handles user creation requests.
@@ -243,11 +257,6 @@ class CreateUserView(APIView):
                 "success": False,
                 "message": f"Server error: {str(e)}"
             }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
-####################################
-# Professor-Related Views and APIs #
-####################################
-
     
 ####################################
 # Course-Filtering Views and APIs #
