@@ -79,6 +79,12 @@ def review_form_page(request, course_id):
     }
     return render(request, 'review_form.html', context)
 
+def professors(request):
+    """
+    Render the Professors page.
+    """
+    return render(request, 'professors.html')
+
 #####################################
 # Department-Related Views and APIs #
 #####################################

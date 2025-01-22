@@ -12,7 +12,7 @@
       <ul class="nav-links">
         <li><a href="{% url 'home' %}" class="{% if request.resolver_match.url_name == 'home' %}active{% endif %}">Home</a></li>
         <li><a href="{% url 'courses' %}" class="{% if request.resolver_match.url_name == 'courses' %}active{% endif %}">Courses</a></li>
-        <li><a href="#" class="{% if request.resolver_match.url_name == 'professors' %}active{% endif %}">Professors</a></li>
+        <li><a href="{% url 'professors' %}" class="{% if request.resolver_match.url_name == 'professors' %}active{% endif %}">Professors</a></li>
         <li><a href="#" class="{% if request.resolver_match.url_name == 'course_filtering' %}active{% endif %}">Course Filtering</a></li>
         <li><a href="#" class="{% if request.resolver_match.url_name == 'about' %}active{% endif %}">About</a></li>
         <script type="module" src="{% static 'js/auth.js' %}"></script>
