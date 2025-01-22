@@ -77,6 +77,9 @@ document.addEventListener("DOMContentLoaded", () => {
       hybrid: boolToStr("hybrid"),
       no_exams: boolToStr("noExams"),
       presentations: boolToStr("presentations"),
+
+      //email
+      email_address: "joedoe@gmail.com"
     };
 
     // 5. Send POST request to create the review

@@ -147,7 +147,7 @@ class CreateReviewAPIView(APIView):
         # Parse email from request.
         # email_address = request.email
         # user = UserService.get_user(email_address)
-        user = request.user if request.user.is_authenticated else get_object_or_404(User, id=1)
+        user = UserService.get_user('joedoe@gmail.com')
 
         # Delegate review creation to the service layer
         review = ReviewService.create_review(course_id, user, request.data)
