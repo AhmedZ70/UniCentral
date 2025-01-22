@@ -345,11 +345,11 @@ body {
 }
 
 /* ============================================= */
-/* Courses Page Styles                            */
+/* Professor Page Styles                            */
 /* ============================================= */
 
 /* Base Styles for Containers */
-#departments-title, #courses-title {
+#departments-title, #professors-title {
   margin-top: 2rem;
   font-size: 1.5rem;
   font-weight: bold;
@@ -406,7 +406,7 @@ body {
 }
 
 /* Course Item Styles */
-.professors-item {
+.professor-item {
   border: 2px solid #fa743e;
   border-radius: 8px;
   padding: 10px;
@@ -418,7 +418,7 @@ body {
   overflow: hidden;
 }
 
-.professors-item:hover {
+.professor-item:hover {
   background-color: #fa743e;
   color: #fff;
 }
@@ -451,13 +451,13 @@ body {
 }
 
 /* Section Headers */
-.courses-page h1 {
+.professors-page h1 {
   font-size: 2.5rem;
   color: #fa743e;
   margin-bottom: 1rem;
 }
 
-.courses-page h2 {
+.professors-page h2 {
   font-size: 1.8rem;
   color: #333;
   margin: 2rem 0 1rem 0;
@@ -528,7 +528,7 @@ footer {
 /* ============================================= */
 /* Courses Container                              */
 /* ============================================= */
-.courses {
+.professors {
   max-width: 800px;
   margin: 0 auto;
   padding: 0 20px;
@@ -538,7 +538,7 @@ footer {
 /* ============================================= */
 /* Courses List                                   */
 /* ============================================= */
-.courses-list {
+.professors-list {
   list-style: none;
   padding: 0;
   margin: 0;
@@ -547,26 +547,26 @@ footer {
   gap: 20px; /* Creates a 20px gap between each .course-item */
 }
 
-.course-link {
+.professor-link {
   text-decoration: none;
   color: #333;
   padding-bottom: 1em;
 }
 
-.course-link:hover {
+.professor-link:hover {
   background-color: #f0f0f0;
   color: #005a5b;
   box-shadow: none;
   margin: 0;
 }
 
-.course-item h4 {
+.professor-item h4 {
   margin-bottom: 0.5rem;
   font-size: 1.25rem;
   color: #005a5b;
 }
 
-.course-item p {
+.professor-item p {
   font-size: 1rem;
   color: #666;
 }
@@ -609,7 +609,7 @@ footer {
     justify-content: center;
   }
 
-  .courses-header {
+  .professors-header {
     flex-direction: column;
   }
 }

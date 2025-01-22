@@ -22,6 +22,7 @@ from .views import (
     CourseReviewListView,
     CreateReviewAPIView,
     CourseProfessorsAPIView,
+    DepartmentProfessorsView,
     CreateUserView,
     home,
     courses,
@@ -59,6 +60,8 @@ urlpatterns = [
     
     # Professor URLs
     path('api/courses/<int:course_id>/professors/', CourseProfessorsAPIView.as_view(), name='course-professors'),
+    path('api/departments/<int:department_id>/professors/', DepartmentProfessorsView.as_view(), name='department_professors'),
+
     
     # User URLs
     path('api/create_user/', CreateUserView.as_view(), name='create_user'),

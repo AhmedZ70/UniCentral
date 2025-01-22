@@ -171,7 +171,8 @@ document.addEventListener("DOMContentLoaded", () => {
         if (!professors || professors.length === 0) {
             professorsContainer.innerHTML = "<p>No professors available for this department.</p>";
         } else {
-            professors.forEach((professors) => {
+            professors.forEach((professor) => {
+                console.log('Professor object:', professor); 
                 const professorLink = document.createElement("a");
                 professorLink.href = `/professors/${professor.id}/`; // Link to professor detail page
                 professorLink.classList.add("professor-link");
@@ -179,9 +180,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 const professorDiv = document.createElement("div");
                 professorDiv.classList.add("professor-item");
                 professorDiv.innerHTML = `
-                    <h4>${professor.title}</h4>
-                    <p>Subject: ${professor.subject} ${professor.number}</p>
-                    <p>Credits: ${professor.credits}</p>
+                    <h4>${professor.fname} ${professor.lname}</h4>
                 `;
                 professorLink.appendChild(professorDiv);
                 professorsContainer.appendChild(professorLink);
