@@ -95,6 +95,9 @@ document.addEventListener('DOMContentLoaded', () => {
         const userCredential = await signInWithEmailAndPassword(auth, email, password);
         const user = userCredential.user;
         console.log('User logged in successfully!', user);
+
+        sessionStorage.setItem('userEmail', email);
+        console.log("User email stored in sessionStorage: " + email);
         
         // Redirect to home page after successful login
         window.location.href = '/'; // Changed path
