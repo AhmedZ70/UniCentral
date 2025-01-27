@@ -8,7 +8,7 @@
   <title>UniCentral</title>
   
   <!-- Corrected CSS file path with Django static tag -->
-  <link rel="stylesheet" href="{% static 'css/my_classmates.css' %}">
+  <link rel="stylesheet" href="{% static 'css/my_courses.css' %}">
   
   <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -26,43 +26,55 @@
       </a>
     </button>
   </div>
-  <div class="actions">
-    <a href="{% url 'signup' %}"><button class="register-btn">REGISTER</button></a>
-    <div class="dropdown-menu">
-      <button class="dropdown-menu-btn">&#9776;</button>
-      <div class="dropdown-menu-content">
-        <div class="icons">
-          <img src="{% static 'assets/my_account_icon.png' %}" alt="UniCentral Logo">
-          <a href="#">My Account</a>
+  {% include 'partials/dropdown.html' %}
+</header>
+
+<main class="main-content">
+  <section class="hero">
+    <div class="text-content">
+        <div class="text-container">
+          <h1>My Courses</h1>
         </div>
-        <div class="icons">
-          <img src="{% static 'assets/my_courses_icon.png' %}" alt="UniCentral Logo">
-          <a href="#">My Courses</a>
+        <div class="semester">
+          <label for="semester">Semester:</label>
+          <select name="semester" id="semester-values">
+            <option value="s2025">Spring 2025</option>
+            <option value="f2024">Fall 2024</option>
+            <option value="su2024">Summer 2024</option>
+            <option value="s2024">Spring 2024</option>
+          </select>
         </div>
-        <div class="icons">
-          <img src="{% static 'assets/my_professors_icon.png' %}" alt="UniCentral Logo">
-          <a href="#">My Professors</a>
-        </div>
-        <div class="icons">
-          <img src="{% static 'assets/my_classmates_icon.png' %}" alt="UniCentral Logo">
-          <a href="{% url 'my_classmates' %}">My Classmates</a>
-        </div>
-        <div class="icons">
-          <img src="{% static 'assets/my_reviews_icon.png' %}" alt="UniCentral Logo">
-          <a href="#">My Reviews</a>
-        </div>
-        <div class="icons">
-          <img src="{% static 'assets/course_planner_icon.png' %}" alt="UniCentral Logo">
-          <a href="#">Course Planner</a>
-        </div>
-        <div class="separator">
-          <hr>
-          <button class="logout-btn">Log Out</button>
-          <hr>
-        </div>
-        <li><a href="#">Privacy Policy</a></li>
-        <li><a href="#">Help & Feedback</a></li>
+    </div>
+  </section>
+  <div class="my-courses">
+    <div class="search-add-courses">
+      <select class="courses-sort">
+        <option value="a-z">A - Z</option>
+        <option value="newest-oldest">Newest - oldest</option>
+        <option value="oldest-newest">Oldest - newest</option>    
+      </select>
+    </div>
+    <div class="course-card">
+    <div class="course-info">
+      <div class="title-section">
+        <h3>CS 2100 Discrete Structures</h3>
+        <span class="required">REQUIRED</span>
+      </div>
+      <p>Estimated Time Spent Per Week: 10 hours</p>
+      <p>In Person / Spring 2025 / M W / 11:50 AM - 1:10 PM</p>
+      <div class="difficulty-rating">
+        <p>Difficulty:   <img src="{% static 'assets/5:6_difficulty.png' %}" alt="difficulty rating"></p>
+      </div>
+      <p>Average Grade: C</p>
+    </div>
+    <button class="remove-button">REMOVE X</button>
+  
+    <div class="course-right">
+      <p>Overall course rating:</p>
+      <div class="rating-container">
+        <img src="{% static 'assets/star.png' %}" alt="star rating">
+        <span class="rating-number">3.5</span>
       </div>
     </div>
   </div>
-</header>
+</main> 
