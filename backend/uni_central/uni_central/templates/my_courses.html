@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  {% load static %}
+  <meta charset="UTF-8">
+  <link rel="icon" href="/static/assets/logo_black.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>UniCentral</title>
+  
+  <!-- Corrected CSS file path with Django static tag -->
+  <link rel="stylesheet" href="{% static 'css/my_classmates.css' %}">
+  
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Corben:wght@400;700&family=Montserrat:ital,wght@0,100..900;1,100..900&family=Sigmar&family=Sniglet:wght@400;800&display=swap" rel="stylesheet">
+  <script type="module" src="{% static 'js/auth.js' %}"></script>
+</head>
+<body>
+
+<header class="navbar">
+  <div class="logo">
+    <button class="logo-home-btn">
+      <a href="{% url 'home' %}" class="logo-home-btn">
+        <img src="{% static 'assets/logo_horizontal.png' %}" alt="UniCentral Logo">
+      </a>
+    </button>
+  </div>
+  <div class="actions">
+    <a href="{% url 'signup' %}"><button class="register-btn">REGISTER</button></a>
+    <div class="dropdown-menu">
+      <button class="dropdown-menu-btn">&#9776;</button>
+      <div class="dropdown-menu-content">
+        <div class="icons">
+          <img src="{% static 'assets/my_account_icon.png' %}" alt="UniCentral Logo">
+          <a href="#">My Account</a>
+        </div>
+        <div class="icons">
+          <img src="{% static 'assets/my_courses_icon.png' %}" alt="UniCentral Logo">
+          <a href="#">My Courses</a>
+        </div>
+        <div class="icons">
+          <img src="{% static 'assets/my_professors_icon.png' %}" alt="UniCentral Logo">
+          <a href="#">My Professors</a>
+        </div>
+        <div class="icons">
+          <img src="{% static 'assets/my_classmates_icon.png' %}" alt="UniCentral Logo">
+          <a href="{% url 'my_classmates' %}">My Classmates</a>
+        </div>
+        <div class="icons">
+          <img src="{% static 'assets/my_reviews_icon.png' %}" alt="UniCentral Logo">
+          <a href="#">My Reviews</a>
+        </div>
+        <div class="icons">
+          <img src="{% static 'assets/course_planner_icon.png' %}" alt="UniCentral Logo">
+          <a href="#">Course Planner</a>
+        </div>
+        <div class="separator">
+          <hr>
+          <button class="logout-btn">Log Out</button>
+          <hr>
+        </div>
+        <li><a href="#">Privacy Policy</a></li>
+        <li><a href="#">Help & Feedback</a></li>
+      </div>
+    </div>
+  </div>
+</header>

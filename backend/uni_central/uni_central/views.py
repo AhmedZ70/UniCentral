@@ -41,11 +41,41 @@ def login_page(request):
     """
     return render(request, 'login.html')
 
+def my_account(request):
+    """
+    Render the My Account page.
+    """
+    return render(request, 'my_account.html')
+
+def my_courses(request):
+    """
+    Render the My Courses page.
+    """
+    return render(request, 'my_courses.html')
+
+def my_professors(request):
+    """
+    Render the My Professors page.
+    """
+    return render(request, 'my_professors.html')
+
 def my_classmates(request):
     """
     Render the My Classmates page.
     """
     return render(request, 'my_classmates.html')
+
+def my_reviews(request):
+    """
+    Render the My Reviews page.
+    """
+    return render(request, 'my_reviews.html')
+
+def course_planner(request):
+    """
+    Render the Course Planner page.
+    """
+    return render(request, 'course_planner.html')
 
 def courses(request):
     """

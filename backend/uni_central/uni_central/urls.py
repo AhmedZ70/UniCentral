@@ -31,7 +31,11 @@ from .views import (
     course_detail,
     review_form_page,
     professors,
-    my_classmates
+    my_courses,
+    my_professors,
+    my_classmates,
+    my_reviews,
+    course_planner
 )
 
 urlpatterns = [
@@ -41,8 +45,12 @@ urlpatterns = [
     path('courses/', courses, name='courses'),  # Render courses.html (user-facing view)
     path('courses/<int:course_id>/', course_detail, name='course-detail'),  # New route for course detail page
     path('courses/<int:course_id>/review/', review_form_page, name='review-form-page'),
-    path('professors/', professors, name='professors'),  # Render professors.html (user-facing view)
+    path('professors/', professors, name='professors'),  # Render professors.html (user-facing view),
+    path('my_courses/', my_courses, name='my_courses'),
+    path('my_professors/', my_professors, name='my_professors'),
     path('my_classmates/', my_classmates, name='my_classmates'),
+    path('my_reviews/', my_reviews, name='my_reviews'),
+    path('course_planner/', course_planner, name='course_planner'),    
     
     ############
     # API URLs #
