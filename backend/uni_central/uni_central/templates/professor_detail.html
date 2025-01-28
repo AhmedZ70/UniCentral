@@ -1,0 +1,120 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="icon" href="/static/assets/logo_black.png">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Professor Details</title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    {% include 'partials/navbar.html' %}
+
+    <main class="main-content professor-detail-page">
+        <!-- Hidden input for professor ID -->
+        <input type="hidden" id="professorId" value="{{ professor_id }}">
+
+        <!-- Professor Information Section -->
+        <section class="professor-info" id="professor-info">
+            <h1 class="professor-name" id="professor-name">Loading professor...</h1>
+            <div class="professor-details" id="professor-details"></div>
+            <!-- Courses Taught Section -->
+            <h3>Courses Taught</h3>
+            <ul class="courses-taught-list" id="courses-taught-list">
+                <!-- Dynamically populated by JS -->
+            </ul>
+        </section>
+
+        <!-- Reviews Section -->
+        <section class="professor-reviews" id="professor-reviews">
+            <h2 class="reviews-title">Reviews</h2>
+            <ul class="reviews-list" id="reviews-list"></ul>
+            <p class="no-reviews-message" id="no-reviews-message" style="display: none;">No reviews available for this professor.</p>
+        </section>
+    </main>
+
+    <style>
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background-color: #FAF8F0;
+            margin: 0;
+            padding: 0;
+            color: #333;
+        }
+
+        .professor-detail-page {
+            max-width: 1000px;
+            margin: 2rem auto;
+            padding: 0 20px;
+        }
+
+        .professor-info, .professor-reviews {
+            background: #fff;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
+        }
+
+        .professor-name {
+            font-size: 2.5rem;
+            color: #005a5b;
+            margin-bottom: 1.5rem;
+            text-align: center;
+            font-weight: 700;
+        }
+
+        .professor-details p {
+            font-size: 1.1rem;
+            margin: 15px 0;
+        }
+
+        .courses-taught-list {
+            list-style: none;
+            padding: 0;
+            margin: 15px 0;
+        }
+
+        .courses-taught-list li {
+            font-size: 1rem;
+            margin: 8px 0;
+        }
+
+        .reviews-title {
+            font-size: 2rem;
+            color: #005a5b;
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+
+        .reviews-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .review-item {
+            margin-bottom: 2rem;
+            border-bottom: 2px solid #e0e0e0;
+            padding-bottom: 2rem;
+        }
+
+        .review-header {
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin-bottom: 1rem;
+            color: #005a5b;
+        }
+
+        .review-content p {
+            font-size: 1.1rem;
+            margin: 0.5rem 0;
+        }
+    </style>
+
+    <script src="{% static 'js/professor_detail.js' %}"></script>
+</body>
+</html>

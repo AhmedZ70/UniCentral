@@ -38,6 +38,12 @@ class CourseService:
         return Course.objects.filter(department=department)
     
     @staticmethod
+    def get_courses_by_professor(professor_id):
+
+        return Course.objects.filter(professors__id=professor_id)
+
+    
+    @staticmethod
     def get_course(course_id):
         return get_object_or_404(Course, id=course_id)
     
@@ -56,6 +62,15 @@ class ReviewService:
         """
         course = CourseService.get_course(course_id)
         reviews = Review.objects.filter(course=course)
+        return reviews
+        
+    @staticmethod
+    def get_reviews_by_professor(professor_id):
+        """
+        Fetch all reviews for a given professor ID.
+        """
+        professor = ProfessorService.get_professor(professor_id)  # Use ProfessorService to fetch the professor
+        reviews = Review.objects.filter(professor=professor)
         return reviews
     
     @staticmethod
@@ -121,7 +136,13 @@ class ProfessorService:
     """
     Provides utility methods for retrieving Professor data.
     """
-
+    @staticmethod
+    def get_professor(professor_id):
+        """
+        Fetch a professor by their ID.
+        """
+        return get_object_or_404(Professor, id=professor_id)
+    
     @staticmethod
     def get_professors_by_course(course_id):
         """
