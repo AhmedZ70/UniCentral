@@ -31,6 +31,7 @@ from .views import (
     course_detail,
     review_form_page,
     professors,
+    my_account,
     my_courses,
     my_professors,
     my_classmates,
@@ -46,6 +47,7 @@ urlpatterns = [
     path('courses/<int:course_id>/', course_detail, name='course-detail'),  # New route for course detail page
     path('courses/<int:course_id>/review/', review_form_page, name='review-form-page'),
     path('professors/', professors, name='professors'),  # Render professors.html (user-facing view),
+    path('my_account/', my_account, name='my_account'),
     path('my_courses/', my_courses, name='my_courses'),
     path('my_professors/', my_professors, name='my_professors'),
     path('my_classmates/', my_classmates, name='my_classmates'),
