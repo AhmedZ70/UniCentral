@@ -4,9 +4,9 @@ from .models import (
     Review, 
     Course, 
     Professor
-    # Classmate
     )
 from django.shortcuts import get_object_or_404
+from django.db.models import Q
 
 ###############################
 # Department-Related Services #
@@ -224,3 +224,50 @@ class FirebaseService:
 #####################################
 # Course-Filtering-Related Services #
 #####################################
+
+class CourseFilteringService:
+    """
+    Provides methods to filter courses dynamically based on query parameters.
+    """
+    def filter_courses(filters):
+        queryset = Course.objects.all()
+
+        department_code = filters.get('department', None)
+        min_number = filters.get('min_number', None)
+        max_number = filters.get('max_number', None)
+        title_contains = filters.get('title', None)
+        min_difficulty = filters.get('min_difficulty', None)
+        max_difficulty = filters.get('max_difficulty', None)
+        min_rating = filters.get('min_rating', None)
+        max_rating = filters.get('max_rating', None)
+        credits = filters.get('credits', None)
+        semester = filters.get('semester', None)
+        professor_name = filters.get('professor', None)
+
+        if department_code:
+            queryset = queryset.filter(department__code__icontains=department_code)
+        if min_number:
+            queryset = queryset.filter(number__gte=min_number)
+        if max_number:
+            queryset = queryset.filter(number__lte=max_number)
+        if title_contains:
+            queryset = queryset.filter(title__icontains=title_contains)
+        if min_difficulty:
+            queryset = queryset.filter(avg_difficulty__gte=min_difficulty)
+        if max_difficulty:
+            queryset = queryset.filter(avg_difficulty__lte=max_difficulty)
+        if min_rating:
+            queryset = queryset.filter(avg_rating__gte=min_rating)
+        if max_rating:
+            queryset = queryset.filter(avg_rating__lte=max_rating)
+        if credits:
+            queryset = queryset.filter(credits=credits)
+        if semester:
+            queryset = queryset.filter(semester__icontains=semester)
+        if professor_name:
+            queryset = queryset.filter(
+                Q(professors__fname__icontains=professor_name) |
+                Q(professors__lname__icontains=professor_name)
+            )
+
+        return queryset

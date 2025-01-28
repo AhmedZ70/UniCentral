@@ -24,6 +24,7 @@ from .views import (
     CourseProfessorsAPIView,
     DepartmentProfessorsView,
     CreateUserView,
+    CourseFilteringView,
     home,
     courses,
     signup_page,
@@ -76,4 +77,6 @@ urlpatterns = [
     # User URLs
     path('api/create_user/', CreateUserView.as_view(), name='create_user'),
      
+     # Course Filtering URLs
+     path('api/course-filtering/', CourseFilteringView.as_view(), name='create_user'),
 ]
