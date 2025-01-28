@@ -190,25 +190,6 @@ class UserService:
             # If user is not found, return False
             return False
 
-# class ClassmateService:
-#     """
-#     Provides methods for adding, deleting, and chatting with classmates.
-#     """
-#     @staticmethod
-#     def search_classmate(classmate_user):
-    
-#     @staticmethod
-#     def add_classmate(classmate_user):
-
-#     @staticmethod
-#     def delete_classmate(classmate_user):
-
-#     @staticmethod
-#     def chat_with_classmate(classmate_user):
-
-#     @staticmethod
-#     def get_classmate_details(classmate_user):
-
     
 class FirebaseService:
     """
