@@ -145,28 +145,13 @@ body, html, ul, li, p, h1, h2, select {
     font-family: 'Agrandir', sans-serif;
   }
 
-  .my-courses {
+  .my-professors {
     width: 100%;
     max-width: 1650px;
-    margin: 0 auto;
     padding: 2rem;
   }
   
-  .search-add-courses {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 1.5rem;
-  }
-  
-  .course-search {
-    flex: 1;
-    padding: 0.5rem 1rem;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-  }
-  
-  .courses-sort {
+  .professors-sort {
     padding: 0.5rem 1rem;
     border: 1px solid #ccc;
     border-radius: 4px;
@@ -175,36 +160,28 @@ body, html, ul, li, p, h1, h2, select {
     margin-left: 50px;
   }
 
-  .courses-sort select{
+  .professors-sort select{
     font-size: 25px;
     font-family: 'Agrandir', sans-serif;
   }
   
-  .course-card {
+  .professor-card {
+    margin-left: 75px;
+    margin-right: 75px;
     background-color: #ffffff;
     border: 3px solid black;
     border-radius: 8px;
     padding: 1.5rem;
     position: relative;
-    min-height: 200px;
+    min-height: 130px;
     display: flex;
     justify-content: space-between;
-    margin-left: 50px;
-    margin-right: 50px;
   }
   
-  .course-info {
+  .professor-info {
     flex: 1;
     margin-right: 200px;
   }
-  
-  /* .course-info h3 {
-    font-size: 24px;
-    margin-bottom: 15px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-  } */
 
   .title-section {
     display: flex;
@@ -227,12 +204,12 @@ body, html, ul, li, p, h1, h2, select {
     white-space: nowrap;
   }
   
-  .course-info p {
+  .professor-info p {
     margin-bottom: 10px;
     font-size: 18px;
   }
   
-  .course-info p {
+  .professor-info p {
     margin-bottom: 10px;
     font-size: 18px;
   }
@@ -248,30 +225,14 @@ body, html, ul, li, p, h1, h2, select {
     vertical-align: bottom;
   }
   
-  .remove-button {
-    position: absolute;
-    right: 1%;
-    top: 10%;
-    transform: translateY(-50%);
-    background-color: #ff4444;
-    color: white;
-    border: none;
-    padding: 8px 16px;
-    border-radius: 8px;
-    font-size: 16px;
-    font-weight: bold;
-    cursor: pointer;
-  }
-  
-  .course-right {
+  .professor-right {
     position: absolute;
     right: 24px;
-    bottom: 24px;
+    bottom: 30px;
     text-align: right;
   }
   
-  .course-right p {
-    margin-bottom: 10px;
+  .professor-right p {
     font-size: 20px;
   }
   
@@ -289,4 +250,4 @@ body, html, ul, li, p, h1, h2, select {
   
   .rating-number {
     font-size: 60px;
-  }
+  } 

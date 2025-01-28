@@ -123,7 +123,7 @@ body {
   font-weight: 100;
   font-size: 65px;
   color: #ff743e;
-  margin-left: 8px;
+  margin-left: 50px;
   margin-top: -50px;
 }
 
@@ -145,7 +145,7 @@ body {
   position: relative;
   padding: 0.5rem;
   z-index: 1;
-  margin-left: 65px;
+  margin-left: 100px;
   margin-top: 10px;
   margin-bottom: 40px;
 }
@@ -221,7 +221,7 @@ body {
   background-color: #fff;
   font-size: 1rem;
   margin-top: -100px;
-  margin-left: 20px;
+  margin-left: 50px;
 }
 
 .classmate-grid {
@@ -229,6 +229,8 @@ body {
   grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); /* Increased minimum width from 300px to 350px */
   gap: 1.5rem;
   padding: 0 1rem;
+  margin-left: 35px;
+  margin-right: 35px;
 }
 
 .classmate-card {
@@ -240,7 +242,7 @@ body {
   padding: 1.5rem;
   display: flex;
   align-items: center;
-  width: 475px;
+  width: 460px;
   height: 200px;
 }
 
