@@ -1,15 +1,14 @@
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.views import APIView
-from rest_framework.decorators import api_view
-from .models import User
 from .services import (
     UserService,
     DepartmentService,
     CourseService, 
     ReviewService, 
-    ProfessorService
+    ProfessorService,
+    CourseFilteringService
     )
 from .serializers import (
     DepartmentSerializer,
@@ -284,3 +283,21 @@ class CreateUserView(APIView):
 ####################################
 # Course-Filtering Views and APIs #
 ####################################
+
+class CourseFilteringView(APIView):
+    """
+    API View to dynamically filter courses based on query parameters.
+    """
+    
+    def get(self, request):
+        try:
+            filters = request.data
+            filtered_courses = CourseFilteringService.filter_courses(filters)
+            serialized = CourseSerializer(filtered_courses, many=True)
+
+            return Response(serialized.data, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response(
+                {"error": str(e)},
+                status=status.HTTP_400_BAD_REQUEST
+            )
