@@ -51,21 +51,42 @@
     </select>
     </div>
     <div class="professor-card">
-    <div class="professor-info">
-      <div class="title-section">
-        <h3>Daniel Kopta</h3>
+      <div class="professor-info">
+        <div class="title-section">
+          <h3>Daniel Kopta</h3>
+        </div>
+        <p>Courses taught: CS 2420, CS 4400, CS 5530</p>
+        <div class="difficulty-rating">
+          <p>Difficulty:   <img src="{% static 'assets/5:6_difficulty.png' %}" alt="difficulty rating"></p>
+        </div>
       </div>
-      <p>Courses taught: CS 2420, CS 4400, CS 5530</p>
-      <div class="difficulty-rating">
-        <p>Difficulty:   <img src="{% static 'assets/5:6_difficulty.png' %}" alt="difficulty rating"></p>
+  
+      <div class="professor-right">
+        <p>Overall professor rating:</p>
+        <div class="rating-container">
+          <img src="{% static 'assets/star.png' %}" alt="star rating">
+          <span class="rating-number">3.5</span>
+        </div>
       </div>
     </div>
+    <div class="professor-card">
+      <div class="professor-info">
+        <div class="title-section">
+          <h3>Daniel Kopta</h3>
+        </div>
+        <p>Courses taught: CS 2420, CS 4400, CS 5530</p>
+        <div class="difficulty-rating">
+          <p>Difficulty:   <img src="{% static 'assets/5:6_difficulty.png' %}" alt="difficulty rating"></p>
+        </div>
+      </div>
   
-    <div class="professor-right">
-      <p>Overall professor rating:</p>
-      <div class="rating-container">
-        <img src="{% static 'assets/star.png' %}" alt="star rating">
-        <span class="rating-number">3.5</span>
+      <div class="professor-right">
+        <p>Overall professor rating:</p>
+        <div class="rating-container">
+          <img src="{% static 'assets/star.png' %}" alt="star rating">
+          <span class="rating-number">3.5</span>
+        </div>
+        <button class="remove-button">REMOVE X</button>
       </div>
     </div>
   </div>
