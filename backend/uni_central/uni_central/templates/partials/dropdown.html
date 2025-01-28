@@ -1,12 +1,14 @@
 {% load static %}
 <div class="actions">
+    <link rel="stylesheet" href="{% static 'css/dropdown.css' %}">
+    <meta charset="UTF-8">
     <a href="{% url 'signup' %}"><button class="register-btn">REGISTER</button></a>
     <div class="dropdown-menu">
       <button class="dropdown-menu-btn">&#9776;</button>
       <div class="dropdown-menu-content">
         <div class="icons">
           <img src="{% static 'assets/my_account_icon.png' %}" alt="UniCentral Logo">
-          <a href="#">My Account</a>
+          <a href="{% url 'my_account' %}">My Account</a>
         </div>
         <div class="icons">
           <img src="{% static 'assets/my_courses_icon.png' %}" alt="UniCentral Logo">
@@ -14,7 +16,7 @@
         </div>
         <div class="icons">
           <img src="{% static 'assets/my_professors_icon.png' %}" alt="UniCentral Logo">
-          <a href="#">My Professors</a>
+          <a href="{% url 'my_professors' %}">My Professors</a>
         </div>
         <div class="icons">
           <img src="{% static 'assets/my_classmates_icon.png' %}" alt="UniCentral Logo">
@@ -22,11 +24,11 @@
         </div>
         <div class="icons">
           <img src="{% static 'assets/my_reviews_icon.png' %}" alt="UniCentral Logo">
-          <a href="#">My Reviews</a>
+          <a href="{% url 'my_reviews' %}">My Reviews</a>
         </div>
         <div class="icons">
           <img src="{% static 'assets/course_planner_icon.png' %}" alt="UniCentral Logo">
-          <a href="#">Course Planner</a>
+          <a href="{% url 'course_planner' %}">Course Planner</a>
         </div>
         <div class="separator">
           <hr>
