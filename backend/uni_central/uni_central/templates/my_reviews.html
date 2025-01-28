@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  {% load static %}
+  <meta charset="UTF-8">
+  <link rel="icon" href="/static/assets/logo_black.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>UniCentral</title>
+  <link rel="stylesheet" href="{% static 'css/my_reviews.css' %}">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Corben:wght@400;700&family=Montserrat:ital,wght@0,100..900;1,100..900&family=Sigmar&family=Sniglet:wght@400;800&display=swap" rel="stylesheet">
+  <script type="module" src="{% static 'js/auth.js' %}"></script>
+</head>
+<body>
+
+<header class="navbar">
+  <div class="logo">
+    <button class="logo-home-btn">
+      <a href="{% url 'home' %}" class="logo-home-btn">
+        <img src="{% static 'assets/logo_horizontal.png' %}" alt="UniCentral Logo">
+      </a>
+    </button>
+  </div>
+  {% include 'partials/dropdown.html' %}
+</header>
+
+<main class="main-content">
+  <section class="hero">
+    <div class="text-content">
+      <div class="text-container">
+        <h1>My Reviews</h1>
+      </div>
+      <div class="review-type">
+        <label for="review-type">Review Type:</label>
+        <select name="review-type" id="review-type">
+          <option value="course">Course Reviews</option>
+          <option value="professor">Professor Reviews</option>
+          <option value="all">All Reviews</option>
+        </select>
+      </div>
+    </div>
+  </section>
+  
+  <div class="my-reviews">
+    <div class="search-reviews">
+      <select class="reviews-sort">
+        <option value="newest-oldest">Newest - oldest</option>
+        <option value="oldest-newest">Oldest - newest</option>    
+      </select>
+    </div>
+    
+    <!-- Course Review Card -->
+    <div class="course-review-card">
+      <div class="review-info">
+        <div class="title-section">
+          <h3>CS 4400 Computer Systems</h3>
+        </div>
+        <p>Review: This class was great!</p>
+        <div class="overall-rating">
+          <p>Rating: <img src="{% static 'assets/4:5_rating.png' %}" alt="difficulty rating"></p>
+        </div>
+        <div class="difficulty-rating">
+          <p>Difficulty: <img src="{% static 'assets/5:6_difficulty.png' %}" alt="difficulty rating"></p>
+        </div>
+        <p>Estimated Weekly Hours: 10 hours</p>
+        <p>Professor: Zhang Mu</p>
+        <p>Would take again: No</p>
+        <p>For Credit: Yes</p>
+        <p>Mandatory Attendance: No</p>
+        <p>Required Course: Yes</p>
+        <p>General Reducation Requirement: No</p>
+        <p>Class Format: In person</p>
+        <p>In Person / Spring 2025 / M W / 11:50 AM - 1:10 PM</p>
+        <p>Average Grade: C</p>
+      </div>
+      <a id="edit-review" href="#" class="edit-review">Edit</a> 
+      <button class="delete-btn">DELETE X</button>
+    </div>
+    
+    <!-- Professor Review Card -->
+    <div class="professor-review-card">
+      <div class="review-info">
+        <div class="title-section">
+          <h3>Daniel Kopta</h3>
+        </div>
+        <p>Review: This professor was great!</p>
+        <div class="overall-rating">
+          <p>Rating: <img src="{% static 'assets/4:5_rating.png' %}" alt="difficulty rating"></p>
+        </div>
+        <div class="difficulty-rating">
+          <p>Difficulty: <img src="{% static 'assets/5:6_difficulty.png' %}" alt="difficulty rating"></p>
+        </div>
+        <p>Estimated Weekly Hours: 10 hours</p>
+        <p>Course Taught: CS 2420 Intro to Data Structures</p>
+        <p>Would take again: No</p>
+        <p>For Credit: Yes</p>
+        <p>Mandatory Attendance: No</p>
+        <p>Required Course: Yes</p>
+        <p>General Reducation Requirement: No</p>
+        <p>Class Format: In person</p>
+        <p>In Person / Spring 2025 / T TH / 10:45 AM - 12:05 PM</p>
+        <p>Average Grade: B+</p>
+      </div>
+      <a id="edit-review" href="#" class="edit-review">Edit</a> 
+      <button class="delete-btn">DELETE X</button>
+    </div>
+  </div>
+</main>
