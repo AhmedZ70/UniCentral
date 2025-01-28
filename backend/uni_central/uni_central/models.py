@@ -191,3 +191,20 @@ class Review(models.Model):
     def __str__(self):
         course_name = self.course.title if self.course else "No Course"
         return f"Review by {self.user.fname} for {course_name}"
+
+####################
+# DEPARTMENT MODEL #
+####################
+# class Classmate(models.Model):
+#     """
+#     A model to store department information.
+
+#     Attributes:
+#         id (AutoField): The primary key of the department. Automatically generated.
+#         name (CharField): The name of the department (e.g., 'Computer Science').
+#         code (CharField): The unique code for the department (e.g., 'CS').
+#     """
+
+#     id = models.AutoField(primary_key=True)
+#     name = models.CharField(max_length=255)
+#     code = models.CharField(max_length=50, unique=True)

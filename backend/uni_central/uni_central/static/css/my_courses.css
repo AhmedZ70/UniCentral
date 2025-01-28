@@ -1,0 +1,407 @@
+/* ============================================= */
+/* General                                       */
+/* ============================================= */
+body, html, ul, li, p, h1, h2, select {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+  
+  body {
+    font-family: 'Montserrat', sans-serif;
+    line-height: 1.6;
+    background-color: #FAF8F0;
+  }
+  
+  @font-face {
+    font-family: 'Agrandir';
+    src: url('../assets/fonts/Agrandir-Regular.otf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+  }
+  
+  /* ============================================= */
+  /* Navbar Styles                                 */
+  /* ============================================= */
+  .navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 2rem;
+    font-weight: 100;
+    font-size: 20px;
+  }
+  
+  .logo {
+    display: flex;
+    align-items: center;
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: #333333;
+  }
+  
+  .logo img {
+    width: 200px;
+    margin-right: 8px;
+  }
+  
+  .logo-home-btn {
+    border: none;
+    background-color: #FAF8F0;
+  }
+  
+  .nav-links {
+    display: flex;
+    list-style: none;
+  }
+  
+  .nav-links li {
+    margin-left: 2rem;
+  }
+  
+  .nav-links a {
+    text-decoration: none;
+    color: #333333;
+    font-weight: bold;
+  }
+  
+  .nav-links a:hover {
+    color: #005a5b;
+  }
+  
+  .actions {
+    display: flex;
+    align-items: center;
+  }
+  
+  .register-btn {
+    background-color: #005a5b;
+    color: #FAF8F0;
+    border: none;
+    font-family: 'Agrandir', sans-serif;
+    font-size: 20px;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-weight: bold;
+    cursor: pointer;
+  }
+  
+  .register-btn:hover {
+    background-color: #007d7d;
+  }
+  
+  .welcome-message {
+    color: #005a5b;
+    font-weight: bold;
+    margin-right: 1rem;
+    display: inline-block;
+    font-family: 'Montserrat', sans-serif;
+  }
+  
+  /* ============================================= */
+  /* Dropdown Menu Styles                           */
+  /* ============================================= */
+  .dropdown-menu {
+    position: relative;
+    font-size: 16px;
+    margin-left: 1rem;
+    cursor: pointer;
+    width: 50px;
+    height: 80px;
+  }
+  
+  .dropdown-menu-btn {
+    color: black;
+    background-color: #FAF8F0;
+    padding: 0; /* Changed from 'none' to '0' for valid CSS */
+    margin-top: 13px;
+    font-size: 40px;
+    border: none;
+    border-radius: 4px;
+  }
+  
+  .dropdown-menu-content {
+    display: none;
+    position: absolute;
+    font-size: 23px;
+    background-color: #f1f1f1;
+    min-width: 250px;
+    min-height: 350px;
+    box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.2);
+    z-index: 100;
+    top: 100%;
+    right: 0;
+    list-style: none;
+    padding: 10px 20px;
+    font-weight: bold;
+    border: 3px solid black;
+    border-radius: 4px;
+  }
+  
+  .dropdown-menu.active .dropdown-menu-content {
+    display: block;
+  }
+  
+  .dropdown-menu-btn:focus + .dropdown-menu-content,
+  .dropdown-menu:hover .dropdown-menu-content {
+    display: block;
+  }
+  
+  .dropdown-menu-btn:focus,
+  .dropdown-menu:hover .dropdown-menu-btn {
+    color: #313131;
+  }
+  
+  .dropdown-menu-content a {
+    display: block;
+    text-decoration: none;
+    color: black;
+  }
+  
+  .dropdown-menu-content a:hover {
+    color: #3c3c3c;
+  }
+  
+  .dropdown-menu-btn:hover + .dropdown-menu-content {
+    display: block;
+  }
+  
+  .dropdown-menu:hover .dropdown-menu-btn {
+    color: #3c3c3c;
+  }
+  
+  /* ============================================= */
+  /* Icon Styles                                    */
+  /* ============================================= */
+  .icons {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 15px;
+  }
+  
+  .icons img {
+    width: 35px;
+  }
+  
+  .icons a {
+    text-decoration: none;
+    color: black;
+    font-weight: bold;
+  }
+  
+  /* ============================================= */
+  /* Button Styles                                  */
+  /* ============================================= */
+  .logout-btn, .login-btn {
+    color: black;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 23px;
+    font-weight: bold;
+    cursor: pointer;
+  }
+  
+  .logout-btn:hover, .login-btn:hover {
+    color: #3c3c3c;
+  }
+  
+  /* ============================================= */
+  /* Hero Section                                   */
+  /* ============================================= */
+  .hero {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 2rem 2rem 0.5rem 2rem; /* Reduced bottom padding */
+  }
+  
+  .text-container {
+    position: relative;
+    z-index: 1;
+  }
+  
+  .text-content {
+    max-width: 100%;
+    font-family: 'Agrandir', sans-serif;
+  }
+  
+  .text-content h1 {
+    font-family: 'Agrandir', sans-serif;
+    font-weight: 100;
+    font-size: 65px;
+    color: #ff743e;
+    margin-left: 8px;
+    margin-top: -50px;
+  }
+  
+  .text-content p {
+    margin-top: 0.5rem;
+    font-family: 'Poppins-light', sans-serif;
+    font-weight: 50;
+    font-size: 25px;
+    color: black;
+  }
+  
+  .semester {
+    font-size: 25px;
+    margin-left: 10px;
+  }
+
+  .semester select {
+    font-size: 20px;
+    font-family: 'Agrandir', sans-serif;
+  }
+
+  .my-courses {
+    width: 100%;
+    max-width: 1650px;
+    margin: 0 auto;
+    padding: 2rem;
+  }
+  
+  .search-add-courses {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1.5rem;
+  }
+  
+  .course-search {
+    flex: 1;
+    padding: 0.5rem 1rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+  }
+  
+  .courses-sort {
+    padding: 0.5rem 1rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    background-color: #fff;
+    font-size: 1rem;
+    margin-left: 5px;
+  }
+
+  .courses-sort select{
+    font-size: 25px;
+    font-family: 'Agrandir', sans-serif;
+  }
+  
+  .course-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); /* Increased minimum width from 300px to 350px */
+    gap: 1.5rem;
+    padding: 0 1rem;
+  }
+  
+  .course-card {
+    background-color: #ffffff;
+    border: 3px solid black;
+    border-radius: 8px;
+    padding: 1.5rem;
+    position: relative;
+    min-height: 200px;
+    display: flex;
+    justify-content: space-between;
+  }
+  
+  .course-info {
+    flex: 1;
+    margin-right: 200px;
+  }
+  
+  /* .course-info h3 {
+    font-size: 24px;
+    margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  } */
+
+  .title-section {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 15px;
+  }
+  
+  .title-section h3 {
+    font-size: 24px;
+    margin: 0;
+  }
+  
+  .required {
+    color: #ff4444;
+    padding: 4px 8px;
+    border-radius: 8px;
+    font-size: 20px;
+    font-weight: bold;
+    white-space: nowrap;
+  }
+  
+  .course-info p {
+    margin-bottom: 10px;
+    font-size: 18px;
+  }
+  
+  .course-info p {
+    margin-bottom: 10px;
+    font-size: 18px;
+  }
+  
+  .difficulty-rating {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  
+  .difficulty-rating img {
+    width: 18%;
+    vertical-align: bottom;
+  }
+  
+  .remove-button {
+    position: absolute;
+    right: 1%;
+    top: 10%;
+    transform: translateY(-50%);
+    background-color: #ff4444;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+  }
+  
+  .course-right {
+    position: absolute;
+    right: 24px;
+    bottom: 24px;
+    text-align: right;
+  }
+  
+  .course-right p {
+    margin-bottom: 10px;
+    font-size: 20px;
+  }
+  
+  .rating-container {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    justify-content: flex-end;
+  }
+  
+  .rating-container img {
+    width: 80px;
+    height: 80px;
+  }
+  
+  .rating-number {
+    font-size: 60px;
+  }

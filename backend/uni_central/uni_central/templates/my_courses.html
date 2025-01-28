@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  {% load static %}
+  <meta charset="UTF-8">
+  <link rel="icon" href="/static/assets/logo_black.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>UniCentral</title>
+  <link rel="stylesheet" href="{% static 'css/my_courses.css' %}">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Corben:wght@400;700&family=Montserrat:ital,wght@0,100..900;1,100..900&family=Sigmar&family=Sniglet:wght@400;800&display=swap" rel="stylesheet">
+  <script type="module" src="{% static 'js/auth.js' %}"></script>
+</head>
+<body>
+
+<header class="navbar">
+  <div class="logo">
+    <button class="logo-home-btn">
+      <a href="{% url 'home' %}" class="logo-home-btn">
+        <img src="{% static 'assets/logo_horizontal.png' %}" alt="UniCentral Logo">
+      </a>
+    </button>
+  </div>
+  {% include 'partials/dropdown.html' %}
+</header>
+
+<main class="main-content">
+  <section class="hero">
+    <div class="text-content">
+        <div class="text-container">
+          <h1>My Courses</h1>
+        </div>
+        <div class="semester">
+          <label for="semester">Semester:</label>
+          <select name="semester" id="semester-values">
+            <option value="s2025">Spring 2025</option>
+            <option value="f2024">Fall 2024</option>
+            <option value="su2024">Summer 2024</option>
+            <option value="s2024">Spring 2024</option>
+          </select>
+        </div>
+    </div>
+  </section>
+  <div class="my-courses">
+    <div class="search-add-courses">
+      <select class="courses-sort">
+        <option value="a-z">A - Z</option>
+        <option value="newest-oldest">Newest - oldest</option>
+        <option value="oldest-newest">Oldest - newest</option>    
+      </select>
+    </div>
+    <div class="course-card">
+    <div class="course-info">
+      <div class="title-section">
+        <h3>CS 2100 Discrete Structures</h3>
+        <span class="required">REQUIRED</span>
+      </div>
+      <p>Estimated Time Spent Per Week: 10 hours</p>
+      <p>In Person / Spring 2025 / M W / 11:50 AM - 1:10 PM</p>
+      <div class="difficulty-rating">
+        <p>Difficulty:   <img src="{% static 'assets/5:6_difficulty.png' %}" alt="difficulty rating"></p>
+      </div>
+      <p>Average Grade: C</p>
+    </div>
+    <button class="remove-button">REMOVE X</button>
+  
+    <div class="course-right">
+      <p>Overall course rating:</p>
+      <div class="rating-container">
+        <img src="{% static 'assets/star.png' %}" alt="star rating">
+        <span class="rating-number">3.5</span>
+      </div>
+    </div>
+  </div>
+</main> 

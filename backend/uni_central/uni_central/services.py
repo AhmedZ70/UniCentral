@@ -4,6 +4,7 @@ from .models import (
     Review, 
     Course, 
     Professor
+    # Classmate
     )
 from django.shortcuts import get_object_or_404
 
@@ -107,6 +108,11 @@ class ReviewService:
         course.update_averages()
 
         return review
+    @staticmethod
+    def get_my_reviews(user_id):
+        user = UserService.get_user(user_id)
+        reviews = Review.objects.filter(user=user)
+        return reviews
 
 ##############################
 # Professor-Related Services #
@@ -183,6 +189,26 @@ class UserService:
         except User.DoesNotExist:
             # If user is not found, return False
             return False
+
+# class ClassmateService:
+#     """
+#     Provides methods for adding, deleting, and chatting with classmates.
+#     """
+#     @staticmethod
+#     def search_classmate(classmate_user):
+    
+#     @staticmethod
+#     def add_classmate(classmate_user):
+
+#     @staticmethod
+#     def delete_classmate(classmate_user):
+
+#     @staticmethod
+#     def chat_with_classmate(classmate_user):
+
+#     @staticmethod
+#     def get_classmate_details(classmate_user):
+
     
 class FirebaseService:
     """
