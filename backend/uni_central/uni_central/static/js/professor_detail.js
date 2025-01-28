@@ -21,26 +21,27 @@ document.addEventListener("DOMContentLoaded", () => {
             const professor = data.professor || {};
             professorNameEl.textContent = `${professor.fname} ${professor.lname}`;
             professorDetailsEl.innerHTML = `
-                <p><strong>Department:</strong> ${professor.department || "N/A"}</p>
+                <p><strong>Department:</strong> ${professor.department?.name || "N/A"}</p>
                 <p><strong>Average Rating:</strong> <span class="rating">${(professor.avg_rating || 0).toFixed(1)}</span></p>
                 <p><strong>Average Difficulty:</strong> <span class="difficulty">${(professor.avg_difficulty || 0).toFixed(1)}</span></p>
-                <p><strong>Courses Taught:</strong></p>
-                <ul id="courses-taught">
-                </ul>
             `;
 
             // Populate courses taught
             const courses = data.courses_taught || [];
-            const coursesTaughtEl = document.getElementById("courses-taught");
+            const coursesTaughtList = document.createElement("ul");
+            coursesTaughtList.classList.add("courses-taught-list");
             if (courses.length > 0) {
                 courses.forEach((course) => {
                     const li = document.createElement("li");
                     li.innerHTML = `${course.title} (${course.subject} ${course.number})`;
-                    coursesTaughtEl.appendChild(li);
+                    coursesTaughtList.appendChild(li);
                 });
             } else {
-                coursesTaughtEl.innerHTML = "<li>No courses found.</li>";
+                const noCoursesMsg = document.createElement("p");
+                noCoursesMsg.textContent = "No courses taught found.";
+                professorDetailsEl.appendChild(noCoursesMsg);
             }
+            professorDetailsEl.appendChild(coursesTaughtList);
 
             // Populate reviews
             const reviews = data.reviews || [];
@@ -55,11 +56,26 @@ document.addEventListener("DOMContentLoaded", () => {
                     li.innerHTML = `
                         <div class="review-header">
                             <strong>Review by:</strong> Anonymous
+                            <span>Grade: ${review.grade || "N/A"}</span>
                         </div>
                         <div class="review-content">
-                            <p><strong>Rating:</strong> ${review.rating || "N/A"}</p>
-                            <p><strong>Difficulty:</strong> ${review.difficulty || "N/A"}</p>
                             <p><strong>Review:</strong> ${review.review || "No comments provided."}</p>
+                            <p><strong>Rating:</strong> <span class="rating">${review.rating || "N/A"}/5</span></p>
+                            <p><strong>Difficulty:</strong> <span class="difficulty">${review.difficulty || "N/A"}/6</span></p>
+                            <p><strong>Estimated Weekly Hours:</strong> ${review.estimated_hours || "N/A"}</p>
+                            <p><strong>Course:</strong> ${review.course?.title || "N/A"} (${review.course?.subject || ""} ${review.course?.number || ""})</p>
+                            <p><strong>Would Take Again:</strong> ${review.would_take_again ? "Yes" : "No"}</p>
+                            <p><strong>For Credit:</strong> ${review.for_credit ? "Yes" : "No"}</p>
+                            <p><strong>Mandatory Attendance:</strong> ${review.mandatory_attendance ? "Yes" : "No"}</p>
+                            <p><strong>Class Format:</strong> 
+                                ${review.in_person ? "In Person " : ""}
+                                ${review.online ? "Online " : ""}
+                                ${review.hybrid ? "Hybrid" : ""}
+                            </p>
+                            <p><strong>Other Notes:</strong> 
+                                ${review.no_exams ? "No Exams " : ""}
+                                ${review.presentations ? "Presentations" : ""}
+                            </p>
                         </div>
                     `;
 

@@ -3,12 +3,10 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <link rel="icon" href="/static/assets/logo_black.png">
+    <link rel="icon" href="{% static 'assets/logo_black.png' %}">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Professor Details</title>
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
 </head>
 <body>
@@ -22,11 +20,6 @@
         <section class="professor-info" id="professor-info">
             <h1 class="professor-name" id="professor-name">Loading professor...</h1>
             <div class="professor-details" id="professor-details"></div>
-            <!-- Courses Taught Section -->
-            <h3>Courses Taught</h3>
-            <ul class="courses-taught-list" id="courses-taught-list">
-                <!-- Dynamically populated by JS -->
-            </ul>
         </section>
 
         <!-- Reviews Section -->
