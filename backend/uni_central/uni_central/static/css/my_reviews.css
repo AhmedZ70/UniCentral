@@ -1,0 +1,292 @@
+/* ============================================= */
+/* General                                       */
+/* ============================================= */
+body, html, ul, li, p, h1, h2, select {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+  
+  body {
+    font-family: 'Montserrat', sans-serif;
+    line-height: 1.6;
+    background-color: #FAF8F0;
+  }
+  
+  @font-face {
+    font-family: 'Agrandir';
+    src: url('../assets/fonts/Agrandir-Regular.otf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+  }
+  
+  /* ============================================= */
+  /* Navbar Styles                                 */
+  /* ============================================= */
+  .navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 2rem;
+    font-weight: 100;
+    font-size: 20px;
+  }
+  
+  .logo {
+    display: flex;
+    align-items: center;
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: #333333;
+  }
+  
+  .logo img {
+    width: 200px;
+    margin-right: 8px;
+  }
+  
+  .logo-home-btn {
+    border: none;
+    background-color: #FAF8F0;
+  }
+  
+  .nav-links {
+    display: flex;
+    list-style: none;
+  }
+  
+  .nav-links li {
+    margin-left: 2rem;
+  }
+  
+  .nav-links a {
+    text-decoration: none;
+    color: #333333;
+    font-weight: bold;
+  }
+  
+  .nav-links a:hover {
+    color: #005a5b;
+  }
+  
+  .actions {
+    display: flex;
+    align-items: center;
+  }
+  
+  .register-btn {
+    background-color: #005a5b;
+    color: #FAF8F0;
+    border: none;
+    font-family: 'Agrandir', sans-serif;
+    font-size: 20px;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-weight: bold;
+    cursor: pointer;
+  }
+  
+  .register-btn:hover {
+    background-color: #007d7d;
+  }
+  
+  .welcome-message {
+    color: #005a5b;
+    font-weight: bold;
+    margin-right: 1rem;
+    display: inline-block;
+    font-family: 'Montserrat', sans-serif;
+  }
+  
+  /* ============================================= */
+  /* Hero Section                                   */
+  /* ============================================= */
+  .hero {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 2rem 2rem 0.5rem 2rem; /* Reduced bottom padding */
+  }
+  
+  .text-container {
+    position: relative;
+    z-index: 1;
+  }
+  
+  .text-content {
+    max-width: 100%;
+    font-family: 'Agrandir', sans-serif;
+  }
+  
+  .text-content h1 {
+    font-family: 'Agrandir', sans-serif;
+    font-weight: 100;
+    font-size: 65px;
+    color: #ff743e;
+    margin-left: 50px;
+    margin-top: -50px;
+  }
+  
+  .text-content p {
+    margin-top: 0.5rem;
+    font-family: 'Poppins-light', sans-serif;
+    font-weight: 50;
+    font-size: 25px;
+    color: black;
+  }
+  
+  .semester {
+    font-size: 25px;
+    margin-left: 50px;
+  }
+
+  .semester select {
+    font-size: 20px;
+    font-family: 'Agrandir', sans-serif;
+  }
+
+  .my-reviews {
+    width: 100%;
+    max-width: 1650px;
+    margin: 0 auto;
+    padding: 2rem;
+  }
+  
+  .search-reviews {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1.5rem;
+  }
+  
+  .reviews-search {
+    flex: 1;
+    padding: 0.5rem 1rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+  }
+  
+  .reviews-sort {
+    padding: 0.5rem 1rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    background-color: #fff;
+    font-size: 1rem;
+    margin-left: 50px;
+  }
+
+  .reviews-sort select{
+    font-size: 25px;
+    font-family: 'Agrandir', sans-serif;
+  }
+  
+  .review-card {
+    background-color: #ffffff;
+    border: 3px solid black;
+    border-radius: 8px;
+    padding: 1.5rem;
+    position: relative;
+    min-height: 200px;
+    display: flex;
+    justify-content: space-between;
+    margin-left: 50px;
+    margin-right: 50px;
+  }
+  
+  .review-info {
+    flex: 1;
+    margin-right: 200px;
+  }
+  
+  /* .course-info h3 {
+    font-size: 24px;
+    margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  } */
+
+  .title-section {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 15px;
+  }
+  
+  .title-section h3 {
+    font-size: 24px;
+    margin: 0;
+  }
+  
+  .required {
+    color: #ff4444;
+    padding: 4px 8px;
+    border-radius: 8px;
+    font-size: 20px;
+    font-weight: bold;
+    white-space: nowrap;
+  }
+  
+  .review-info p {
+    margin-bottom: 10px;
+    font-size: 18px;
+  }
+  
+  .review-info p {
+    margin-bottom: 10px;
+    font-size: 18px;
+  }
+  
+  .difficulty-rating {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  
+  .difficulty-rating img {
+    width: 18%;
+    vertical-align: bottom;
+  }
+  
+  .remove-button {
+    position: absolute;
+    right: 1%;
+    top: 10%;
+    transform: translateY(-50%);
+    background-color: #ff4444;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+  }
+  
+  .review-right {
+    position: absolute;
+    right: 24px;
+    bottom: 24px;
+    text-align: right;
+  }
+  
+  .review-right p {
+    margin-bottom: 10px;
+    font-size: 20px;
+  }
+  
+  .rating-container {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    justify-content: flex-end;
+  }
+  
+  .rating-container img {
+    width: 80px;
+    height: 80px;
+  }
+  
+  .rating-number {
+    font-size: 60px;
+  }
