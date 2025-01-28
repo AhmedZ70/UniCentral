@@ -123,7 +123,7 @@ body, html, ul, li, p, h1, h2, select {
     font-weight: 100;
     font-size: 65px;
     color: #ff743e;
-    margin-left: 8px;
+    margin-left: 50px;
     margin-top: -50px;
   }
   
@@ -137,7 +137,7 @@ body, html, ul, li, p, h1, h2, select {
   
   .semester {
     font-size: 25px;
-    margin-left: 10px;
+    margin-left: 50px;
   }
 
   .semester select {
@@ -172,19 +172,12 @@ body, html, ul, li, p, h1, h2, select {
     border-radius: 4px;
     background-color: #fff;
     font-size: 1rem;
-    margin-left: 5px;
+    margin-left: 50px;
   }
 
   .courses-sort select{
     font-size: 25px;
     font-family: 'Agrandir', sans-serif;
-  }
-  
-  .course-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); /* Increased minimum width from 300px to 350px */
-    gap: 1.5rem;
-    padding: 0 1rem;
   }
   
   .course-card {
@@ -196,6 +189,8 @@ body, html, ul, li, p, h1, h2, select {
     min-height: 200px;
     display: flex;
     justify-content: space-between;
+    margin-left: 50px;
+    margin-right: 50px;
   }
   
   .course-info {
