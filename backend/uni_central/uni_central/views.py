@@ -1,15 +1,14 @@
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.views import APIView
-from rest_framework.decorators import api_view
-from .models import User
 from .services import (
     UserService,
     DepartmentService,
     CourseService, 
     ReviewService, 
-    ProfessorService
+    ProfessorService,
+    CourseFilteringService
     )
 from .serializers import (
     DepartmentSerializer,
@@ -98,6 +97,17 @@ def course_detail(request, course_id):
         'course_id': course_id, 
     }
     return render(request, 'course_detail.html', context)
+
+def professor_detail(request, professor_id):
+    """
+    Render the template for a professor Detail page.
+    The frontend (JS) will call the API endpoint below to get course + reviews.
+    """
+    context = {
+        'professor_id': professor_id, 
+    }
+    return render(request, 'professor_detail.html', context)
+
 
 def review_form_page(request, course_id):
     """
@@ -225,6 +235,33 @@ class DepartmentProfessorsView(APIView):
         serializer = ProfessorSerializer(professors, many=True)
         return Response(serializer.data)
     
+class ProfessorReviewListView(APIView):
+    """
+    API View to fetch professor details, their reviews, and courses taught.
+    """
+    def get(self, request, professor_id):
+        # Fetch professor and reviews using the service layer
+        professor = ProfessorService.get_professor(professor_id)
+        reviews = ReviewService.get_reviews_by_professor(professor_id)
+
+        # Fetch courses taught by the professor using the service layer
+        courses_taught = CourseService.get_courses_by_professor(professor_id)
+
+        # Serialize the data
+        professor_serializer = ProfessorSerializer(professor)
+        review_serializer = ReviewSerializer(reviews, many=True)
+        course_serializer = CourseSerializer(courses_taught, many=True)
+
+        # Return the combined data
+        data = {
+            'professor': professor_serializer.data,
+            'reviews': review_serializer.data,
+            'courses_taught': course_serializer.data,
+        }
+        return Response(data, status=status.HTTP_200_OK)
+
+
+    
 ####################################
 # User-Related Views and APIs #
 ####################################
@@ -284,3 +321,21 @@ class CreateUserView(APIView):
 ####################################
 # Course-Filtering Views and APIs #
 ####################################
+
+class CourseFilteringView(APIView):
+    """
+    API View to dynamically filter courses based on query parameters.
+    """
+    
+    def get(self, request):
+        try:
+            filters = request.data
+            filtered_courses = CourseFilteringService.filter_courses(filters)
+            serialized = CourseSerializer(filtered_courses, many=True)
+
+            return Response(serialized.data, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response(
+                {"error": str(e)},
+                status=status.HTTP_400_BAD_REQUEST
+            )
