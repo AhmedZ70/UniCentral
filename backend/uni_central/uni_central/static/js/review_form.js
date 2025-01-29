@@ -79,7 +79,7 @@ document.addEventListener("DOMContentLoaded", () => {
       presentations: boolToStr("presentations"),
 
       //email
-      email_address: "joedoe@gmail.com"
+      email_address: sessionStorage.getItem('userEmail')
     };
 
     // 5. Send POST request to create the review
