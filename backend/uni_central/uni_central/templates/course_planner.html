@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  {% load static %}
+  <meta charset="UTF-8">
+  <link rel="icon" href="/static/assets/logo_black.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>UniCentral</title>
+  <link rel="stylesheet" href="{% static 'css/course_planner.css' %}">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Corben:wght@400;700&family=Montserrat:ital,wght@0,100..900;1,100..900&family=Sigmar&family=Sniglet:wght@400;800&display=swap" rel="stylesheet">
+  <script type="module" src="{% static 'js/auth.js' %}"></script>
+</head>
+<body>
+
+<header class="navbar">
+  <div class="logo">
+    <button class="logo-home-btn">
+      <a href="{% url 'home' %}" class="logo-home-btn">
+        <img src="{% static 'assets/logo_horizontal.png' %}" alt="UniCentral Logo">
+      </a>
+    </button>
+  </div>
+  {% include 'partials/dropdown.html' %}
+</header>
+
+<main class="main-content">
+  <section class="hero">
+    <div class="text-content">
+      <div class="text-container">
+        <h1>Course Planner</h1>
+        <h2>Plan your courses by first adding a semester, then adding your planned or previously taken courses to that semester!</h2>
+      </div>
+    </div>
+  </section>
+  <main>
+    <button class="add-semester">Add Semester +</button>
+    <!-- Popup overlay -->
+    <div class="semester-popup-overlay" id="semester-popup">
+        <div class="semester-popup-content">
+            <button class="close-popup" onclick="">&times;</button>
+            <h2 class="semester-popup-title">Enter your desired semester</h2>
+            <div class="semester-popup-body">
+                <label for="semester-choice"><input type="text"></label>
+            </div>
+            <div class="popup-buttons">
+                <button class="semester-popup-button submit" onclick="">Add +</button>
+            </div>
+        </div>
+    </div>    
+    <div class="semesters">
+        <div class="semester-box">
+
+        </div>
+    </div>
+  </main>
