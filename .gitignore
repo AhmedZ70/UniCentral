@@ -6,7 +6,6 @@ backend/uni_central/uni_central/__pycache__/apps.cpython-312.pyc
 .DS_Store
 /__pycache__
 uploads/*
-db.sqlite3
 *.pyc
 autotester
 *~
