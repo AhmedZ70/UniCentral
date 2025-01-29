@@ -10,7 +10,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Corben:wght@400;700&family=Montserrat:ital,wght@0,100..900;1,100..900&family=Sigmar&family=Sniglet:wght@400;800&display=swap" rel="stylesheet">
-  <script type="module" src="{% static 'js/auth.js' %}"></script>
+  <script src="{% static 'js/course_planner.js' %}"></script>
 </head>
 <body>
 
@@ -26,32 +26,53 @@
 </header>
 
 <main class="main-content">
-  <section class="hero">
-    <div class="text-content">
-      <div class="text-container">
-        <h1>Course Planner</h1>
-        <h2>Plan your courses by first adding a semester, then adding your planned or previously taken courses to that semester!</h2>
+    <section class="hero">
+      <div class="text-content">
+        <div class="text-container">
+          <h1>Course Planner</h1>
+          <h2>Plan your courses by adding semesters, courses, and credits to create a roadmap to your degree.</h2>
+        </div>
+      </div>
+    </section>
+    
+    <div id="course-planner">
+        <button class="add-semester" onclick="showSemesterPopup()">Add Semester +</button>      <div id="course-planner-container">
+        <!-- Semesters will be rendered here -->
       </div>
     </div>
-  </section>
-  <main>
-    <button class="add-semester">Add Semester +</button>
-    <!-- Popup overlay -->
+  
+    <!-- Semester Popup -->
     <div class="semester-popup-overlay" id="semester-popup">
-        <div class="semester-popup-content">
-            <button class="close-popup" onclick="">&times;</button>
-            <h2 class="semester-popup-title">Enter your desired semester</h2>
-            <div class="semester-popup-body">
-                <label for="semester-choice"><input type="text"></label>
-            </div>
-            <div class="popup-buttons">
-                <button class="semester-popup-button submit" onclick="">Add +</button>
-            </div>
+      <div class="semester-popup-content">
+        <button class="close-popup" onclick="closeSemesterPopup()">&times;</button>
+        <h2 class="semester-popup-title">Enter your desired semester</h2>
+        <div class="semester-popup-body">
+          <select id="term-select">
+            <option value="Fall">Fall</option>
+            <option value="Spring">Spring</option>
+            <option value="Summer">Summer</option>
+          </select>
+          <input type="number" id="year-input" placeholder="Year">
         </div>
-    </div>    
-    <div class="semesters">
-        <div class="semester-box">
-
+        <div class="popup-buttons">
+          <button class="semester-popup-button submit" onclick="submitSemester()">Add +</button>
         </div>
+      </div>
+    </div>
+  
+    <!-- Course Popup -->
+    <div class="semester-popup-overlay" id="course-popup">
+      <div class="semester-popup-content">
+        <button class="close-popup" onclick="closeCoursePopup()">&times;</button>
+        <h2 class="semester-popup-title">Add Course</h2>
+        <div class="semester-popup-body">
+          <input type="text" id="course-code" placeholder="Course Code (e.g., CS 1410)">
+          <input type="text" id="course-name" placeholder="Course Name">
+          <input type="number" id="course-credits" placeholder="Credits" min="1" max="6">
+        </div>
+        <div class="popup-buttons">
+          <button class="semester-popup-button submit" onclick="submitCourse()">Add Course</button>
+        </div>
+      </div>
     </div>
   </main>
