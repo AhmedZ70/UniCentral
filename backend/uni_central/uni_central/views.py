@@ -191,9 +191,9 @@ class CreateReviewAPIView(APIView):
         # Identify the user. 
         # If unauthenticated, fallback to a default user with ID=1, or raise 404 if not found.
         # Parse email from request.
-        # email_address = request.email
-        # user = UserService.get_user(email_address)
-        user = UserService.get_user('joedoe@gmail.com')
+        email_address = request.email
+        user = UserService.get_user(email_address)
+        #user = UserService.get_user('joedoe@gmail.com')
 
         # Delegate review creation to the service layer
         review = ReviewService.create_review(course_id, user, request.data)
