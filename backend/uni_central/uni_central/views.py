@@ -191,7 +191,7 @@ class CreateReviewAPIView(APIView):
         # Identify the user. 
         # If unauthenticated, fallback to a default user with ID=1, or raise 404 if not found.
         # Parse email from request.
-        email_address = request.email
+        email_address = request.data.get('email_address')
         user = UserService.get_user(email_address)
         #user = UserService.get_user('joedoe@gmail.com')
 
