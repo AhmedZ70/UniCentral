@@ -49,6 +49,7 @@
         <option value="newest-oldest">Newest - oldest</option>
         <option value="oldest-newest">Oldest - newest</option>    
       </select>
+      <button class="add-course">Add Course +</button>
     </div>
     <div class="course-card">
     <div class="course-info">
@@ -70,6 +71,17 @@
       <div class="rating-container">
         <img src="{% static 'assets/star.png' %}" alt="star rating">
         <span class="rating-number">3.5</span>
+      </div>
+    </div>
+  </div>
+  <div class="course-search-popup-overlay" id="course-search-popup">
+    <div class="course-search-popup-content">
+      <button class="close-popup" onclick="closeSearchPopup()">&times;</button>
+      <h2 class="course-search-popup-title">Search for a course</h2>
+      <div class="course-search-popup-body">
+        <input type="text" id="course-search" placeholder="Search by course code or name...">
+        <div id="search-results">
+        </div>
       </div>
     </div>
   </div>
