@@ -39,10 +39,8 @@ class CourseService:
     
     @staticmethod
     def get_courses_by_professor(professor_id):
-
         return Course.objects.filter(professors__id=professor_id)
 
-    
     @staticmethod
     def get_course(course_id):
         return get_object_or_404(Course, id=course_id)
@@ -123,12 +121,6 @@ class ReviewService:
         course.update_averages()
 
         return review
-    @staticmethod
-    def get_my_reviews(user_id):
-        user = UserService.get_user(user_id)
-        reviews = Review.objects.filter(user=user)
-        return reviews
-
 ##############################
 # Professor-Related Services #
 ##############################
@@ -183,9 +175,21 @@ class UserService:
         return professors
     
     @staticmethod
+    def get_reviews(user):
+        reviews = Review.objects.filter(user)
+        return reviews
+    
+    @staticmethod
     def add_course(user, course):
         user.courses.add(course)
         user.save()
+        
+    @staticmethod
+    def remove_course(user, course):
+        if course in user.courses.all():
+            user.courses.remove(course)
+            return True
+        return False
         
     
     @staticmethod
