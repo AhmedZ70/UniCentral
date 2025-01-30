@@ -180,6 +180,12 @@ class UserService:
         return reviews
     
     @staticmethod
+    def get_classmates(user):
+        courses = user.courses.all()
+        classmates = User.objects.filter(courses__in=courses).exclude(id=user.id).distinct()
+        return classmates
+    
+    @staticmethod
     def add_course(user, course):
         user.courses.add(course)
         user.save()
