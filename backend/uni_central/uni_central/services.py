@@ -125,45 +125,44 @@ class ReviewService:
     @staticmethod
     def create_review_for_professor(professor_id, user, review_data):
         """
-        Creates a review for a professor and updates the professor's avg_rating and avg_difficulty.
-        Args:
-            professor_id (int): The ID of the professor.
-            user (User): The user creating the review.
-            review_data (dict): A dictionary containing the review details.
-        Returns:
-            Review: The created review object.
+        Creates a review for a professor and associates it with the selected course.
         """
         professor = ProfessorService.get_professor(professor_id)
+
+        # Fetch the course if provided
+        course_id = review_data.get("course")
+        course = get_object_or_404(Course, id=course_id) if course_id else None
 
         # Create the Review object
         review = Review.objects.create(
             user=user,
             professor=professor,
+            course=course,  # Associate the selected course
 
             # Text / string fields
-            review=review_data.get('review'),
-            grade=review_data.get('grade'),
+            review=review_data.get("review"),
+            grade=review_data.get("grade"),
 
             # Numeric fields
-            rating=float(review_data.get('rating')) if review_data.get('rating') else None,
-            difficulty=int(review_data.get('difficulty')) if review_data.get('difficulty') else None,
-            estimated_hours=float(review_data.get('estimated_hours')) if review_data.get('estimated_hours') else None,
+            rating=float(review_data.get("rating")) if review_data.get("rating") else None,
+            difficulty=int(review_data.get("difficulty")) if review_data.get("difficulty") else None,
+            estimated_hours=float(review_data.get("estimated_hours")) if review_data.get("estimated_hours") else None,
 
             # Boolean fields
-            would_take_again=review_data.get('would_take_again') == 'true',
-            for_credit=review_data.get('for_credit') == 'true',
-            mandatory_attendance=review_data.get('mandatory_attendance') == 'true',
-            in_person=review_data.get('in_person') == 'true',
-            online=review_data.get('online') == 'true',
-            hybrid=review_data.get('hybrid') == 'true',
-            no_exams=review_data.get('no_exams') == 'true',
-            presentations=review_data.get('presentations') == 'true',
+            would_take_again=review_data.get("would_take_again") == "true",
+            for_credit=review_data.get("for_credit") == "true",
+            mandatory_attendance=review_data.get("mandatory_attendance") == "true",
+            in_person=review_data.get("in_person") == "true",
+            online=review_data.get("online") == "true",
+            hybrid=review_data.get("hybrid") == "true",
+            no_exams=review_data.get("no_exams") == "true",
+            presentations=review_data.get("presentations") == "true",
         )
 
-        # Update professor's averages if needed
-        # Example: professor.update_averages()
+        professor.update_averages()
 
         return review
+
 
     @staticmethod
     def get_my_reviews(user_id):

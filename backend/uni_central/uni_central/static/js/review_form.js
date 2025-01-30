@@ -41,13 +41,61 @@ document.addEventListener("DOMContentLoaded", () => {
     const submitBtn = document.getElementById("submitReviewBtn");
     submitBtn.addEventListener("click", (e) => {
         e.preventDefault();
-  
+        // Get field values
+        const reviewText = document.getElementById("reviewText").value.trim();
+        const rating = document.getElementById("rating").value.trim();
+        const difficulty = document.getElementById("difficulty").value.trim();
+
+        // Get error elements
+        const reviewTextError = document.getElementById("reviewTextError");
+        const ratingError = document.getElementById("ratingError");
+        const difficultyError = document.getElementById("difficultyError");
+
+        // Reset errors
+        document.getElementById("reviewText").classList.remove("error");
+        document.getElementById("rating").classList.remove("error");
+        document.getElementById("difficulty").classList.remove("error");
+        reviewTextError.style.display = "none";
+        ratingError.style.display = "none";
+        difficultyError.style.display = "none";
+
+        let isValid = true;
+
+        // Validate Review Text
+        if (!reviewText) {
+            document.getElementById("reviewText").classList.add("error");
+            reviewTextError.textContent = "Review text is required.";
+            reviewTextError.style.display = "block";
+            isValid = false;
+        }
+
+        // Validate Rating
+        if (!rating || isNaN(rating) || rating < 1 || rating > 5) {
+            document.getElementById("rating").classList.add("error");
+            ratingError.textContent = "Rating must be between 1 and 5.";
+            ratingError.style.display = "block";
+            isValid = false;
+        }
+
+        // Validate Difficulty
+        if (!difficulty || isNaN(difficulty) || difficulty < 1 || difficulty > 6) {
+            document.getElementById("difficulty").classList.add("error");
+            difficultyError.textContent = "Difficulty must be between 1 and 6.";
+            difficultyError.style.display = "block";
+            isValid = false;
+        }
+
+        // Stop submission if validation fails
+        if (!isValid) {
+            return;
+        }
         const bodyData = {
-            review: document.getElementById("reviewText").value,
-            rating: document.getElementById("rating").value,
-            difficulty: document.getElementById("difficulty").value,
-            estimated_hours: document.getElementById("estimatedHours").value,
-            grade: document.getElementById("grade").value,
+            review: reviewText,
+            rating: parseFloat(rating),
+            difficulty: parseInt(difficulty),
+            estimated_hours: document.getElementById("estimatedHours").value.trim() || null,
+            grade: document.getElementById("grade").value.trim() || null,
+
             would_take_again: document.getElementById("wouldTakeAgain").checked,
             for_credit: document.getElementById("forCredit").checked,
             mandatory_attendance: document.getElementById("mandatoryAttendance").checked,
@@ -80,9 +128,13 @@ document.addEventListener("DOMContentLoaded", () => {
                 if (!response.ok) throw new Error("Failed to create review.");
                 return response.json();
             })
-            .then(() => {
-                alert("Review created successfully!");
-                location.reload();
+            .then((data) => {
+                // Redirect to course or professor detail page based on context
+                if (contextType === "course") {
+                    window.location.href = `/courses/${contextId}/`;
+                } else if (contextType === "professor") {
+                    window.location.href = `/professors/${contextId}/`;
+                }
             })
             .catch((error) => {
                 console.error("Error submitting review:", error);
