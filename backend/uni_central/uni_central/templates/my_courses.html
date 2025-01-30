@@ -10,20 +10,10 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Corben:wght@400;700&family=Montserrat:ital,wght@0,100..900;1,100..900&family=Sigmar&family=Sniglet:wght@400;800&display=swap" rel="stylesheet">
-  <script type="module" src="{% static 'js/auth.js' %}"></script>
+  <script type="module" src="{% static 'js/my_courses.js' %}"></script>
 </head>
-<body>
 
-<header class="navbar">
-  <div class="logo">
-    <button class="logo-home-btn">
-      <a href="{% url 'home' %}" class="logo-home-btn">
-        <img src="{% static 'assets/logo_horizontal.png' %}" alt="UniCentral Logo">
-      </a>
-    </button>
-  </div>
-  {% include 'partials/dropdown.html' %}
-</header>
+{% include 'partials/navbar.html' %}
 
 <main class="main-content">
   <section class="hero">
@@ -49,6 +39,7 @@
         <option value="newest-oldest">Newest - oldest</option>
         <option value="oldest-newest">Oldest - newest</option>    
       </select>
+      <button class="add-course">Add Course +</button>
     </div>
     <div class="course-card">
     <div class="course-info">
@@ -64,7 +55,7 @@
       <p>Average Grade: C</p>
     </div>
     <button class="remove-button">REMOVE X</button>
-  
+
     <div class="course-right">
       <p>Overall course rating:</p>
       <div class="rating-container">
@@ -73,4 +64,15 @@
       </div>
     </div>
   </div>
-</main> 
+  <div class="course-search-popup-overlay" id="course-search-popup">
+    <div class="course-search-popup-content">
+      <button class="close-popup">&times;</button>
+      <h2 class="course-search-popup-title">Search for a course</h2>
+      <div class="course-search-popup-body">
+        <input type="text" id="course-search" placeholder="Search by course code or name...">
+        <div id="search-results">
+        </div>
+      </div>
+    </div>
+  </div>
+</main>

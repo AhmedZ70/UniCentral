@@ -84,8 +84,8 @@ urlpatterns = [
 
     # User URLs
     path('api/create_user/', CreateUserView.as_view(), name='create_user'),
-    path('api/my_courses/', MyCoursesView.as_view(), name='my_courses'),
-    path('api/my_professors/', MyProfessorsView.as_view(), name='my_professors'),
+    path('api/my_courses/', MyCoursesView.as_view(), name='api-my_courses'),
+    path('api/my_professors/', MyProfessorsView.as_view(), name='api-my_professors'),
      
      # Course Filtering URLs
      path('api/course-filtering/', CourseFilteringView.as_view(), name='course_filter'),
