@@ -227,7 +227,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     <p>Overall course rating:</p>
                     <div class="rating-container">
                         <img src="/static/assets/star.png" alt="star rating">
-                        <span class="rating-number">${course.avg_rating || 'N/A'}</span>
+                        <span class="rating-number">${(course.avg_rating || 0).toFixed(1)}</span>
                     </div>
                 </div>
             `;
