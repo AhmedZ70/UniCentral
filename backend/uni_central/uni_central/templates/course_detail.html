@@ -11,183 +11,183 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Corben:wght@400;700&family=Montserrat:ital,wght@0,100..900;1,100..900&family=Sigmar&family=Sniglet:wght@400;800&display=swap" rel="stylesheet">
 </head>
-<body>
-    {% include 'partials/navbar.html' %}
 
-    <main class="main-content course-detail-page">
-        <input type="hidden" id="courseId" value="{{ course_id }}">
-        <!-- Course Information Section -->
-        <section class="course-info" id="course-info">
-            <!-- Populated by JavaScript -->
-            <h1 class="course-title" id="course-title">Loading course...</h1>
-            <div class="course-details" id="course-details"></div>
-        </section>
+{% include 'partials/navbar.html' %}
 
-        <!-- Reviews Section -->
-        <section class="course-reviews" id="course-reviews">
-            <h2 class="reviews-title">Reviews</h2>
-            <!-- The <ul> will be filled by JS. If no reviews, we'll show a "no reviews" message. -->
-            <ul class="reviews-list" id="reviews-list"></ul>
-            <p class="no-reviews-message" id="no-reviews-message" style="display: none;">No reviews available for this course.</p>
+<main class="main-content course-detail-page">
+    <input type="hidden" id="courseId" value="{{ course_id }}">
+    <!-- Course Information Section -->
+    <section class="course-info" id="course-info">
+        <!-- Populated by JavaScript -->
+        <h1 class="course-title" id="course-title">Loading course...</h1>
+        <div class="course-details" id="course-details"></div>
+    </section>
 
-            <!-- "Leave a Review" link uses the course_id passed from Django to build the correct URL -->
-            <a id="leave-review-btn" href="{% url 'review-form-page' course_id=course_id %}" class="leave-review-button">Leave a Review</a>
-        </section>
-    </main>
-    <style>
-        body {
-            font-family: 'Montserrat', sans-serif;
-            background-color: #FAF8F0;
-            color: #333333;
-            line-height: 1.6;
-        }
+    <!-- Reviews Section -->
+    <section class="course-reviews" id="course-reviews">
+        <h2 class="reviews-title">Reviews</h2>
+        <!-- The <ul> will be filled by JS. If no reviews, we'll show a "no reviews" message. -->
+        <ul class="reviews-list" id="reviews-list"></ul>
+        <p class="no-reviews-message" id="no-reviews-message" style="display: none;">No reviews available for this course.</p>
 
-        .course-detail-page {
-            max-width: 1000px;
-            margin: 2rem auto;
-            padding: 0 20px;
-        }
+        <!-- "Leave a Review" link uses the course_id passed from Django to build the correct URL -->
+        <a id="leave-review-btn" href="{% url 'review-form-page' course_id=course_id %}" class="leave-review-button">Leave a Review</a>
+    </section>
+</main>
+<style>
+    body {
+        font-family: 'Montserrat', sans-serif;
+        background-color: #FAF8F0;
+        color: #333333;
+        line-height: 1.6;
+    }
 
-        .course-info, .course-reviews {
-            background: #fff;
-            padding: 30px;
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-            margin-bottom: 2rem;
-            transition: all 0.3s ease;
-        }
+    .course-detail-page {
+        max-width: 1000px;
+        margin: 2rem auto;
+        padding: 0 20px;
+    }
 
-        .course-info:hover, .course-reviews:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
-        }
+    .course-info, .course-reviews {
+        background: #fff;
+        padding: 30px;
+        border-radius: 15px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        margin-bottom: 2rem;
+        transition: all 0.3s ease;
+    }
 
+    .course-info:hover, .course-reviews:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+    }
+
+    .course-title {
+        font-size: 2.5rem;
+        color: #005a5b;
+        margin-bottom: 1.5rem;
+        text-align: center;
+        font-weight: 700;
+        letter-spacing: 1px;
+    }
+
+    .course-details p {
+        font-size: 1.1rem;
+        margin: 15px 0;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .detail-label {
+        font-weight: 600;
+        color: #005a5b;
+        min-width: 200px;
+    }
+
+    .reviews-title {
+        font-size: 2rem;
+        color: #005a5b;
+        margin-bottom: 1.5rem;
+        text-align: center;
+        font-weight: 700;
+    }
+
+    .reviews-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    .review-item {
+        margin-bottom: 2rem;
+        padding-bottom: 2rem;
+        border-bottom: 2px solid #e0e0e0;
+    }
+
+    .review-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-size: 1.3rem;
+        font-weight: bold;
+        color: #005a5b;
+        margin-bottom: 1rem;
+    }
+
+    .review-header span {
+        font-weight: normal;
+        font-size: 1.1rem;
+        color: #666666;
+    }
+
+    .review-content p {
+        margin: 0.7rem 0;
+        font-size: 1.1rem;
+        color: #333;
+        line-height: 1.6;
+    }
+
+    .rating, .difficulty {
+        font-weight: 600;
+        padding: 3px 8px;
+        border-radius: 5px;
+        color: #fff;
+    }
+
+    .rating {
+        background-color: #4CAF50;
+    }
+
+    .difficulty {
+        background-color: #FFA500;
+    }
+
+    .yes {
+        color: #4CAF50;
+        font-weight: 600;
+    }
+
+    .no {
+        color: #F44336;
+        font-weight: 600;
+    }
+
+    .leave-review-button {
+        display: inline-block;
+        margin-top: 20px;
+        padding: 12px 25px;
+        background-color: #005a5b;
+        color: #fff;
+        text-decoration: none;
+        border-radius: 30px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        text-align: center;
+    }
+
+    .leave-review-button:hover {
+        background-color: #004e4f;
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(0, 90, 91, 0.3);
+    }
+
+    @media (max-width: 768px) {
         .course-title {
-            font-size: 2.5rem;
-            color: #005a5b;
-            margin-bottom: 1.5rem;
-            text-align: center;
-            font-weight: 700;
-            letter-spacing: 1px;
+            font-size: 2rem;
         }
 
         .course-details p {
-            font-size: 1.1rem;
-            margin: 15px 0;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+            flex-direction: column;
+            align-items: flex-start;
         }
 
         .detail-label {
-            font-weight: 600;
-            color: #005a5b;
-            min-width: 200px;
+            margin-bottom: 5px;
         }
-
-        .reviews-title {
-            font-size: 2rem;
-            color: #005a5b;
-            margin-bottom: 1.5rem;
-            text-align: center;
-            font-weight: 700;
-        }
-
-        .reviews-list {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-        }
-
-        .review-item {
-            margin-bottom: 2rem;
-            padding-bottom: 2rem;
-            border-bottom: 2px solid #e0e0e0;
-        }
-
-        .review-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-size: 1.3rem;
-            font-weight: bold;
-            color: #005a5b;
-            margin-bottom: 1rem;
-        }
-
-        .review-header span {
-            font-weight: normal;
-            font-size: 1.1rem;
-            color: #666666;
-        }
-
-        .review-content p {
-            margin: 0.7rem 0;
-            font-size: 1.1rem;
-            color: #333;
-            line-height: 1.6;
-        }
-
-        .rating, .difficulty {
-            font-weight: 600;
-            padding: 3px 8px;
-            border-radius: 5px;
-            color: #fff;
-        }
-
-        .rating {
-            background-color: #4CAF50;
-        }
-
-        .difficulty {
-            background-color: #FFA500;
-        }
-
-        .yes {
-            color: #4CAF50;
-            font-weight: 600;
-        }
-
-        .no {
-            color: #F44336;
-            font-weight: 600;
-        }
-
-        .leave-review-button {
-            display: inline-block;
-            margin-top: 20px;
-            padding: 12px 25px;
-            background-color: #005a5b;
-            color: #fff;
-            text-decoration: none;
-            border-radius: 30px;
-            font-weight: 600;
-            transition: all 0.3s ease;
-            text-align: center;
-        }
-
-        .leave-review-button:hover {
-            background-color: #004e4f;
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0, 90, 91, 0.3);
-        }
-
-        @media (max-width: 768px) {
-            .course-title {
-                font-size: 2rem;
-            }
-
-            .course-details p {
-                flex-direction: column;
-                align-items: flex-start;
-            }
-
-            .detail-label {
-                margin-bottom: 5px;
-            }
-        }
-    </style>
-    <script src="{% static 'js/course_detail.js' %}"></script>
-    <script type="module" src="{% static 'js/auth.js' %}"></script>
+    }
+</style>
+<script src="{% static 'js/course_detail.js' %}"></script>
+<script type="module" src="{% static 'js/auth.js' %}"></script>
 </body>
 </html>

@@ -12,18 +12,8 @@
   <link href="https://fonts.googleapis.com/css2?family=Corben:wght@400;700&family=Montserrat:ital,wght@0,100..900;1,100..900&family=Sigmar&family=Sniglet:wght@400;800&display=swap" rel="stylesheet">
   <script src="{% static 'js/course_planner.js' %}"></script>
 </head>
-<body>
 
-<header class="navbar">
-  <div class="logo">
-    <button class="logo-home-btn">
-      <a href="{% url 'home' %}" class="logo-home-btn">
-        <img src="{% static 'assets/logo_horizontal.png' %}" alt="UniCentral Logo">
-      </a>
-    </button>
-  </div>
-  {% include 'partials/dropdown.html' %}
-</header>
+{% include 'partials/navbar.html' %}
 
 <main class="main-content">
     <section class="hero">

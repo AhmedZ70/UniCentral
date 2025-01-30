@@ -12,33 +12,33 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Corben:wght@400;700&family=Montserrat:ital,wght@0,100..900;1,100..900&family=Sigmar&family=Sniglet:wght@400;800&display=swap" rel="stylesheet">
 </head>
-<body>
-  {% include 'partials/navbar.html' %}
 
-  <main class="main-content courses-page">
-    <div class="courses-header">
-      <h1>Courses @</h1>
-      <select id="university" class="university-select">
-        <option value="University of Utah">University of Utah</option>
-        <option value="Stanford University">Stanford University</option>
-        <option value="MIT">MIT</option>
-      </select>
-    </div>
-  
-    <h2 id="departments-title">Departments</h2>
-    <div class="departments" id="departments">
-      <p class="loading-message">Loading departments...</p>
-    </div>
+{% include 'partials/navbar.html' %}
 
-    <!-- Breadcrumb container -->
-    <div id="breadcrumb">Departments</div>
+<main class="main-content courses-page">
+  <div class="courses-header">
+    <h1>Courses @</h1>
+    <select id="university" class="university-select">
+      <option value="University of Utah">University of Utah</option>
+      <option value="Stanford University">Stanford University</option>
+      <option value="MIT">MIT</option>
+    </select>
+  </div>
 
-    <h2 id="courses-title">Courses</h2>
-    <div class="courses" id="courses">
-      <p class="loading-message">Select a department to view its courses.</p>
-    </div>
-  </main>
+  <h2 id="departments-title">Departments</h2>
+  <div class="departments" id="departments">
+    <p class="loading-message">Loading departments...</p>
+  </div>
 
-  <script src="{% static 'js/courses.js' %}"></script>
+  <!-- Breadcrumb container -->
+  <div id="breadcrumb">Departments</div>
+
+  <h2 id="courses-title">Courses</h2>
+  <div class="courses" id="courses">
+    <p class="loading-message">Select a department to view its courses.</p>
+  </div>
+</main>
+
+<script src="{% static 'js/courses.js' %}"></script>
 </body>
 </html>
