@@ -31,6 +31,7 @@ from .views import (
     MyCoursesView,
     MyProfessorsView,
     MyReviewsView,
+    MyClassmatesView,
     home,
     courses,
     about_page,
@@ -92,6 +93,7 @@ urlpatterns = [
     path('api/my_courses/', MyCoursesView.as_view(), name='api-my_courses'),
     path('api/my_professors/', MyProfessorsView.as_view(), name='api-my_professors'),
     path('api/my_reviews/', MyReviewsView.as_view(), name='api-my_reviews'),
+    path('api/my_classmates/', MyClassmatesView.as_view(), name='api-my_classmates'),
      
     # Course Filtering URLs
     path('api/course-filtering/', CourseFilteringView.as_view(), name='course_filter'),
