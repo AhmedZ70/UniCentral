@@ -334,6 +334,18 @@ class MyReviewsView(APIView):
         serialized = ReviewSerializer(reviews, many=True)
         return Response(serialized.data, status=status.HTTP_200_OK)
     
+class MyClassmatesView(APIView):
+    """
+    API View to fetch classmates in the courses of a user
+    """
+    def get(self, request):
+        email_address = request.data.get('email_address')
+        user = UserService.get_user(email_address)
+        
+        classmates = UserService.get_classmates(user)
+        serialized = UserSerializer(classmates, many=True)
+        return Response(serialized.data, status=status.HTTP_200_OK)
+    
 class CreateUserView(APIView):
     """
     Handles user creation requests.
