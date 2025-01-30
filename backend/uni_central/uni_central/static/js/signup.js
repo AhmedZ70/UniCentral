@@ -198,6 +198,8 @@ document.addEventListener('DOMContentLoaded', () => {
         .then(data => {
             if (data.message === "User created successfully.") {
             console.log("User created:", data);
+            sessionStorage.setItem('userEmail', email);
+            console.log("User email stored in sessionStorage: " + email);
             } else {
             console.log("Error:", data.message);
             }

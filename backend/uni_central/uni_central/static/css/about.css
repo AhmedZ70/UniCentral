@@ -1,0 +1,145 @@
+/* ============================================= */
+/* General                                       */
+/* ============================================= */
+body, html {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Montserrat', sans-serif;
+  background-color: #FAF8F0;
+  color: #333333;
+}
+
+@font-face {
+  font-family: 'Agrandir';
+  src: url('../assets/fonts/Agrandir-Regular.otf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+/* ============================================= */
+/* Navbar                                        */
+/* ============================================= */
+.navbar {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  padding: 1.5rem 2rem;
+  background-color: #FAF8F0;
+}
+
+/* Logo (Left Side) */
+.logo img {
+  width: 200px;
+}
+
+/* ============================================= */
+/* Hero Section                                  */
+/* ============================================= */
+.hero {
+  text-align: center;
+  padding: 4rem 2rem;
+  background-color: #ff743e;
+  color: #FAF8F0;
+}
+
+.hero h1 {
+  font-family: 'Agrandir', sans-serif;
+  font-size: 3rem;
+  margin-bottom: 1rem;
+}
+
+.hero p {
+  font-size: 1.25rem;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+/* ============================================= */
+/* About Section                                 */
+/* ============================================= */
+.about {
+  text-align: center;
+  padding: 3rem 2rem;
+}
+
+.about h2 {
+  font-size: 2rem;
+  color: #005a5b;
+  margin-bottom: 1rem;
+}
+
+.about p {
+  font-size: 1.2rem;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+/* ============================================= */
+/* Team Section                                  */
+/* ============================================= */
+.team {
+  text-align: center;
+  padding: 3rem 2rem;
+  background-color: #e8f5e9;
+}
+
+.team h2 {
+  font-size: 2rem;
+  color: #005a5b;
+  margin-bottom: 1.5rem;
+}
+
+.team-members {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 2rem;
+}
+
+/* Team Member Cards */
+.member {
+  background-color: #fff;
+  padding: 1.5rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  width: 250px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Team Member Images */
+.member img {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-bottom: 1rem;
+  border: 3px solid #fa743e;
+}
+
+/* Team Member Name */
+.member h3 {
+  font-size: 1.5rem;
+  color: #fa743e;
+  margin-bottom: 0.5rem;
+}
+
+/* Team Member Role */
+.member p {
+  font-size: 1.1rem;
+  color: #333;
+}
+
+/* ============================================= */
+/* Footer                                        */
+/* ============================================= */
+footer {
+  text-align: center;
+  padding: 1.5rem;
+  font-size: 1rem;
+  background-color: #fafafa;
+  color: #333333;
+}

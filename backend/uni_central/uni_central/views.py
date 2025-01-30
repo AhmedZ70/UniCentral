@@ -208,10 +208,10 @@ class CreateReviewAPIView(APIView):
         # Identify the user. 
         # If unauthenticated, fallback to a default user with ID=1, or raise 404 if not found.
         # Parse email from request.
-        # email_address = request.email
-        # user = UserService.get_user(email_address)
-        user = UserService.get_user('joedoe@gmail.com')
+        email_address = request.data.get('email_address')
         review_data = request.data
+        user = UserService.get_user(email_address)
+        #user = UserService.get_user('joedoe@gmail.com')
 
         try:
             review = ReviewService.create_review_for_course(course_id, user, review_data)
@@ -305,6 +305,88 @@ class CreateProfessorReviewAPIView(APIView):
 ####################################
 # User-Related Views and APIs #
 ####################################
+
+class EnrollView(APIView):
+    """
+    API View to add a course to a user when they enroll.
+    """
+    def post(self, request, course_id):
+        email_address = request.data.get('email_address')
+        user = UserService.get_user(email_address)
+        course = CourseService.get_course(course_id)
+        UserService.add_course(user, course)
+        
+        return Response(
+            {
+                "message": "Enrolled in course successfully",
+                "course_id": course_id
+            },
+            status=status.HTTP_201_CREATED
+        )
+
+class UnEnrollView(APIView):
+    """
+    API View to remove a course to a user when they un-enroll.
+    """
+    def delete(self, request, course_id):
+        email_address = request.data.get('email_address')
+        user = UserService.get_user(email_address)
+        course = CourseService.get_course(course_id)
+
+        success = UserService.remove_course(user, course)
+
+        if success:
+            return Response({"message": "Course removed successfully."}, status=status.HTTP_200_OK)
+        else:
+            return Response({"error": "User was not enrolled in this course."}, status=status.HTTP_400_BAD_REQUEST)
+
+class MyCoursesView(APIView):
+    """
+    API View to fetch courses that a user is in.
+    """
+    def get(self, request):
+        email_address = request.data.get('email_address')
+        user = UserService.get_user(email_address)
+        courses = UserService.get_courses(user)
+        
+        serialized = CourseSerializer(courses, many=True)
+        return Response(serialized.data, status=status.HTTP_200_OK)
+    
+class MyProfessorsView(APIView):
+    """
+    API View to fetch professors of courses that a user is in.
+    """
+    def get(self, request):
+        email_address = request.data.get('email_address')
+        user = UserService.get_user(email_address)
+        professors = UserService.get_professors(user)
+        
+        serialized = ProfessorSerializer(professors, many=True)
+        return Response(serialized.data, status=status.HTTP_200_OK)
+    
+class MyReviewsView(APIView):
+    """
+    API View to fetch reviews of courses that a user has made.
+    """
+    def get(self, request):
+        email_address = request.data.get('email_address')
+        user = UserService.get_user(email_address)
+        
+        reviews = UserService.get_reviews(user)
+        serialized = ReviewSerializer(reviews, many=True)
+        return Response(serialized.data, status=status.HTTP_200_OK)
+    
+class MyClassmatesView(APIView):
+    """
+    API View to fetch classmates in the courses of a user
+    """
+    def get(self, request):
+        email_address = request.data.get('email_address')
+        user = UserService.get_user(email_address)
+        
+        classmates = UserService.get_classmates(user)
+        serialized = UserSerializer(classmates, many=True)
+        return Response(serialized.data, status=status.HTTP_200_OK)
     
 class CreateUserView(APIView):
     """

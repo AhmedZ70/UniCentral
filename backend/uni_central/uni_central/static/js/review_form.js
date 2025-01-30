@@ -106,6 +106,9 @@ document.addEventListener("DOMContentLoaded", () => {
             hybrid: document.getElementById("hybrid").checked,
             no_exams: document.getElementById("noExams").checked,
             presentations: document.getElementById("presentations").checked,
+
+            //email_address: sessionStorage.getItem('userEmail')
+            email_address: "joedoe@gmail.com"
         };
   
         if (contextType === "course") {

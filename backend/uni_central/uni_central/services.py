@@ -39,7 +39,6 @@ class CourseService:
     
     @staticmethod
     def get_courses_by_professor(professor_id):
-
         return Course.objects.filter(professors__id=professor_id)
 
     @staticmethod
@@ -211,6 +210,41 @@ class UserService:
     @staticmethod
     def get_user(email_address):
         return get_object_or_404(User, email_address=email_address)
+    
+    @staticmethod
+    def get_courses(user):
+        courses = user.courses.all()
+        return courses
+    
+    @staticmethod
+    def get_professors(user):
+        courses = user.courses.all()
+        professors = Professor.objects.filter(courses__in=courses).distinct()
+        return professors
+    
+    @staticmethod
+    def get_reviews(user):
+        reviews = Review.objects.filter(user)
+        return reviews
+    
+    @staticmethod
+    def get_classmates(user):
+        courses = user.courses.all()
+        classmates = User.objects.filter(courses__in=courses).exclude(id=user.id).distinct()
+        return classmates
+    
+    @staticmethod
+    def add_course(user, course):
+        user.courses.add(course)
+        user.save()
+        
+    @staticmethod
+    def remove_course(user, course):
+        if course in user.courses.all():
+            user.courses.remove(course)
+            return True
+        return False
+        
     
     @staticmethod
     def create_user(email_address, fname, lname):

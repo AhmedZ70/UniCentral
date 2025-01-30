@@ -1,0 +1,388 @@
+/* ============================================= */
+/* General                                       */
+/* ============================================= */
+body,
+html,
+ul,
+li,
+p,
+h1,
+h2,
+select {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Montserrat', sans-serif;
+    line-height: 1.6;
+    background-color: #FAF8F0;
+}
+
+@font-face {
+    font-family: 'Agrandir';
+    src: url('../assets/fonts/Agrandir-Regular.otf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+
+/* ============================================= */
+/* Navbar Styles                                 */
+/* ============================================= */
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 2rem;
+    font-weight: 100;
+    font-size: 20px;
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: #333333;
+}
+
+.logo img {
+    width: 200px;
+    margin-right: 8px;
+}
+
+.logo-home-btn {
+    border: none;
+    background-color: #FAF8F0;
+}
+
+.nav-links {
+    display: flex;
+    list-style: none;
+}
+
+.nav-links li {
+    margin-left: 2rem;
+}
+
+.nav-links a {
+    text-decoration: none;
+    color: #333333;
+    font-weight: bold;
+}
+
+.nav-links a:hover {
+    color: #005a5b;
+}
+
+.actions {
+    display: flex;
+    align-items: center;
+}
+
+.register-btn {
+    background-color: #005a5b;
+    color: #FAF8F0;
+    border: none;
+    font-family: 'Agrandir', sans-serif;
+    font-size: 20px;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.register-btn:hover {
+    background-color: #007d7d;
+}
+
+.welcome-message {
+    color: #005a5b;
+    font-weight: bold;
+    margin-right: 1rem;
+    display: inline-block;
+    font-family: 'Montserrat', sans-serif;
+}
+
+/* ============================================= */
+/* Hero Section                                   */
+/* ============================================= */
+.hero {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 2rem 2rem 0.5rem 2rem;
+}
+
+.text-container {
+    position: relative;
+    z-index: 1;
+}
+
+.text-content {
+    max-width: 100%;
+    font-family: 'Agrandir', sans-serif;
+    margin-left: 50px;
+}
+
+.text-content h1 {
+    font-weight: 100;
+    font-size: 65px;
+    color: #ff743e;
+    margin-top: -50px;
+}
+
+.text-content h3 {
+    font-family: 'Montserrat', sans-serif;
+}
+
+.text-content p {
+    margin-top: 0.5rem;
+    font-family: 'Poppins-light', sans-serif;
+    font-weight: 50;
+    font-size: 25px;
+    color: black;
+}
+
+#course-planner {
+    padding: 2rem;
+}
+
+.add-semester {
+    background-color: #005a5b;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 8px;
+    font-size: 18px;
+    font-family: 'Montserrat', sans-serif;
+    cursor: pointer;
+    margin-bottom: 20px;
+    margin-left: 50px;
+}
+
+.add-semester {
+    background-color: #005a5b;
+    transition: background-color 0.3s ease;
+}
+
+.add-semester:hover {
+    background-color: #007d7d;
+}
+
+.semester-container {
+    background: white;
+    border: 2px solid #ddd;
+    border-radius: 8px;
+    margin-left: 50px;
+    margin-right: 50px;
+    margin-bottom: 20px;
+    padding: 20px;
+}
+
+.semester-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.semester-header h3 {
+    font-size: 24px;
+    color: #333;
+}
+
+.semester-header button {
+    background-color: #005a5b;
+    color: white;
+    padding: 8px 16px;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    font-family: 'Montserrat', sans-serif;
+}
+
+.semester-header button:hover {
+    background-color: #007d7d;
+}
+
+/* Specific style for Remove Semester button */
+.semester-header button:first-of-type {
+    background-color: #ff4444;
+    /* Red color for remove button */
+}
+
+.semester-header button:first-of-type:hover {
+    background-color: #ff6666;
+}
+
+.courses-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 15px;
+}
+
+.course-card {
+    background: #f8f8f8;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    padding: 15px;
+}
+
+.course-card h4 {
+    margin: 0 0 10px 0;
+    color: #005a5b;
+}
+
+.course-card button {
+    background-color: #ff4444;
+    color: white;
+    padding: 8px 16px;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    font-family: 'Montserrat', sans-serif;
+    margin-top: 10px;
+    /* Add some space above the button */
+}
+
+.course-card button:hover {
+    background-color: #ff6666;
+}
+
+/* Popup Overlay */
+.semester-popup-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+/* Popup Content */
+.semester-popup-content {
+    background-color: #ffffff;
+    padding: 30px;
+    border-radius: 12px;
+    min-width: 400px;
+    position: relative;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+}
+
+/* Close Button */
+.close-popup {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    font-size: 24px;
+    color: #666666;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 5px;
+}
+
+.close-popup:hover {
+    color: #333333;
+}
+
+/* Popup Title */
+.semester-popup-title {
+    font-family: 'Agrandir', sans-serif;
+    font-size: 24px;
+    color: #333333;
+    margin-bottom: 20px;
+    padding-right: 30px;
+}
+
+/* Popup Body */
+.semester-popup-body {
+    margin: 25px 0;
+}
+
+/* Form Elements */
+.semester-popup-body input,
+.semester-popup-body select {
+    width: 200px;
+    padding: 12px;
+    margin-bottom: 15px;
+    border: 2px solid #e0e0e0;
+    border-radius: 8px;
+    font-size: 16px;
+    font-family: 'Montserrat', sans-serif;
+    transition: border-color 0.3s ease;
+}
+
+.semester-popup-body input:focus,
+.semester-popup-body select:focus {
+    outline: none;
+    border-color: #005a5b;
+}
+
+.semester-popup-body label {
+    display: block;
+    margin-bottom: 8px;
+    font-size: 16px;
+    color: #333333;
+}
+
+/* Popup Buttons */
+.popup-buttons {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 25px;
+}
+
+.semester-popup-button {
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    font-family: 'Montserrat', sans-serif;
+}
+
+.semester-popup-button.submit {
+    background-color: #005a5b;
+    color: white;
+    border: none;
+}
+
+.semester-popup-button.submit:hover {
+    background-color: #007d7d;
+}
+
+/* Animation for popup appearance */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.semester-popup-overlay.active {
+    display: flex;
+}
+
+.semester-popup-overlay.active .semester-popup-content {
+    animation: fadeIn 0.3s ease-out forwards;
+}

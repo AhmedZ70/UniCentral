@@ -28,8 +28,15 @@ from .views import (
     CreateProfessorReviewAPIView,
     CourseFilteringView,
     ProfessorCoursesAPIView,
+    EnrollView,
+    UnEnrollView,
+    MyCoursesView,
+    MyProfessorsView,
+    MyReviewsView,
+    MyClassmatesView,
     home,
     courses,
+    about_page,
     signup_page,
     login_page,
     course_detail,
@@ -68,6 +75,7 @@ urlpatterns = [
 
     path('professors/', professors, name='professors'),
     path('professors/<int:professor_id>/', professor_detail, name='professor-detail'),
+    path('about/', about_page, name='about'),
 
     path('my_account/', my_account, name='my_account'),
     path('my_courses/', my_courses, name='my_courses'),
@@ -88,6 +96,8 @@ urlpatterns = [
     
     # Review URLs
     path('api/courses/<int:course_id>/reviews/', CourseReviewListView.as_view(), name='course-reviews'),
+    path('api/courses/<int:course_id>/reviews/enroll/', EnrollView.as_view(), name='api-course-enroll'),
+    path('api/courses/<int:course_id>/reviews/un_enroll/', UnEnrollView.as_view(), name='api-course-un-enroll'),
     path('api/courses/<int:course_id>/reviews/create/', CreateReviewAPIView.as_view(), name='api-review-create'),
      path('api/professors/<int:professor_id>/reviews/', ProfessorReviewListView.as_view(), name='professor-reviews'),
     path('api/professors/<int:professor_id>/reviews/create/', CreateProfessorReviewAPIView.as_view(), name='create-professor-review'),
@@ -99,10 +109,13 @@ urlpatterns = [
     path('api/departments/<int:department_id>/professors/', DepartmentProfessorsView.as_view(), name='department_professors'),
    
 
-    
     # User URLs
     path('api/create_user/', CreateUserView.as_view(), name='create_user'),
+    path('api/my_courses/', MyCoursesView.as_view(), name='api-my_courses'),
+    path('api/my_professors/', MyProfessorsView.as_view(), name='api-my_professors'),
+    path('api/my_reviews/', MyReviewsView.as_view(), name='api-my_reviews'),
+    path('api/my_classmates/', MyClassmatesView.as_view(), name='api-my_classmates'),
      
-     # Course Filtering URLs
-     path('api/course-filtering/', CourseFilteringView.as_view(), name='create_user'),
+    # Course Filtering URLs
+    path('api/course-filtering/', CourseFilteringView.as_view(), name='course_filter'),
 ]
