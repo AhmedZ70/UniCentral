@@ -31,6 +31,7 @@ from .views import (
     MyProfessorsView,
     home,
     courses,
+    about_page,
     signup_page,
     login_page,
     course_detail,
@@ -54,6 +55,7 @@ urlpatterns = [
     path('courses/<int:course_id>/review/', review_form_page, name='review-form-page'),
     path('professors/', professors, name='professors'),
     path('professors/<int:professor_id>/', professor_detail, name='professor-detail'),
+    path('about/', about_page, name='about'),
 
     path('my_account/', my_account, name='my_account'),
     path('my_courses/', my_courses, name='my_courses'),
