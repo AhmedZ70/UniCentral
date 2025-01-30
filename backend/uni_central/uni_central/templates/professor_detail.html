@@ -15,7 +15,7 @@
     <main class="main-content professor-detail-page">
         <!-- Hidden input for professor ID -->
         <input type="hidden" id="professorId" value="{{ professor_id }}">
-
+        
         <!-- Professor Information Section -->
         <section class="professor-info" id="professor-info">
             <h1 class="professor-name" id="professor-name">Loading professor...</h1>
@@ -28,15 +28,19 @@
             <ul class="reviews-list" id="reviews-list"></ul>
             <p class="no-reviews-message" id="no-reviews-message" style="display: none;">No reviews available for this professor.</p>
         </section>
+
+        <a id="professor-leave-review-btn" href="{% url 'professor-review-form' context_id=professor_id %}" class="professor-leave-review-button">
+            Leave a Review
+        </a>
+        
     </main>
 
     <style>
         body {
             font-family: 'Montserrat', sans-serif;
             background-color: #FAF8F0;
-            margin: 0;
-            padding: 0;
-            color: #333;
+            color: #333333;
+            line-height: 1.6;
         }
 
         .professor-detail-page {
@@ -51,30 +55,35 @@
             border-radius: 15px;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
             margin-bottom: 2rem;
+            transition: all 0.3s ease;
         }
 
-        .professor-name {
+        .professor-info:hover, .professor-reviews:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+        }
+
+        .professor-title {
             font-size: 2.5rem;
             color: #005a5b;
             margin-bottom: 1.5rem;
             text-align: center;
             font-weight: 700;
+            letter-spacing: 1px;
         }
 
         .professor-details p {
             font-size: 1.1rem;
             margin: 15px 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
 
-        .courses-taught-list {
-            list-style: none;
-            padding: 0;
-            margin: 15px 0;
-        }
-
-        .courses-taught-list li {
-            font-size: 1rem;
-            margin: 8px 0;
+        .detail-label {
+            font-weight: 600;
+            color: #005a5b;
+            min-width: 200px;
         }
 
         .reviews-title {
@@ -82,29 +91,101 @@
             color: #005a5b;
             margin-bottom: 1.5rem;
             text-align: center;
+            font-weight: 700;
         }
 
         .reviews-list {
             list-style: none;
             padding: 0;
+            margin: 0;
         }
 
         .review-item {
             margin-bottom: 2rem;
-            border-bottom: 2px solid #e0e0e0;
             padding-bottom: 2rem;
+            border-bottom: 2px solid #e0e0e0;
         }
 
         .review-header {
-            font-size: 1.2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 1.3rem;
             font-weight: bold;
-            margin-bottom: 1rem;
             color: #005a5b;
+            margin-bottom: 1rem;
+        }
+
+        .review-header span {
+            font-weight: normal;
+            font-size: 1.1rem;
+            color: #666666;
         }
 
         .review-content p {
+            margin: 0.7rem 0;
             font-size: 1.1rem;
-            margin: 0.5rem 0;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .rating, .difficulty {
+            font-weight: 600;
+            padding: 3px 8px;
+            border-radius: 5px;
+            color: #fff;
+        }
+
+        .rating {
+            background-color: #4CAF50;
+        }
+
+        .difficulty {
+            background-color: #FFA500;
+        }
+
+        .yes {
+            color: #4CAF50;
+            font-weight: 600;
+        }
+
+        .no {
+            color: #F44336;
+            font-weight: 600;
+        }
+
+        .professor-leave-review-button {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 12px 25px;
+            background-color: #005a5b;
+            color: #fff;
+            text-decoration: none;
+            border-radius: 30px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+
+        .professor-leave-review-button:hover {
+            background-color: #004e4f;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 90, 91, 0.3);
+        }
+
+        @media (max-width: 768px) {
+            .professor-title {
+                font-size: 2rem;
+            }
+
+            .professor-details p {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .detail-label {
+                margin-bottom: 5px;
+            }
         }
     </style>
 

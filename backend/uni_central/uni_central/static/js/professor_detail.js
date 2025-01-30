@@ -26,10 +26,16 @@ document.addEventListener("DOMContentLoaded", () => {
                 <p><strong>Average Difficulty:</strong> <span class="difficulty">${(professor.avg_difficulty || 0).toFixed(1)}</span></p>
             `;
 
+            // Add bold "Courses taught" heading
+            const coursesHeading = document.createElement("p");
+            coursesHeading.innerHTML = `<strong>Courses taught:</strong>`;
+            professorDetailsEl.appendChild(coursesHeading);
+
             // Populate courses taught
             const courses = data.courses_taught || [];
             const coursesTaughtList = document.createElement("ul");
             coursesTaughtList.classList.add("courses-taught-list");
+
             if (courses.length > 0) {
                 courses.forEach((course) => {
                     const li = document.createElement("li");
