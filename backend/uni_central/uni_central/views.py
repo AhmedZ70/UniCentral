@@ -282,6 +282,22 @@ class EnrollView(APIView):
             status=status.HTTP_201_CREATED
         )
 
+class UnEnrollView(APIView):
+    """
+    API View to remove a course to a user when they un-enroll.
+    """
+    def delete(self, request, course_id):
+        email_address = request.data.get('email_address')
+        user = UserService.get_user(email_address)
+        course = CourseService.get_course(course_id)
+
+        success = UserService.remove_course(user, course)
+
+        if success:
+            return Response({"message": "Course removed successfully."}, status=status.HTTP_200_OK)
+        else:
+            return Response({"error": "User was not enrolled in this course."}, status=status.HTTP_400_BAD_REQUEST)
+
 class MyCoursesView(APIView):
     """
     API View to fetch courses that a user is in.
@@ -304,6 +320,18 @@ class MyProfessorsView(APIView):
         professors = UserService.get_professors(user)
         
         serialized = ProfessorSerializer(professors, many=True)
+        return Response(serialized.data, status=status.HTTP_200_OK)
+    
+class MyReviewsView(APIView):
+    """
+    API View to fetch reviews of courses that a user has made.
+    """
+    def get(self, request):
+        email_address = request.data.get('email_address')
+        user = UserService.get_user(email_address)
+        
+        reviews = UserService.get_reviews(user)
+        serialized = ReviewSerializer(reviews, many=True)
         return Response(serialized.data, status=status.HTTP_200_OK)
     
 class CreateUserView(APIView):

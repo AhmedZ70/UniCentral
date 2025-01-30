@@ -27,8 +27,10 @@ from .views import (
     ProfessorReviewListView,
     CourseFilteringView,
     EnrollView,
+    UnEnrollView,
     MyCoursesView,
     MyProfessorsView,
+    MyReviewsView,
     home,
     courses,
     signup_page,
@@ -75,6 +77,7 @@ urlpatterns = [
     # Review URLs
     path('api/courses/<int:course_id>/reviews/', CourseReviewListView.as_view(), name='course-reviews'),
     path('api/courses/<int:course_id>/reviews/enroll/', EnrollView.as_view(), name='api-course-enroll'),
+    path('api/courses/<int:course_id>/reviews/un_enroll/', UnEnrollView.as_view(), name='api-course-un-enroll'),
     path('api/courses/<int:course_id>/reviews/create/', CreateReviewAPIView.as_view(), name='api-review-create'),
     
     # Professor URLs
@@ -84,9 +87,10 @@ urlpatterns = [
 
     # User URLs
     path('api/create_user/', CreateUserView.as_view(), name='create_user'),
-    path('api/my_courses/', MyCoursesView.as_view(), name='my_courses'),
-    path('api/my_professors/', MyProfessorsView.as_view(), name='my_professors'),
+    path('api/my_courses/', MyCoursesView.as_view(), name='api-my_courses'),
+    path('api/my_professors/', MyProfessorsView.as_view(), name='api-my_professors'),
+    path('api/my_reviews/', MyReviewsView.as_view(), name='api-my_reviews'),
      
-     # Course Filtering URLs
-     path('api/course-filtering/', CourseFilteringView.as_view(), name='course_filter'),
+    # Course Filtering URLs
+    path('api/course-filtering/', CourseFilteringView.as_view(), name='course_filter'),
 ]
