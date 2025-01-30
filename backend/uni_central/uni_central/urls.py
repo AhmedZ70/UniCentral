@@ -111,7 +111,7 @@ urlpatterns = [
 
     # User URLs
     path('api/create_user/', CreateUserView.as_view(), name='create_user'),
-    path('api/my_courses/', MyCoursesView.as_view(), name='api-my_courses'),
+    path('api/my_courses/<str:email_address>/', MyCoursesView.as_view(), name='api-my_courses'),
     path('api/my_professors/', MyProfessorsView.as_view(), name='api-my_professors'),
     path('api/my_reviews/', MyReviewsView.as_view(), name='api-my_reviews'),
     path('api/my_classmates/', MyClassmatesView.as_view(), name='api-my_classmates'),
