@@ -15,7 +15,7 @@
     <main class="main-content professor-detail-page">
         <!-- Hidden input for professor ID -->
         <input type="hidden" id="professorId" value="{{ professor_id }}">
-
+        
         <!-- Professor Information Section -->
         <section class="professor-info" id="professor-info">
             <h1 class="professor-name" id="professor-name">Loading professor...</h1>
@@ -28,6 +28,11 @@
             <ul class="reviews-list" id="reviews-list"></ul>
             <p class="no-reviews-message" id="no-reviews-message" style="display: none;">No reviews available for this professor.</p>
         </section>
+
+        <a id="professor-leave-review-btn" href="{% url 'professor-review-form' context_id=professor_id %}" class="professor-leave-review-button">
+            Leave a Review
+        </a>
+        
     </main>
 
     <style>
@@ -105,6 +110,24 @@
         .review-content p {
             font-size: 1.1rem;
             margin: 0.5rem 0;
+        }
+        .professor-leave-review-button {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 12px 25px;
+            background-color: #005a5b;
+            color: #fff;
+            text-decoration: none;
+            border-radius: 30px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+
+        .professor-leave-review-button:hover {
+            background-color: #004e4f;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 90, 91, 0.3);
         }
     </style>
 
