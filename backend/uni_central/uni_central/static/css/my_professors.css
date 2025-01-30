@@ -90,14 +90,6 @@ body, html, ul, li, p, h1, h2, select {
     background-color: #007d7d;
   }
   
-  .welcome-message {
-    color: #005a5b;
-    font-weight: bold;
-    margin-right: 1rem;
-    display: inline-block;
-    font-family: 'Montserrat', sans-serif;
-  }
-  
   /* ============================================= */
   /* Hero Section                                   */
   /* ============================================= */
@@ -176,6 +168,7 @@ body, html, ul, li, p, h1, h2, select {
     min-height: 130px;
     display: flex;
     justify-content: space-between;
+    margin-bottom: 15px;
   }
   
   .professor-info {
@@ -228,26 +221,27 @@ body, html, ul, li, p, h1, h2, select {
   .professor-right {
     position: absolute;
     right: 24px;
-    bottom: 30px;
+    bottom: 24px;
     text-align: right;
   }
   
   .professor-right p {
+    margin-bottom: 10px;
     font-size: 20px;
   }
-  
-  .rating-container {
+    
+    .rating-container {
     display: flex;
     align-items: center;
     gap: 10px;
     justify-content: flex-end;
-  }
-  
-  .rating-container img {
+    }
+    
+    .rating-container img {
     width: 80px;
     height: 80px;
-  }
-  
-  .rating-number {
+    }
+    
+    .rating-number {
     font-size: 60px;
-  } 
+    }

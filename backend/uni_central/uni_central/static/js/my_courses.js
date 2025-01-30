@@ -217,7 +217,7 @@ document.addEventListener("DOMContentLoaded", () => {
                         <h3>${course.subject} ${course.number} ${course.title}</h3>
                         ${course.required_course ? '<span class="required">REQUIRED</span>' : ''}
                     </div>
-                    <p>In Person / ${course.semester}</p>
+                    <p>${course.semester} / In person</p>
                     <div class="difficulty-rating">
                         <p>Difficulty:</p>
                     </div>
