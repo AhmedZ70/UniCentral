@@ -295,6 +295,11 @@ margin-right: 50px;
 background-color: #007d7d;
 }
 
+.no-courses h3{
+  font-size: 24px;
+  margin: 0;
+}
+
 .course-card {
 background-color: #ffffff;
 border: 3px solid black;
@@ -312,6 +317,11 @@ margin-right: 50px;
 flex: 1;
 margin-right: 200px;
 }
+
+.course-info p {
+  margin-bottom: 10px;
+  font-size: 18px;
+  }
 
 .title-section {
 display: flex;
@@ -332,16 +342,6 @@ border-radius: 8px;
 font-size: 20px;
 font-weight: bold;
 white-space: nowrap;
-}
-
-.course-info p {
-margin-bottom: 10px;
-font-size: 18px;
-}
-
-.course-info p {
-margin-bottom: 10px;
-font-size: 18px;
 }
 
 .difficulty-rating {

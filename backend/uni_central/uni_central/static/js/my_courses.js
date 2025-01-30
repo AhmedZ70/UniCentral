@@ -139,11 +139,8 @@ document.addEventListener("DOMContentLoaded", () => {
             case 'a-z':
                 coursesToSort.sort((a, b) => `${a.subject}${a.number}`.localeCompare(`${b.subject}${b.number}`));
                 break;
-            case 'newest-oldest':
-                coursesToSort.sort((a, b) => new Date(b.added_date) - new Date(a.added_date));
-                break;
-            case 'oldest-newest':
-                coursesToSort.sort((a, b) => new Date(a.added_date) - new Date(b.added_date));
+            case 'z-a':
+                coursesToSort.sort((a, b) => `${a.subject}${a.number}`.localeCompare(`${b.subject}${b.number}`));
                 break;
         }
         displayCourses(coursesToSort);
@@ -157,6 +154,16 @@ document.addEventListener("DOMContentLoaded", () => {
         // Clear existing cards (but keep the sort section)
         const existingCards = container.querySelectorAll('.course-card');
         existingCards.forEach(card => card.remove());
+        console.log("course length: ", courses.length);
+        if (courses.length === 0) {
+            const courseCard = document.createElement('div');
+            courseCard.className = 'no-courses';
+            courseCard.innerHTML = `
+                <h3>There are no courses to display. Add a course to see your courses.</h3>
+            `;
+            coursesSection.appendChild(courseCard);  // Add this line to append the message
+            return;  // Add this line to stop the function here
+        }
 
         courses.forEach(course => {
             const courseCard = document.createElement('div');
