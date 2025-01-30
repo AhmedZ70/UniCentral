@@ -303,7 +303,7 @@ class MyCoursesView(APIView):
     API View to fetch courses that a user is in.
     """
     def get(self, request):
-        email_address = request.data.get('email_address')
+        email_address = "joedoe@gmail.com"  
         user = UserService.get_user(email_address)
         courses = UserService.get_courses(user)
         
