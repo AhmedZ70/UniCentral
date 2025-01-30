@@ -17,21 +17,6 @@ body, html {
   font-style: normal;
 }
 
-/* ============================================= */
-/* Navbar                                        */
-/* ============================================= */
-.navbar {
-  display: flex;
-  justify-content: flex-start;
-  align-items: center;
-  padding: 1.5rem 2rem;
-  background-color: #FAF8F0;
-}
-
-/* Logo (Left Side) */
-.logo img {
-  width: 200px;
-}
 
 /* ============================================= */
 /* Hero Section                                  */

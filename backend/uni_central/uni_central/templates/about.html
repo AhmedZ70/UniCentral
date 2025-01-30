@@ -6,7 +6,11 @@
   <link rel="icon" href="{% static 'assets/logo_black.png' %}">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>About UniCentral</title>
+  <!-- Global Styles for Navbar and Other Shared Components -->
+  <link rel="stylesheet" href="{% static 'css/style.css' %}">
+  <!-- Page-Specific Styles -->
   <link rel="stylesheet" href="{% static 'css/about.css' %}">
+  <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Corben:wght@400;700&family=Montserrat:ital,wght@0,100..900;1,100..900&family=Sigmar&family=Sniglet:wght@400;800&display=swap" rel="stylesheet">
@@ -14,58 +18,54 @@
 </head>
 <body>
 
-<header class="navbar">
-  <!-- LOGO on the LEFT -->
-  <div class="logo">
-    <a href="{% url 'home' %}">
-      <img src="{% static 'assets/logo_horizontal.png' %}" alt="UniCentral Logo">
-    </a>
-  </div>
-</header>
+  <!-- Navbar -->
+  {% include 'partials/navbar.html' %}
 
-<main class="main-content">
-  <section class="hero">
-    <div class="text-content">
+  <!-- Main Content -->
+  <main class="main-content">
+    <section class="hero">
+      <div class="text-content">
         <h1>About UniCentral</h1>
         <p>UniCentral is an innovative web platform designed to simplify the course registration process for students by integrating essential resources into one user-friendly platform.</p>
-    </div>
-  </section>
-  
-  <section class="about">
-    <h2>Our Mission</h2>
-    <p>We aim to empower students by providing comprehensive course information, professor reviews, workload assessments, and schedule planning tools in a single, intuitive interface.</p>
-  </section>
-  
-  <section class="team">
-    <h2>Meet Our Team</h2>
-    <div class="team-members">
+      </div>
+    </section>
+    
+    <section class="about">
+      <h2>Our Mission</h2>
+      <p>We aim to empower students by providing comprehensive course information, professor reviews, workload assessments, and schedule planning tools in a single, intuitive interface.</p>
+    </section>
+    
+    <section class="team">
+      <h2>Meet Our Team</h2>
+      <div class="team-members">
         <div class="member">
-            <img src="{% static 'assets/team/joe.JPG' %}" alt="Joe Corbeil">
-            <h3>Joe Corbeil</h3>
-            <p>Backend Engineer</p>
+          <img src="{% static 'assets/team/joe.JPG' %}" alt="Joe Corbeil">
+          <h3>Joe Corbeil</h3>
+          <p>Backend Engineer</p>
         </div>
         <div class="member">
-            <img src="{% static 'assets/team/tori.JPG' %}" alt="Victoria Locke">
-            <h3>Victoria Locke</h3>
-            <p>Frontend Developer</p>
+          <img src="{% static 'assets/team/tori.JPG' %}" alt="Victoria Locke">
+          <h3>Victoria Locke</h3>
+          <p>Frontend Developer</p>
         </div>
         <div class="member">
-            <img src="{% static 'assets/team/raj.jpg' %}" alt="Raj Reddy">
-            <h3>Raj Reddy</h3>
-            <p>Infrastructure & Security</p>
+          <img src="{% static 'assets/team/raj.jpg' %}" alt="Raj Reddy">
+          <h3>Raj Reddy</h3>
+          <p>Infrastructure & Security</p>
         </div>
         <div class="member">
-            <img src="{% static 'assets/team/ahmed.JPG' %}" alt="Ahmed Zahran">
-            <h3>Ahmed Zahran</h3>
-            <p>Full-Stack Developer</p>
+          <img src="{% static 'assets/team/ahmed.JPG' %}" alt="Ahmed Zahran">
+          <h3>Ahmed Zahran</h3>
+          <p>Full-Stack Developer</p>
         </div>
-    </div>
-  </section>
-</main>
+      </div>
+    </section>
+  </main>
 
-<footer>
-  <p>&copy; 2025 UniCentral. All Rights Reserved.</p>
-</footer>
+  <!-- Footer -->
+  <footer>
+    <p>&copy; 2025 UniCentral. All Rights Reserved.</p>
+  </footer>
 
 </body>
 </html>
