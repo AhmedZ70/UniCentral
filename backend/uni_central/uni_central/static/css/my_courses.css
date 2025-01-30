@@ -350,9 +350,21 @@ align-items: center;
 gap: 8px;
 }
 
-.difficulty-rating img {
-width: 18%;
-vertical-align: bottom;
+.difficulty-dots {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.difficulty-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background-color: #ddd; /* Default empty dot color */
+}
+
+.difficulty-dot.filled {
+  background-color: #ff743e; /* Filled dot color */
 }
 
 .remove-button {
