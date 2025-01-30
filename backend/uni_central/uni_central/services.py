@@ -172,6 +172,23 @@ class UserService:
         return get_object_or_404(User, email_address=email_address)
     
     @staticmethod
+    def get_courses(user):
+        courses = user.courses.all()
+        return courses
+    
+    @staticmethod
+    def get_professors(user):
+        courses = user.courses.all()
+        professors = Professor.objects.filter(courses__in=courses).distinct()
+        return professors
+    
+    @staticmethod
+    def add_course(user, course):
+        user.courses.add(course)
+        user.save()
+        
+    
+    @staticmethod
     def create_user(email_address, fname, lname):
         """
         Creates a new user in the SQLite database.

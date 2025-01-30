@@ -260,11 +260,51 @@ class ProfessorReviewListView(APIView):
         }
         return Response(data, status=status.HTTP_200_OK)
 
-
-    
 ####################################
 # User-Related Views and APIs #
 ####################################
+
+class EnrollView(APIView):
+    """
+    API View to add a course to a user when they enroll.
+    """
+    def post(self, request, course_id):
+        email_address = request.data.get('email_address')
+        user = UserService.get_user(email_address)
+        course = CourseService.get_course(course_id)
+        UserService.add_course(user, course)
+        
+        return Response(
+            {
+                "message": "Enrolled in course successfully",
+                "course_id": course_id
+            },
+            status=status.HTTP_201_CREATED
+        )
+
+class MyCoursesView(APIView):
+    """
+    API View to fetch courses that a user is in.
+    """
+    def get(self, request):
+        email_address = request.data.get('email_address')
+        user = UserService.get_user(email_address)
+        courses = UserService.get_courses(user)
+        
+        serialized = CourseSerializer(courses, many=True)
+        return Response(serialized.data, status=status.HTTP_200_OK)
+    
+class MyProfessorsView(APIView):
+    """
+    API View to fetch professors of courses that a user is in.
+    """
+    def get(self, request):
+        email_address = request.data.get('email_address')
+        user = UserService.get_user(email_address)
+        professors = UserService.get_professors(user)
+        
+        serialized = ProfessorSerializer(professors, many=True)
+        return Response(serialized.data, status=status.HTTP_200_OK)
     
 class CreateUserView(APIView):
     """
