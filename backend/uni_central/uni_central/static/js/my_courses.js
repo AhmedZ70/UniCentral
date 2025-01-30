@@ -217,7 +217,6 @@ document.addEventListener("DOMContentLoaded", () => {
                         <h3>${course.subject} ${course.number} ${course.title}</h3>
                         ${course.required_course ? '<span class="required">REQUIRED</span>' : ''}
                     </div>
-                    <p>Estimated Time Spent Per Week: ${course.estimated_hours || 'N/A'} hours</p>
                     <p>In Person / ${course.semester}</p>
                     <div class="difficulty-rating">
                         <p>Difficulty:</p>
