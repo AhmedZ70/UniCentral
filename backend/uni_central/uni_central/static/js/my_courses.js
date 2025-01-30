@@ -146,6 +146,49 @@ document.addEventListener("DOMContentLoaded", () => {
         displayCourses(coursesToSort);
     }
 
+    function createDifficultyDots(difficulty) {
+        const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+        svg.setAttribute("width", "120");
+        svg.setAttribute("height", "20");
+        svg.setAttribute("viewBox", "0 0 120 20");
+
+        const colors = [
+            { start: 0, end: 2, color: "#4CAF50" },   // Green
+            { start: 2, end: 4, color: "#FFC107" },   // Yellow
+            { start: 4, end: 6, color: "#F44336" }    // Red
+        ];
+
+        colors.forEach((colorGroup, groupIndex) => {
+            for (let i = 0; i < 2; i++) {
+                const circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+                circle.setAttribute("cx", `${(groupIndex * 40 + i * 20) + 10}`);
+                circle.setAttribute("cy", "10");
+                circle.setAttribute("r", "8");
+                circle.setAttribute("fill", "none");
+                circle.setAttribute("stroke", colorGroup.color);
+                circle.setAttribute("stroke-width", "3");
+
+                const fillPercentage = Math.max(0, Math.min(1, 
+                    Math.max(0, Math.min(1, 
+                        (difficulty - colorGroup.start) / 2
+                    ))
+                ));
+
+                const fillCircle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+                fillCircle.setAttribute("cx", `${(groupIndex * 40 + i * 20) + 10}`);
+                fillCircle.setAttribute("cy", "10");
+                fillCircle.setAttribute("r", "8");
+                fillCircle.setAttribute("fill", fillPercentage > 0 ? colorGroup.color : "transparent");
+                fillCircle.setAttribute("opacity", fillPercentage);
+
+                svg.appendChild(circle);
+                svg.appendChild(fillCircle);
+            }
+        });
+
+        return svg;
+    }
+
     // Display courses in the container
     function displayCourses(courses) {
         const container = document.querySelector('.my-courses');
@@ -177,7 +220,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     <p>Estimated Time Spent Per Week: ${course.estimated_hours || 'N/A'} hours</p>
                     <p>In Person / ${course.semester}</p>
                     <div class="difficulty-rating">
-                        <p>Difficulty: <img src="/static/assets/${course.avg_difficulty || '0/6'}_difficulty.png" alt="difficulty rating"></p>
+                        <p>Difficulty:</p>
                     </div>
                     <p>Average Grade: ${course.grade || 'N/A'}</p>
                 </div>
@@ -189,6 +232,10 @@ document.addEventListener("DOMContentLoaded", () => {
                     </div>
                 </div>
             `;
+            const difficultyRating = courseCard.querySelector('.difficulty-rating');
+            const difficultyDots = createDifficultyDots(course.avg_difficulty || 0);
+            difficultyRating.appendChild(difficultyDots);
+
             coursesSection.appendChild(courseCard);
         });
     }
