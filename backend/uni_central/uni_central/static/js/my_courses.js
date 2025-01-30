@@ -68,7 +68,7 @@ document.addEventListener("DOMContentLoaded", () => {
     // Fetch all courses and populate semester select
     async function fetchAllCourses(userEmail) {
         try {
-            const response = await fetch(`/api/my_courses/?email=${encodeURIComponent(userEmail)}`, {
+            const response = await fetch(`/api/my_courses/${encodeURIComponent(userEmail)}/`, {
                 headers: {
                     'Accept': 'application/json'
                 }

@@ -205,16 +205,33 @@ class CreateReviewAPIView(APIView):
     Handle the creation of a Review for a given course (POST).
     """
     def post(self, request, course_id):
-        # Identify the user. 
-        # If unauthenticated, fallback to a default user with ID=1, or raise 404 if not found.
-        # Parse email from request.
         email_address = request.data.get('email_address')
-        review_data = request.data
         user = UserService.get_user(email_address)
-        #user = UserService.get_user('joedoe@gmail.com')
+        review_data = request.data
 
         try:
             review = ReviewService.create_review_for_course(course_id, user, review_data)
+            return Response(
+                {"message": "Review created successfully", "review_id": review.id},
+                status=status.HTTP_201_CREATED
+            )
+        except Exception as e:
+            return Response(
+                {"error": str(e)},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+            
+class CreateProfessorReviewAPIView(APIView):
+    """
+    API View to handle the creation of a review for a professor.
+    """
+    def post(self, request, professor_id):
+        email_address = request.data.get('email_address')
+        user = UserService.get_user(email_address)
+        review_data = request.data
+
+        try:
+            review = ReviewService.create_review_for_professor(professor_id, user, review_data)
             return Response(
                 {"message": "Review created successfully", "review_id": review.id},
                 status=status.HTTP_201_CREATED
@@ -280,28 +297,6 @@ class ProfessorReviewListView(APIView):
         }
         return Response(data, status=status.HTTP_200_OK)
 
-
-class CreateProfessorReviewAPIView(APIView):
-    """
-    API View to handle the creation of a review for a professor.
-    """
-    def post(self, request, professor_id):
-        # Identify the user (placeholder logic; replace with actual user handling)
-        user = UserService.get_user('joedoe@gmail.com')  # Replace with request.user or actual email logic
-        review_data = request.data
-
-        try:
-            review = ReviewService.create_review_for_professor(professor_id, user, review_data)
-            return Response(
-                {"message": "Review created successfully", "review_id": review.id},
-                status=status.HTTP_201_CREATED
-            )
-        except Exception as e:
-            return Response(
-                {"error": str(e)},
-                status=status.HTTP_400_BAD_REQUEST
-            )
-
 ####################################
 # User-Related Views and APIs #
 ####################################
@@ -344,8 +339,7 @@ class MyCoursesView(APIView):
     """
     API View to fetch courses that a user is in.
     """
-    def get(self, request):
-        email_address = "joedoe@gmail.com"  
+    def get(self, request, email_address):
         user = UserService.get_user(email_address)
         courses = UserService.get_courses(user)
         

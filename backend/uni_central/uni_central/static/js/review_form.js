@@ -1,3 +1,18 @@
+import { getAuth, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js';
+
+// global variable for email
+let userEmail = null;
+
+const auth = getAuth();
+onAuthStateChanged(auth, (user) => {
+    if (user) {
+        userEmail = user.email;
+        console.log("User email:", userEmail);
+    } else {
+        console.log("No user is signed in.");
+    }
+});
+
 document.addEventListener("DOMContentLoaded", () => {
     const contextType = document.getElementById("contextType").value; // "course" or "professor"
     const contextId = document.getElementById("contextId").value;
@@ -107,8 +122,7 @@ document.addEventListener("DOMContentLoaded", () => {
             no_exams: document.getElementById("noExams").checked,
             presentations: document.getElementById("presentations").checked,
 
-            //email_address: sessionStorage.getItem('userEmail')
-            email_address: "joedoe@gmail.com"
+            email_address: userEmail
         };
   
         if (contextType === "course") {
