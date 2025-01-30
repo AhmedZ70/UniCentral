@@ -25,7 +25,9 @@ from .views import (
     DepartmentProfessorsView,
     CreateUserView,
     ProfessorReviewListView,
+    CreateProfessorReviewAPIView,
     CourseFilteringView,
+    ProfessorCoursesAPIView,
     EnrollView,
     UnEnrollView,
     MyCoursesView,
@@ -55,7 +57,22 @@ urlpatterns = [
     path('login/', login_page, name='login'),
     path('courses/', courses, name='courses'),  # Render courses.html (user-facing view)
     path('courses/<int:course_id>/', course_detail, name='course-detail'), 
-    path('courses/<int:course_id>/review/', review_form_page, name='review-form-page'),
+
+
+    path(
+        'courses/<int:context_id>/review/',
+        review_form_page,
+        {'context_type': 'course'},
+        name='course-review-form'
+    ),
+    path(
+        'professors/<int:context_id>/review/',
+        review_form_page,
+        {'context_type': 'professor'},
+        name='professor-review-form'
+    ),
+
+
     path('professors/', professors, name='professors'),
     path('professors/<int:professor_id>/', professor_detail, name='professor-detail'),
     path('about/', about_page, name='about'),
@@ -82,11 +99,15 @@ urlpatterns = [
     path('api/courses/<int:course_id>/reviews/enroll/', EnrollView.as_view(), name='api-course-enroll'),
     path('api/courses/<int:course_id>/reviews/un_enroll/', UnEnrollView.as_view(), name='api-course-un-enroll'),
     path('api/courses/<int:course_id>/reviews/create/', CreateReviewAPIView.as_view(), name='api-review-create'),
+     path('api/professors/<int:professor_id>/reviews/', ProfessorReviewListView.as_view(), name='professor-reviews'),
+    path('api/professors/<int:professor_id>/reviews/create/', CreateProfessorReviewAPIView.as_view(), name='create-professor-review'),
+
     
     # Professor URLs
     path('api/courses/<int:course_id>/professors/', CourseProfessorsAPIView.as_view(), name='course-professors'),
+    path('api/professors/<int:professor_id>/courses/', ProfessorCoursesAPIView.as_view(), name='professor-courses'),
     path('api/departments/<int:department_id>/professors/', DepartmentProfessorsView.as_view(), name='department_professors'),
-    path('api/professors/<int:professor_id>/reviews/', ProfessorReviewListView.as_view(), name='professor-reviews'),
+   
 
     # User URLs
     path('api/create_user/', CreateUserView.as_view(), name='create_user'),

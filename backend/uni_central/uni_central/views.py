@@ -109,15 +109,16 @@ def professor_detail(request, professor_id):
     return render(request, 'professor_detail.html', context)
 
 
-def review_form_page(request, course_id):
-    """
-    Renders an empty form (no DB lookups).
-    The frontend will fetch the professors and other course data via API.
-    """
+def review_form_page(request, context_type, context_id):
+    # context_type should be either "course" or "professor"
     context = {
-        'course_id': course_id,
+        'context_type': context_type,
+        'context_id': context_id,
+        
     }
     return render(request, 'review_form.html', context)
+
+
 
 def professors(request):
     """
@@ -178,7 +179,23 @@ class CourseReviewListView(APIView):
             'reviews': review_serializer.data
         }
         return Response(data, status=status.HTTP_200_OK)
-            
+
+class ProfessorCoursesAPIView(APIView):
+    """
+    Fetch all courses for a given professor (GET /api/professors/<professor_id>/courses/).
+    """
+    def get(self, request, professor_id):
+        """
+        Handles GET requests to fetch courses for the given professor.
+        """
+        try:
+            # Fetch courses using the service layer
+            courses = CourseService.get_courses_by_professor(professor_id)
+            serialized = CourseSerializer(courses, many=True)
+            return Response(serialized.data, status=status.HTTP_200_OK)
+        except Exception as e:
+            # Handle cases like invalid professor_id
+            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 ####################################
 # Review-Related Views and APIs #
 ####################################
@@ -192,19 +209,22 @@ class CreateReviewAPIView(APIView):
         # If unauthenticated, fallback to a default user with ID=1, or raise 404 if not found.
         # Parse email from request.
         email_address = request.data.get('email_address')
+        review_data = request.data
         user = UserService.get_user(email_address)
         #user = UserService.get_user('joedoe@gmail.com')
 
-        # Delegate review creation to the service layer
-        review = ReviewService.create_review(course_id, user, request.data)
+        try:
+            review = ReviewService.create_review_for_course(course_id, user, review_data)
+            return Response(
+                {"message": "Review created successfully", "review_id": review.id},
+                status=status.HTTP_201_CREATED
+            )
+        except Exception as e:
+            return Response(
+                {"error": str(e)},
+                status=status.HTTP_400_BAD_REQUEST
+            )
 
-        return Response(
-            {
-                "message": "Review created successfully",
-                "review_id": review.id
-            },
-            status=status.HTTP_201_CREATED
-        )
 
 ####################################
 # Professor-Related Views and APIs #
@@ -221,7 +241,7 @@ class CourseProfessorsAPIView(APIView):
         professors = ProfessorService.get_professors_by_course(course_id)
         serialized = ProfessorSerializer(professors, many=True)
         return Response(serialized.data, status=status.HTTP_200_OK)
-    
+
 class DepartmentProfessorsView(APIView):
     """
     Retrieves professors for a specific department by ID.
@@ -259,6 +279,28 @@ class ProfessorReviewListView(APIView):
             'courses_taught': course_serializer.data,
         }
         return Response(data, status=status.HTTP_200_OK)
+
+
+class CreateProfessorReviewAPIView(APIView):
+    """
+    API View to handle the creation of a review for a professor.
+    """
+    def post(self, request, professor_id):
+        # Identify the user (placeholder logic; replace with actual user handling)
+        user = UserService.get_user('joedoe@gmail.com')  # Replace with request.user or actual email logic
+        review_data = request.data
+
+        try:
+            review = ReviewService.create_review_for_professor(professor_id, user, review_data)
+            return Response(
+                {"message": "Review created successfully", "review_id": review.id},
+                status=status.HTTP_201_CREATED
+            )
+        except Exception as e:
+            return Response(
+                {"error": str(e)},
+                status=status.HTTP_400_BAD_REQUEST
+            )
 
 ####################################
 # User-Related Views and APIs #
