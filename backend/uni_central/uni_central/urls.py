@@ -42,6 +42,7 @@ from .views import (
     course_detail,
     review_form_page,
     professors,
+    course_filtering,
     my_account,
     my_courses,
     my_professors,
@@ -75,6 +76,7 @@ urlpatterns = [
 
     path('professors/', professors, name='professors'),
     path('professors/<int:professor_id>/', professor_detail, name='professor-detail'),
+    path('course_filtering', course_filtering, name='course_filtering'),
     path('about/', about_page, name='about'),
 
     path('my_account/', my_account, name='my_account'),
@@ -117,5 +119,5 @@ urlpatterns = [
     path('api/my_classmates/', MyClassmatesView.as_view(), name='api-my_classmates'),
      
     # Course Filtering URLs
-    path('api/course-filtering/', CourseFilteringView.as_view(), name='course_filter'),
+    path('api/course-filtering/', CourseFilteringView.as_view(), name='api-course_filtering'),
 ]

@@ -301,53 +301,53 @@ background-color: #007d7d;
 }
 
 .course-card {
-background-color: #ffffff;
-border: 3px solid black;
-border-radius: 8px;
-padding: 1.5rem;
-position: relative;
-min-height: 200px;
-display: flex;
-justify-content: space-between;
-margin-left: 50px;
-margin-right: 50px;
+  background-color: #ffffff;
+  border: 3px solid black;
+  border-radius: 8px;
+  padding: 1.5rem;
+  position: relative;
+  min-height: 200px;
+  display: flex;
+  justify-content: space-between;
+  margin-left: 50px;
+  margin-right: 50px;
 }
 
 .course-info {
-flex: 1;
-margin-right: 200px;
+  flex: 1;
+  margin-right: 200px;
 }
 
 .course-info p {
-  margin-bottom: 10px;
-  font-size: 18px;
-  }
+    margin-bottom: 10px;
+    font-size: 18px;
+}
 
 .title-section {
-display: flex;
-align-items: center;
-gap: 10px;
-margin-bottom: 15px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 15px;
 }
 
 .title-section h3 {
-font-size: 24px;
-margin: 0;
+  font-size: 24px;
+  margin: 0;
 }
 
 .required {
-color: #ff4444;
-padding: 4px 8px;
-border-radius: 8px;
-font-size: 20px;
-font-weight: bold;
-white-space: nowrap;
+  color: #ff4444;
+  padding: 4px 8px;
+  border-radius: 8px;
+  font-size: 20px;
+  font-weight: bold;
+  white-space: nowrap;
 }
 
 .difficulty-rating {
-display: flex;
-align-items: center;
-gap: 8px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
 .difficulty-dots {
