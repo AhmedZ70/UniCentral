@@ -97,14 +97,6 @@ body {
     background-color: #007d7d;
 }
 
-.welcome-message {
-    color: #005a5b;
-    font-weight: bold;
-    margin-right: 1rem;
-    display: inline-block;
-    font-family: 'Montserrat', sans-serif;
-}
-
 /* ============================================= */
 /* Hero Section                                   */
 /* ============================================= */
@@ -156,7 +148,7 @@ body {
 }
 
 input[type="text"] {
-    width: 26rem;
+    width: 24rem;
     height: 2rem;
     border-radius: 8px;
     font-size: 1.5rem;
@@ -176,6 +168,16 @@ input[type="checkbox"] {
     accent-color: #ff743e;
 }
 
+.time-per-week-label input[type="number"] {
+    width: 5rem;
+    height: 2rem;
+}
+
+.avg-grade-label input[type="text"] {
+    width: 5rem;
+    height: 2rem;
+}
+
 .search-button {
     margin-left: auto;
     background-color: #005a5b;
@@ -193,6 +195,11 @@ input[type="checkbox"] {
     background-color: #007d7d;
 }
 
+.no-results {
+    display: flex;
+    align-items: center;
+}
+
 .course-card {
     background-color: #ffffff;
     border: 3px solid black;
@@ -202,6 +209,7 @@ input[type="checkbox"] {
     min-height: 200px;
     display: flex;
     justify-content: space-between;
-    margin-left: 50px;
-    margin-right: 50px;
+    margin-left: 5rem;
+    margin-right: 5rem;
+    margin-bottom: 2rem;
 }
