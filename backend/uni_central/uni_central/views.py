@@ -82,6 +82,12 @@ def courses(request):
     """
     return render(request, 'courses.html')
 
+def course_filtering(request):
+    """
+    Render the Course Filtering page.
+    """
+    return render(request, 'course_filtering.html')
+
 def about_page(request):
     """
     Render the About page.
