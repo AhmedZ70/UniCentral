@@ -34,6 +34,7 @@ from .views import (
     MyProfessorsView,
     MyReviewsView,
     MyClassmatesView,
+    UserDetailsView,
     home,
     courses,
     about_page,
@@ -101,7 +102,7 @@ urlpatterns = [
     path('api/courses/<int:course_id>/reviews/enroll/', EnrollView.as_view(), name='api-course-enroll'),
     path('api/courses/<int:course_id>/reviews/un_enroll/', UnEnrollView.as_view(), name='api-course-un-enroll'),
     path('api/courses/<int:course_id>/reviews/create/', CreateReviewAPIView.as_view(), name='api-review-create'),
-     path('api/professors/<int:professor_id>/reviews/', ProfessorReviewListView.as_view(), name='professor-reviews'),
+    path('api/professors/<int:professor_id>/reviews/', ProfessorReviewListView.as_view(), name='professor-reviews'),
     path('api/professors/<int:professor_id>/reviews/create/', CreateProfessorReviewAPIView.as_view(), name='create-professor-review'),
 
     
@@ -120,4 +121,6 @@ urlpatterns = [
      
     # Course Filtering URLs
     path('api/filter-courses/', CourseFilteringView.as_view(), name='api-filter_courses'),
+
+    path('api/users/<str:email_address>/details/', UserDetailsView.as_view(), name='user-details'),
 ]

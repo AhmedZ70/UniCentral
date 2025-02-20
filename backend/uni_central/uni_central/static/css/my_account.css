@@ -166,6 +166,11 @@ body, html, ul, li, p, h1, h2, select {
     margin-bottom: 15px;
   }
 
+  .update-password:hover{
+    background-color:  #007d7d;
+  }
+
+
   .save-changes {
     position: absolute;
     right: 100px;
@@ -175,4 +180,19 @@ body, html, ul, li, p, h1, h2, select {
     font-size: 30px;
     border-radius: 8px;
     border-color: #005a5b;
+  }
+
+  .edit-profile-button {
+    position: absolute;
+    right: 100px;
+    bottom: 100px;
+    background-color: #005a5b;
+    color: white;
+    font-size: 30px;
+    border-radius: 8px;
+    border-color: #005a5b;
+  }
+
+  .edit-profile-button:hover{
+    background-color:  #007d7d;
   }
