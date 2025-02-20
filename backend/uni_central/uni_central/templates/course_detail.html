@@ -21,6 +21,8 @@
             <!-- Populated by JavaScript -->
             <h1 class="course-title" id="course-title">Loading course...</h1>
             <div class="course-details" id="course-details"></div>
+            <!-- Add the Enroll Button -->
+            <button id="enroll-btn" class="leave-review-button">Enroll</button>
         </section>
 
         <!-- Reviews Section -->
@@ -34,11 +36,9 @@
             <a id="leave-review-btn" href="{% url 'course-review-form' context_id=course_id %}" class="leave-review-button">
                 Leave a Review
             </a>
-            
-
-
         </section>
     </main>
+
     <style>
         body {
             font-family: 'Montserrat', sans-serif;
@@ -158,7 +158,7 @@
             font-weight: 600;
         }
 
-        .leave-review-button {
+        .leave-review-button, #enroll-btn {
             display: inline-block;
             margin-top: 20px;
             padding: 12px 25px;
@@ -169,12 +169,19 @@
             font-weight: 600;
             transition: all 0.3s ease;
             text-align: center;
+            border: none;
+            cursor: pointer;
         }
 
-        .leave-review-button:hover {
+        .leave-review-button:hover, #enroll-btn:hover {
             background-color: #004e4f;
             transform: translateY(-2px);
             box-shadow: 0 5px 15px rgba(0, 90, 91, 0.3);
+        }
+
+        #enroll-btn:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
         }
 
         @media (max-width: 768px) {
@@ -192,8 +199,8 @@
             }
         }
     </style>
-    <script src="{% static 'js/course_detail.js' %}"></script>
+
+    <script type="module" src="{% static 'js/course_detail.js' %}"></script>
     <script type="module" src="{% static 'js/auth.js' %}"></script>
 </body>
 </html>
-
