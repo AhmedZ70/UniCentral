@@ -91,6 +91,12 @@ def course_filtering(request):
     """
     return render(request, 'course_filtering.html')
 
+def discussion_board(request):
+    """
+    Render the Course Filtering page.
+    """
+    return render(request, 'discussion_board.html')
+
 def about_page(request):
     """
     Render the About page.

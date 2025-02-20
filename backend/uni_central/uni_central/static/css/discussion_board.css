@@ -1,0 +1,337 @@
+/* ============================================= */
+/* General                                       */
+/* ============================================= */
+body, html, ul, li, p, h1, h2, select {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+  
+  body {
+    font-family: 'Montserrat', sans-serif;
+    line-height: 1.6;
+    background-color: #FAF8F0;
+  }
+  
+  @font-face {
+    font-family: 'Agrandir';
+    src: url('../assets/fonts/Agrandir-Regular.otf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+  }
+  
+  /* ============================================= */
+  /* Navbar Styles                                 */
+  /* ============================================= */
+  .navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 2rem;
+    font-weight: 100;
+    font-size: 20px;
+  }
+  
+  .logo {
+    display: flex;
+    align-items: center;
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: #333333;
+  }
+  
+  .logo img {
+    width: 200px;
+    margin-right: 8px;
+  }
+  
+  .logo-home-btn {
+    border: none;
+    background-color: #FAF8F0;
+  }
+  
+  .nav-links {
+    display: flex;
+    list-style: none;
+  }
+  
+  .nav-links li {
+    margin-left: 2rem;
+  }
+  
+  .nav-links a {
+    text-decoration: none;
+    color: #333333;
+    font-weight: bold;
+  }
+  
+  .nav-links a:hover {
+    color: #005a5b;
+  }
+  
+  .actions {
+    display: flex;
+    align-items: center;
+  }
+  
+  .register-btn {
+    background-color: #005a5b;
+    color: #FAF8F0;
+    border: none;
+    font-family: 'Agrandir', sans-serif;
+    font-size: 20px;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-weight: bold;
+    cursor: pointer;
+  }
+  
+  .register-btn:hover {
+    background-color: #007d7d;
+  }
+  
+  .welcome-message {
+    color: #005a5b;
+    font-weight: bold;
+    margin-right: 1rem;
+    display: inline-block;
+    font-family: 'Montserrat', sans-serif;
+  }
+  
+  /* ============================================= */
+  /* Hero Section                                   */
+  /* ============================================= */
+  .hero {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 3rem 2rem;
+  }
+  
+  .text-container {
+    position: relative;
+    z-index: 1;
+  }
+  
+  .text-content {
+    max-width: 100%;
+    font-family: 'Agrandir', sans-serif;
+  }
+  
+  .text-content h1 {
+    display: flex;
+    align-items: center;
+    font-weight: 100;
+    font-size: 65px;
+    color: #ff743e;
+    margin-left: 50px;
+    margin-top: -50px;
+  }
+
+  .text-content img{
+    width: 300px;
+    vertical-align: center;
+    margin-right: 30px;
+    margin-bottom: 15px;
+  }
+
+.text-content h2 {
+    font-size: 24px;
+    color: #333333;
+    margin-left: 50px;
+}
+
+/* ============================================= */
+/* Discussion Controls                           */
+/* ============================================= */
+.discussion-controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 2rem;
+    margin: 0 50px;
+}
+
+.search-bar input {
+    width: 300px;
+    height: 40px;
+    padding: 0 1rem;
+    border: 2px solid #005a5b;
+    border-radius: 20px;
+    font-size: 16px;
+    font-family: 'Montserrat', sans-serif;
+}
+
+.filters select {
+    height: 40px;
+    padding: 0 1rem;
+    margin-right: 1rem;
+    border: 2px solid #005a5b;
+    border-radius: 20px;
+    font-size: 16px;
+    font-family: 'Montserrat', sans-serif;
+    background-color: white;
+}
+
+.new-thread-button {
+    background-color: #005a5b;
+    color: white;
+    padding: 0.5rem 1.5rem;
+    border: none;
+    border-radius: 20px;
+    font-size: 18px;
+    font-family: 'Agrandir', sans-serif;
+    cursor: pointer;
+}
+
+.new-thread-button:hover {
+    background-color: #007d7d;
+}
+
+/* ============================================= */
+/* Thread Styles                                 */
+/* ============================================= */
+.discussion-threads {
+    margin: 0 50px;
+}
+
+.thread {
+    background-color: white;
+    border-radius: 10px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.thread-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 1rem;
+}
+
+.thread-header h3 {
+    color: #005a5b;
+    font-size: 24px;
+    font-family: 'Agrandir', sans-serif;
+}
+
+.thread-meta {
+    display: flex;
+    gap: 1rem;
+    font-size: 14px;
+    color: #666;
+}
+
+.topic-tag {
+    background-color: #ff743e;
+    color: white;
+    padding: 0.2rem 0.8rem;
+    border-radius: 15px;
+    font-size: 14px;
+}
+
+/* ============================================= */
+/* Responses                                     */
+/* ============================================= */
+.responses {
+    margin-top: 1.5rem;
+    padding-left: 2rem;
+    border-left: 3px solid #eee;
+}
+
+.response {
+    margin-bottom: 1.5rem;
+}
+
+.response-meta {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-top: 0.5rem;
+    font-size: 14px;
+    color: #666;
+}
+
+.upvote {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+/* ============================================= */
+/* Modal Styles                                  */
+/* ============================================= */
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.modal-content {
+    background-color: white;
+    padding: 2rem;
+    border-radius: 10px;
+    width: 600px;
+    max-width: 90%;
+}
+
+.modal-content h2 {
+    color: #005a5b;
+    margin-bottom: 1.5rem;
+    font-family: 'Agrandir', sans-serif;
+}
+
+.modal-content input,
+.modal-content select,
+.modal-content textarea {
+    width: 100%;
+    padding: 0.8rem;
+    margin-bottom: 1rem;
+    border: 2px solid #005a5b;
+    border-radius: 8px;
+    font-family: 'Montserrat', sans-serif;
+}
+
+.modal-content textarea {
+    min-height: 150px;
+    resize: vertical;
+}
+
+.form-controls {
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+}
+
+.cancel-button,
+.submit-button {
+    padding: 0.5rem 1.5rem;
+    border-radius: 20px;
+    font-size: 16px;
+    font-family: 'Agrandir', sans-serif;
+    cursor: pointer;
+}
+
+.cancel-button {
+    background-color: #eee;
+    border: none;
+    color: #333;
+}
+
+.submit-button {
+    background-color: #005a5b;
+    border: none;
+    color: white;
+}
+
+.submit-button:hover {
+    background-color: #007d7d;
+}

@@ -51,6 +51,7 @@ from .views import (
     my_reviews,
     course_planner, 
     professor_detail,
+    discussion_board
 )
 
 urlpatterns = [
@@ -85,7 +86,8 @@ urlpatterns = [
     path('my_professors/', my_professors, name='my_professors'),
     path('my_classmates/', my_classmates, name='my_classmates'),
     path('my_reviews/', my_reviews, name='my_reviews'),
-    path('course_planner/', course_planner, name='course_planner'),    
+    path('course_planner/', course_planner, name='course_planner'),
+    path('discussion_board/', discussion_board, name='discussion_board'),    
     
     ############
     # API URLs #
