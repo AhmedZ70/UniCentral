@@ -43,8 +43,11 @@ def login_page(request):
 def my_account(request):
     """
     Render the My Account page.
-    """
-    return render(request, 'my_account.html')
+    """    
+    context = {
+        'userEmail': request.user.email if request.user.is_authenticated else None
+    }
+    return render(request, 'my_account.html', context)
 
 def my_courses(request):
     """
@@ -87,6 +90,12 @@ def course_filtering(request):
     Render the Course Filtering page.
     """
     return render(request, 'course_filtering.html')
+
+def discussion_board(request):
+    """
+    Render the Course Filtering page.
+    """
+    return render(request, 'discussion_board.html')
 
 def about_page(request):
     """
@@ -440,6 +449,32 @@ class CreateUserView(APIView):
                 "message": f"Server error: {str(e)}"
             }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
     
+class UserDetailsView(APIView):
+    def get(self, request, email_address):
+        try:
+            print(f"Attempting to get user with email: {email_address}")  # Debug log
+            user = UserService.get_user(email_address)
+            
+            if not user:
+                print(f"No user found with email: {email_address}")  # Debug log
+                return Response(
+                    {"error": "User not found"},
+                    status=status.HTTP_404_NOT_FOUND
+                )
+                
+            print(f"User found: {user}")  # Debug log
+            serialized = UserSerializer(user)
+            return Response(serialized.data, status=status.HTTP_200_OK)
+            
+        except Exception as e:
+            print(f"Error in UserDetailsView: {str(e)}")  # Debug log
+            import traceback
+            print(f"Full traceback: {traceback.format_exc()}")  # Debug log
+            return Response(
+                {"error": str(e)},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
 ####################################
 # Course-Filtering Views and APIs #
 ####################################

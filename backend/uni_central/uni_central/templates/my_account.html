@@ -10,23 +10,45 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Corben:wght@400;700&family=Montserrat:ital,wght@0,100..900;1,100..900&family=Sigmar&family=Sniglet:wght@400;800&display=swap" rel="stylesheet">
-  <script type="module" src="{% static 'js/auth.js' %}"></script>
+  <script type="module" src="{% static 'js/my_account.js' %}"></script>
 </head>
 
 {% include 'partials/navbar.html' %}
 
-<main class="main-content">
+<!-- <main class="main-content">
   <section class="hero">
     <div class="text-content">
-        <h1><img src="{% static 'assets/profile_picture.png' %}" alt="profile picture">My Account</h1>
-        <p><button class="update-profile-picture">Update profile picture</button></p>
+        <h1>My Account</h1>
     </div>
   </section>
   <div class="account-info">
-    <p><label for="fName">First name: </label> <input type="text" id="fName"></p>
-    <p><label for="lName">Last name: </label> <input type="text" id="lName"></p>
-    <p><label for="email_address">Email address: </label></p>
+    <p><label for="fName">First name: Victoria</label></p>
+    <p><label for="lName">Last name: Locke</label></p>
+    <p>Email address: victoriajlocke614@gmail.com <span id="user-email"></span></p>
+    <p><label for="school">School: University of Utah</label></p>
+    <p><label for="major">Major: Computer Science</label></p>
+    <p><label for="year">Year in school: Senior</label></p>
+
     <p><button class="update-password">Update password</button></p>
     <p><button class="save-changes">SAVE CHANGES</button></p>
   </div>
-</main> 
+</main>  -->
+
+<main class="main-content">
+  <section class="hero">
+    <div class="text-content">
+        <h1>My Account</h1>
+    </div>
+  </section>
+  <div class="account-info">
+    <p><label for="fName">First name: </label><span id="fNameDisplay"></span><input type="text" id="fName" class="edit-input" style="display: none;"></p>
+    <p><label for="lName">Last name: </label><span id="lNameDisplay"></span><input type="text" id="lName" class="edit-input" style="display: none;"></p>
+    <p>Email address: <span id="user-email"></span></p>
+    <p><label for="school">School: </label><span id="schoolDisplay"></span><input type="text" id="school" class="edit-input" style="display: none;"></p>
+    <p><label for="major">Major: </label><span id="majorDisplay"></span><input type="text" id="major" class="edit-input" style="display: none;"></p>
+    <p><label for="year">Year in school: </label><span id="yearDisplay"></span><input type="text" id="year" class="edit-input" style="display: none;"></p>
+    
+    <p><button class="update-password">Update password</button></p>
+    <p><button id="edit-button" class="edit-profile-button">Edit Profile</button></p>
+  </div>
+</main>
