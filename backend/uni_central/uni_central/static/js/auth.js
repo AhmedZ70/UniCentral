@@ -25,7 +25,8 @@ function handleAuthStateChange() {
     const logoutBtn = document.querySelector('.logout-btn');
 
     if (user) {
-      console.log('User is signed in:', user);
+      // User is signed in
+      console.log(`User logged in with email: ${user.email}`); // Log user email
       if (registerLinkAndBtn && actionsDiv) {
         if (logoutBtn) {
           logoutBtn.addEventListener('click', (event) => {
@@ -50,10 +51,10 @@ function handleAuthStateChange() {
         registerLinkAndBtn.replaceWith(welcomeText);
       }
     } else {
+      // User is signed out
+      console.log("User logged out"); // Log user logout
       const loginLink = document.createElement('a');
       const loginBtn = document.querySelector('.logout-btn');
-      // User is signed out
-      console.log('User is signed out');
       // Initial home page state
       if (!welcomeMessage && actionsDiv) {
         loginLink.href = '/login/';
@@ -116,4 +117,4 @@ document.addEventListener('DOMContentLoaded', () => {
   handleLeaveReviewButton();
 });
 
-export { auth, handleAuthStateChange, handleLeaveReviewButton };
+export { auth, onAuthStateChanged, handleAuthStateChange, handleLeaveReviewButton };

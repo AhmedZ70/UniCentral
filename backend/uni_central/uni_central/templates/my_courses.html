@@ -12,66 +12,48 @@
   <link href="https://fonts.googleapis.com/css2?family=Corben:wght@400;700&family=Montserrat:ital,wght@0,100..900;1,100..900&family=Sigmar&family=Sniglet:wght@400;800&display=swap" rel="stylesheet">
   <script type="module" src="{% static 'js/my_courses.js' %}"></script>
 </head>
+<body>
+  {% include 'partials/navbar.html' %}
 
-{% include 'partials/navbar.html' %}
-
-<main class="main-content">
-  <section class="hero">
-    <div class="text-content">
+  <main class="main-content">
+    <section class="hero">
+      <div class="text-content">
         <div class="text-container">
           <h1>My Courses</h1>
         </div>
         <div class="semester">
           <label for="semester">Semester:</label>
           <select name="semester" id="semester-values">
-            <!-- <option value="s2025">Spring 2025</option>
-            <option value="f2024">Fall 2024</option>
-            <option value="su2024">Summer 2024</option>
-            <option value="s2024">Spring 2024</option> -->
+            <!-- Semester options will be dynamically populated by JavaScript -->
           </select>
         </div>
-    </div>
-  </section>
-  <div class="my-courses">
-    <div class="search-add-courses">
-      <select class="courses-sort">
-        <option value="a-z">A - Z</option>
-        <option value="z-a">Z - A</option>
-      </select>
-      <button class="add-course">Add Course +</button>
-    </div>
-    <!-- <div class="course-card">
-    <div class="course-info">
-      <div class="title-section">
-        <h3>CS 2100 Discrete Structures</h3>
-        <span class="required">REQUIRED</span>
       </div>
-      <p>Estimated Time Spent Per Week: 10 hours</p>
-      <p>In Person / Spring 2025 / M W / 11:50 AM - 1:10 PM</p>
-      <div class="difficulty-rating">
-        <p>Difficulty:   <img src="{% static 'assets/5:6_difficulty.png' %}" alt="difficulty rating"></p>
-      </div>
-      <p>Average Grade: C</p>
-    </div>
-    <button class="remove-button">REMOVE X</button>
+    </section>
 
-    <div class="course-right">
-      <p>Overall course rating:</p>
-      <div class="rating-container">
-        <img src="{% static 'assets/star.png' %}" alt="star rating">
-        <span class="rating-number">3.5</span>
+    <div class="my-courses">
+      <div class="search-add-courses">
+        <select class="courses-sort">
+          <option value="a-z">A - Z</option>
+          <option value="z-a">Z - A</option>
+        </select>
+        <button class="add-course">Add Course +</button>
       </div>
-    </div>
-  </div> -->
-  <div class="course-search-popup-overlay" id="course-search-popup">
-    <div class="course-search-popup-content">
-      <button class="close-popup">&times;</button>
-      <h2 class="course-search-popup-title">Search for a course</h2>
-      <div class="course-search-popup-body">
-        <input type="text" id="course-search" placeholder="Search by course code or name...">
-        <div id="search-results">
+
+      <!-- Course cards will be dynamically populated here -->
+      <div class="course-cards"></div>
+
+      <!-- Popup for searching courses -->
+      <div class="course-search-popup-overlay" id="course-search-popup">
+        <div class="course-search-popup-content">
+          <button class="close-popup">&times;</button>
+          <h2 class="course-search-popup-title">Search for a course</h2>
+          <div class="course-search-popup-body">
+            <input type="text" id="course-search" placeholder="Search by course code or name...">
+            <div id="search-results"></div>
+          </div>
         </div>
       </div>
     </div>
-  </div>
-</main>
+  </main>
+</body>
+</html>
