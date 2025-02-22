@@ -21,6 +21,11 @@ class User(models.Model):
     fname = models.CharField(max_length=100)
     lname = models.CharField(max_length=100)
     courses = models.ManyToManyField('Course', related_name='students')
+    professors = models.ManyToManyField('Professor', related_name='students')
+    university = models.CharField(max_length=255, null=True)
+    major = models.CharField(max_length=255, null=True)
+    year = models.IntegerField(null=True)
+    course_plan = models.JSONField(default=dict)
 
     class Meta:
         db_table = 'users'
@@ -205,18 +210,62 @@ class Review(models.Model):
         return f"Review by {self.user.fname} for {course_name}"
 
 ####################
-# DEPARTMENT MODEL #
+# THREAD MODEL #
 ####################
-# class Classmate(models.Model):
-#     """
-#     A model to store department information.
+class Thread(models.Model):
+    """
+    A model representing a discussion thread.
 
-#     Attributes:
-#         id (AutoField): The primary key of the department. Automatically generated.
-#         name (CharField): The name of the department (e.g., 'Computer Science').
-#         code (CharField): The unique code for the department (e.g., 'CS').
-#     """
+    Attributes:
+        id (AutoField): The primary key of the thread. Automatically generated.
+        title (CharField): The title of the discussion thread.
+        user (ForeignKey): The user who started the thread.
+        courses (ManyToManyField): The courses related to this thread.
+        professors (ManyToManyField): The professors related to this thread.
+        created_at (DateTimeField): The timestamp when the thread was created.
+        updated_at (DateTimeField): The timestamp when the thread was last updated.
+    """
 
-#     id = models.AutoField(primary_key=True)
-#     name = models.CharField(max_length=255)
-#     code = models.CharField(max_length=50, unique=True)
+    id = models.AutoField(primary_key=True)
+    title = models.CharField(max_length=255)
+    user = models.ForeignKey('User', on_delete=models.CASCADE, related_name='threads')
+    courses = models.ManyToManyField('Course', related_name='threads', blank=True)
+    professors = models.ManyToManyField('Professor', related_name='threads', blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        db_table = 'threads'
+
+    def __str__(self):
+        return self.title
+
+
+####################
+# COMMENT MODEL #
+####################
+class Comment(models.Model):
+    """
+    A model representing a comment in a discussion thread.
+
+    Attributes:
+        id (AutoField): The primary key of the comment. Automatically generated.
+        thread (ForeignKey): The thread this comment belongs to.
+        user (ForeignKey): The user who posted the comment.
+        content (TextField): The text content of the comment.
+        created_at (DateTimeField): The timestamp when the comment was created.
+        updated_at (DateTimeField): The timestamp when the comment was last updated.
+    """
+
+    id = models.AutoField(primary_key=True)
+    thread = models.ForeignKey('Thread', on_delete=models.CASCADE, related_name='comments')
+    user = models.ForeignKey('User', on_delete=models.CASCADE, related_name='comments')
+    content = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        db_table = 'comments'
+
+    def __str__(self):
+        return f"Comment by {self.user.fname} on {self.thread.title}"

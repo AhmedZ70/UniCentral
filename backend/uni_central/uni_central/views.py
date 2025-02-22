@@ -43,8 +43,11 @@ def login_page(request):
 def my_account(request):
     """
     Render the My Account page.
-    """
-    return render(request, 'my_account.html')
+    """    
+    context = {
+        'userEmail': request.user.email if request.user.is_authenticated else None
+    }
+    return render(request, 'my_account.html', context)
 
 def my_courses(request):
     """
@@ -88,6 +91,12 @@ def course_filtering(request):
     """
     return render(request, 'course_filtering.html')
 
+def discussion_board(request):
+    """
+    Render the Course Filtering page.
+    """
+    return render(request, 'discussion_board.html')
+
 def about_page(request):
     """
     Render the About page.
@@ -123,8 +132,6 @@ def review_form_page(request, context_type, context_id):
         
     }
     return render(request, 'review_form.html', context)
-
-
 
 def professors(request):
     """
@@ -307,6 +314,40 @@ class ProfessorReviewListView(APIView):
 # User-Related Views and APIs #
 ####################################
 
+class AddProfessorView(APIView):
+    """
+    API View to add a professor to a user when they add.
+    """
+    def post(self, request, professor_id):
+        email_address = request.data.get('email_address')
+        user = UserService.get_user(email_address)
+        professor = ProfessorService.get_professor(professor_id)
+        UserService.add_professor(user, professor)
+        
+        return Response(
+            {
+                "message": "Added Professor to Professors successfully",
+                "professor_id": professor_id
+            },
+            status=status.HTTP_201_CREATED
+        )
+        
+class RemoveProfessorView(APIView):
+    """
+    API View to remove a proffesor from a users account.
+    """
+    def delete(self, request, professor_id):
+        email_address = request.data.get('email_address')
+        user = UserService.get_user(email_address)
+        professor = ProfessorService.get_professor(professor_id)
+
+        success = UserService.remove_professor(user, professor)
+
+        if success:
+            return Response({"message": "Professor removed successfully."}, status=status.HTTP_200_OK)
+        else:
+            return Response({"error": "Professor was not removed from this user."}, status=status.HTTP_400_BAD_REQUEST)
+
 class EnrollView(APIView):
     """
     API View to add a course to a user when they enroll.
@@ -440,6 +481,32 @@ class CreateUserView(APIView):
                 "message": f"Server error: {str(e)}"
             }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
     
+class UserDetailsView(APIView):
+    def get(self, request, email_address):
+        try:
+            print(f"Attempting to get user with email: {email_address}")  # Debug log
+            user = UserService.get_user(email_address)
+            
+            if not user:
+                print(f"No user found with email: {email_address}")  # Debug log
+                return Response(
+                    {"error": "User not found"},
+                    status=status.HTTP_404_NOT_FOUND
+                )
+                
+            print(f"User found: {user}")  # Debug log
+            serialized = UserSerializer(user)
+            return Response(serialized.data, status=status.HTTP_200_OK)
+            
+        except Exception as e:
+            print(f"Error in UserDetailsView: {str(e)}")  # Debug log
+            import traceback
+            print(f"Full traceback: {traceback.format_exc()}")  # Debug log
+            return Response(
+                {"error": str(e)},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
 ####################################
 # Course-Filtering Views and APIs #
 ####################################

@@ -30,10 +30,13 @@ from .views import (
     ProfessorCoursesAPIView,
     EnrollView,
     UnEnrollView,
+    AddProfessorView,
+    RemoveProfessorView,
     MyCoursesView,
     MyProfessorsView,
     MyReviewsView,
     MyClassmatesView,
+    UserDetailsView,
     home,
     courses,
     about_page,
@@ -50,6 +53,7 @@ from .views import (
     my_reviews,
     course_planner, 
     professor_detail,
+    discussion_board
 )
 
 urlpatterns = [
@@ -84,7 +88,8 @@ urlpatterns = [
     path('my_professors/', my_professors, name='my_professors'),
     path('my_classmates/', my_classmates, name='my_classmates'),
     path('my_reviews/', my_reviews, name='my_reviews'),
-    path('course_planner/', course_planner, name='course_planner'),    
+    path('course_planner/', course_planner, name='course_planner'),
+    path('discussion_board/', discussion_board, name='discussion_board'),    
     
     ############
     # API URLs #
@@ -106,7 +111,9 @@ urlpatterns = [
     path('api/courses/<int:course_id>/reviews/create/', CreateReviewAPIView.as_view(), name='api-review-create'),
     path('api/professors/<int:professor_id>/reviews/', ProfessorReviewListView.as_view(), name='professor-reviews'),
     path('api/professors/<int:professor_id>/reviews/create/', CreateProfessorReviewAPIView.as_view(), name='create-professor-review'),
-
+    path('api/professors/<int:professor_id>/reviews/add/', AddProfessorView.as_view(), name='api-professor-add'),
+    path('api/professors/<int:professor_id>/reviews/remove/', RemoveProfessorView.as_view(), name='api-professor-remove'),
+    
     
     # Professor URLs
     path('api/courses/<int:course_id>/professors/', CourseProfessorsAPIView.as_view(), name='course-professors'),
@@ -123,4 +130,6 @@ urlpatterns = [
      
     # Course Filtering URLs
     path('api/filter-courses/', CourseFilteringView.as_view(), name='api-filter_courses'),
+
+    path('api/users/<str:email_address>/details/', UserDetailsView.as_view(), name='user-details'),
 ]
