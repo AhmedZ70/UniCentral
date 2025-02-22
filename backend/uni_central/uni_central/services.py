@@ -247,7 +247,18 @@ class UserService:
             user.courses.remove(course)
             return True
         return False
+    
+    @staticmethod
+    def add_professor(user, professor):
+        user.professors.add(professor)
+        user.save()
         
+    @staticmethod
+    def remove_professor(user, professor):
+        if professor in user.professors.all():
+            user.professors.remove(professor)
+            return True
+        return False
     
     @staticmethod
     def create_user(email_address, fname, lname):

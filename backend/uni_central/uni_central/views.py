@@ -133,8 +133,6 @@ def review_form_page(request, context_type, context_id):
     }
     return render(request, 'review_form.html', context)
 
-
-
 def professors(request):
     """
     Render the Professors page.
@@ -315,6 +313,40 @@ class ProfessorReviewListView(APIView):
 ####################################
 # User-Related Views and APIs #
 ####################################
+
+class AddProfessorView(APIView):
+    """
+    API View to add a professor to a user when they add.
+    """
+    def post(self, request, professor_id):
+        email_address = request.data.get('email_address')
+        user = UserService.get_user(email_address)
+        professor = ProfessorService.get_professor(professor_id)
+        UserService.add_professor(user, professor)
+        
+        return Response(
+            {
+                "message": "Added Professor to Professors successfully",
+                "professor_id": professor_id
+            },
+            status=status.HTTP_201_CREATED
+        )
+        
+class RemoveProfessorView(APIView):
+    """
+    API View to remove a proffesor from a users account.
+    """
+    def delete(self, request, professor_id):
+        email_address = request.data.get('email_address')
+        user = UserService.get_user(email_address)
+        professor = ProfessorService.get_professor(professor_id)
+
+        success = UserService.remove_professor(user, professor)
+
+        if success:
+            return Response({"message": "Professor removed successfully."}, status=status.HTTP_200_OK)
+        else:
+            return Response({"error": "Professor was not removed from this user."}, status=status.HTTP_400_BAD_REQUEST)
 
 class EnrollView(APIView):
     """
