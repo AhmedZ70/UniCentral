@@ -10,35 +10,6 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Corben:wght@400;700&family=Montserrat:ital,wght@0,100..900;1,100..900&family=Sigmar&family=Sniglet:wght@400;800&display=swap" rel="stylesheet">
-</head>
-<body>
-    {% include 'partials/navbar.html' %}
-
-    <main class="main-content course-detail-page">
-        <input type="hidden" id="courseId" value="{{ course_id }}">
-        <!-- Course Information Section -->
-        <section class="course-info" id="course-info">
-            <!-- Populated by JavaScript -->
-            <h1 class="course-title" id="course-title">Loading course...</h1>
-            <div class="course-details" id="course-details"></div>
-            <!-- Add the Enroll Button -->
-            <button id="enroll-btn" class="leave-review-button">Enroll</button>
-        </section>
-
-        <!-- Reviews Section -->
-        <section class="course-reviews" id="course-reviews">
-            <h2 class="reviews-title">Reviews</h2>
-            <!-- The <ul> will be filled by JS. If no reviews, we'll show a "no reviews" message. -->
-            <ul class="reviews-list" id="reviews-list"></ul>
-            <p class="no-reviews-message" id="no-reviews-message" style="display: none;">No reviews available for this course.</p>
-
-            <!-- "Leave a Review" link uses the course_id passed from Django to build the correct URL -->
-            <a id="leave-review-btn" href="{% url 'course-review-form' context_id=course_id %}" class="leave-review-button">
-                Leave a Review
-            </a>
-        </section>
-    </main>
-
     <style>
         body {
             font-family: 'Montserrat', sans-serif;
@@ -184,6 +155,51 @@
             cursor: not-allowed;
         }
 
+        .rating-container, .difficulty-container {
+            margin: 15px 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .rating-stars {
+            display: flex;
+            gap: 5px;
+        }
+
+        .star {
+            font-size: 24px;
+            color: #ccc; /* Default color for empty stars */
+        }
+
+        .star.filled {
+            color: #ffd700; /* Gold color for filled stars */
+        }
+
+        .difficulty-rating {
+            display: flex;
+            gap: 5px;
+        }
+
+        .difficulty-circle {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background-color: #e0e0e0; /* Default color for empty circles */
+        }
+
+        .difficulty-circle.filled {
+            background-color: #4CAF50; /* Green for low difficulty */
+        }
+
+        .difficulty-circle.filled.yellow {
+            background-color: #FFC107; /* Yellow for medium difficulty */
+        }
+
+        .difficulty-circle.filled.red {
+            background-color: #F44336; /* Red for high difficulty */
+        }
+
         @media (max-width: 768px) {
             .course-title {
                 font-size: 2rem;
@@ -199,6 +215,50 @@
             }
         }
     </style>
+</head>
+<body>
+    {% include 'partials/navbar.html' %}
+
+    <main class="main-content course-detail-page">
+        <input type="hidden" id="courseId" value="{{ course_id }}">
+        <!-- Course Information Section -->
+        <section class="course-info" id="course-info">
+            <h1 class="course-title" id="course-title">Loading course...</h1>
+            <div class="course-details" id="course-details">
+                <!-- Rating Section -->
+                <div class="rating-container">
+                    <p>Overall Rating:</p>
+                    <div id="course-rating"></div>
+                </div>
+
+                <!-- Difficulty Section -->
+                <div class="difficulty-container">
+                    <p>Difficulty:</p>
+                    <div id="course-difficulty"></div>
+                </div>
+
+                <!-- Other Course Details -->
+                <p><span class="detail-label">Subject:</span> <span id="course-subject"></span></p>
+                <p><span class="detail-label">Credits:</span> <span id="course-credits"></span></p>
+                <p><span class="detail-label">Semester:</span> <span id="course-semester"></span></p>
+                <p><span class="detail-label">Average Grade:</span> <span id="course-grade"></span></p>
+            </div>
+            <button id="enroll-btn" class="leave-review-button">Enroll</button>
+        </section>
+
+        <!-- Reviews Section -->
+        <section class="course-reviews" id="course-reviews">
+            <h2 class="reviews-title">Reviews</h2>
+            <!-- The <ul> will be filled by JS. If no reviews, we'll show a "no reviews" message. -->
+            <ul class="reviews-list" id="reviews-list"></ul>
+            <p class="no-reviews-message" id="no-reviews-message" style="display: none;">No reviews available for this course.</p>
+
+            <!-- "Leave a Review" link uses the course_id passed from Django to build the correct URL -->
+            <a id="leave-review-btn" href="{% url 'course-review-form' context_id=course_id %}" class="leave-review-button">
+                Leave a Review
+            </a>
+        </section>
+    </main>
 
     <script type="module" src="{% static 'js/course_detail.js' %}"></script>
     <script type="module" src="{% static 'js/auth.js' %}"></script>

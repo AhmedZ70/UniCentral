@@ -193,25 +193,34 @@ document.addEventListener("DOMContentLoaded", () => {
     function displayCourses(courses) {
         const container = document.querySelector('.my-courses');
         const coursesSection = container.querySelector('.course-cards') || container;
-
-        // Clear existing cards (but keep the sort section)
+    
+        // Clear existing cards
         const existingCards = container.querySelectorAll('.course-card');
         existingCards.forEach(card => card.remove());
-        console.log("course length: ", courses.length);
+    
         if (courses.length === 0) {
             const courseCard = document.createElement('div');
             courseCard.className = 'no-courses';
             courseCard.innerHTML = `
                 <h3>There are no courses to display. Add a course to see your courses.</h3>
             `;
-            coursesSection.appendChild(courseCard);  // Add this line to append the message
-            return;  // Add this line to stop the function here
+            coursesSection.appendChild(courseCard);
+            return;
         }
-
+    
         courses.forEach(course => {
-            const courseCard = document.createElement('div');
-            courseCard.className = 'course-card';
-            courseCard.innerHTML = `
+            // Create a link element for the course card
+            const courseLink = document.createElement('a');
+            courseLink.href = `/courses/${course.id}/`;  // Ensure this matches your Django URL pattern
+            courseLink.className = 'course-card';
+    
+            // Add inline styles to ensure they are applied
+            courseLink.style.textDecoration = 'none';
+            courseLink.style.color = 'inherit';
+            courseLink.style.display = 'block';
+    
+            // Create the course card content
+            courseLink.innerHTML = `
                 <div class="course-info">
                     <div class="title-section">
                         <h3>${course.subject} ${course.number} ${course.title}</h3>
@@ -231,11 +240,14 @@ document.addEventListener("DOMContentLoaded", () => {
                     </div>
                 </div>
             `;
-            const difficultyRating = courseCard.querySelector('.difficulty-rating');
+    
+            // Append the course link to the container
+            coursesSection.appendChild(courseLink);
+    
+            // Insert the difficulty dots into the correct spot
+            const difficultyRating = courseLink.querySelector('.difficulty-rating');
             const difficultyDots = createDifficultyDots(course.avg_difficulty || 0);
             difficultyRating.appendChild(difficultyDots);
-
-            coursesSection.appendChild(courseCard);
         });
     }
 });

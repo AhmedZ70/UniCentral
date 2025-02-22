@@ -1,411 +1,466 @@
-/* ============================================= */
-/* General                                       */
-/* ============================================= */
-body, html, ul, li, p, h1, h2, select {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-
-body {
-  font-family: 'Montserrat', sans-serif;
-  line-height: 1.6;
-  background-color: #FAF8F0;
-}
-
-@font-face {
-  font-family: 'Agrandir';
-  src: url('../assets/fonts/Agrandir-Regular.otf') format('truetype');
-  font-weight: normal;
-  font-style: normal;
-}
-
-/* ============================================= */
-/* Navbar Styles                                 */
-/* ============================================= */
-.navbar {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 1rem 2rem;
-  font-weight: 100;
-  font-size: 20px;
-}
-
-.logo {
-  display: flex;
-  align-items: center;
-  font-size: 1.2rem;
-  font-weight: bold;
-  color: #333333;
-}
-
-.logo img {
-  width: 200px;
-  margin-right: 8px;
-}
-
-.logo-home-btn {
-  border: none;
-  background-color: #FAF8F0;
-}
-
-.nav-links {
-  display: flex;
-  list-style: none;
-}
-
-.nav-links li {
-  margin-left: 2rem;
-}
-
-.nav-links a {
-  text-decoration: none;
-  color: #333333;
-  font-weight: bold;
-}
-
-.nav-links a:hover {
-  color: #007d7d;
-}
-
-.actions {
-  display: flex;
-  align-items: center;
-}
-
-.register-btn {
-  background-color: #005a5b;
-  color: #FAF8F0;
-  border: none;
-  font-family: 'Agrandir', sans-serif;
-  font-size: 20px;
-  padding: 0.5rem 1rem;
-  border-radius: 20px;
-  font-weight: bold;
-  cursor: pointer;
-}
-
-.register-btn:hover {
-  background-color: #007d7d;
-}
-
-
-/* ============================================= */
-/* Hero Section                                   */
-/* ============================================= */
-.hero {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 2rem 2rem 0.5rem 2rem; /* Reduced bottom padding */
-}
-
-.text-container {
-  position: relative;
-  z-index: 1;
-}
-
-.text-content {
-  max-width: 100%;
-  font-family: 'Agrandir', sans-serif;
-}
-
-.text-content h1 {
-  font-family: 'Agrandir', sans-serif;
-  font-weight: 100;
-  font-size: 65px;
-  color: #ff743e;
-  margin-left: 50px;
-  margin-top: -50px;
-}
-
-.text-content p {
-  margin-top: 0.5rem;
-  font-family: 'Poppins-light', sans-serif;
-  font-weight: 50;
-  font-size: 25px;
-  color: black;
-}
-
-.semester {
-  font-size: 25px;
-  margin-left: 50px;
-}
-
-.semester select {
-  font-size: 20px;
-  font-family: 'Agrandir', sans-serif;
-}
-
-.my-courses {
-  width: 100%;
-  max-width: 1650px;
-  margin: 0 auto;
-  padding: 2rem;
-}
-
-.search-add-courses {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 1.5rem;
-}
-
-#course-search {
-  width: 100%;
-  padding: 10px;
-  margin-bottom: 15px;
-  border: 2px solid #e0e0e0;
-  border-radius: 8px;
-  font-size: 16px;
-}
-
-.search-result-item {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 10px;
-  border: 1px solid #e0e0e0;
-  margin-bottom: 8px;
-  border-radius: 4px;
-}
-
-.search-result-item button {
-  background-color: #005a5b;
-  color: white;
-  border: none;
-  padding: 6px 12px;
-  border-radius: 4px;
-  cursor: pointer;
-}
-
-.search-result-item button:hover {
-  background-color: #007d7d;
-}
-
-#search-results {
-  max-height: 300px;
-  overflow-y: auto;
-}
-
-.courses-sort {
-padding: 0.5rem 1rem;
-border: 1px solid #ccc;
-border-radius: 4px;
-background-color: #fff;
-font-size: 1rem;
-margin-left: 50px;
-}
-
-.courses-sort select{
-font-size: 25px;
-font-family: 'Agrandir', sans-serif;
-}
-
-/* Popup Overlay */
-.course-search-popup-overlay {
-position: fixed;
-top: 0;
-left: 0;
-width: 100%;
-height: 100%;
-background-color: rgba(0, 0, 0, 0.5);
-display: none;
-justify-content: center;
-align-items: center;
-z-index: 1000;
-}
-
-/* Popup Content */
-.course-search-popup-content {
-background-color: #ffffff;
-padding: 30px;
-border-radius: 12px;
-min-width: 400px;
-position: relative;
-box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
-}
-
-/* Close Button */
-.close-popup {
-position: absolute;
-top: 15px;
-right: 15px;
-font-size: 24px;
-color: #666666;
-background: none;
-border: none;
-cursor: pointer;
-padding: 5px;
-}
-
-.close-popup:hover {
-color: #333333;
-}
-
-/* Popup Title */
-.course-search-popup-title {
-font-family: 'Agrandir', sans-serif;
-font-size: 24px;
-color: #333333;
-margin-bottom: 20px;
-padding-right: 30px;
-}
-
-/* Popup Body */
-.course-search-popup-body {
-margin: 25px 0;
-}
-
-/* Animation for popup appearance */
-@keyframes fadeIn {
-from {
-    opacity: 0;
-    transform: translateY(-20px);
-}
-to {
-    opacity: 1;
-    transform: translateY(0);
-}
-}
-
-.course-search-popup-overlay.active {
-display: flex;
-}
-
-.course-search-popup-overlay.active .course-search-popup-content {
-animation: fadeIn 0.3s ease-out forwards;
-}
-
-.search-add-courses button {
-background-color: #005a5b;
-font-family: 'Montserrat', sans-serif;
-color: white;
-border: none;
-padding: 8px 16px;
-border-radius: 8px;
-font-size: 16px;
-font-weight: bold;
-cursor: pointer;
-margin-right: 50px;
-}
-
-.search-add-courses button:hover{
-background-color: #007d7d;
-}
-
-.no-courses h3{
-  font-size: 24px;
-  margin: 0;
-}
-
-.course-card {
-  background-color: #ffffff;
-  border: 3px solid black;
-  border-radius: 8px;
-  padding: 1.5rem;
-  position: relative;
-  min-height: 200px;
-  display: flex;
-  justify-content: space-between;
-  margin-left: 50px;
-  margin-right: 50px;
-}
-
-.course-info {
-  flex: 1;
-  margin-right: 200px;
-}
-
-.course-info p {
-    margin-bottom: 10px;
-    font-size: 18px;
-}
-
-.title-section {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-bottom: 15px;
-}
-
-.title-section h3 {
-  font-size: 24px;
-  margin: 0;
-}
-
-.required {
-  color: #ff4444;
-  padding: 4px 8px;
-  border-radius: 8px;
-  font-size: 20px;
-  font-weight: bold;
-  white-space: nowrap;
-}
-
-.difficulty-rating {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.difficulty-dots {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-}
-
-.difficulty-dot {
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  background-color: #ddd; /* Default empty dot color */
-}
-
-.difficulty-dot.filled {
-  background-color: #ff743e; /* Filled dot color */
-}
-
-.remove-button {
-position: absolute;
-right: 1%;
-top: 10%;
-transform: translateY(-50%);
-background-color: #ff4444;
-color: white;
-border: none;
-padding: 8px 16px;
-border-radius: 8px;
-font-size: 16px;
-font-weight: bold;
-cursor: pointer;
-}
-
-.course-right {
-position: absolute;
-right: 24px;
-bottom: 24px;
-text-align: right;
-}
-
-.course-right p {
-margin-bottom: 10px;
-font-size: 20px;
-}
-
-.rating-container {
-display: flex;
-align-items: center;
-gap: 10px;
-justify-content: flex-end;
-}
-
-.rating-container img {
-width: 80px;
-height: 80px;
-}
-
-.rating-number {
-font-size: 60px;
-}
+/* ===========================
+   Base Resets and Fonts
+   =========================== */
+   *,
+   *::before,
+   *::after {
+     margin: 0;
+     padding: 0;
+     box-sizing: border-box;
+   }
+   
+   body, html {
+     width: 100%;
+     height: 100%;
+     font-family: 'Montserrat', sans-serif;
+     background-color: #FAF8F0;
+     line-height: 1.6;
+   }
+   
+   @font-face {
+     font-family: 'Agrandir';
+     src: url('../assets/fonts/Agrandir-Regular.otf') format('truetype');
+     font-weight: normal;
+     font-style: normal;
+   }
+   
+   /* ===========================
+      Navbar
+      =========================== */
+   .navbar {
+     display: flex;
+     justify-content: space-between;
+     align-items: center;
+     padding: 1rem 2rem;
+     font-weight: 100;
+     font-size: 20px;
+   }
+   
+   .logo {
+     display: flex;
+     align-items: center;
+     font-size: 1.2rem;
+     font-weight: bold;
+     color: #333333;
+   }
+   
+   .logo img {
+     width: 200px;
+     margin-right: 8px;
+   }
+   
+   .logo-home-btn {
+     border: none;
+     background-color: #FAF8F0;
+   }
+   
+   .nav-links {
+     display: flex;
+     list-style: none;
+   }
+   
+   .nav-links li {
+     margin-left: 2rem;
+   }
+   
+   .nav-links a {
+     text-decoration: none;
+     color: #333333;
+     font-weight: bold;
+   }
+   
+   .nav-links a:hover {
+     color: #007d7d;
+   }
+   
+   .actions {
+     display: flex;
+     align-items: center;
+   }
+   
+   .register-btn {
+     background-color: #005a5b;
+     color: #FAF8F0;
+     border: none;
+     font-family: 'Agrandir', sans-serif;
+     font-size: 20px;
+     padding: 0.5rem 1rem;
+     border-radius: 20px;
+     font-weight: bold;
+     cursor: pointer;
+   }
+   
+   .register-btn:hover {
+     background-color: #007d7d;
+   }
+   
+   /* ===========================
+      Hero Section
+      =========================== */
+   .hero {
+     display: flex;
+     justify-content: space-between;
+     align-items: center;
+     padding: 2rem;
+   }
+   
+   .text-container {
+     position: relative;
+     z-index: 1;
+   }
+   
+   .text-content {
+     max-width: 100%;
+     font-family: 'Agrandir', sans-serif;
+   }
+   
+   .text-content h1 {
+     font-family: 'Agrandir', sans-serif;
+     font-weight: 100;
+     font-size: 65px;
+     color: #ff743e;
+     margin-bottom: 0.5rem;
+   }
+   
+   .text-content p {
+     font-family: 'Poppins-light', sans-serif;
+     font-weight: 50;
+     font-size: 25px;
+     color: black;
+     margin-top: 1rem;
+   }
+   
+   .semester {
+     font-size: 25px;
+     margin-top: 1rem;
+   }
+   
+   .semester select {
+     font-size: 20px;
+     font-family: 'Agrandir', sans-serif;
+   }
+   
+   .courses-sort {
+     padding: 0.5rem 1rem;
+     border: 1px solid #ccc;
+     border-radius: 4px;
+     background-color: #fff;
+     font-size: 1rem;
+   }
+   
+   /* ===========================
+      My Courses Section
+      =========================== */
+   .my-courses {
+     width: 100%;
+     max-width: 1650px;
+     margin: 0 auto;
+     padding: 2rem;
+   }
+   
+   .search-add-courses {
+     display: flex;
+     align-items: center;
+     justify-content: space-between;
+     margin-bottom: 1.5rem;
+   }
+   
+   #course-search {
+     width: 100%;
+     padding: 10px;
+     margin-bottom: 15px;
+     border: 2px solid #e0e0e0;
+     border-radius: 8px;
+     font-size: 16px;
+   }
+   
+   .search-result-item {
+     display: flex;
+     justify-content: space-between;
+     align-items: center;
+     padding: 10px;
+     border: 1px solid #e0e0e0;
+     margin-bottom: 8px;
+     border-radius: 4px;
+   }
+   
+   .search-result-item button {
+     background-color: #005a5b;
+     color: white;
+     border: none;
+     padding: 6px 12px;
+     border-radius: 4px;
+     cursor: pointer;
+   }
+   
+   .search-result-item button:hover {
+     background-color: #007d7d;
+   }
+   
+   #search-results {
+     max-height: 300px;
+     overflow-y: auto;
+   }
+   
+   /* ===========================
+      Course Cards
+      =========================== */
+   .course-card {
+     background-color: #ffffff;
+     border: 3px solid black;
+     border-radius: 8px;
+     padding: 1.5rem;
+     position: relative;
+     display: flex;
+     justify-content: space-between;
+     margin: 1rem auto; /* center on all screens */
+     max-width: 1000px; /* keep them from going too wide */
+     cursor: pointer;
+     transition: all 0.3s ease;
+   }
+   
+   .course-card:hover {
+     transform: translateY(-5px);
+     box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+     border-color: #005a5b;
+   }
+   
+   .course-info {
+     flex: 1;
+     margin-right: 200px;
+   }
+   
+   .course-info p {
+     margin-bottom: 10px;
+     font-size: 18px;
+   }
+   
+   .title-section {
+     display: flex;
+     align-items: center;
+     gap: 10px;
+     margin-bottom: 15px;
+   }
+   
+   .title-section h3 {
+     font-size: 24px;
+     margin: 0;
+   }
+   
+   .required {
+     color: #ff4444;
+     padding: 4px 8px;
+     border-radius: 8px;
+     font-size: 20px;
+     font-weight: bold;
+     white-space: nowrap;
+   }
+   
+   .difficulty-rating {
+     display: flex;
+     align-items: center;
+     gap: 8px;
+   }
+   
+   .course-right {
+     position: absolute;
+     right: 24px;
+     bottom: 24px;
+     text-align: right;
+   }
+   
+   .course-right p {
+     margin-bottom: 10px;
+     font-size: 20px;
+   }
+   
+   .rating-container {
+     display: flex;
+     align-items: center;
+     gap: 10px;
+     justify-content: flex-end;
+   }
+   
+   .rating-container img {
+     width: 80px;
+     height: 80px;
+   }
+   
+   .rating-number {
+     font-size: 60px;
+   }
+   
+   /* When there are no courses */
+   .no-courses {
+     text-align: center;
+     font-size: 1.25rem;
+   }
+   
+   /* ===========================
+      Course Cards Link Styling
+      =========================== */
+   .my-courses .course-cards .course-card a {
+     text-decoration: none !important; /* Remove underline */
+     color: inherit !important; /* Inherit text color from parent */
+     display: block; /* Make the link fill the entire card */
+   }
+   
+   .my-courses .course-cards .course-card a:hover {
+     text-decoration: none !important; /* Ensure no underline on hover */
+     color: inherit !important; /* Inherit text color on hover */
+   }
+   
+   /* ===========================
+      Popup Styles
+      =========================== */
+   .course-search-popup-overlay {
+     position: fixed;
+     top: 0;
+     left: 0;
+     width: 100%;
+     height: 100%;
+     background-color: rgba(0, 0, 0, 0.5);
+     display: none;
+     justify-content: center;
+     align-items: center;
+     z-index: 1000;
+   }
+   
+   .course-search-popup-content {
+     background-color: #ffffff;
+     padding: 30px;
+     border-radius: 12px;
+     min-width: 400px;
+     position: relative;
+     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+   }
+   
+   .close-popup {
+     position: absolute;
+     top: 15px;
+     right: 15px;
+     font-size: 24px;
+     color: #666666;
+     background: none;
+     border: none;
+     cursor: pointer;
+     padding: 5px;
+   }
+   
+   .close-popup:hover {
+     color: #333333;
+   }
+   
+   .course-search-popup-title {
+     font-family: 'Agrandir', sans-serif;
+     font-size: 24px;
+     color: #333333;
+     margin-bottom: 20px;
+     padding-right: 30px;
+   }
+   
+   .course-search-popup-body {
+     margin: 25px 0;
+   }
+   
+   @keyframes fadeIn {
+     from {
+       opacity: 0;
+       transform: translateY(-20px);
+     }
+     to {
+       opacity: 1;
+       transform: translateY(0);
+     }
+   }
+   
+   .course-search-popup-overlay.active {
+     display: flex;
+   }
+   
+   .course-search-popup-overlay.active .course-search-popup-content {
+     animation: fadeIn 0.3s ease-out forwards;
+   }
+   
+   /* ===========================
+      Responsive Queries
+      =========================== */
+   @media (max-width: 1024px) {
+     /* You can start scaling stuff down here if desired */
+   }
+   
+   @media (max-width: 768px) {
+     .hero {
+       flex-direction: column;
+       text-align: center;
+       padding: 2rem 1rem;
+     }
+   
+     .text-content h1 {
+       font-size: 45px;
+       margin-left: 0;
+     }
+   
+     .text-content p {
+       font-size: 20px;
+     }
+   
+     .semester {
+       margin: 1rem 0;
+       text-align: center;
+     }
+   
+     .courses-sort {
+       margin: 1rem 0;
+     }
+   
+     .course-card {
+       flex-direction: column;
+       margin: 1rem auto;
+       max-width: 90vw; /* narrower on small screens */
+       padding: 1rem;
+     }
+   
+     .course-info {
+       margin-right: 0;
+     }
+   
+     .course-right {
+       position: static;
+       margin-top: 1rem;
+       text-align: center;
+     }
+   
+     .rating-container img {
+       width: 40px;
+       height: 40px;
+     }
+   
+     .rating-number {
+       font-size: 30px;
+     }
+   }
+   
+   @media (max-width: 480px) {
+     .text-content h1 {
+       font-size: 35px;
+     }
+   
+     .text-content p {
+       font-size: 18px;
+     }
+   
+     .course-info p,
+     .course-right p {
+       font-size: 16px;
+     }
+   
+     .rating-container img {
+       width: 30px;
+       height: 30px;
+     }
+   
+     .rating-number {
+       font-size: 24px;
+     }
+   }

@@ -30,18 +30,19 @@ document.addEventListener("DOMContentLoaded", () => {
             const course = data.course || {};
             courseTitleEl.textContent = course.title || "Untitled Course";
 
-            courseDetailsEl.innerHTML = `
-                <p><span class="detail-label">Subject:</span>
-                   ${course.subject || "N/A"} ${course.number || ""}</p>
-                <p><span class="detail-label">Credits:</span>
-                   ${course.credits || "N/A"}</p>
-                <p><span class="detail-label">Semester:</span>
-                   ${course.semester || "Not specified"}</p>
-                <p><span class="detail-label">Average Rating:</span>
-                   <span class="rating">${(course.avg_rating || 0).toFixed(1)}</span></p>
-                <p><span class="detail-label">Average Difficulty:</span>
-                   <span class="difficulty">${(course.avg_difficulty || 0).toFixed(1)}</span></p>
-            `;
+            // Populate rating stars
+            const ratingContainer = document.getElementById("course-rating");
+            ratingContainer.appendChild(createRatingStars(course.avg_rating));
+
+            // Populate difficulty circles
+            const difficultyContainer = document.getElementById("course-difficulty");
+            difficultyContainer.appendChild(createDifficultyCircles(course.avg_difficulty));
+
+            // Populate other course details
+            document.getElementById("course-subject").textContent = course.subject || "N/A";
+            document.getElementById("course-credits").textContent = course.credits || "N/A";
+            document.getElementById("course-semester").textContent = course.semester || "Not specified";
+            document.getElementById("course-grade").textContent = course.grade || "N/A";
 
             // 5. Populate reviews list
             const reviews = data.reviews || [];
@@ -159,3 +160,50 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 });
+
+// Function to create rating stars
+function createRatingStars(rating) {
+    const maxStars = 5;
+    const filledStars = Math.round(rating); // Round to the nearest whole number
+    const starsContainer = document.createElement('div');
+    starsContainer.className = 'rating-stars';
+
+    for (let i = 1; i <= maxStars; i++) {
+        const star = document.createElement('span');
+        star.className = i <= filledStars ? 'star filled' : 'star';
+        star.innerHTML = '★'; // Unicode star character
+        starsContainer.appendChild(star);
+    }
+
+    return starsContainer;
+}
+
+// Function to create difficulty circles
+function createDifficultyCircles(difficulty) {
+    const maxCircles = 6;
+    const filledCircles = Math.round(difficulty); // Round to the nearest whole number
+    const circlesContainer = document.createElement('div');
+    circlesContainer.className = 'difficulty-rating';
+
+    for (let i = 1; i <= maxCircles; i++) {
+        const circle = document.createElement('div');
+        circle.className = 'difficulty-circle';
+
+        if (i <= filledCircles) {
+            circle.classList.add('filled');
+
+            // Add color based on difficulty level
+            if (i <= 2) {
+                circle.classList.add('green');
+            } else if (i <= 4) {
+                circle.classList.add('yellow');
+            } else {
+                circle.classList.add('red');
+            }
+        }
+
+        circlesContainer.appendChild(circle);
+    }
+
+    return circlesContainer;
+}
