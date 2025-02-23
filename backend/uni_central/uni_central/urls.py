@@ -130,6 +130,8 @@ urlpatterns = [
     path('api/my_classmates/', MyClassmatesView.as_view(), name='api-my_classmates'),
     path('api/users/<str:email_address>/details/', MyAccountView.as_view(), name='user-details'),
     path('api/users/<str:email_address>/details/edit-details', EditAccountView.as_view(), name='edit-user-details'),
+    path('api/my_classmates/<str:email_address>/', MyClassmatesView.as_view(), name='my_classmates'),
+    
      
     # Course Filtering URLs
     path('api/filter-courses/', CourseFilteringView.as_view(), name='api-filter_courses'),
