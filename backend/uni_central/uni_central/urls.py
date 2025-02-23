@@ -36,7 +36,7 @@ from .views import (
     MyProfessorsView,
     MyReviewsView,
     MyClassmatesView,
-    UserDetailsView,
+    MyAccountView,
     home,
     courses,
     about_page,
@@ -131,5 +131,5 @@ urlpatterns = [
     # Course Filtering URLs
     path('api/filter-courses/', CourseFilteringView.as_view(), name='api-filter_courses'),
 
-    path('api/users/<str:email_address>/details/', UserDetailsView.as_view(), name='user-details'),
+    path('api/users/<str:email_address>/details/', MyAccountView.as_view(), name='user-details'),
 ]

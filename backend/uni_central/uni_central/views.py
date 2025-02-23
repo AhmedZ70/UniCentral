@@ -481,20 +481,17 @@ class CreateUserView(APIView):
                 "message": f"Server error: {str(e)}"
             }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
     
-class UserDetailsView(APIView):
+class MyAccountView(APIView):
     def get(self, request, email_address):
         try:
-            print(f"Attempting to get user with email: {email_address}")  # Debug log
             user = UserService.get_user(email_address)
             
             if not user:
-                print(f"No user found with email: {email_address}")  # Debug log
                 return Response(
                     {"error": "User not found"},
                     status=status.HTTP_404_NOT_FOUND
                 )
                 
-            print(f"User found: {user}")  # Debug log
             serialized = UserSerializer(user)
             return Response(serialized.data, status=status.HTTP_200_OK)
             
