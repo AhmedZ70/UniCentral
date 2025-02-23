@@ -382,6 +382,42 @@ class UnEnrollView(APIView):
             return Response({"message": "Course removed successfully."}, status=status.HTTP_200_OK)
         else:
             return Response({"error": "User was not enrolled in this course."}, status=status.HTTP_400_BAD_REQUEST)
+        
+class MyAccountView(APIView):
+    def get(self, request, email_address):
+        try:
+            user = UserService.get_user(email_address)
+            
+            if not user:
+                return Response(
+                    {"error": "User not found"},
+                    status=status.HTTP_404_NOT_FOUND
+                )
+                
+            serialized = UserSerializer(user)
+            return Response(serialized.data, status=status.HTTP_200_OK)
+            
+        except Exception as e:
+            print(f"Error in UserDetailsView: {str(e)}")  # Debug log
+            import traceback
+            print(f"Full traceback: {traceback.format_exc()}")  # Debug log
+            return Response(
+                {"error": str(e)},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+class EditAccountView(APIView):
+    """
+    API View to edit account information of a user.
+    """
+    def post(self, request):
+        email_address = request.data.get('email_address')
+        user = UserService.get_user(email_address=email_address)
+        university = request.data.get('university')
+        major = request.data.get('major')
+        year = request.data.get('year')
+        UserService.change_account_info(user=user, university=university,
+                                        year=year, major=major)
 
 class MyCoursesView(APIView):
     """
@@ -479,32 +515,6 @@ class CreateUserView(APIView):
                 "success": False,
                 "message": f"Server error: {str(e)}"
             }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-    
-class UserDetailsView(APIView):
-    def get(self, request, email_address):
-        try:
-            print(f"Attempting to get user with email: {email_address}")  # Debug log
-            user = UserService.get_user(email_address)
-            
-            if not user:
-                print(f"No user found with email: {email_address}")  # Debug log
-                return Response(
-                    {"error": "User not found"},
-                    status=status.HTTP_404_NOT_FOUND
-                )
-                
-            print(f"User found: {user}")  # Debug log
-            serialized = UserSerializer(user)
-            return Response(serialized.data, status=status.HTTP_200_OK)
-            
-        except Exception as e:
-            print(f"Error in UserDetailsView: {str(e)}")  # Debug log
-            import traceback
-            print(f"Full traceback: {traceback.format_exc()}")  # Debug log
-            return Response(
-                {"error": str(e)},
-                status=status.HTTP_400_BAD_REQUEST
-            )
         
 ####################################
 # Course-Filtering Views and APIs #

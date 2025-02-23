@@ -24,15 +24,15 @@ document.addEventListener("DOMContentLoaded", () => {
     onAuthStateChanged(auth, (user) => {
         if (user) {
             // Get DOM elements to populate
-            const emailEl = document.getElementById('user-email');
-            const fNameDisplayEl = document.getElementById('fNameDisplay');
-            const lNameDisplayEl = document.getElementById('lNameDisplay');
-            const schoolDisplayEl = document.getElementById('schoolDisplay');
-            const majorDisplayEl = document.getElementById('majorDisplay');
-            const yearDisplayEl = document.getElementById('yearDisplay');
+            const email = document.getElementById('user-email');
+            const fNameDisplay = document.getElementById('fNameDisplay');
+            const lNameDisplay = document.getElementById('lNameDisplay');
+            const universityDisplay = document.getElementById('universityDisplay');
+            const majorDisplay = document.getElementById('majorDisplay');
+            const yearDisplay = document.getElementById('yearDisplay');
 
             // Display email right away since we have it from Firebase
-            emailEl.textContent = user.email;
+            email.textContent = user.email;
 
             // Fetch user details from your API
             fetch(`/api/users/${user.email}/details/`)
@@ -44,16 +44,16 @@ document.addEventListener("DOMContentLoaded", () => {
                 })
                 .then((data) => {
                     // Populate display elements
-                    fNameDisplayEl.textContent = data.fname || '';
-                    lNameDisplayEl.textContent = data.lname || '';
-                    schoolDisplayEl.textContent = data.school || '';
-                    majorDisplayEl.textContent = data.major || '';
-                    yearDisplayEl.textContent = data.year || '';
+                    fNameDisplay.textContent = data.fname || '';
+                    lNameDisplay.textContent = data.lname || '';
+                    universityDisplay.textContent = data.university || '';
+                    majorDisplay.textContent = data.major || '';
+                    yearDisplay.textContent = data.year || '';
 
                     // Also populate input fields (hidden by default)
                     document.getElementById('fName').value = data.fname || '';
                     document.getElementById('lName').value = data.lname || '';
-                    document.getElementById('school').value = data.school || '';
+                    document.getElementById('university').value = data.university || '';
                     document.getElementById('major').value = data.major || '';
                     document.getElementById('year').value = data.year || '';
                 })
@@ -75,13 +75,13 @@ document.addEventListener("DOMContentLoaded", () => {
             // Show input fields, hide display text
             document.getElementById('fName').style.display = 'inline-block';
             document.getElementById('lName').style.display = 'inline-block';
-            document.getElementById('school').style.display = 'inline-block';
+            document.getElementById('university').style.display = 'inline-block';
             document.getElementById('major').style.display = 'inline-block';
             document.getElementById('year').style.display = 'inline-block';
             
             document.getElementById('fNameDisplay').style.display = 'none';
             document.getElementById('lNameDisplay').style.display = 'none';
-            document.getElementById('schoolDisplay').style.display = 'none';
+            document.getElementById('universityDisplay').style.display = 'none';
             document.getElementById('majorDisplay').style.display = 'none';
             document.getElementById('yearDisplay').style.display = 'none';
         } else {
@@ -92,20 +92,20 @@ document.addEventListener("DOMContentLoaded", () => {
             // Update display text with new values
             document.getElementById('fNameDisplay').textContent = document.getElementById('fName').value;
             document.getElementById('lNameDisplay').textContent = document.getElementById('lName').value;
-            document.getElementById('schoolDisplay').textContent = document.getElementById('school').value;
+            document.getElementById('universityDisplay').textContent = document.getElementById('university').value;
             document.getElementById('majorDisplay').textContent = document.getElementById('major').value;
             document.getElementById('yearDisplay').textContent = document.getElementById('year').value;
             
             // Show display text, hide input fields
             document.getElementById('fName').style.display = 'none';
             document.getElementById('lName').style.display = 'none';
-            document.getElementById('school').style.display = 'none';
+            document.getElementById('university').style.display = 'none';
             document.getElementById('major').style.display = 'none';
             document.getElementById('year').style.display = 'none';
             
             document.getElementById('fNameDisplay').style.display = 'inline';
             document.getElementById('lNameDisplay').style.display = 'inline';
-            document.getElementById('schoolDisplay').style.display = 'inline';
+            document.getElementById('universityDisplay').style.display = 'inline';
             document.getElementById('majorDisplay').style.display = 'inline';
             document.getElementById('yearDisplay').style.display = 'inline';
             
@@ -120,7 +120,7 @@ function saveChanges(email) {
         email: email,
         fname: document.getElementById('fName').value,
         lname: document.getElementById('lName').value,
-        school: document.getElementById('school').value,
+        university: document.getElementById('university').value,
         major: document.getElementById('major').value,
         year: document.getElementById('year').value
     };
