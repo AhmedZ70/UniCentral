@@ -142,15 +142,15 @@ document.addEventListener("DOMContentLoaded", () => {
 
 function saveChanges(email) {
     const userData = {
-        email: email,
-        // fname: document.getElementById('fName').value,
-        // lname: document.getElementById('lName').value,
+        email_address: email,
         university: document.getElementById('university').value,
         major: document.getElementById('major').value,
         year: document.getElementById('year').value
     };
 
-    fetch('/api/users/edit/', {  // Update this URL to match your EditAccountView URL pattern
+    console.log('Sending data:', userData); // Debug log
+
+    fetch('/api/users/details/edit-details', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -159,16 +159,26 @@ function saveChanges(email) {
     })
     .then(response => {
         if (!response.ok) {
-            throw new Error(`Failed to update user data (status ${response.status})`);
+            return response.json().then(errorData => {
+                console.error('Server error details:', errorData); // Debug log
+                throw new Error(errorData.message || `Failed to update user data (status ${response.status})`);
+            }).catch(jsonError => {
+                throw new Error(`Failed to update user data (status ${response.status})`);
+            });
         }
         return response.json();
     })
     .then(data => {
         console.log('Success:', data);
         alert('Profile updated successfully!');
+        
+        // Refresh the display
+        document.getElementById('universityDisplay').textContent = userData.university;
+        document.getElementById('majorDisplay').textContent = userData.major;
+        document.getElementById('yearDisplay').textContent = userData.year;
     })
     .catch((error) => {
-        console.error('Error:', error);
+        console.error('Error details:', error);
         alert('Failed to update profile. Please try again.');
     });
 }

@@ -410,14 +410,36 @@ class EditAccountView(APIView):
     API View to edit account information of a user.
     """
     def post(self, request):
-        email_address = request.data.get('email_address')
-        user = UserService.get_user(email_address=email_address)
-        university = request.data.get('university')
-        major = request.data.get('major')
-        year = request.data.get('year')
-        UserService.change_account_info(user=user, university=university,
-                                        year=year, major=major)
-
+        try:
+            email_address = request.data.get('email_address')
+            user = UserService.get_user(email_address=email_address)
+            university = request.data.get('university')
+            major = request.data.get('major')
+            year = request.data.get('year')
+            
+            updated_user = UserService.change_account_info(
+                user=user, 
+                university=university,
+                year=year, 
+                major=major
+            )
+            
+            return Response({
+                "message": "Profile updated successfully",
+                "data": {
+                    "university": updated_user.university,
+                    "major": updated_user.major,
+                    "year": updated_user.year
+                }
+            })
+            
+        except Exception as e:
+            print("Error:", str(e))  # For debugging
+            return Response(
+                {"error": str(e)},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+        
 class MyCoursesView(APIView):
     """
     API View to fetch courses that a user is in.
