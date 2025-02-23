@@ -261,6 +261,18 @@ class UserService:
         return False
     
     @staticmethod
+    def change_account_info(user, university, year, major):
+        try:
+            user = user.objects.get(user=user)
+        except user.DoesNotExist:
+            raise ValueError("User profile does not exist")
+
+        user.university = university
+        user.major = major
+        user.year = year
+        user.save()
+    
+    @staticmethod
     def create_user(email_address, fname, lname):
         """
         Creates a new user in the SQLite database.
