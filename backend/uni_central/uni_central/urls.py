@@ -126,7 +126,8 @@ urlpatterns = [
     path('api/my_courses/<str:email_address>/', MyCoursesView.as_view(), name='api-my_courses'),
     path('api/my_professors/', MyProfessorsView.as_view(), name='api-my_professors'),
     path('api/my_reviews/', MyReviewsView.as_view(), name='api-my_reviews'),
-    path('api/my_classmates/', MyClassmatesView.as_view(), name='api-my_classmates'),
+    path('api/my_classmates/<str:email_address>/', MyClassmatesView.as_view(), name='api-my_classmates'),
+
      
     # Course Filtering URLs
     path('api/filter-courses/', CourseFilteringView.as_view(), name='api-filter_courses'),

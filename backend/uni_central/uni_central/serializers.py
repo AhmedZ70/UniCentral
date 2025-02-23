@@ -7,10 +7,21 @@ class DepartmentSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 class UserSerializer(serializers.ModelSerializer):
+    common_classes = serializers.SerializerMethodField()
+    
     class Meta:
         model = User
-        fields = '__all__'
+        fields = ('id', 'email_address', 'fname', 'lname', 'common_classes')
 
+    def get_common_classes(self, obj):
+        current_user = self.context.get('current_user')
+        if current_user:
+            current_courses = set(current_user.courses.values_list('title', flat=True))
+            classmate_courses = set(obj.courses.values_list('title', flat=True))
+            common = list(current_courses.intersection(classmate_courses))
+            return common
+        return []
+    
 class CourseSerializer(serializers.ModelSerializer):
     department = DepartmentSerializer()
 

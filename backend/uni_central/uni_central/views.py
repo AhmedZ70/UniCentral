@@ -2,6 +2,7 @@ from django.shortcuts import render
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.views import APIView
+from rest_framework.permissions import IsAuthenticated
 from .services import (
     UserService,
     DepartmentService,
@@ -421,14 +422,12 @@ class MyClassmatesView(APIView):
     """
     API View to fetch classmates in the courses of a user
     """
-    def get(self, request):
-        email_address = request.data.get('email_address')
+    def get(self, request, email_address, *args, **kwargs):
         user = UserService.get_user(email_address)
-        
         classmates = UserService.get_classmates(user)
-        serialized = UserSerializer(classmates, many=True)
+        serialized = UserSerializer(classmates, many=True, context={'current_user': user})
         return Response(serialized.data, status=status.HTTP_200_OK)
-    
+
 class CreateUserView(APIView):
     """
     Handles user creation requests.
