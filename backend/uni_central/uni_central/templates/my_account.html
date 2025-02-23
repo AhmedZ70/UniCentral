@@ -41,8 +41,8 @@
     </div>
   </section>
   <div class="account-info">
-    <p><label for="fName">First name: </label><span id="fNameDisplay"></span><input type="text" id="fName" class="edit-input" style="display: none;"></p>
-    <p><label for="lName">Last name: </label><span id="lNameDisplay"></span><input type="text" id="lName" class="edit-input" style="display: none;"></p>
+    <p><label for="fName">First name: </label><span id="fNameDisplay"></span></p>
+    <p><label for="lName">Last name: </label><span id="lNameDisplay"></span></p>
     <p>Email address: <span id="user-email"></span></p>
     <p><label for="university">School: </label><span id="universityDisplay"></span><input type="text" id="university" class="edit-input" style="display: none;"></p>
     <p><label for="major">Major: </label><span id="majorDisplay"></span><input type="text" id="major" class="edit-input" style="display: none;"></p>
@@ -50,5 +50,17 @@
     
     <p><button class="update-password">Update password</button></p>
     <p><button id="edit-button" class="edit-profile-button">Edit Profile</button></p>
+  </div>
+  <div id="password-modal" class="modal" style="display: none;">
+    <div class="modal-content">
+      <h2>Update Password</h2>
+      <input type="password" id="new-password" placeholder="Enter new password">
+      <input type="password" id="confirm-password" placeholder="Confirm new password">
+      <div class="button-group">
+        <button id="confirm-password-change">Update</button>
+        <button id="cancel-password-change">Cancel</button>
+      </div>
+      <p id="password-error" class="error" style="display: none; color: red;"></p>
+    </div>
   </div>
 </main>

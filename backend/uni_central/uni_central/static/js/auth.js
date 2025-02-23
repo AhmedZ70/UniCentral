@@ -87,6 +87,26 @@ function handleAuthStateChange() {
   });
 }
 
+export function updateUserPassword(newPassword) {
+  const auth = getAuth();
+  const user = auth.currentUser;
+  
+  if (!user) {
+      return Promise.reject(new Error('No user is currently signed in'));
+  }
+
+  return user.updatePassword(newPassword)
+      .then(() => {
+          return { success: true, message: 'Password updated successfully' };
+      })
+      .catch((error) => {
+          if (error.code === 'auth/requires-recent-login') {
+              throw new Error('Please log out and log back in to change your password');
+          }
+          throw error;
+      });
+}
+
 // Function to handle the "Leave a Review" button behavior
 function handleLeaveReviewButton() {
   const leaveReviewBtn = document.getElementById('leave-review-btn');

@@ -1,5 +1,6 @@
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js';
 import { getAuth, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js';
+import { updateUserPassword } from './auth.js';
 
 const firebaseConfig = {
     apiKey: "AIzaSyD0wF4R9GdY2m7eAwVL_j_mihLit4rRZ5Q",
@@ -20,10 +21,14 @@ let isEditing = false;
 
 document.addEventListener("DOMContentLoaded", () => {
     const editButton = document.getElementById('edit-button');
+    const passwordModal = document.getElementById('password-modal');
+    const updatePasswordBtn = document.querySelector('.update-password');
+    const confirmPasswordBtn = document.getElementById('confirm-password-change');
+    const cancelPasswordBtn = document.getElementById('cancel-password-change');
+    const passwordError = document.getElementById('password-error');
     
     onAuthStateChanged(auth, (user) => {
         if (user) {
-            // Get DOM elements to populate
             const email = document.getElementById('user-email');
             const fNameDisplay = document.getElementById('fNameDisplay');
             const lNameDisplay = document.getElementById('lNameDisplay');
@@ -31,10 +36,8 @@ document.addEventListener("DOMContentLoaded", () => {
             const majorDisplay = document.getElementById('majorDisplay');
             const yearDisplay = document.getElementById('yearDisplay');
 
-            // Display email right away since we have it from Firebase
             email.textContent = user.email;
 
-            // Fetch user details from your API
             fetch(`/api/users/${user.email}/details/`)
                 .then((response) => {
                     if (!response.ok) {
@@ -43,7 +46,6 @@ document.addEventListener("DOMContentLoaded", () => {
                     return response.json();
                 })
                 .then((data) => {
-                    // Populate display elements
                     fNameDisplay.textContent = data.fname || '';
                     lNameDisplay.textContent = data.lname || '';
                     universityDisplay.textContent = data.university || '';
@@ -51,8 +53,6 @@ document.addEventListener("DOMContentLoaded", () => {
                     yearDisplay.textContent = data.year || '';
 
                     // Also populate input fields (hidden by default)
-                    document.getElementById('fName').value = data.fname || '';
-                    document.getElementById('lName').value = data.lname || '';
                     document.getElementById('university').value = data.university || '';
                     document.getElementById('major').value = data.major || '';
                     document.getElementById('year').value = data.year || '';
@@ -68,75 +68,107 @@ document.addEventListener("DOMContentLoaded", () => {
         isEditing = !isEditing;
         
         if (isEditing) {
-            // Switch to edit mode
             editButton.textContent = 'Save Changes';
             editButton.classList.add('save-changes');
             
-            // Show input fields, hide display text
-            document.getElementById('fName').style.display = 'inline-block';
-            document.getElementById('lName').style.display = 'inline-block';
+            // document.getElementById('fName').style.display = 'inline-block';
+            // document.getElementById('lName').style.display = 'inline-block';
             document.getElementById('university').style.display = 'inline-block';
             document.getElementById('major').style.display = 'inline-block';
             document.getElementById('year').style.display = 'inline-block';
             
-            document.getElementById('fNameDisplay').style.display = 'none';
-            document.getElementById('lNameDisplay').style.display = 'none';
+            // document.getElementById('fNameDisplay').style.display = 'none';
+            // document.getElementById('lNameDisplay').style.display = 'none';
             document.getElementById('universityDisplay').style.display = 'none';
             document.getElementById('majorDisplay').style.display = 'none';
             document.getElementById('yearDisplay').style.display = 'none';
         } else {
-            // Switch back to display mode
             editButton.textContent = 'Edit Profile';
             editButton.classList.remove('save-changes');
             
-            // Update display text with new values
-            document.getElementById('fNameDisplay').textContent = document.getElementById('fName').value;
-            document.getElementById('lNameDisplay').textContent = document.getElementById('lName').value;
+            // document.getElementById('fNameDisplay').textContent = document.getElementById('fName').value;
+            // document.getElementById('lNameDisplay').textContent = document.getElementById('lName').value;
             document.getElementById('universityDisplay').textContent = document.getElementById('university').value;
             document.getElementById('majorDisplay').textContent = document.getElementById('major').value;
             document.getElementById('yearDisplay').textContent = document.getElementById('year').value;
             
-            // Show display text, hide input fields
-            document.getElementById('fName').style.display = 'none';
-            document.getElementById('lName').style.display = 'none';
+            // document.getElementById('fName').style.display = 'none';
+            // document.getElementById('lName').style.display = 'none';
             document.getElementById('university').style.display = 'none';
             document.getElementById('major').style.display = 'none';
             document.getElementById('year').style.display = 'none';
             
-            document.getElementById('fNameDisplay').style.display = 'inline';
-            document.getElementById('lNameDisplay').style.display = 'inline';
+            // document.getElementById('fNameDisplay').style.display = 'inline';
+            // document.getElementById('lNameDisplay').style.display = 'inline';
             document.getElementById('universityDisplay').style.display = 'inline';
             document.getElementById('majorDisplay').style.display = 'inline';
             document.getElementById('yearDisplay').style.display = 'inline';
             
-            // Save changes to backend
             saveChanges(auth.currentUser.email);
         }
+    });
+
+    confirmPasswordBtn.addEventListener('click', () => {
+        const newPassword = document.getElementById('new-password').value;
+        const confirmPassword = document.getElementById('confirm-password').value;
+    
+        // Validate passwords match
+        if (newPassword !== confirmPassword) {
+            passwordError.textContent = 'Passwords do not match';
+            passwordError.style.display = 'block';
+            return;
+        }
+    
+        // Validate password length
+        if (newPassword.length < 6) {
+            passwordError.textContent = 'Password must be at least 6 characters';
+            passwordError.style.display = 'block';
+            return;
+        }
+    
+        // Update password using the imported function
+        updateUserPassword(newPassword)
+            .then((result) => {
+                passwordModal.style.display = 'none';
+                alert(result.message);
+            })
+            .catch((error) => {
+                passwordError.textContent = error.message;
+                passwordError.style.display = 'block';
+                console.error('Error updating password:', error);
+            });
     });
 });
 
 function saveChanges(email) {
     const userData = {
         email: email,
-        fname: document.getElementById('fName').value,
-        lname: document.getElementById('lName').value,
+        // fname: document.getElementById('fName').value,
+        // lname: document.getElementById('lName').value,
         university: document.getElementById('university').value,
         major: document.getElementById('major').value,
         year: document.getElementById('year').value
     };
 
-    fetch('/api/users/update/', {
+    fetch('/api/users/edit/', {  // Update this URL to match your EditAccountView URL pattern
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
         },
         body: JSON.stringify(userData)
     })
-    .then(response => response.json())
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`Failed to update user data (status ${response.status})`);
+        }
+        return response.json();
+    })
     .then(data => {
         console.log('Success:', data);
+        alert('Profile updated successfully!');
     })
     .catch((error) => {
         console.error('Error:', error);
+        alert('Failed to update profile. Please try again.');
     });
 }
