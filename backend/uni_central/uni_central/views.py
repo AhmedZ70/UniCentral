@@ -254,7 +254,38 @@ class CreateProfessorReviewAPIView(APIView):
                 {"error": str(e)},
                 status=status.HTTP_400_BAD_REQUEST
             )
+            
+class UpdateReviewAPIView(APIView):
+    """
+    API View to update an existing review by review_id.
+    """
 
+    def put(self, request):
+        """
+        Handles PUT requests to update a review.
+        """
+        try:
+            review_id = request.get.data('review_id')
+            updated_review = ReviewService.update_review(review_id, request.data)
+            serializer = ReviewSerializer(updated_review)
+            return Response({"message": "Review updated successfully", "review": serializer.data}, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response(str(e))
+
+class DeleteReviewAPIView(APIView):
+    """
+    API View to delete an existing review by review_id.
+    """
+    
+    def delete(self, request, review_id):
+        """
+        Calls the ReviewService to delete a review.
+        """
+        review_id = request.data.get('review_id')
+        review = ReviewService.get_review_by_id(review_id)
+        result = ReviewService.delete_review(review)
+
+        return Response(result)
 
 ####################################
 # Professor-Related Views and APIs #
