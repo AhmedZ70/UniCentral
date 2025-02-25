@@ -325,15 +325,14 @@ class UserService:
     
     @staticmethod
     def change_account_info(user, university, year, major):
-        try:
-            user = user.objects.get(user=user)
-        except user.DoesNotExist:
+        if not user:
             raise ValueError("User profile does not exist")
 
         user.university = university
         user.major = major
         user.year = year
         user.save()
+        return user
     
     @staticmethod
     def create_user(email_address, fname, lname):
