@@ -13,13 +13,19 @@
   <script src="{% static 'js/discussion_board.js' %}"></script>
 </head>
 
+<body {% if context_type %}data-context-type="{{ context_type }}" data-context-id="{{ context_id }}"{% endif %}>
+
 {% include 'partials/navbar.html' %}
 
 <main class="main-content">
     <section class="hero">
       <div class="text-content">
         <div class="text-container">
-          <h1>Discussion Board</h1>
+            {% if titleOrName %}
+                <h1>{{ titleOrName }} - Discussion</h1>
+            {% else %}
+                <h1>Discussion</h1>
+            {% endif %}
           <h2>Ask a question or answer a fellow classmate's question!</h2>
         </div>
       </div>
@@ -48,8 +54,7 @@
     </section>
 
     <!-- Discussion Threads -->
-    <section class="discussion-threads">
-        <!-- Example of a thread -->
+    <!-- <section class="discussion-threads">
         <div class="thread">
             <div class="thread-header">
                 <h3>How many exams are required in this course?</h3>
@@ -75,7 +80,6 @@
             </div>
         </div>
 
-        <!-- Another thread example -->
         <div class="thread">
             <div class="thread-header">
                 <h3>Project groups for final assignment</h3>
@@ -100,22 +104,22 @@
                 <button class="reply-button">Reply</button>
             </div>
         </div>
-    </section>
+    </section> -->
 
-    <!-- New Thread Modal -->
+    <!-- Update the form to match our JavaScript -->
     <div id="new-thread-modal" class="modal" style="display: none;">
         <div class="modal-content">
             <h2>Create New Thread</h2>
             <form id="new-thread-form">
-                <input type="text" placeholder="Thread title" required>
-                <select required>
+                <input type="text" name="title" placeholder="Thread title" required>
+                <select name="category" required>
                     <option value="">Select topic</option>
+                    <option value="general">General</option>
                     <option value="exams">Exams</option>
                     <option value="homework">Homework</option>
                     <option value="projects">Projects</option>
-                    <option value="general">General</option>
                 </select>
-                <textarea placeholder="Write your question or discussion topic here..." required></textarea>
+                <textarea name="content" placeholder="Write your question or discussion topic here..." required></textarea>
                 <div class="form-controls">
                     <button type="button" class="cancel-button">Cancel</button>
                     <button type="submit" class="submit-button">Post Thread</button>
@@ -124,12 +128,12 @@
         </div>
     </div>
 
-    <!-- Reply Modal -->
+    <!-- Update the reply modal to include the thread ID -->
     <div id="reply-modal" class="modal" style="display: none;">
         <div class="modal-content">
             <h2>Post Reply</h2>
             <form id="reply-form">
-                <textarea placeholder="Write your reply here..." required></textarea>
+                <textarea name="content" placeholder="Write your reply here..." required></textarea>
                 <div class="form-controls">
                     <button type="button" class="cancel-button">Cancel</button>
                     <button type="submit" class="submit-button">Post Reply</button>
@@ -137,4 +141,12 @@
             </form>
         </div>
     </div>
+
+    <!-- Add a container for external search results (optional) -->
+    <section class="external-results" style="display: none;">
+        <h3>Related discussions from around the web</h3>
+        <div class="external-threads-container">
+            <!-- External results will be populated here -->
+        </div>
+    </section>
 </main>

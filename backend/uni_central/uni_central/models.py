@@ -234,11 +234,24 @@ class Thread(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
+    content = models.TextField(default="")  # The main question text
+    CATEGORY_CHOICES = [
+        ('general', 'General'),
+        ('exams', 'Exams'),
+        ('homework', 'Homework'),
+        ('projects', 'Projects')
+    ]
+    category = models.CharField(max_length=50, choices=CATEGORY_CHOICES, default='general')
+
     class Meta:
         db_table = 'threads'
 
     def __str__(self):
         return self.title
+    
+    def reply_count(self):
+        """Return the number of comments on this thread"""
+        return self.comments.count()
 
 
 ####################
@@ -263,6 +276,8 @@ class Comment(models.Model):
     content = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
+    upvotes = models.IntegerField(default=0)
 
     class Meta:
         db_table = 'comments'

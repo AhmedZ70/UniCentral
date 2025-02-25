@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Department, User, Course, Professor, Review
+from .models import Department, User, Course, Professor, Review, Thread, Comment
 
 class DepartmentSerializer(serializers.ModelSerializer):
     class Meta:
@@ -44,3 +44,45 @@ class ReviewSerializer(serializers.ModelSerializer):
     class Meta:
         model = Review
         fields = '__all__'
+
+class CommentSerializer(serializers.ModelSerializer):
+    author = serializers.SerializerMethodField()
+    timestamp = serializers.SerializerMethodField()
+    
+    class Meta:
+        model = Comment
+        fields = ['id', 'content', 'author', 'timestamp', 'upvotes']
+    
+    def get_author(self, obj):
+        if obj.user:
+            return f"{obj.user.fname} {obj.user.lname}"
+        return "Anonymous Student"
+    
+    def get_timestamp(self, obj):
+        return obj.created_at
+
+class ThreadSerializer(serializers.ModelSerializer):
+    comments = CommentSerializer(many=True, read_only=True)
+    author = serializers.SerializerMethodField()
+    timestamp = serializers.SerializerMethodField()
+    reply_count = serializers.SerializerMethodField()
+    topic_tag = serializers.SerializerMethodField()
+    
+    class Meta:
+        model = Thread
+        fields = ['id', 'title', 'content', 'author', 'timestamp', 
+                  'reply_count', 'topic_tag', 'comments']
+    
+    def get_author(self, obj):
+        if obj.user:
+            return f"{obj.user.fname} {obj.user.lname}"
+        return "Anonymous Student"
+    
+    def get_timestamp(self, obj):
+        return obj.created_at
+    
+    def get_reply_count(self, obj):
+        return obj.comments.count()
+    
+    def get_topic_tag(self, obj):
+        return obj.get_category_display()

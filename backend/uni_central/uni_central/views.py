@@ -16,6 +16,8 @@ from .serializers import (
     CourseSerializer,
     ProfessorSerializer,
     ReviewSerializer,
+    CommentSerializer,
+    ThreadSerializer,
 )
 
 ######################
@@ -91,11 +93,27 @@ def course_filtering(request):
     """
     return render(request, 'course_filtering.html')
 
-def discussion_board(request):
+def discussion_board(request, context_type=None, context_id=None):
     """
-    Render the Course Filtering page.
+    Render the Discussion Board page with optional context for a specific course or professor.
     """
-    return render(request, 'discussion_board.html')
+    context = {}
+    
+    if context_type and context_id:
+        if context_type == 'course':
+            # Get course data
+            course = CourseService.get_course(context_id)
+            context['name'] = course.title
+            context['context_type'] = 'course'
+            context['context_id'] = context_id
+        elif context_type == 'professor':
+            # Get professor data
+            professor = ProfessorService.get_professor(context_id)
+            context['name'] = f"Prof. {professor.fname} {professor.lname}"
+            context['context_type'] = 'professor'
+            context['context_id'] = context_id
+    
+    return render(request, 'discussion_board.html', context)
 
 def about_page(request):
     """
@@ -595,3 +613,115 @@ class CourseFilteringView(APIView):
                 {"error": str(e)},
                 status=status.HTTP_400_BAD_REQUEST
             )
+
+#####################################
+#  Discussion Board Views and APIs  #
+#####################################
+class DiscussionBoardView(APIView):
+    def get(self, request):
+        return render(request, 'discussion_board.html')
+
+class CourseDiscussionBoardView(APIView):
+    def get(self, request, context_id):
+        course = CourseService.get_course(context_id)
+        context = {
+            'name': course.title,
+            'context_type': 'course',
+            'context_id': context_id
+        }
+        return render(request, 'discussion_board.html', context)
+
+class ProfessorDiscussionBoardView(APIView):
+    def get(self, request, context_id):
+        professor = ProfessorService.get_professor(context_id)
+        context = {
+            'name': f"Prof. {professor.fname} {professor.lname}",
+            'context_type': 'professor',
+            'context_id': context_id
+        }
+        return render(request, 'discussion_board.html', context)
+    
+class ThreadListView(APIView):
+    def get(self, request):
+        # Get filter parameters
+        category = request.query_params.get('filter_by', 'all')
+        sort_by = request.query_params.get('sort_by', 'recent')
+        search = request.query_params.get('search', '')
+        
+        # Get context parameters
+        context_type = request.query_params.get('context_type')
+        context_id = request.query_params.get('context_id')
+        
+        # Start with all threads
+        threads = Thread.objects.all().prefetch_related('comments', 'user')
+        
+        # Apply context filter
+        if context_type == 'course' and context_id:
+            threads = threads.filter(courses__id=context_id)
+        elif context_type == 'professor' and context_id:
+            threads = threads.filter(professors__id=context_id)
+        
+        # Apply other filters
+        if category != 'all':
+            threads = threads.filter(category=category)
+            
+        if search:
+            threads = threads.filter(
+                Q(title__icontains=search) | 
+                Q(content__icontains=search)
+            )
+        
+        if sort_by == 'recent':
+            threads = threads.order_by('-created_at')
+        elif sort_by == 'popular':
+            threads = threads.annotate(
+                comment_count=Count('comments')
+            ).order_by('-comment_count')
+        elif sort_by == 'unanswered':
+            threads = threads.annotate(
+                comment_count=Count('comments')
+            ).filter(comment_count=0)
+        
+        serializer = ThreadSerializer(threads, many=True)
+        return Response(serializer.data)
+    
+    def post(self, request):
+        data = request.data
+        
+        thread = Thread.objects.create(
+            title=data.get('title'),
+            content=data.get('content'),
+            category=data.get('category', 'general'),
+            user=request.user
+        )
+        
+        if 'course_id' in data and data['course_id']:
+            thread.courses.add(data['course_id'])
+        
+        if 'professor_id' in data and data['professor_id']:
+            thread.professors.add(data['professor_id'])
+        
+        serializer = ThreadSerializer(thread)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+class CommentView(APIView):
+    def post(self, request, thread_id):
+        thread = Thread.objects.get(id=thread_id)
+        
+        comment = Comment.objects.create(
+            thread=thread,
+            user=request.user,
+            content=request.data.get('content')
+        )
+        
+        serializer = CommentSerializer(comment)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+class UpvoteCommentView(APIView):
+    def post(self, request, comment_id):
+        comment = Comment.objects.get(id=comment_id)
+        comment.upvotes += 1
+        comment.save()
+        
+        return Response({"success": True, "upvotes": comment.upvotes})     
+        

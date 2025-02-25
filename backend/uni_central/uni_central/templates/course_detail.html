@@ -6,11 +6,12 @@
     <link rel="icon" href="/static/assets/logo_black.png">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Course Details</title>
-    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <link rel="stylesheet" href="{% static 'css/course_detail.css' %}">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Corben:wght@400;700&family=Montserrat:ital,wght@0,100..900;1,100..900&family=Sigmar&family=Sniglet:wght@400;800&display=swap" rel="stylesheet">
-    <style>
+    <script src="{% static 'js/course_detail.js' %}"></script>
+    <!-- <style>
         body {
             font-family: 'Montserrat', sans-serif;
             background-color: #FAF8F0;
@@ -214,7 +215,7 @@
                 margin-bottom: 5px;
             }
         }
-    </style>
+    </style> -->
 </head>
 <body>
     {% include 'partials/navbar.html' %}
@@ -243,7 +244,11 @@
                 <p><span class="detail-label">Semester:</span> <span id="course-semester"></span></p>
                 <p><span class="detail-label">Average Grade:</span> <span id="course-grade"></span></p>
             </div>
-            <button id="enroll-btn" class="leave-review-button">Enroll</button>
+            <div class="course-buttons">
+                <button id="enroll-btn" class="leave-review-button">Enroll</button>
+                <a id="discussion-board-btn" href="{% url 'course_discussion_board' context_id=course_id %}" class="go-to-discussion-board-button">                    Discussion Board
+                </a>
+            </div>
         </section>
 
         <!-- Reviews Section -->
@@ -259,8 +264,5 @@
             </a>
         </section>
     </main>
-
-    <script type="module" src="{% static 'js/course_detail.js' %}"></script>
-    <script type="module" src="{% static 'js/auth.js' %}"></script>
 </body>
 </html>

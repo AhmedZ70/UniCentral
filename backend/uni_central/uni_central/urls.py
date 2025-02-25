@@ -40,6 +40,12 @@ from .views import (
     EditAccountView,
     UpdateReviewAPIView,
     DeleteReviewAPIView,
+    CourseDiscussionBoardView,
+    ProfessorDiscussionBoardView,
+    DiscussionBoardView,
+    ThreadListView, 
+    CommentView, 
+    UpvoteCommentView,
     home,
     courses,
     about_page,
@@ -136,5 +142,13 @@ urlpatterns = [
      
     # Course Filtering URLs
     path('api/filter-courses/', CourseFilteringView.as_view(), name='api-filter_courses'),
+
+    # Discussion Board URLs
+    path('discussion-board/', DiscussionBoardView.as_view(), name='discussion_board'),
+    path('courses/<int:context_id>/discussions/', CourseDiscussionBoardView.as_view(), name='course_discussion_board'),
+    path('professors/<int:context_id>/discussions/', ProfessorDiscussionBoardView.as_view(), name='professor_discussion_board'),
+    path('api/forums/', ThreadListView.as_view(), name='forum_threads'),
+    path('api/forums/<int:thread_id>/comments/', CommentView.as_view(), name='thread_comments'),
+    path('api/comments/<int:comment_id>/upvote/', UpvoteCommentView.as_view(), name='upvote_comment'),
 ]
 
