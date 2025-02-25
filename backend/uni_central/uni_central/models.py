@@ -229,8 +229,10 @@ class Thread(models.Model):
     id = models.AutoField(primary_key=True)
     title = models.CharField(max_length=255)
     user = models.ForeignKey('User', on_delete=models.CASCADE, related_name='threads')
-    courses = models.ManyToManyField('Course', related_name='threads', blank=True)
-    professors = models.ManyToManyField('Professor', related_name='threads', blank=True)
+    course = models.ForeignKey('Course', on_delete=models.CASCADE, 
+                               related_name='threads', blank=True, null=True)
+    professor = models.ForeignKey('Professor', on_delete=models.CASCADE,
+                                  related_name='threads', blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

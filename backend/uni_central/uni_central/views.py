@@ -8,7 +8,9 @@ from .services import (
     CourseService, 
     ReviewService, 
     ProfessorService,
-    CourseFilteringService
+    CourseFilteringService,
+    ThreadService,
+    CommentService,
     )
 from .serializers import (
     DepartmentSerializer,
@@ -16,6 +18,8 @@ from .serializers import (
     CourseSerializer,
     ProfessorSerializer,
     ReviewSerializer,
+    ThreadSerializer,
+    CommentSerializer
 )
 
 ######################
@@ -595,3 +599,141 @@ class CourseFilteringView(APIView):
                 {"error": str(e)},
                 status=status.HTTP_400_BAD_REQUEST
             )
+
+#########################
+# Thread Views and APIs #
+#########################
+
+class CourseThreadsAPIView(APIView):
+    """
+    API View to fetch all threads related to a specific course.
+    """
+
+    def get(self, request, course_id):
+        threads = ThreadService.get_threads_by_course(course_id)
+
+        if threads is None:
+            return Response({"error": "Course not found"}, status=status.HTTP_404_NOT_FOUND)
+
+        serialized = ThreadSerializer(threads, many=True)
+        return Response(serialized.data)
+    
+class ProfessorThreadsAPIView(APIView):
+    """
+    API View to fetch all threads related to a specific professor.
+    """
+
+    def get(self, request, professor_id):
+        threads = ThreadService.get_threads_by_professor(professor_id)
+
+        if threads is None:
+            return Response({"error": "Professor not found"}, status=status.HTTP_404_NOT_FOUND)
+
+        serialized = ThreadSerializer(threads, many=True)
+        return Response(serialized.data)
+
+class CreateThreadAPIView(APIView):
+    """
+    API View to create a new thread.
+    """
+    def post(self, request):
+        user = UserService.get_user(request.data.get("email_address"))
+        result = ThreadService.create_thread(user, request.data)
+
+        if result["success"]:
+            serializer = ThreadSerializer(result["thread"])
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        
+        return Response({"error": result["error"]}, status=status.HTTP_400_BAD_REQUEST)
+
+
+class UpdateThreadAPIView(APIView):
+    """
+    API View to update an existing thread.
+    """
+
+    def put(self, request, thread_id):
+        result = ThreadService.update_thread(thread_id, request.data)
+
+        if result["success"]:
+            serializer = ThreadSerializer(result["thread"])
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        
+        return Response({"error": result["error"]}, status=status.HTTP_400_BAD_REQUEST)
+
+
+class DeleteThreadAPIView(APIView):
+    """
+    API View to delete an existing thread.
+    """
+
+    def delete(self, request, thread_id):
+        result = ThreadService.delete_thread(thread_id)
+
+        if result["success"]:
+            return Response({"message": result["message"]}, status=status.HTTP_200_OK)
+        
+        return Response({"error": result["error"]}, status=status.HTTP_400_BAD_REQUEST)
+
+
+##########################
+# Comment Views and APIs #
+##########################
+
+class ThreadCommentsAPIView(APIView):
+    """
+    API View to fetch all comments related to a specific thread.
+    """
+
+    def get(self, request, thread_id):
+        comments = CommentService.get_comments_by_thread(thread_id)
+
+        if comments is None:
+            return Response({"error": "Thread not found"}, status=status.HTTP_404_NOT_FOUND)
+
+        serialized = CommentSerializer(comments, many=True)
+        return Response(serialized.data)
+
+class CreateCommentAPIView(APIView):
+    """
+    API View to create a new comment.
+    """
+
+    def post(self, request, thread_id):
+        user = UserService.get_user(request.data.get("email_address"))
+        result = CommentService.create_comment(user, thread_id, request.data)
+
+        if result["success"]:
+            serializer = CommentSerializer(result["comment"])
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        
+        return Response({"error": result["error"]}, status=status.HTTP_400_BAD_REQUEST)
+
+
+class UpdateCommentAPIView(APIView):
+    """
+    API View to update an existing comment.
+    """
+
+    def put(self, request, comment_id):
+        result = CommentService.update_comment(comment_id, request.data)
+
+        if result["success"]:
+            serializer = CommentSerializer(result["comment"])
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        
+        return Response({"error": result["error"]}, status=status.HTTP_400_BAD_REQUEST)
+
+
+class DeleteCommentAPIView(APIView):
+    """
+    API View to delete an existing comment.
+    """
+
+    def delete(self, request, comment_id):
+        result = CommentService.delete_comment(comment_id)
+
+        if result["success"]:
+            return Response({"message": result["message"]}, status=status.HTTP_200_OK)
+        
+        return Response({"error": result["error"]}, status=status.HTTP_400_BAD_REQUEST)
