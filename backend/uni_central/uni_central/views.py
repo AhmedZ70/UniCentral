@@ -109,7 +109,7 @@ def discussion_board(request, context_type=None, context_id=None):
         elif context_type == 'professor':
             # Get professor data
             professor = ProfessorService.get_professor(context_id)
-            context['name'] = f"Prof. {professor.fname} {professor.lname}"
+            context['name'] = f"{professor.fname} {professor.lname}"
             context['context_type'] = 'professor'
             context['context_id'] = context_id
     

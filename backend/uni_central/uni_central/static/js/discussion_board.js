@@ -290,8 +290,7 @@ function createNewThread(form) {
     fetch('/api/forums/', {
         method: 'POST',
         headers: {
-            'Content-Type': 'application/json',
-            'X-CSRFToken': getCsrfToken()
+            'Content-Type': 'application/json'        
         },
         body: JSON.stringify(threadData)
     })
@@ -342,12 +341,17 @@ function loadThreads() {
     
     // Fetch threads from API
     fetch(`/api/forums/?${params.toString()}`)
-        .then(response => {
-            // Rest of function remains the same...
+        .then(response => response.json ())
+        .then(data => {
+            renderThreads(data);
+        })
+        .catch(error => {
+            console.error('Error fetching threads:', error);
+            document.querySelector('.discussion-threads').innerHTML = 
+                '<div class="error">Failed to load discussions. Please try again later.</div>';
         });
 }
 
-// Submit a reply to a thread
 function submitReply(form) {
     const content = form.querySelector('textarea').value;
     const threadId = document.getElementById('reply-modal').dataset.threadId;
@@ -371,11 +375,9 @@ function submitReply(form) {
         return response.json();
     })
     .then(data => {
-        // Hide modal and reset form
         document.getElementById('reply-modal').style.display = 'none';
         form.reset();
         
-        // Reload threads to show the new reply
         loadThreads();
     })
     .catch(error => {
@@ -384,7 +386,6 @@ function submitReply(form) {
     });
 }
 
-// Upvote a comment
 function upvoteComment(commentId, button) {
     fetch(`/api/comments/${commentId}/upvote/`, {
         method: 'POST',
@@ -399,7 +400,6 @@ function upvoteComment(commentId, button) {
         return response.json();
     })
     .then(data => {
-        // Update the upvote count in the button
         button.textContent = `👍 ${data.upvotes}`;
     })
     .catch(error => {
