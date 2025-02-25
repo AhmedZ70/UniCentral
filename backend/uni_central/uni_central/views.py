@@ -2,7 +2,6 @@ from django.shortcuts import render
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.views import APIView
-from rest_framework.permissions import IsAuthenticated
 from .services import (
     UserService,
     DepartmentService,
@@ -255,7 +254,38 @@ class CreateProfessorReviewAPIView(APIView):
                 {"error": str(e)},
                 status=status.HTTP_400_BAD_REQUEST
             )
+            
+class UpdateReviewAPIView(APIView):
+    """
+    API View to update an existing review by review_id.
+    """
 
+    def put(self, request):
+        """
+        Handles PUT requests to update a review.
+        """
+        try:
+            review_id = request.get.data('review_id')
+            updated_review = ReviewService.update_review(review_id, request.data)
+            serializer = ReviewSerializer(updated_review)
+            return Response({"message": "Review updated successfully", "review": serializer.data}, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response(str(e))
+
+class DeleteReviewAPIView(APIView):
+    """
+    API View to delete an existing review by review_id.
+    """
+    
+    def delete(self, request, review_id):
+        """
+        Calls the ReviewService to delete a review.
+        """
+        review_id = request.data.get('review_id')
+        review = ReviewService.get_review_by_id(review_id)
+        result = ReviewService.delete_review(review)
+
+        return Response(result)
 
 ####################################
 # Professor-Related Views and APIs #
@@ -458,12 +488,14 @@ class MyClassmatesView(APIView):
     """
     API View to fetch classmates in the courses of a user
     """
-    def get(self, request, email_address, *args, **kwargs):
+    def get(self, request):
+        email_address = request.data.get('email_address')
         user = UserService.get_user(email_address)
+        
         classmates = UserService.get_classmates(user)
-        serialized = UserSerializer(classmates, many=True, context={'current_user': user})
+        serialized = UserSerializer(classmates, many=True)
         return Response(serialized.data, status=status.HTTP_200_OK)
-
+    
 class CreateUserView(APIView):
     """
     Handles user creation requests.

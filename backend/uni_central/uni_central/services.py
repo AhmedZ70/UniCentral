@@ -52,6 +52,16 @@ class ReviewService:
     """
     Provides utility methods for retrieving Review data.
     """
+    
+    @staticmethod
+    def get_review_by_id(review_id):
+        """
+        Fetch a review by its ID.
+        """
+        try:
+            return Review.objects.get(id=review_id)
+        except Review.DoesNotExist:
+            return None
 
     @staticmethod
     def get_reviews_by_course(course_id):
@@ -165,12 +175,65 @@ class ReviewService:
 
         return review
 
-
     @staticmethod
-    def get_my_reviews(user_id):
-        user = UserService.get_user(user_id)
-        reviews = Review.objects.filter(user=user)
-        return reviews
+    def update_review(review_id, review_data):
+        """
+        Updates an existing review.
+
+        Args:
+            review_id (int): The ID of the review to update.
+            review_data (dict): A dictionary containing the updated review details.
+
+        Returns:
+            Review: The updated review object.
+        """
+        review = ReviewService.get_review_by_id(review_id)
+        if review == None:
+            return None
+
+        # Update fields only if provided in review_data
+        if "review" in review_data:
+            review.review = review_data["review"]
+        if "rating" in review_data:
+            review.rating = float(review_data["rating"])
+        if "difficulty" in review_data:
+            review.difficulty = int(review_data["difficulty"])
+        if "estimated_hours" in review_data:
+            review.estimated_hours = float(review_data["estimated_hours"])
+        if "would_take_again" in review_data:
+            review.would_take_again = review_data["would_take_again"] == "true"
+        if "for_credit" in review_data:
+            review.for_credit = review_data["for_credit"] == "true"
+        if "mandatory_attendance" in review_data:
+            review.mandatory_attendance = review_data["mandatory_attendance"] == "true"
+
+        # Save the updated review
+        review.save()
+
+        # Update course and professor averages if applicable
+        if review.course:
+            review.course.update_averages()
+        if review.professor:
+            review.professor.update_averages()
+
+        return review
+    
+    @staticmethod
+    def delete_review(review):
+        if not review:
+            return {"success": False, "error": "Review not found"}
+        
+        course = review.course
+        professor = review.professor
+        
+        review.delete()
+        
+        if course:
+            course.update_averages()
+        if professor:
+            professor.update_averages()
+            
+        return {"success": True, "message": "Review deleted successfully"}
 
 ##############################
 # Professor-Related Services #
