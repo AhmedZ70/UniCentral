@@ -89,7 +89,7 @@ document.addEventListener("DOMContentLoaded", () => {
             const lNameDisplay = document.getElementById('lNameDisplay');
             const universityDisplay = document.getElementById('universityDisplay');
             const majorDisplay = document.getElementById('majorDisplay');
-            const yearDisplay = document.getElementById('yearDisplay');
+            const gradYearDisplay = document.getElementById('yearDisplay');
 
             email.textContent = user.email;
 
@@ -105,11 +105,13 @@ document.addEventListener("DOMContentLoaded", () => {
                     lNameDisplay.textContent = data.lname || '';
                     universityDisplay.textContent = data.university || '';
                     majorDisplay.textContent = data.major || '';
-                    yearDisplay.textContent = data.year || '';
+                    gradYearDisplay.textContent = data.year || '';
 
                     document.getElementById('university').value = data.university || '';
                     document.getElementById('major').value = data.major || '';
                     document.getElementById('year').value = data.year || '';
+                    console.log("Raw API response:", data); // Add this line to see the complete response
+                    console.log("Fetching user data: fname: ", data.fname, " lname: ", data.lname, " university", data.university, "major: ", data.major, " year: ", data.year);
                 })
                 .catch((error) => {
                     console.error("Error fetching user data:", error);

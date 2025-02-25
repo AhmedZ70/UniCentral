@@ -51,11 +51,9 @@ function handleAuthStateChange() {
         registerLinkAndBtn.replaceWith(welcomeText);
       }
     } else {
-      // User is signed out
       console.log("User logged out"); // Log user logout
       const loginLink = document.createElement('a');
       const loginBtn = document.querySelector('.logout-btn');
-      // Initial home page state
       if (!welcomeMessage && actionsDiv) {
         loginLink.href = '/login/';
         loginBtn.className = 'login-btn';

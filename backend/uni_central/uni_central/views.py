@@ -424,13 +424,17 @@ class MyAccountView(APIView):
                     status=status.HTTP_404_NOT_FOUND
                 )
                 
-            serialized = UserSerializer(user)
-            return Response(serialized.data, status=status.HTTP_200_OK)
+            data = UserSerializer(user).data
+            data['university'] = user.university
+            data['major'] = user.major
+            data['year'] = user.year
+            
+            return Response(data, status=status.HTTP_200_OK)
             
         except Exception as e:
-            print(f"Error in UserDetailsView: {str(e)}")  # Debug log
+            print(f"Error in MyAccountView: {str(e)}")  
             import traceback
-            print(f"Full traceback: {traceback.format_exc()}")  # Debug log
+            print(f"Full traceback: {traceback.format_exc()}") 
             return Response(
                 {"error": str(e)},
                 status=status.HTTP_400_BAD_REQUEST
