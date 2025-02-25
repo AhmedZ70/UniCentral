@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Department, User, Course, Professor, Review
+from .models import Department, User, Course, Professor, Review, Thread, Comment
 
 class DepartmentSerializer(serializers.ModelSerializer):
     class Meta:
@@ -43,4 +43,33 @@ class ReviewSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Review
+        fields = '__all__'
+        
+class ThreadSerializer(serializers.ModelSerializer):
+    user = UserSerializer(read_only=True)
+    course = CourseSerializer(required=False, allow_null=True)
+    professor = ProfessorSerializer(required=False, allow_null=True)
+
+    class Meta:
+        model = Thread
+        fields = '__all__'
+
+    def validate(self, data):
+        """
+        Ensure that exactly one of course or professor is provided.
+        """
+        course = data.get('course')
+        professor = data.get('professor')
+
+        if bool(course) == bool(professor):  # True == True or False == False → Invalid
+            raise serializers.ValidationError("A thread must be linked to either a course or a professor, not both.")
+
+        return data
+
+class CommentSerializer(serializers.ModelSerializer):
+    user = UserSerializer(read_only=True)
+    thread = ThreadSerializer(read_only=True)
+
+    class Meta:
+        model = Comment
         fields = '__all__'

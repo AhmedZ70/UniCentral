@@ -3,7 +3,9 @@ from .models import (
     User, 
     Review, 
     Course, 
-    Professor
+    Professor,
+    Thread,
+    Comment,
     )
 from django.shortcuts import get_object_or_404
 from django.db.models import Q
@@ -455,3 +457,162 @@ class CourseFilteringService:
             )
 
         return queryset
+    
+###########################
+# Thread-Related Services #
+###########################
+
+class ThreadService:
+    """
+    Provides methods for managing Threads.
+    """
+    
+    @staticmethod
+    def get_threads_by_course(course_id):
+        """
+        Fetch all threads related to a specific course.
+        """
+        course = CourseService.get_course(course_id)
+        if not course:
+            return None
+
+        return Thread.objects.filter(course=course)
+    
+    @staticmethod
+    def get_threads_by_professor(professor_id):
+        """
+        Fetch all threads related to a specific professor.
+        """
+        professor = ProfessorService.get_professor(professor_id)
+        if not professor:
+            return None
+
+        return Thread.objects.filter(professor=professor)
+
+    @staticmethod
+    def create_thread(user, thread_data):
+        """
+        Creates a new thread linked to either a course or a professor.
+        """
+        
+        course_id = thread_data.get("course_id")
+        professor_id = thread_data.get("professor_id")
+
+        if bool(course_id) == bool(professor_id):
+            return {"success": False, "error": "A thread must be linked to either a course or a professor, not both."}
+
+        course = CourseService.get_course(course_id) if course_id else None
+        professor = ProfessorService.get_professor(professor_id) if professor_id else None
+
+        if course_id and not course:
+            return {"success": False, "error": "Course not found"}
+        if professor_id and not professor:
+            return {"success": False, "error": "Professor not found"}
+
+        try:
+            thread = Thread.objects.create(
+                title=thread_data.get("title"),
+                user=user,
+                course=course,
+                professor=professor
+            )
+            return {"success": True, "thread": thread}
+        except Exception as e:
+            return {"success": False, "error": str(e)}
+
+    @staticmethod
+    def update_thread(thread_id, thread_data):
+        """
+        Updates an existing thread's title.
+        """
+        
+        thread = ThreadService.get_thread_by_id(thread_id)
+        if not thread:
+            return {"success": False, "error": "Thread not found"}
+
+        if "title" in thread_data:
+            thread.title = thread_data["title"]
+
+        thread.save()
+        return {"success": True, "thread": thread}
+
+    @staticmethod
+    def delete_thread(thread_id):
+        """
+        Deletes a thread by ID.
+        """
+        thread = ThreadService.get_thread_by_id(thread_id)
+        if not thread:
+            return {"success": False, "error": "Thread not found"}
+
+        thread.delete()
+        return {"success": True, "message": "Thread deleted successfully"}
+
+############################
+# Comment-Related Services #
+############################
+
+class CommentService:
+    """
+    Provides methods for managing Comments.
+    """
+    
+    @staticmethod
+    def get_comments_by_thread(thread_id):
+        """
+        Fetch all comments related to a specific thread.
+        """
+        thread = ThreadService.get_thread_by_id(thread_id)
+        if not thread:
+            return None
+
+        return Comment.objects.filter(thread=thread)
+
+    @staticmethod
+    def create_comment(user, thread_id, comment_data):
+        """
+        Creates a new comment under a thread.
+        """
+        
+        thread = ThreadService.get_thread_by_id(thread_id)
+        if not thread:
+            return {"success": False, "error": "Thread not found"}
+
+        try:
+            comment = Comment.objects.create(
+                thread=thread,
+                user=user,
+                content=comment_data.get("content")
+            )
+            return {"success": True, "comment": comment}
+        except Exception as e:
+            return {"success": False, "error": str(e)}
+
+    @staticmethod
+    def update_comment(comment_id, comment_data):
+        """
+        Updates an existing comment.
+        """
+        
+        comment = CommentService.get_comment_by_id(comment_id)
+        if not comment:
+            return {"success": False, "error": "Comment not found"}
+
+        if "content" in comment_data:
+            comment.content = comment_data["content"]
+
+        comment.save()
+        return {"success": True, "comment": comment}
+
+    @staticmethod
+    def delete_comment(comment_id):
+        """
+        Deletes a comment by ID.
+        """
+        
+        comment = CommentService.get_comment_by_id(comment_id)
+        if not comment:
+            return {"success": False, "error": "Comment not found"}
+
+        comment.delete()
+        return {"success": True, "message": "Comment deleted successfully"}

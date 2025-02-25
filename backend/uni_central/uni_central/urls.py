@@ -40,6 +40,15 @@ from .views import (
     EditAccountView,
     UpdateReviewAPIView,
     DeleteReviewAPIView,
+    CreateThreadAPIView,
+    UpdateThreadAPIView,
+    DeleteThreadAPIView,
+    CourseThreadsAPIView,
+    ProfessorThreadsAPIView,
+    ThreadCommentsAPIView,
+    CreateCommentAPIView,
+    UpdateCommentAPIView,
+    DeleteCommentAPIView,
     home,
     courses,
     about_page,
@@ -136,5 +145,19 @@ urlpatterns = [
      
     # Course Filtering URLs
     path('api/filter-courses/', CourseFilteringView.as_view(), name='api-filter_courses'),
+    
+    # Thread URLs
+    path("api/threads/create/", CreateThreadAPIView.as_view(), name="api-create-thread"),
+    path("api/threads/<int:thread_id>/update/", UpdateThreadAPIView.as_view(), name="api-update-thread"),
+    path("api/threads/<int:thread_id>/delete/", DeleteThreadAPIView.as_view(), name="api-delete-thread"),
+    path("api/courses/<int:course_id>/threads/", CourseThreadsAPIView.as_view(), name="course-threads"),
+    path("api/professors/<int:professor_id>/threads/", ProfessorThreadsAPIView.as_view(), name="professor-threads"),
+
+    # Comment URLs
+    path("api/threads/<int:thread_id>/comments/create/", CreateCommentAPIView.as_view(), name="api-create-comment"),
+    path("api/comments/<int:comment_id>/update/", UpdateCommentAPIView.as_view(), name="api-update-comment"),
+    path("api/comments/<int:comment_id>/delete/", DeleteCommentAPIView.as_view(), name="api-delete-comment"),
+    path("api/threads/<int:thread_id>/comments/", ThreadCommentsAPIView.as_view(), name="thread-comments"),
+
 ]
 
