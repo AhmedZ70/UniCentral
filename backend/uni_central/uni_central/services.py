@@ -335,6 +335,18 @@ class UserService:
         return user
     
     @staticmethod
+    def update_course_plan(user, course_plan):
+        """
+        Updates the user's course plan.
+        """
+        if not user:
+            raise ValueError("User not found")
+
+        user.course_plan = course_plan
+        user.save()
+        return user
+    
+    @staticmethod
     def create_user(email_address, fname, lname):
         """
         Creates a new user in the SQLite database.

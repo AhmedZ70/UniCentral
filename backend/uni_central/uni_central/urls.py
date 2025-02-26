@@ -16,7 +16,7 @@ from .views import (
     AddProfessorView,
     RemoveProfessorView,
     MyCoursesView,
-    MyProfessorsView,  # Ensure this is imported
+    MyProfessorsView,
     MyReviewsView,
     MyClassmatesView,
     MyAccountView,
@@ -32,6 +32,7 @@ from .views import (
     CreateCommentAPIView,
     UpdateCommentAPIView,
     DeleteCommentAPIView,
+    CoursePlanUpdateAPIView,
     home,
     courses,
     about_page,
@@ -121,6 +122,8 @@ urlpatterns = [
     path('api/my_classmates/', MyClassmatesView.as_view(), name='api-my_classmates'),
     path('api/users/<str:email_address>/details/', MyAccountView.as_view(), name='user-details'),
     path('api/users/details/edit-details', EditAccountView.as_view(), name='edit-user-details'),
+    path('api/users/update-course-plan/', CoursePlanUpdateAPIView.as_view(), name='update-course-plan'),
+        
      
     # Course Filtering URLs
     path('api/filter-courses/', CourseFilteringView.as_view(), name='api-filter_courses'),
