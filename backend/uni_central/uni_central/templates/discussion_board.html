@@ -10,7 +10,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Corben:wght@400;700&family=Montserrat:ital,wght@0,100..900;1,100..900&family=Sigmar&family=Sniglet:wght@400;800&display=swap" rel="stylesheet">
-  <script src="{% static 'js/discussion_board.js' %}"></script>
+  <script type="module" src="{% static 'js/discussion_board.js' %}"></script>
 </head>
 
 <body {% if context_type %}data-context-type="{{ context_type }}" data-context-id="{{ context_id }}"{% endif %}>

@@ -17,45 +17,67 @@ const auth = getAuth(app);
 let userEmail = null;
 let isEditing = false;
 
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', function() {
+    // Create discussion-threads container if it doesn't exist
+    if (!document.querySelector('.discussion-threads')) {
+        const mainContent = document.querySelector('.main-content');
+        const threadsContainer = document.createElement('section');
+        threadsContainer.className = 'discussion-threads';
+        mainContent.appendChild(threadsContainer);
+    }
+    
     // Load threads when page loads
     loadThreads();
     
-    // Set up event listeners
-    document.querySelector('.new-thread-button').addEventListener('click', () => {
-        document.getElementById('new-thread-modal').style.display = 'block';
-    });
+    // Set up new thread button listener
+    const newThreadButton = document.querySelector('.new-thread-button');
+    if (newThreadButton) {
+        newThreadButton.addEventListener('click', showNewThreadModal);
+        console.log("New thread button listener added");
+    } else {
+        console.error("New thread button not found");
+    }
     
-    // Handle form submissions
-    document.getElementById('new-thread-form').addEventListener('submit', function(e) {
-        e.preventDefault();
-        createNewThread(this);
-    });
-    
-    // Handle reply form submissions
-    document.getElementById('reply-form').addEventListener('submit', function(e) {
-        e.preventDefault();
-        submitReply(this);
-    });
-    
-    // Close modals when cancel is clicked
-    document.querySelectorAll('.cancel-button').forEach(button => {
-        button.addEventListener('click', function() {
-            document.getElementById('new-thread-modal').style.display = 'none';
-            document.getElementById('reply-modal').style.display = 'none';
+    // Set up form listeners
+    const newThreadForm = document.getElementById('new-thread-form');
+    if (newThreadForm) {
+        newThreadForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            createNewThread(this);
         });
+    }
+    
+    const replyForm = document.getElementById('reply-form');
+    if (replyForm) {
+        replyForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            submitReply(this);
+        });
+    }
+    
+    // Set up modal close buttons
+    document.querySelectorAll('.cancel-button').forEach(button => {
+        button.addEventListener('click', closeModals);
     });
     
-    // Handle search and filters
-    document.getElementById('search-discussions').addEventListener('input', debounce(() => {
-        loadThreads();
-    }, 500));
+    // Set up search and filter listeners
+    const searchInput = document.getElementById('search-discussions');
+    if (searchInput) {
+        searchInput.addEventListener('input', debounce(loadThreads, 500));
+    }
     
-    document.getElementById('sort-by').addEventListener('change', loadThreads);
-    document.getElementById('filter-by').addEventListener('change', loadThreads);
+    const sortBySelect = document.getElementById('sort-by');
+    if (sortBySelect) {
+        sortBySelect.addEventListener('change', loadThreads);
+    }
+    
+    const filterBySelect = document.getElementById('filter-by');
+    if (filterBySelect) {
+        filterBySelect.addEventListener('change', loadThreads);
+    }
 });
 
-// Utility function for debouncing
+// Utility function for debouncing search input
 function debounce(func, wait) {
     let timeout;
     return function() {
@@ -66,7 +88,7 @@ function debounce(func, wait) {
     };
 }
 
-// Format relative time (e.g., "2 days ago")
+// Format relative time for thread timestamps
 function formatRelativeTime(dateString) {
     const date = new Date(dateString);
     const now = new Date();
@@ -89,56 +111,83 @@ function formatRelativeTime(dateString) {
     }
 }
 
-// Load threads from the API
-function loadThreads() {
-    const searchTerm = document.getElementById('search-discussions').value;
-    const sortBy = document.getElementById('sort-by').value;
-    const filterBy = document.getElementById('filter-by').value;
-    
-    // Show loading indicator
-    const threadsContainer = document.querySelector('.discussion-threads');
-    threadsContainer.innerHTML = '<div class="loading">Loading discussions...</div>';
-    
-    // Build query parameters
-    const params = new URLSearchParams();
-    if (searchTerm) params.append('search', searchTerm);
-    if (sortBy) params.append('sort_by', sortBy);
-    if (filterBy) params.append('filter_by', filterBy);
-    
-    // Fetch threads from API
-    fetch(`/api/forums/?${params.toString()}`)
-        .then(response => {
-            if (!response.ok) {
-                throw new Error(`Network response was not ok (${response.status})`);
+// Load threads from API
+async function loadThreads() {
+    try {
+        // Get filter parameters
+        const searchTerm = document.getElementById('search-discussions').value;
+        const sortBy = document.getElementById('sort-by').value;
+        const filterBy = document.getElementById('filter-by').value;
+        
+        // Show loading state
+        let threadsContainer = document.querySelector('.discussion-threads');
+        threadsContainer.innerHTML = '<div class="loading">Loading discussions...</div>';
+        
+        // Build query parameters
+        const params = new URLSearchParams();
+        if (searchTerm) params.append('search', searchTerm);
+        if (sortBy) params.append('sort_by', sortBy);
+        if (filterBy && filterBy !== 'all') params.append('filter_by', filterBy);
+        
+        // Add context if available
+        const contextType = document.body.dataset.contextType;
+        const contextId = document.body.dataset.contextId;
+        
+        if (contextType && contextId) {
+            params.append('context_type', contextType);
+            params.append('context_id', contextId);
+        }
+        
+        // Fetch threads from API
+        const response = await fetch(`/api/forums/?${params.toString()}`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json'
             }
-            return response.json();
-        })
-        .then(data => {
-            // Clear the container
-            threadsContainer.innerHTML = '';
-            
-            // Check if we have any threads
-            if (!data || data.length === 0) {
-                threadsContainer.innerHTML = '<div class="no-results">No discussions found.</div>';
-                return;
-            }
-            
-            // Render each thread
-            data.forEach(thread => {
-                const threadElement = createThreadElement(thread);
-                threadsContainer.appendChild(threadElement);
-            });
-            
-            // Attach reply button event listeners
-            attachReplyListeners();
-        })
-        .catch(error => {
-            console.error('Error fetching threads:', error);
-            threadsContainer.innerHTML = '<div class="error">Failed to load discussions. Please try again later.</div>';
         });
+        
+        if (!response.ok) {
+            throw new Error(`Server returned ${response.status}: ${response.statusText}`);
+        }
+        
+        const data = await response.json();
+        displayThreads(data);
+    } catch (error) {
+        console.error('Error loading threads:', error);
+        const threadsContainer = document.querySelector('.discussion-threads');
+        threadsContainer.innerHTML = `
+            <div class="error-message">
+                <p>Failed to load discussions. Please try again later.</p>
+            </div>
+        `;
+    }
 }
 
-// Create thread element
+// Display threads in the container
+function displayThreads(threads) {
+    const threadsContainer = document.querySelector('.discussion-threads');
+    threadsContainer.innerHTML = '';
+    
+    if (!threads || threads.length === 0) {
+        threadsContainer.innerHTML = `
+            <div class="no-results">
+                <p>No discussions found.</p>
+            </div>
+        `;
+        return;
+    }
+    
+    // Create a thread element for each thread
+    threads.forEach(thread => {
+        const threadElement = createThreadElement(thread);
+        threadsContainer.appendChild(threadElement);
+    });
+    
+    // Add event listeners to reply buttons
+    attachReplyListeners();
+}
+
+// Create HTML element for a thread
 function createThreadElement(thread) {
     const threadElement = document.createElement('div');
     threadElement.className = 'thread';
@@ -156,15 +205,15 @@ function createThreadElement(thread) {
     
     const topicTag = document.createElement('span');
     topicTag.className = 'topic-tag';
-    topicTag.textContent = thread.topic_tag || 'General';
+    topicTag.textContent = thread.category || 'General';
     
     const timestamp = document.createElement('span');
     timestamp.className = 'timestamp';
-    timestamp.textContent = `Posted ${formatRelativeTime(thread.timestamp)}`;
+    timestamp.textContent = `Posted ${formatRelativeTime(thread.created_at)}`;
     
     const replyCount = document.createElement('span');
     replyCount.className = 'reply-count';
-    replyCount.textContent = `${thread.reply_count || 0} replies`;
+    replyCount.textContent = `${thread.comments ? thread.comments.length : 0} replies`;
     
     metaElement.appendChild(topicTag);
     metaElement.appendChild(timestamp);
@@ -207,7 +256,7 @@ function createThreadElement(thread) {
     return threadElement;
 }
 
-// Create response element for a comment
+// Create HTML element for a comment/response
 function createResponseElement(comment) {
     const responseElement = document.createElement('div');
     responseElement.className = 'response';
@@ -225,12 +274,14 @@ function createResponseElement(comment) {
     
     const timestampSpan = document.createElement('span');
     timestampSpan.className = 'timestamp';
-    timestampSpan.textContent = formatRelativeTime(comment.timestamp);
+    timestampSpan.textContent = formatRelativeTime(comment.created_at);
     
     const upvoteButton = document.createElement('button');
     upvoteButton.className = 'upvote';
     upvoteButton.textContent = `👍 ${comment.upvotes || 0}`;
-    upvoteButton.addEventListener('click', () => upvoteComment(comment.id, upvoteButton));
+    upvoteButton.addEventListener('click', function() {
+        upvoteComment(comment.id, this);
+    });
     
     metaElement.appendChild(authorSpan);
     metaElement.appendChild(timestampSpan);
@@ -242,7 +293,7 @@ function createResponseElement(comment) {
     return responseElement;
 }
 
-// Attach reply button listeners
+// Attach listeners to reply buttons
 function attachReplyListeners() {
     document.querySelectorAll('.reply-button').forEach(button => {
         button.addEventListener('click', function() {
@@ -252,158 +303,167 @@ function attachReplyListeners() {
     });
 }
 
-// Show reply modal
-function showReplyModal(threadId) {
-    const modal = document.getElementById('reply-modal');
-    modal.dataset.threadId = threadId;
-    modal.style.display = 'block';
-    modal.querySelector('textarea').focus();
-}
-
-// Create a new thread
-function createNewThread(form) {
-    const title = form.querySelector('input[type="text"]').value;
-    const category = form.querySelector('select').value;
-    const content = form.querySelector('textarea').value;
+// Show new thread modal with authentication check
+function showNewThreadModal() {
+    // Check if user is logged in
+    const userLoggedIn = document.querySelector('.user-email') || document.querySelector('.logged-in-indicator');
     
-    if (!title || !category || !content) {
-        alert('Please fill out all fields');
+    if (!userLoggedIn) {
+        // User is not logged in, redirect to login page
+        window.location.href = '/login?redirect=' + encodeURIComponent(window.location.pathname);
         return;
     }
     
-    const threadData = {
-        title,
-        category,
-        content
-    };
+    // User is logged in, show the modal
+    const modal = document.getElementById('new-thread-modal');
+    if (modal) {
+        modal.style.display = 'block';
+        modal.querySelector('input[name="title"]').focus();
+    } else {
+        console.error("New thread modal not found");
+    }
+}
+
+// Show reply modal for a specific thread with authentication check
+function showReplyModal(threadId) {
+    // Check if user is logged in
+    const userLoggedIn = document.querySelector('.user-email') || document.querySelector('.logged-in-indicator');
     
-    // Add course or professor context if available
-    const contextType = document.body.dataset.contextType;
-    const contextId = document.body.dataset.contextId;
-    
-    if (contextType === 'course' && contextId) {
-        threadData.course_id = contextId;
-    } else if (contextType === 'professor' && contextId) {
-        threadData.professor_id = contextId;
+    if (!userLoggedIn) {
+        // User is not logged in, redirect to login page
+        window.location.href = '/login?redirect=' + encodeURIComponent(window.location.pathname);
+        return;
     }
     
-    fetch('/api/forums/', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'        
-        },
-        body: JSON.stringify(threadData)
-    })
-    .then(response => {
-        if (!response.ok) {
-            throw new Error(`Network response was not ok (${response.status})`);
+    // User is logged in, show the modal
+    const modal = document.getElementById('reply-modal');
+    if (modal) {
+        modal.dataset.threadId = threadId;
+        modal.style.display = 'block';
+        modal.querySelector('textarea').focus();
+    } else {
+        console.error("Reply modal not found");
+    }
+}
+
+// Close all modals
+function closeModals() {
+    const modals = document.querySelectorAll('.modal');
+    modals.forEach(modal => {
+        modal.style.display = 'none';
+    });
+}
+
+// Create a new thread
+async function createNewThread(form) {
+    try {
+        const title = form.querySelector('input[name="title"]').value.trim();
+        const category = form.querySelector('select[name="category"]').value;
+        const content = form.querySelector('textarea[name="content"]').value.trim();
+        
+        if (!title || !category || !content) {
+            alert('Please fill out all fields');
+            return;
         }
-        return response.json();
-    })
-    .then(data => {
-        // Hide modal and reset form
-        document.getElementById('new-thread-modal').style.display = 'none';
+        
+        const threadData = {
+            title,
+            category,
+            content
+        };
+        
+        // Add context if available
+        const contextType = document.body.dataset.contextType;
+        const contextId = document.body.dataset.contextId;
+        
+        if (contextType === 'course' && contextId) {
+            threadData.course_id = contextId;
+        } else if (contextType === 'professor' && contextId) {
+            threadData.professor_id = contextId;
+        }
+        
+        const response = await fetch('/api/forums/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(threadData)
+        });
+        
+        if (!response.ok) {
+            throw new Error(`Server returned ${response.status}: ${response.statusText}`);
+        }
+        
+        const data = await response.json();
+        console.log('Thread created successfully:', data);
+        
+        // Close modal and reset form
+        closeModals();
         form.reset();
         
         // Reload threads to show the new one
         loadThreads();
-    })
-    .catch(error => {
+    } catch (error) {
         console.error('Error creating thread:', error);
         alert('Failed to create thread. Please try again later.');
-    });
+    }
 }
 
-// Load threads function should also use context
-function loadThreads() {
-    const searchTerm = document.getElementById('search-discussions').value;
-    const sortBy = document.getElementById('sort-by').value;
-    const filterBy = document.getElementById('filter-by').value;
-    
-    // Show loading indicator
-    const threadsContainer = document.querySelector('.discussion-threads');
-    threadsContainer.innerHTML = '<div class="loading">Loading discussions...</div>';
-    
-    // Build query parameters
-    const params = new URLSearchParams();
-    if (searchTerm) params.append('search', searchTerm);
-    if (sortBy) params.append('sort_by', sortBy);
-    if (filterBy) params.append('filter_by', filterBy);
-    
-    // Add context if available
-    const contextType = document.body.dataset.contextType;
-    const contextId = document.body.dataset.contextId;
-    
-    if (contextType && contextId) {
-        params.append('context_type', contextType);
-        params.append('context_id', contextId);
-    }
-    
-    // Fetch threads from API
-    fetch(`/api/forums/?${params.toString()}`)
-        .then(response => response.json ())
-        .then(data => {
-            renderThreads(data);
-        })
-        .catch(error => {
-            console.error('Error fetching threads:', error);
-            document.querySelector('.discussion-threads').innerHTML = 
-                '<div class="error">Failed to load discussions. Please try again later.</div>';
-        });
-}
-
-function submitReply(form) {
-    const content = form.querySelector('textarea').value;
-    const threadId = document.getElementById('reply-modal').dataset.threadId;
-    
-    if (!content) {
-        alert('Please enter a reply');
-        return;
-    }
-    
-    fetch(`/api/forums/${threadId}/comments/`, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ content })
-    })
-    .then(response => {
-        if (!response.ok) {
-            throw new Error(`Network response was not ok (${response.status})`);
+// Submit a reply to a thread
+async function submitReply(form) {
+    try {
+        const content = form.querySelector('textarea[name="content"]').value.trim();
+        const threadId = document.getElementById('reply-modal').dataset.threadId;
+        
+        if (!content) {
+            alert('Please enter a reply');
+            return;
         }
-        return response.json();
-    })
-    .then(data => {
-        document.getElementById('reply-modal').style.display = 'none';
+        
+        const response = await fetch(`/api/forums/${threadId}/comments/`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ content })
+        });
+        
+        if (!response.ok) {
+            throw new Error(`Server returned ${response.status}: ${response.statusText}`);
+        }
+        
+        const data = await response.json();
+        console.log('Reply posted successfully:', data);
+        
+        // Close modal and reset form
+        closeModals();
         form.reset();
         
+        // Reload threads to show the new reply
         loadThreads();
-    })
-    .catch(error => {
+    } catch (error) {
         console.error('Error posting reply:', error);
         alert('Failed to post reply. Please try again later.');
-    });
+    }
 }
 
-function upvoteComment(commentId, button) {
-    fetch(`/api/comments/${commentId}/upvote/`, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        }
-    })
-    .then(response => {
+// Upvote a comment
+async function upvoteComment(commentId, button) {
+    try {
+        const response = await fetch(`/api/comments/${commentId}/upvote/`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+        
         if (!response.ok) {
-            throw new Error(`Network response was not ok (${response.status})`);
+            throw new Error(`Server returned ${response.status}: ${response.statusText}`);
         }
-        return response.json();
-    })
-    .then(data => {
+        
+        const data = await response.json();
         button.textContent = `👍 ${data.upvotes}`;
-    })
-    .catch(error => {
+    } catch (error) {
         console.error('Error upvoting comment:', error);
-    });
+    }
 }
-    
