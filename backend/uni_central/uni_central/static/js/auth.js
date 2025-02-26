@@ -1,5 +1,5 @@
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js';
-import { getAuth, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js';
+import { getAuth, onAuthStateChanged, signOut, updatePassword } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js';
 
 const firebaseConfig = {
   apiKey: "AIzaSyD0wF4R9GdY2m7eAwVL_j_mihLit4rRZ5Q",
@@ -51,11 +51,9 @@ function handleAuthStateChange() {
         registerLinkAndBtn.replaceWith(welcomeText);
       }
     } else {
-      // User is signed out
       console.log("User logged out"); // Log user logout
       const loginLink = document.createElement('a');
       const loginBtn = document.querySelector('.logout-btn');
-      // Initial home page state
       if (!welcomeMessage && actionsDiv) {
         loginLink.href = '/login/';
         loginBtn.className = 'login-btn';
@@ -85,6 +83,31 @@ function handleAuthStateChange() {
       }
     }
   });
+}
+
+export function logoutUser() {
+  return signOut(auth).then(() => {
+      window.location.href = '/login/';
+  });
+}
+
+export function updateUserPassword(newPassword) {
+  const currentUser = auth.currentUser;  // Changed variable name to avoid conflict
+  
+  if (!currentUser) {
+      return Promise.reject(new Error('No user is currently signed in'));
+  }
+
+  return updatePassword(currentUser, newPassword)
+      .then(() => {
+          return { success: true, message: 'Password updated successfully' };
+      })
+      .catch((error) => {
+          if (error.code === 'auth/requires-recent-login') {
+              throw new Error('Please log out and log back in to change your password');
+          }
+          throw error;
+      });
 }
 
 // Function to handle the "Leave a Review" button behavior

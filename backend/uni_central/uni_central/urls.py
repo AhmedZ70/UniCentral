@@ -19,7 +19,19 @@ from .views import (
     MyProfessorsView,  # Ensure this is imported
     MyReviewsView,
     MyClassmatesView,
-    UserDetailsView,
+    MyAccountView,
+    EditAccountView,
+    UpdateReviewAPIView,
+    DeleteReviewAPIView,
+    CreateThreadAPIView,
+    UpdateThreadAPIView,
+    DeleteThreadAPIView,
+    CourseThreadsAPIView,
+    ProfessorThreadsAPIView,
+    ThreadCommentsAPIView,
+    CreateCommentAPIView,
+    UpdateCommentAPIView,
+    DeleteCommentAPIView,
     home,
     courses,
     about_page,
@@ -89,6 +101,8 @@ urlpatterns = [
     path('api/courses/<int:course_id>/reviews/un_enroll/', UnEnrollView.as_view(), name='api-course-un-enroll'),
 
     path('api/courses/<int:course_id>/reviews/create/', CreateReviewAPIView.as_view(), name='api-review-create'),
+    path('api/reviews/<int:review_id>/update/', UpdateReviewAPIView.as_view(), name='api-review-update'),
+    path('api/reviews/<int:review_id>/delete/', DeleteReviewAPIView.as_view(), name='api-delete-review'),
     path('api/professors/<int:professor_id>/reviews/', ProfessorReviewListView.as_view(), name='professor-reviews'),
     path('api/professors/<int:professor_id>/reviews/create/', CreateProfessorReviewAPIView.as_view(), name='create-professor-review'),
     path('api/professors/<int:professor_id>/reviews/add/', AddProfessorView.as_view(), name='api-professor-add'),
@@ -105,9 +119,22 @@ urlpatterns = [
     path('api/my_professors/<str:email_address>/', MyProfessorsView.as_view(), name='api-my_professors'),  # Added this line
     path('api/my_reviews/', MyReviewsView.as_view(), name='api-my_reviews'),
     path('api/my_classmates/', MyClassmatesView.as_view(), name='api-my_classmates'),
+    path('api/users/<str:email_address>/details/', MyAccountView.as_view(), name='user-details'),
+    path('api/users/details/edit-details', EditAccountView.as_view(), name='edit-user-details'),
      
     # Course Filtering URLs
     path('api/filter-courses/', CourseFilteringView.as_view(), name='api-filter_courses'),
+    
+    # Thread URLs
+    path("api/threads/create/", CreateThreadAPIView.as_view(), name="api-create-thread"),
+    path("api/threads/<int:thread_id>/update/", UpdateThreadAPIView.as_view(), name="api-update-thread"),
+    path("api/threads/<int:thread_id>/delete/", DeleteThreadAPIView.as_view(), name="api-delete-thread"),
+    path("api/courses/<int:course_id>/threads/", CourseThreadsAPIView.as_view(), name="course-threads"),
+    path("api/professors/<int:professor_id>/threads/", ProfessorThreadsAPIView.as_view(), name="professor-threads"),
 
-    path('api/users/<str:email_address>/details/', UserDetailsView.as_view(), name='user-details'),
+    # Comment URLs
+    path("api/threads/<int:thread_id>/comments/create/", CreateCommentAPIView.as_view(), name="api-create-comment"),
+    path("api/comments/<int:comment_id>/update/", UpdateCommentAPIView.as_view(), name="api-update-comment"),
+    path("api/comments/<int:comment_id>/delete/", DeleteCommentAPIView.as_view(), name="api-delete-comment"),
+    path("api/threads/<int:thread_id>/comments/", ThreadCommentsAPIView.as_view(), name="thread-comments"),
 ]

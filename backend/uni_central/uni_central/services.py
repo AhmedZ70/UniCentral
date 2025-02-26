@@ -3,7 +3,9 @@ from .models import (
     User, 
     Review, 
     Course, 
-    Professor
+    Professor,
+    Thread,
+    Comment,
     )
 from django.shortcuts import get_object_or_404
 from django.db.models import Q
@@ -52,6 +54,16 @@ class ReviewService:
     """
     Provides utility methods for retrieving Review data.
     """
+    
+    @staticmethod
+    def get_review_by_id(review_id):
+        """
+        Fetch a review by its ID.
+        """
+        try:
+            return Review.objects.get(id=review_id)
+        except Review.DoesNotExist:
+            return None
 
     @staticmethod
     def get_reviews_by_course(course_id):
@@ -165,12 +177,65 @@ class ReviewService:
 
         return review
 
-
     @staticmethod
-    def get_my_reviews(user_id):
-        user = UserService.get_user(user_id)
-        reviews = Review.objects.filter(user=user)
-        return reviews
+    def update_review(review_id, review_data):
+        """
+        Updates an existing review.
+
+        Args:
+            review_id (int): The ID of the review to update.
+            review_data (dict): A dictionary containing the updated review details.
+
+        Returns:
+            Review: The updated review object.
+        """
+        review = ReviewService.get_review_by_id(review_id)
+        if review == None:
+            return None
+
+        # Update fields only if provided in review_data
+        if "review" in review_data:
+            review.review = review_data["review"]
+        if "rating" in review_data:
+            review.rating = float(review_data["rating"])
+        if "difficulty" in review_data:
+            review.difficulty = int(review_data["difficulty"])
+        if "estimated_hours" in review_data:
+            review.estimated_hours = float(review_data["estimated_hours"])
+        if "would_take_again" in review_data:
+            review.would_take_again = review_data["would_take_again"] == "true"
+        if "for_credit" in review_data:
+            review.for_credit = review_data["for_credit"] == "true"
+        if "mandatory_attendance" in review_data:
+            review.mandatory_attendance = review_data["mandatory_attendance"] == "true"
+
+        # Save the updated review
+        review.save()
+
+        # Update course and professor averages if applicable
+        if review.course:
+            review.course.update_averages()
+        if review.professor:
+            review.professor.update_averages()
+
+        return review
+    
+    @staticmethod
+    def delete_review(review):
+        if not review:
+            return {"success": False, "error": "Review not found"}
+        
+        course = review.course
+        professor = review.professor
+        
+        review.delete()
+        
+        if course:
+            course.update_averages()
+        if professor:
+            professor.update_averages()
+            
+        return {"success": True, "message": "Review deleted successfully"}
 
 ##############################
 # Professor-Related Services #
@@ -257,6 +322,17 @@ class UserService:
             user.professors.remove(professor)
             return True
         return False
+    
+    @staticmethod
+    def change_account_info(user, university, year, major):
+        if not user:
+            raise ValueError("User profile does not exist")
+
+        user.university = university
+        user.major = major
+        user.year = year
+        user.save()
+        return user
     
     @staticmethod
     def create_user(email_address, fname, lname):
@@ -379,3 +455,162 @@ class CourseFilteringService:
             )
 
         return queryset
+    
+###########################
+# Thread-Related Services #
+###########################
+
+class ThreadService:
+    """
+    Provides methods for managing Threads.
+    """
+    
+    @staticmethod
+    def get_threads_by_course(course_id):
+        """
+        Fetch all threads related to a specific course.
+        """
+        course = CourseService.get_course(course_id)
+        if not course:
+            return None
+
+        return Thread.objects.filter(course=course)
+    
+    @staticmethod
+    def get_threads_by_professor(professor_id):
+        """
+        Fetch all threads related to a specific professor.
+        """
+        professor = ProfessorService.get_professor(professor_id)
+        if not professor:
+            return None
+
+        return Thread.objects.filter(professor=professor)
+
+    @staticmethod
+    def create_thread(user, thread_data):
+        """
+        Creates a new thread linked to either a course or a professor.
+        """
+        
+        course_id = thread_data.get("course_id")
+        professor_id = thread_data.get("professor_id")
+
+        if bool(course_id) == bool(professor_id):
+            return {"success": False, "error": "A thread must be linked to either a course or a professor, not both."}
+
+        course = CourseService.get_course(course_id) if course_id else None
+        professor = ProfessorService.get_professor(professor_id) if professor_id else None
+
+        if course_id and not course:
+            return {"success": False, "error": "Course not found"}
+        if professor_id and not professor:
+            return {"success": False, "error": "Professor not found"}
+
+        try:
+            thread = Thread.objects.create(
+                title=thread_data.get("title"),
+                user=user,
+                course=course,
+                professor=professor
+            )
+            return {"success": True, "thread": thread}
+        except Exception as e:
+            return {"success": False, "error": str(e)}
+
+    @staticmethod
+    def update_thread(thread_id, thread_data):
+        """
+        Updates an existing thread's title.
+        """
+        
+        thread = ThreadService.get_thread_by_id(thread_id)
+        if not thread:
+            return {"success": False, "error": "Thread not found"}
+
+        if "title" in thread_data:
+            thread.title = thread_data["title"]
+
+        thread.save()
+        return {"success": True, "thread": thread}
+
+    @staticmethod
+    def delete_thread(thread_id):
+        """
+        Deletes a thread by ID.
+        """
+        thread = ThreadService.get_thread_by_id(thread_id)
+        if not thread:
+            return {"success": False, "error": "Thread not found"}
+
+        thread.delete()
+        return {"success": True, "message": "Thread deleted successfully"}
+
+############################
+# Comment-Related Services #
+############################
+
+class CommentService:
+    """
+    Provides methods for managing Comments.
+    """
+    
+    @staticmethod
+    def get_comments_by_thread(thread_id):
+        """
+        Fetch all comments related to a specific thread.
+        """
+        thread = ThreadService.get_thread_by_id(thread_id)
+        if not thread:
+            return None
+
+        return Comment.objects.filter(thread=thread)
+
+    @staticmethod
+    def create_comment(user, thread_id, comment_data):
+        """
+        Creates a new comment under a thread.
+        """
+        
+        thread = ThreadService.get_thread_by_id(thread_id)
+        if not thread:
+            return {"success": False, "error": "Thread not found"}
+
+        try:
+            comment = Comment.objects.create(
+                thread=thread,
+                user=user,
+                content=comment_data.get("content")
+            )
+            return {"success": True, "comment": comment}
+        except Exception as e:
+            return {"success": False, "error": str(e)}
+
+    @staticmethod
+    def update_comment(comment_id, comment_data):
+        """
+        Updates an existing comment.
+        """
+        
+        comment = CommentService.get_comment_by_id(comment_id)
+        if not comment:
+            return {"success": False, "error": "Comment not found"}
+
+        if "content" in comment_data:
+            comment.content = comment_data["content"]
+
+        comment.save()
+        return {"success": True, "comment": comment}
+
+    @staticmethod
+    def delete_comment(comment_id):
+        """
+        Deletes a comment by ID.
+        """
+        
+        comment = CommentService.get_comment_by_id(comment_id)
+        if not comment:
+            return {"success": False, "error": "Comment not found"}
+
+        comment.delete()
+        return {"success": True, "message": "Comment deleted successfully"}

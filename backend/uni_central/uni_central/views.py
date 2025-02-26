@@ -8,7 +8,9 @@ from .services import (
     CourseService, 
     ReviewService, 
     ProfessorService,
-    CourseFilteringService
+    CourseFilteringService,
+    ThreadService,
+    CommentService,
     )
 from .serializers import (
     DepartmentSerializer,
@@ -16,6 +18,8 @@ from .serializers import (
     CourseSerializer,
     ProfessorSerializer,
     ReviewSerializer,
+    ThreadSerializer,
+    CommentSerializer
 )
 
 ######################
@@ -254,7 +258,38 @@ class CreateProfessorReviewAPIView(APIView):
                 {"error": str(e)},
                 status=status.HTTP_400_BAD_REQUEST
             )
+            
+class UpdateReviewAPIView(APIView):
+    """
+    API View to update an existing review by review_id.
+    """
 
+    def put(self, request):
+        """
+        Handles PUT requests to update a review.
+        """
+        try:
+            review_id = request.get.data('review_id')
+            updated_review = ReviewService.update_review(review_id, request.data)
+            serializer = ReviewSerializer(updated_review)
+            return Response({"message": "Review updated successfully", "review": serializer.data}, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response(str(e))
+
+class DeleteReviewAPIView(APIView):
+    """
+    API View to delete an existing review by review_id.
+    """
+    
+    def delete(self, request, review_id):
+        """
+        Calls the ReviewService to delete a review.
+        """
+        review_id = request.data.get('review_id')
+        review = ReviewService.get_review_by_id(review_id)
+        result = ReviewService.delete_review(review)
+
+        return Response(result)
 
 ####################################
 # Professor-Related Views and APIs #
@@ -381,7 +416,69 @@ class UnEnrollView(APIView):
             return Response({"message": "Course removed successfully."}, status=status.HTTP_200_OK)
         else:
             return Response({"error": "User was not enrolled in this course."}, status=status.HTTP_400_BAD_REQUEST)
+        
+class MyAccountView(APIView):
+    def get(self, request, email_address):
+        try:
+            user = UserService.get_user(email_address)
+            
+            if not user:
+                return Response(
+                    {"error": "User not found"},
+                    status=status.HTTP_404_NOT_FOUND
+                )
+                
+            data = UserSerializer(user).data
+            data['university'] = user.university
+            data['major'] = user.major
+            data['year'] = user.year
+            
+            return Response(data, status=status.HTTP_200_OK)
+            
+        except Exception as e:
+            print(f"Error in MyAccountView: {str(e)}")  
+            import traceback
+            print(f"Full traceback: {traceback.format_exc()}") 
+            return Response(
+                {"error": str(e)},
+                status=status.HTTP_400_BAD_REQUEST
+            )
 
+class EditAccountView(APIView):
+    """
+    API View to edit account information of a user.
+    """
+    def post(self, request):
+        try:
+            email_address = request.data.get('email_address')
+            user = UserService.get_user(email_address=email_address)
+            university = request.data.get('university')
+            major = request.data.get('major')
+            year = request.data.get('year')
+            
+            updated_user = UserService.change_account_info(
+                user=user, 
+                university=university,
+                year=year, 
+                major=major
+            )
+            
+            return Response({
+                "message": "Profile updated successfully",
+                "data": {
+                    "university": updated_user.university,
+                    "major": updated_user.major,
+                    "year": updated_user.year
+                }
+            })
+            
+        except Exception as e:
+            print("Error:", str(e))  # For debugging
+            return Response(
+                {"error": str(e)},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+        
 class MyCoursesView(APIView):
     """
     API View to fetch courses that a user is in.
@@ -485,32 +582,6 @@ class CreateUserView(APIView):
                 "success": False,
                 "message": f"Server error: {str(e)}"
             }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-    
-class UserDetailsView(APIView):
-    def get(self, request, email_address):
-        try:
-            print(f"Attempting to get user with email: {email_address}")  # Debug log
-            user = UserService.get_user(email_address)
-            
-            if not user:
-                print(f"No user found with email: {email_address}")  # Debug log
-                return Response(
-                    {"error": "User not found"},
-                    status=status.HTTP_404_NOT_FOUND
-                )
-                
-            print(f"User found: {user}")  # Debug log
-            serialized = UserSerializer(user)
-            return Response(serialized.data, status=status.HTTP_200_OK)
-            
-        except Exception as e:
-            print(f"Error in UserDetailsView: {str(e)}")  # Debug log
-            import traceback
-            print(f"Full traceback: {traceback.format_exc()}")  # Debug log
-            return Response(
-                {"error": str(e)},
-                status=status.HTTP_400_BAD_REQUEST
-            )
         
 ####################################
 # Course-Filtering Views and APIs #
@@ -533,3 +604,141 @@ class CourseFilteringView(APIView):
                 {"error": str(e)},
                 status=status.HTTP_400_BAD_REQUEST
             )
+
+#########################
+# Thread Views and APIs #
+#########################
+
+class CourseThreadsAPIView(APIView):
+    """
+    API View to fetch all threads related to a specific course.
+    """
+
+    def get(self, request, course_id):
+        threads = ThreadService.get_threads_by_course(course_id)
+
+        if threads is None:
+            return Response({"error": "Course not found"}, status=status.HTTP_404_NOT_FOUND)
+
+        serialized = ThreadSerializer(threads, many=True)
+        return Response(serialized.data)
+    
+class ProfessorThreadsAPIView(APIView):
+    """
+    API View to fetch all threads related to a specific professor.
+    """
+
+    def get(self, request, professor_id):
+        threads = ThreadService.get_threads_by_professor(professor_id)
+
+        if threads is None:
+            return Response({"error": "Professor not found"}, status=status.HTTP_404_NOT_FOUND)
+
+        serialized = ThreadSerializer(threads, many=True)
+        return Response(serialized.data)
+
+class CreateThreadAPIView(APIView):
+    """
+    API View to create a new thread.
+    """
+    def post(self, request):
+        user = UserService.get_user(request.data.get("email_address"))
+        result = ThreadService.create_thread(user, request.data)
+
+        if result["success"]:
+            serializer = ThreadSerializer(result["thread"])
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        
+        return Response({"error": result["error"]}, status=status.HTTP_400_BAD_REQUEST)
+
+
+class UpdateThreadAPIView(APIView):
+    """
+    API View to update an existing thread.
+    """
+
+    def put(self, request, thread_id):
+        result = ThreadService.update_thread(thread_id, request.data)
+
+        if result["success"]:
+            serializer = ThreadSerializer(result["thread"])
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        
+        return Response({"error": result["error"]}, status=status.HTTP_400_BAD_REQUEST)
+
+
+class DeleteThreadAPIView(APIView):
+    """
+    API View to delete an existing thread.
+    """
+
+    def delete(self, request, thread_id):
+        result = ThreadService.delete_thread(thread_id)
+
+        if result["success"]:
+            return Response({"message": result["message"]}, status=status.HTTP_200_OK)
+        
+        return Response({"error": result["error"]}, status=status.HTTP_400_BAD_REQUEST)
+
+
+##########################
+# Comment Views and APIs #
+##########################
+
+class ThreadCommentsAPIView(APIView):
+    """
+    API View to fetch all comments related to a specific thread.
+    """
+
+    def get(self, request, thread_id):
+        comments = CommentService.get_comments_by_thread(thread_id)
+
+        if comments is None:
+            return Response({"error": "Thread not found"}, status=status.HTTP_404_NOT_FOUND)
+
+        serialized = CommentSerializer(comments, many=True)
+        return Response(serialized.data)
+
+class CreateCommentAPIView(APIView):
+    """
+    API View to create a new comment.
+    """
+
+    def post(self, request, thread_id):
+        user = UserService.get_user(request.data.get("email_address"))
+        result = CommentService.create_comment(user, thread_id, request.data)
+
+        if result["success"]:
+            serializer = CommentSerializer(result["comment"])
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        
+        return Response({"error": result["error"]}, status=status.HTTP_400_BAD_REQUEST)
+
+
+class UpdateCommentAPIView(APIView):
+    """
+    API View to update an existing comment.
+    """
+
+    def put(self, request, comment_id):
+        result = CommentService.update_comment(comment_id, request.data)
+
+        if result["success"]:
+            serializer = CommentSerializer(result["comment"])
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        
+        return Response({"error": result["error"]}, status=status.HTTP_400_BAD_REQUEST)
+
+
+class DeleteCommentAPIView(APIView):
+    """
+    API View to delete an existing comment.
+    """
+
+    def delete(self, request, comment_id):
+        result = CommentService.delete_comment(comment_id)
+
+        if result["success"]:
+            return Response({"message": result["message"]}, status=status.HTTP_200_OK)
+        
+        return Response({"error": result["error"]}, status=status.HTTP_400_BAD_REQUEST)
