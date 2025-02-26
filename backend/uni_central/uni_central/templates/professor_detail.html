@@ -20,6 +20,8 @@
         <section class="professor-info" id="professor-info">
             <h1 class="professor-name" id="professor-name">Loading professor...</h1>
             <div class="professor-details" id="professor-details"></div>
+            <!-- Add Professor Button -->
+            <button id="add-professor-btn" class="professor-leave-review-button">Add Professor</button>
         </section>
 
         <!-- Reviews Section -->
@@ -29,10 +31,10 @@
             <p class="no-reviews-message" id="no-reviews-message" style="display: none;">No reviews available for this professor.</p>
         </section>
 
+        <!-- Leave a Review Button -->
         <a id="professor-leave-review-btn" href="{% url 'professor-review-form' context_id=professor_id %}" class="professor-leave-review-button">
             Leave a Review
         </a>
-        
     </main>
 
     <style>
@@ -154,7 +156,7 @@
             font-weight: 600;
         }
 
-        .professor-leave-review-button {
+        .professor-leave-review-button, #add-professor-btn {
             display: inline-block;
             margin-top: 20px;
             padding: 12px 25px;
@@ -165,12 +167,19 @@
             font-weight: 600;
             transition: all 0.3s ease;
             text-align: center;
+            border: none;
+            cursor: pointer;
         }
 
-        .professor-leave-review-button:hover {
+        .professor-leave-review-button:hover, #add-professor-btn:hover {
             background-color: #004e4f;
             transform: translateY(-2px);
             box-shadow: 0 5px 15px rgba(0, 90, 91, 0.3);
+        }
+
+        #add-professor-btn:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
         }
 
         @media (max-width: 768px) {
@@ -189,6 +198,7 @@
         }
     </style>
 
-    <script src="{% static 'js/professor_detail.js' %}"></script>
+    <script type="module" src="{% static 'js/professor_detail.js' %}"></script>
+    <script type="module" src="{% static 'js/auth.js' %}"></script>
 </body>
 </html>

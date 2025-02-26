@@ -221,9 +221,7 @@ class UserService:
     
     @staticmethod
     def get_professors(user):
-        courses = user.courses.all()
-        professors = Professor.objects.filter(courses__in=courses).distinct()
-        return professors
+        return user.professors.all()
     
     @staticmethod
     def get_reviews(user):
