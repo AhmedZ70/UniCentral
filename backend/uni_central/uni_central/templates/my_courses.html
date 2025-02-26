@@ -5,54 +5,52 @@
   <meta charset="UTF-8">
   <link rel="icon" href="/static/assets/logo_black.png">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>UniCentral</title>
+  <title>UniCentral - My Courses</title>
   <link rel="stylesheet" href="{% static 'css/my_courses.css' %}">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Corben:wght@400;700&family=Montserrat:ital,wght@0,100..900;1,100..900&family=Sigmar&family=Sniglet:wght@400;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
   <script type="module" src="{% static 'js/my_courses.js' %}"></script>
 </head>
 <body>
   {% include 'partials/navbar.html' %}
 
   <main class="main-content">
+    <!-- Hero Section -->
     <section class="hero">
       <div class="text-content">
-        <div class="text-container">
-          <h1>My Courses</h1>
-        </div>
-        <div class="semester">
-          <label for="semester">Semester:</label>
-          <select name="semester" id="semester-values">
-            <!-- Semester options will be dynamically populated by JavaScript -->
-          </select>
-        </div>
+        <h1>My Courses</h1>
       </div>
     </section>
 
-    <div class="my-courses">
-      <div class="search-add-courses">
-        <select class="courses-sort">
-          <option value="a-z">A - Z</option>
-          <option value="z-a">Z - A</option>
-        </select>
-        <button class="add-course">Add Course +</button>
-      </div>
+    <!-- Search and Sort Section -->
+    <div class="filter-sort-container">
+      <!-- Search Input -->
+      <input
+        type="text"
+        id="search-input"
+        placeholder="Search by course name..."
+        class="search-input"
+      />
 
-      <!-- Course cards will be dynamically populated here -->
-      <div class="course-cards"></div>
+      <!-- Sort Dropdown -->
+      <label for="sort-by">Sort by:</label>
+      <select id="sort-by">
+        <option value="name-asc">Name (A-Z)</option>
+        <option value="name-desc">Name (Z-A)</option>
+        <option value="rating-asc">Rating (Low to High)</option>
+        <option value="rating-desc">Rating (High to Low)</option>
+      </select>
+    </div>
 
-      <!-- Popup for searching courses -->
-      <div class="course-search-popup-overlay" id="course-search-popup">
-        <div class="course-search-popup-content">
-          <button class="close-popup">&times;</button>
-          <h2 class="course-search-popup-title">Search for a course</h2>
-          <div class="course-search-popup-body">
-            <input type="text" id="course-search" placeholder="Search by course code or name...">
-            <div id="search-results"></div>
-          </div>
-        </div>
-      </div>
+    <!-- Course Cards Container -->
+    <div class="course-cards">
+      <!-- Course cards will be dynamically inserted here by JavaScript -->
+    </div>
+
+    <!-- No Courses Message -->
+    <div id="no-courses-message" style="display: none;">
+      <p>You haven't added any courses yet. Visit a course's page to add them to your list.</p>
     </div>
   </main>
 </body>

@@ -1,114 +1,96 @@
-import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js';
-import { getAuth, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js';
-
-const firebaseConfig = {
-  apiKey: "AIzaSyD0wF4R9GdY2m7eAwVL_j_mihLit4rRZ5Q",
-  authDomain: "unicentral-b6c23.firebaseapp.com",
-  projectId: "unicentral-b6c23",
-  storageBucket: "unicentral-b6c23.appspot.com",
-  messagingSenderId: "554502030441",
-  appId: "1:554502030441:web:6dccab580dbcfdb974cef8",
-  measurementId: "G-M4L04508RH",
-  clientId: "554502030441-g68f3tti18fiip1hpr6ehn6q6u5sn8fh.apps.googleusercontent.com"
-};
-
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
+import { auth, onAuthStateChanged } from './auth.js';
 
 document.addEventListener("DOMContentLoaded", () => {
-  let myCourses = [];
-  const courseCardsContainer = document.querySelector('.course-cards');
-  const noCoursesMessage = document.getElementById('no-courses-message');
+  let myProfessors = [];
+  const professorCardsContainer = document.querySelector('.professor-cards-container');
+  const noProfessorsMessage = document.getElementById('no-professors-message');
   const sortBy = document.getElementById('sort-by');
-  const searchInput = document.getElementById('search-input');
+  const searchInput = document.getElementById('search-input'); // New search input
 
   // Initialize the page with authentication check
   onAuthStateChanged(auth, (user) => {
     if (user) {
       const emailAddress = user.email;
       console.log("User is signed in with email:", emailAddress);
-      fetchMyCourses(emailAddress);
+      fetchMyProfessors(emailAddress);
     } else {
       console.log("No user signed in, redirecting to login");
       window.location.href = '/login/';
     }
   });
 
-  // Fetch the user's added courses
-  async function fetchMyCourses(emailAddress) {
+  // Fetch the user's added professors
+  async function fetchMyProfessors(emailAddress) {
     try {
-      const response = await fetch(`/api/my_courses/${encodeURIComponent(emailAddress)}/`);
+      const response = await fetch(`/api/my_professors/${encodeURIComponent(emailAddress)}/`);
       if (!response.ok) {
-        throw new Error(`Failed to fetch courses (status ${response.status})`);
+        throw new Error(`Failed to fetch professors (status ${response.status})`);
       }
       const data = await response.json();
-      myCourses = data;
-      displayCourses(myCourses);
+      myProfessors = data;
+      displayProfessors(myProfessors); // Display all professors initially
     } catch (error) {
-      console.error("Error fetching courses:", error);
-      noCoursesMessage.style.display = "block";
+      console.error("Error fetching professors:", error);
+      noProfessorsMessage.style.display = "block";
     }
   }
 
-  // Display courses in the UI with clickable cards
-  function displayCourses(courses) {
-    courseCardsContainer.innerHTML = ''; // Clear existing cards
+  // Display professors in the UI with clickable cards
+  function displayProfessors(professors) {
+    professorCardsContainer.innerHTML = ''; // Clear existing cards
 
-    if (courses.length === 0) {
-      noCoursesMessage.style.display = "block";
+    if (professors.length === 0) {
+      noProfessorsMessage.style.display = "block";
       return;
     }
 
-    noCoursesMessage.style.display = "none";
-    courses.forEach((course) => {
-      // Create an anchor element for the clickable course card
+    noProfessorsMessage.style.display = "none";
+    professors.forEach((professor) => {
+      // Create an anchor element for the clickable professor card
       const cardLink = document.createElement('a');
-      cardLink.href = `/courses/${course.id}/`; // Link to course details page
-      cardLink.className = 'course-card';
+      cardLink.href = `/professors/${professor.id}/`; // Link to professor details page
+      cardLink.className = 'professor-card';
       cardLink.style.textDecoration = 'none';
       cardLink.style.color = 'inherit';
 
       // Populate the card content
       cardLink.innerHTML = `
-        <div class="course-info">
-          <h3>${course.subject} ${course.number}: ${course.title}</h3>
-          <p><strong>Department:</strong> ${course.department?.name || "N/A"}</p>
+        <div class="professor-info">
+          <h3>${professor.fname} ${professor.lname}</h3>
+          <p><strong>Department:</strong> ${professor.department?.name || "N/A"}</p>
           <div class="rating-container">
             <p><strong>Average Rating:</strong></p>
-            <div class="rating-stars">${createRatingStars(course.avg_rating)}</div>
+            <div class="rating-stars">${createRatingStars(professor.avg_rating)}</div>
           </div>
           <div class="difficulty-container">
             <p><strong>Average Difficulty:</strong></p>
-            <div class="difficulty-rating">${createDifficultyCircles(course.avg_difficulty)}</div>
+            <div class="difficulty-rating">${createDifficultyCircles(professor.avg_difficulty)}</div>
           </div>
-          <p><strong>Credits:</strong> ${course.credits || "N/A"}</p>
         </div>
-        <div class="course-actions">
-          <button class="remove-course-btn" data-course-id="${course.id}">Remove</button>
+        <div class="professor-actions">
+          <button class="remove-professor-btn" data-professor-id="${professor.id}">Remove</button>
         </div>
       `;
 
-      courseCardsContainer.appendChild(cardLink);
+      professorCardsContainer.appendChild(cardLink);
     });
 
-    // Add event listeners to "Remove" buttons
-    document.querySelectorAll('.remove-course-btn').forEach((button) => {
+    // Add event listeners to "Remove" buttons and prevent the card's navigation when clicked
+    document.querySelectorAll('.remove-professor-btn').forEach((button) => {
       button.addEventListener('click', (e) => {
         e.preventDefault();
         e.stopPropagation(); // Prevent the click from bubbling to the anchor element
-        const courseId = button.getAttribute('data-course-id');
-        removeCourse(courseId);
+        const professorId = button.getAttribute('data-professor-id');
+        removeProfessor(professorId);
       });
     });
   }
 
-  // Remove a course from the user's list
-  async function removeCourse(courseId) {
+  // Remove a professor from the user's list
+  async function removeProfessor(professorId) {
     const emailAddress = auth.currentUser.email;
-    
     try {
-      const response = await fetch(`/api/courses/${courseId}/reviews/un_enroll/`, {
+      const response = await fetch(`/api/professors/${professorId}/reviews/remove/`, {
         method: 'DELETE',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email_address: emailAddress }),
@@ -116,46 +98,46 @@ document.addEventListener("DOMContentLoaded", () => {
       const data = await response.json();
       if (data.message) {
         alert(data.message);
-        fetchMyCourses(emailAddress); // Refresh the list
+        fetchMyProfessors(emailAddress); // Refresh the list
       } else if (data.error) {
         alert(data.error);
       }
     } catch (error) {
-      console.error("Error removing course:", error);
+      console.error("Error removing professor:", error);
     }
   }
 
-  // Sort courses
+  // Sort professors
   sortBy.addEventListener('change', () => {
     const sortType = sortBy.value;
-    let sortedCourses = [...myCourses];
+    let sortedProfessors = [...myProfessors];
 
     switch (sortType) {
       case 'name-asc':
-        sortedCourses.sort((a, b) => a.title.localeCompare(b.title));
+        sortedProfessors.sort((a, b) => `${a.fname} ${a.lname}`.localeCompare(`${b.fname} ${b.lname}`));
         break;
       case 'name-desc':
-        sortedCourses.sort((a, b) => b.title.localeCompare(a.title));
+        sortedProfessors.sort((a, b) => `${b.fname} ${b.lname}`.localeCompare(`${a.fname} ${a.lname}`));
         break;
       case 'rating-asc':
-        sortedCourses.sort((a, b) => (a.avg_rating || 0) - (b.avg_rating || 0));
+        sortedProfessors.sort((a, b) => (a.avg_rating || 0) - (b.avg_rating || 0));
         break;
       case 'rating-desc':
-        sortedCourses.sort((a, b) => (b.avg_rating || 0) - (a.avg_rating || 0));
+        sortedProfessors.sort((a, b) => (b.avg_rating || 0) - (a.avg_rating || 0));
         break;
     }
 
-    displayCourses(sortedCourses);
+    displayProfessors(sortedProfessors);
   });
 
   // Search functionality
   searchInput.addEventListener('input', () => {
     const searchQuery = searchInput.value.trim().toLowerCase();
-    const filteredCourses = myCourses.filter((course) => {
-      const courseName = course.title.toLowerCase();
-      return courseName.includes(searchQuery);
+    const filteredProfessors = myProfessors.filter((professor) => {
+      const fullName = `${professor.fname} ${professor.lname}`.toLowerCase();
+      return fullName.includes(searchQuery);
     });
-    displayCourses(filteredCourses);
+    displayProfessors(filteredProfessors);
   });
 
   /**

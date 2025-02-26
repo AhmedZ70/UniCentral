@@ -492,15 +492,20 @@ class MyCoursesView(APIView):
     
 class MyProfessorsView(APIView):
     """
-    API View to fetch professors of courses that a user is in.
+    API View to fetch the list of professors added by a user.
     """
-    def get(self, request):
-        email_address = request.data.get('email_address')
+    def get(self, request, email_address):  # Accept email_address as a positional argument
+        # Fetch the user by email address
         user = UserService.get_user(email_address)
+        
+        # Fetch the professors added by the user
         professors = UserService.get_professors(user)
         
-        serialized = ProfessorSerializer(professors, many=True)
-        return Response(serialized.data, status=status.HTTP_200_OK)
+        # Serialize the professors
+        serializer = ProfessorSerializer(professors, many=True)
+        
+        # Return the serialized data
+        return Response(serializer.data, status=status.HTTP_200_OK)
     
 class MyReviewsView(APIView):
     """
