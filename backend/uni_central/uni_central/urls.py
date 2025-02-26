@@ -1,20 +1,3 @@
-"""
-URL configuration for uni_central project.
-
-The `urlpatterns` list routes URLs to views. For more information please see:
-    https://docs.djangoproject.com/en/5.1/topics/http/urls/
-Examples:
-Function views
-    1. Add an import:  from my_app import views
-    2. Add a URL to urlpatterns:  path('', views.home, name='home')
-Class-based views
-    1. Add an import:  from other_app.views import Home
-    2. Add a URL to urlpatterns:  path('', Home.as_view(), name='home')
-Including another URLconf
-    1. Import the include() function: from django.urls import include, path
-    2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
-"""
-
 from django.urls import path
 from .views import (
     DepartmentListView,
@@ -40,12 +23,16 @@ from .views import (
     EditAccountView,
     UpdateReviewAPIView,
     DeleteReviewAPIView,
-    CourseDiscussionBoardView,
-    ProfessorDiscussionBoardView,
-    DiscussionBoardView,
-    ThreadListView, 
-    CommentView, 
-    UpvoteCommentView,
+    CreateThreadAPIView,
+    UpdateThreadAPIView,
+    DeleteThreadAPIView,
+    CourseThreadsAPIView,
+    ProfessorThreadsAPIView,
+    ThreadCommentsAPIView,
+    CreateCommentAPIView,
+    UpdateCommentAPIView,
+    DeleteCommentAPIView,
+    CoursePlanUpdateAPIView,
     home,
     courses,
     about_page,
@@ -72,7 +59,6 @@ urlpatterns = [
     path('courses/', courses, name='courses'),  # Render courses.html (user-facing view)
     path('courses/<int:course_id>/', course_detail, name='course-detail'), 
 
-
     path(
         'courses/<int:context_id>/review/',
         review_form_page,
@@ -85,7 +71,6 @@ urlpatterns = [
         {'context_type': 'professor'},
         name='professor-review-form'
     ),
-
 
     path('professors/', professors, name='professors'),
     path('professors/<int:professor_id>/', professor_detail, name='professor-detail'),
@@ -124,31 +109,35 @@ urlpatterns = [
     path('api/professors/<int:professor_id>/reviews/add/', AddProfessorView.as_view(), name='api-professor-add'),
     path('api/professors/<int:professor_id>/reviews/remove/', RemoveProfessorView.as_view(), name='api-professor-remove'),
     
-    
     # Professor URLs
     path('api/courses/<int:course_id>/professors/', CourseProfessorsAPIView.as_view(), name='course-professors'),
     path('api/professors/<int:professor_id>/courses/', ProfessorCoursesAPIView.as_view(), name='professor-courses'),
     path('api/departments/<int:department_id>/professors/', DepartmentProfessorsView.as_view(), name='department_professors'),
    
-
     # User URLs
     path('api/create_user/', CreateUserView.as_view(), name='create_user'),
     path('api/my_courses/<str:email_address>/', MyCoursesView.as_view(), name='api-my_courses'),
-    path('api/my_professors/', MyProfessorsView.as_view(), name='api-my_professors'),
+    path('api/my_professors/<str:email_address>/', MyProfessorsView.as_view(), name='api-my_professors'),  # Added this line
     path('api/my_reviews/', MyReviewsView.as_view(), name='api-my_reviews'),
     path('api/my_classmates/', MyClassmatesView.as_view(), name='api-my_classmates'),
     path('api/users/<str:email_address>/details/', MyAccountView.as_view(), name='user-details'),
     path('api/users/details/edit-details', EditAccountView.as_view(), name='edit-user-details'),
+    path('api/users/update-course-plan/', CoursePlanUpdateAPIView.as_view(), name='update-course-plan'),
+        
      
     # Course Filtering URLs
     path('api/filter-courses/', CourseFilteringView.as_view(), name='api-filter_courses'),
+    
+    # Thread URLs
+    path("api/threads/create/", CreateThreadAPIView.as_view(), name="api-create-thread"),
+    path("api/threads/<int:thread_id>/update/", UpdateThreadAPIView.as_view(), name="api-update-thread"),
+    path("api/threads/<int:thread_id>/delete/", DeleteThreadAPIView.as_view(), name="api-delete-thread"),
+    path("api/courses/<int:course_id>/threads/", CourseThreadsAPIView.as_view(), name="course-threads"),
+    path("api/professors/<int:professor_id>/threads/", ProfessorThreadsAPIView.as_view(), name="professor-threads"),
 
-    # Discussion Board URLs
-    path('discussion-board/', DiscussionBoardView.as_view(), name='discussion_board'),
-    path('courses/<int:context_id>/discussions/', CourseDiscussionBoardView.as_view(), name='course_discussion_board'),
-    path('professors/<int:context_id>/discussions/', ProfessorDiscussionBoardView.as_view(), name='professor_discussion_board'),
-    path('api/forums/', ThreadListView.as_view(), name='forum_threads'),
-    path('api/forums/<int:thread_id>/comments/', CommentView.as_view(), name='thread_comments'),
-    path('api/comments/<int:comment_id>/upvote/', UpvoteCommentView.as_view(), name='upvote_comment'),
+    # Comment URLs
+    path("api/threads/<int:thread_id>/comments/create/", CreateCommentAPIView.as_view(), name="api-create-comment"),
+    path("api/comments/<int:comment_id>/update/", UpdateCommentAPIView.as_view(), name="api-update-comment"),
+    path("api/comments/<int:comment_id>/delete/", DeleteCommentAPIView.as_view(), name="api-delete-comment"),
+    path("api/threads/<int:thread_id>/comments/", ThreadCommentsAPIView.as_view(), name="thread-comments"),
 ]
-

@@ -8,7 +8,9 @@ from .services import (
     CourseService, 
     ReviewService, 
     ProfessorService,
-    CourseFilteringService
+    CourseFilteringService,
+    ThreadService,
+    CommentService,
     )
 from .serializers import (
     DepartmentSerializer,
@@ -16,8 +18,8 @@ from .serializers import (
     CourseSerializer,
     ProfessorSerializer,
     ReviewSerializer,
-    CommentSerializer,
     ThreadSerializer,
+    CommentSerializer
 )
 
 ######################
@@ -506,15 +508,20 @@ class MyCoursesView(APIView):
     
 class MyProfessorsView(APIView):
     """
-    API View to fetch professors of courses that a user is in.
+    API View to fetch the list of professors added by a user.
     """
-    def get(self, request):
-        email_address = request.data.get('email_address')
+    def get(self, request, email_address):  # Accept email_address as a positional argument
+        # Fetch the user by email address
         user = UserService.get_user(email_address)
+        
+        # Fetch the professors added by the user
         professors = UserService.get_professors(user)
         
-        serialized = ProfessorSerializer(professors, many=True)
-        return Response(serialized.data, status=status.HTTP_200_OK)
+        # Serialize the professors
+        serializer = ProfessorSerializer(professors, many=True)
+        
+        # Return the serialized data
+        return Response(serializer.data, status=status.HTTP_200_OK)
     
 class MyReviewsView(APIView):
     """
@@ -539,6 +546,43 @@ class MyClassmatesView(APIView):
         classmates = UserService.get_classmates(user)
         serialized = UserSerializer(classmates, many=True)
         return Response(serialized.data, status=status.HTTP_200_OK)
+    
+class CoursePlanUpdateAPIView(APIView):
+    """
+    API View to update the user's course plan only.
+    """
+
+    def put(self, request):
+        try:
+            email_address = request.data.get("email_address")
+            user = UserService.get_user(email_address=email_address)
+
+            if not user:
+                return Response(
+                    {"error": "User not found"}, 
+                    status=status.HTTP_404_NOT_FOUND
+                )
+
+            course_plan = request.data.get("course_plan")
+            if course_plan is None:
+                return Response(
+                    {"error": "course_plan is required"}, 
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+
+            updated_user = UserService.update_course_plan(user, course_plan)
+
+            return Response({
+                "message": "Course plan updated successfully",
+                "course_plan": updated_user.course_plan
+            }, status=status.HTTP_200_OK)
+
+        except Exception as e:
+            return Response(
+                {"error": str(e)}, 
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+
     
 class CreateUserView(APIView):
     """
@@ -614,114 +658,140 @@ class CourseFilteringView(APIView):
                 status=status.HTTP_400_BAD_REQUEST
             )
 
-#####################################
-#  Discussion Board Views and APIs  #
-#####################################
-class DiscussionBoardView(APIView):
-    def get(self, request):
-        return render(request, 'discussion_board.html')
+#########################
+# Thread Views and APIs #
+#########################
 
-class CourseDiscussionBoardView(APIView):
-    def get(self, request, context_id):
-        course = CourseService.get_course(context_id)
-        context = {
-            'name': course.title,
-            'context_type': 'course',
-            'context_id': context_id
-        }
-        return render(request, 'discussion_board.html', context)
+class CourseThreadsAPIView(APIView):
+    """
+    API View to fetch all threads related to a specific course.
+    """
 
-class ProfessorDiscussionBoardView(APIView):
-    def get(self, request, context_id):
-        professor = ProfessorService.get_professor(context_id)
-        context = {
-            'name': f"Prof. {professor.fname} {professor.lname}",
-            'context_type': 'professor',
-            'context_id': context_id
-        }
-        return render(request, 'discussion_board.html', context)
+    def get(self, request, course_id):
+        threads = ThreadService.get_threads_by_course(course_id)
+
+        if threads is None:
+            return Response({"error": "Course not found"}, status=status.HTTP_404_NOT_FOUND)
+
+        serialized = ThreadSerializer(threads, many=True)
+        return Response(serialized.data)
     
-class ThreadListView(APIView):
-    def get(self, request):
-        # Get filter parameters
-        category = request.query_params.get('filter_by', 'all')
-        sort_by = request.query_params.get('sort_by', 'recent')
-        search = request.query_params.get('search', '')
-        
-        # Get context parameters
-        context_type = request.query_params.get('context_type')
-        context_id = request.query_params.get('context_id')
-        
-        # Start with all threads
-        threads = Thread.objects.all().prefetch_related('comments', 'user')
-        
-        # Apply context filter
-        if context_type == 'course' and context_id:
-            threads = threads.filter(courses__id=context_id)
-        elif context_type == 'professor' and context_id:
-            threads = threads.filter(professors__id=context_id)
-        
-        # Apply other filters
-        if category != 'all':
-            threads = threads.filter(category=category)
-            
-        if search:
-            threads = threads.filter(
-                Q(title__icontains=search) | 
-                Q(content__icontains=search)
-            )
-        
-        if sort_by == 'recent':
-            threads = threads.order_by('-created_at')
-        elif sort_by == 'popular':
-            threads = threads.annotate(
-                comment_count=Count('comments')
-            ).order_by('-comment_count')
-        elif sort_by == 'unanswered':
-            threads = threads.annotate(
-                comment_count=Count('comments')
-            ).filter(comment_count=0)
-        
-        serializer = ThreadSerializer(threads, many=True)
-        return Response(serializer.data)
-    
+class ProfessorThreadsAPIView(APIView):
+    """
+    API View to fetch all threads related to a specific professor.
+    """
+
+    def get(self, request, professor_id):
+        threads = ThreadService.get_threads_by_professor(professor_id)
+
+        if threads is None:
+            return Response({"error": "Professor not found"}, status=status.HTTP_404_NOT_FOUND)
+
+        serialized = ThreadSerializer(threads, many=True)
+        return Response(serialized.data)
+
+class CreateThreadAPIView(APIView):
+    """
+    API View to create a new thread.
+    """
     def post(self, request):
-        data = request.data
-        
-        thread = Thread.objects.create(
-            title=data.get('title'),
-            content=data.get('content'),
-            category=data.get('category', 'general'),
-            user=request.user
-        )
-        
-        if 'course_id' in data and data['course_id']:
-            thread.courses.add(data['course_id'])
-        
-        if 'professor_id' in data and data['professor_id']:
-            thread.professors.add(data['professor_id'])
-        
-        serializer = ThreadSerializer(thread)
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
+        user = UserService.get_user(request.data.get("email_address"))
+        result = ThreadService.create_thread(user, request.data)
 
-class CommentView(APIView):
+        if result["success"]:
+            serializer = ThreadSerializer(result["thread"])
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        
+        return Response({"error": result["error"]}, status=status.HTTP_400_BAD_REQUEST)
+
+
+class UpdateThreadAPIView(APIView):
+    """
+    API View to update an existing thread.
+    """
+
+    def put(self, request, thread_id):
+        result = ThreadService.update_thread(thread_id, request.data)
+
+        if result["success"]:
+            serializer = ThreadSerializer(result["thread"])
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        
+        return Response({"error": result["error"]}, status=status.HTTP_400_BAD_REQUEST)
+
+
+class DeleteThreadAPIView(APIView):
+    """
+    API View to delete an existing thread.
+    """
+
+    def delete(self, request, thread_id):
+        result = ThreadService.delete_thread(thread_id)
+
+        if result["success"]:
+            return Response({"message": result["message"]}, status=status.HTTP_200_OK)
+        
+        return Response({"error": result["error"]}, status=status.HTTP_400_BAD_REQUEST)
+
+
+##########################
+# Comment Views and APIs #
+##########################
+
+class ThreadCommentsAPIView(APIView):
+    """
+    API View to fetch all comments related to a specific thread.
+    """
+
+    def get(self, request, thread_id):
+        comments = CommentService.get_comments_by_thread(thread_id)
+
+        if comments is None:
+            return Response({"error": "Thread not found"}, status=status.HTTP_404_NOT_FOUND)
+
+        serialized = CommentSerializer(comments, many=True)
+        return Response(serialized.data)
+
+class CreateCommentAPIView(APIView):
+    """
+    API View to create a new comment.
+    """
+
     def post(self, request, thread_id):
-        thread = Thread.objects.get(id=thread_id)
-        
-        comment = Comment.objects.create(
-            thread=thread,
-            user=request.user,
-            content=request.data.get('content')
-        )
-        
-        serializer = CommentSerializer(comment)
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
+        user = UserService.get_user(request.data.get("email_address"))
+        result = CommentService.create_comment(user, thread_id, request.data)
 
-class UpvoteCommentView(APIView):
-    def post(self, request, comment_id):
-        comment = Comment.objects.get(id=comment_id)
-        comment.upvotes += 1
-        comment.save()
+        if result["success"]:
+            serializer = CommentSerializer(result["comment"])
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
         
-        return Response({"success": True, "upvotes": comment.upvotes})     
+        return Response({"error": result["error"]}, status=status.HTTP_400_BAD_REQUEST)
+
+
+class UpdateCommentAPIView(APIView):
+    """
+    API View to update an existing comment.
+    """
+
+    def put(self, request, comment_id):
+        result = CommentService.update_comment(comment_id, request.data)
+
+        if result["success"]:
+            serializer = CommentSerializer(result["comment"])
+            return Response(serializer.data, status=status.HTTP_200_OK)
         
+        return Response({"error": result["error"]}, status=status.HTTP_400_BAD_REQUEST)
+
+
+class DeleteCommentAPIView(APIView):
+    """
+    API View to delete an existing comment.
+    """
+
+    def delete(self, request, comment_id):
+        result = CommentService.delete_comment(comment_id)
+
+        if result["success"]:
+            return Response({"message": result["message"]}, status=status.HTTP_200_OK)
+        
+        return Response({"error": result["error"]}, status=status.HTTP_400_BAD_REQUEST)

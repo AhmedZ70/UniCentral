@@ -1,4 +1,6 @@
+import { auth, onAuthStateChanged } from './auth.js';
 document.addEventListener("DOMContentLoaded", () => {
+
     // Get professor ID from the hidden input
     const professorId = document.getElementById("professorId").value;
 
@@ -7,6 +9,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const professorDetailsEl = document.getElementById("professor-details");
     const reviewsListEl = document.getElementById("reviews-list");
     const noReviewsMsgEl = document.getElementById("no-reviews-message");
+    const addProfessorBtn = document.getElementById("add-professor-btn");
 
     // Fetch professor details, reviews, and courses taught
     fetch(`/api/professors/${professorId}/reviews/`)
@@ -93,4 +96,52 @@ document.addEventListener("DOMContentLoaded", () => {
             console.error("Error fetching professor data:", error);
             professorNameEl.textContent = "Error Loading Professor Details";
         });
+
+    // Handle "Add Professor" button
+    if (addProfessorBtn) {
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                const emailAddress = user.email;
+
+                // Check if the professor is already added
+                fetch(`/api/my_professors/${emailAddress}/`)
+                    .then((response) => response.json())
+                    .then((data) => {
+                        const isAdded = data.some((prof) => prof.id === parseInt(professorId));
+                        if (isAdded) {
+                            addProfessorBtn.textContent = "Remove Professor";
+                        } else {
+                            addProfessorBtn.textContent = "Add Professor";
+                        }
+                    });
+
+                // Handle button click
+                addProfessorBtn.addEventListener("click", () => {
+                    const isAdded = addProfessorBtn.textContent === "Remove Professor";
+                    const url = isAdded
+                        ? `/api/professors/${professorId}/reviews/remove/`
+                        : `/api/professors/${professorId}/reviews/add/`;
+
+                    fetch(url, {
+                        method: isAdded ? "DELETE" : "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ email_address: emailAddress }),
+                    })
+                        .then((response) => response.json())
+                        .then((data) => {
+                            if (data.message) {
+                                alert(data.message);
+                                addProfessorBtn.textContent = isAdded ? "Add Professor" : "Remove Professor";
+                            } else if (data.error) {
+                                alert(data.error);
+                            }
+                        });
+                });
+            } else {
+                // User is signed out
+                addProfessorBtn.textContent = "Login to Add Professor";
+                addProfessorBtn.disabled = true;
+            }
+        });
+    }
 });

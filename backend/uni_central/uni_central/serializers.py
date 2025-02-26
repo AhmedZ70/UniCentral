@@ -43,46 +43,32 @@ class ReviewSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Review
-        fields = '__all__'
-
-class CommentSerializer(serializers.ModelSerializer):
-    author = serializers.SerializerMethodField()
-    timestamp = serializers.SerializerMethodField()
-    
-    class Meta:
-        model = Comment
-        fields = ['id', 'content', 'author', 'timestamp', 'upvotes']
-    
-    def get_author(self, obj):
-        if obj.user:
-            return f"{obj.user.fname} {obj.user.lname}"
-        return "Anonymous Student"
-    
-    def get_timestamp(self, obj):
-        return obj.created_at
-
+        
 class ThreadSerializer(serializers.ModelSerializer):
-    comments = CommentSerializer(many=True, read_only=True)
-    author = serializers.SerializerMethodField()
-    timestamp = serializers.SerializerMethodField()
-    reply_count = serializers.SerializerMethodField()
-    topic_tag = serializers.SerializerMethodField()
-    
+    user = UserSerializer(read_only=True)
+    course = CourseSerializer(required=False, allow_null=True)
+    professor = ProfessorSerializer(required=False, allow_null=True)
+
     class Meta:
         model = Thread
-        fields = ['id', 'title', 'content', 'author', 'timestamp', 
-                  'reply_count', 'topic_tag', 'comments']
-    
-    def get_author(self, obj):
-        if obj.user:
-            return f"{obj.user.fname} {obj.user.lname}"
-        return "Anonymous Student"
-    
-    def get_timestamp(self, obj):
-        return obj.created_at
-    
-    def get_reply_count(self, obj):
-        return obj.comments.count()
-    
-    def get_topic_tag(self, obj):
-        return obj.get_category_display()
+        fields = '__all__'
+
+    def validate(self, data):
+        """
+        Ensure that exactly one of course or professor is provided.
+        """
+        course = data.get('course')
+        professor = data.get('professor')
+
+        if bool(course) == bool(professor):  # True == True or False == False → Invalid
+            raise serializers.ValidationError("A thread must be linked to either a course or a professor, not both.")
+
+        return data
+
+class CommentSerializer(serializers.ModelSerializer):
+    user = UserSerializer(read_only=True)
+    thread = ThreadSerializer(read_only=True)
+
+    class Meta:
+        model = Comment
+        fields = '__all__'

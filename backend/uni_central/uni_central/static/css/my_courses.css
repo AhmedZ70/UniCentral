@@ -9,11 +9,12 @@
      box-sizing: border-box;
    }
    
-   body, html {
+   body,
+   html {
      width: 100%;
      height: 100%;
      font-family: 'Montserrat', sans-serif;
-     background-color: #FAF8F0;
+     background-color: #faf8f0;
      line-height: 1.6;
    }
    
@@ -51,7 +52,7 @@
    
    .logo-home-btn {
      border: none;
-     background-color: #FAF8F0;
+     background-color: #faf8f0;
    }
    
    .nav-links {
@@ -80,7 +81,7 @@
    
    .register-btn {
      background-color: #005a5b;
-     color: #FAF8F0;
+     color: #faf8f0;
      border: none;
      font-family: 'Agrandir', sans-serif;
      font-size: 20px;
@@ -104,11 +105,6 @@
      padding: 2rem;
    }
    
-   .text-container {
-     position: relative;
-     z-index: 1;
-   }
-   
    .text-content {
      max-width: 100%;
      font-family: 'Agrandir', sans-serif;
@@ -130,81 +126,59 @@
      margin-top: 1rem;
    }
    
-   .semester {
-     font-size: 25px;
-     margin-top: 1rem;
+   /* ===========================
+      Filter and Sort Section
+      =========================== */
+   .filter-sort-container {
+     display: flex;
+     align-items: center;
+     gap: 10px;
+     padding: 1rem 2rem;
+     background-color: #ffffff;
+     border-radius: 8px;
+     margin: 1rem auto;
+     max-width: 1000px;
+     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
    }
    
-   .semester select {
-     font-size: 20px;
-     font-family: 'Agrandir', sans-serif;
-   }
-   
-   .courses-sort {
-     padding: 0.5rem 1rem;
+   .search-input {
+     padding: 8px 12px;
      border: 1px solid #ccc;
      border-radius: 4px;
+     font-size: 14px;
+     flex: 1;
+   }
+   
+   .search-input:focus {
+     border-color: #005a5b;
+     outline: none;
+   }
+   
+   .sort-by {
+     padding: 8px 12px;
+     border: 1px solid #ccc;
+     border-radius: 4px;
+     font-size: 14px;
      background-color: #fff;
-     font-size: 1rem;
-   }
-   
-   /* ===========================
-      My Courses Section
-      =========================== */
-   .my-courses {
-     width: 100%;
-     max-width: 1650px;
-     margin: 0 auto;
-     padding: 2rem;
-   }
-   
-   .search-add-courses {
-     display: flex;
-     align-items: center;
-     justify-content: space-between;
-     margin-bottom: 1.5rem;
-   }
-   
-   #course-search {
-     width: 100%;
-     padding: 10px;
-     margin-bottom: 15px;
-     border: 2px solid #e0e0e0;
-     border-radius: 8px;
-     font-size: 16px;
-   }
-   
-   .search-result-item {
-     display: flex;
-     justify-content: space-between;
-     align-items: center;
-     padding: 10px;
-     border: 1px solid #e0e0e0;
-     margin-bottom: 8px;
-     border-radius: 4px;
-   }
-   
-   .search-result-item button {
-     background-color: #005a5b;
-     color: white;
-     border: none;
-     padding: 6px 12px;
-     border-radius: 4px;
      cursor: pointer;
    }
    
-   .search-result-item button:hover {
-     background-color: #007d7d;
-   }
-   
-   #search-results {
-     max-height: 300px;
-     overflow-y: auto;
+   .sort-by:hover {
+     border-color: #005a5b;
    }
    
    /* ===========================
       Course Cards
       =========================== */
+   .course-cards {
+     display: grid;
+     grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+     gap: 20px;
+     padding: 1rem 2rem;
+     max-width: 1200px;
+     margin: 0 auto;
+   }
+   
    .course-card {
      background-color: #ffffff;
      border: 3px solid black;
@@ -212,11 +186,12 @@
      padding: 1.5rem;
      position: relative;
      display: flex;
+     flex-direction: column;
      justify-content: space-between;
-     margin: 1rem auto; /* center on all screens */
-     max-width: 1000px; /* keep them from going too wide */
      cursor: pointer;
      transition: all 0.3s ease;
+     text-decoration: none;
+     color: inherit;
    }
    
    .course-card:hover {
@@ -227,168 +202,118 @@
    
    .course-info {
      flex: 1;
-     margin-right: 200px;
+   }
+   
+   .course-info h3 {
+     font-size: 24px;
+     margin: 0 0 10px;
+     color: #005a5b;
    }
    
    .course-info p {
-     margin-bottom: 10px;
-     font-size: 18px;
+     font-size: 16px;
+     margin: 8px 0;
+     color: #333;
    }
    
-   .title-section {
+   .rating-container,
+   .difficulty-container {
+     margin: 15px 0;
      display: flex;
      align-items: center;
      gap: 10px;
-     margin-bottom: 15px;
    }
    
-   .title-section h3 {
-     font-size: 24px;
-     margin: 0;
+   .rating-stars {
+     display: flex;
+     gap: 5px;
    }
    
-   .required {
-     color: #ff4444;
-     padding: 4px 8px;
-     border-radius: 8px;
+   .star {
      font-size: 20px;
-     font-weight: bold;
-     white-space: nowrap;
+     color: #ccc; /* Default color for empty stars */
+   }
+   
+   .star.filled {
+     color: #ffd700; /* Gold color for filled stars */
+   }
+   
+   .star.partial {
+     position: relative;
+   }
+   
+   .star.partial .filled {
+     position: absolute;
+     overflow: hidden;
    }
    
    .difficulty-rating {
      display: flex;
-     align-items: center;
-     gap: 8px;
+     gap: 5px;
    }
    
-   .course-right {
-     position: absolute;
-     right: 24px;
-     bottom: 24px;
+   .difficulty-circle {
+     width: 14px;
+     height: 14px;
+     border-radius: 50%;
+     background-color: #e0e0e0; /* Default color for empty circles */
+   }
+   
+   .difficulty-circle.filled {
+     background-color: var(--color, #4caf50); /* Green for low difficulty */
+   }
+   
+   .difficulty-circle.filled.yellow {
+     background-color: #ffc107; /* Yellow for medium difficulty */
+   }
+   
+   .difficulty-circle.filled.red {
+     background-color: #f44336; /* Red for high difficulty */
+   }
+   
+   .difficulty-circle.partial {
+     background: conic-gradient(
+       var(--color, #4caf50) 0% calc(var(--percentage, 0) * 1%),
+       #e0e0e0 calc(var(--percentage, 0) * 1%) 100%
+     );
+   }
+   
+   /* ===========================
+      Course Actions (Remove Button)
+      =========================== */
+   .course-actions {
+     margin-top: 15px;
      text-align: right;
    }
    
-   .course-right p {
-     margin-bottom: 10px;
-     font-size: 20px;
+   .remove-course-btn {
+     background-color: #f44336;
+     color: #fff;
+     border: none;
+     padding: 8px 16px;
+     border-radius: 4px;
+     font-size: 14px;
+     cursor: pointer;
+     transition: background-color 0.3s ease;
    }
    
-   .rating-container {
-     display: flex;
-     align-items: center;
-     gap: 10px;
-     justify-content: flex-end;
+   .remove-course-btn:hover {
+     background-color: #d32f2f;
    }
    
-   .rating-container img {
-     width: 80px;
-     height: 80px;
-   }
-   
-   .rating-number {
-     font-size: 60px;
-   }
-   
-   /* When there are no courses */
-   .no-courses {
+   /* ===========================
+      No Courses Message
+      =========================== */
+   .no-courses-message {
      text-align: center;
      font-size: 1.25rem;
-   }
-   
-   /* ===========================
-      Course Cards Link Styling
-      =========================== */
-   .my-courses .course-cards .course-card a {
-     text-decoration: none !important; /* Remove underline */
-     color: inherit !important; /* Inherit text color from parent */
-     display: block; /* Make the link fill the entire card */
-   }
-   
-   .my-courses .course-cards .course-card a:hover {
-     text-decoration: none !important; /* Ensure no underline on hover */
-     color: inherit !important; /* Inherit text color on hover */
-   }
-   
-   /* ===========================
-      Popup Styles
-      =========================== */
-   .course-search-popup-overlay {
-     position: fixed;
-     top: 0;
-     left: 0;
-     width: 100%;
-     height: 100%;
-     background-color: rgba(0, 0, 0, 0.5);
-     display: none;
-     justify-content: center;
-     align-items: center;
-     z-index: 1000;
-   }
-   
-   .course-search-popup-content {
-     background-color: #ffffff;
-     padding: 30px;
-     border-radius: 12px;
-     min-width: 400px;
-     position: relative;
-     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
-   }
-   
-   .close-popup {
-     position: absolute;
-     top: 15px;
-     right: 15px;
-     font-size: 24px;
-     color: #666666;
-     background: none;
-     border: none;
-     cursor: pointer;
-     padding: 5px;
-   }
-   
-   .close-popup:hover {
-     color: #333333;
-   }
-   
-   .course-search-popup-title {
-     font-family: 'Agrandir', sans-serif;
-     font-size: 24px;
-     color: #333333;
-     margin-bottom: 20px;
-     padding-right: 30px;
-   }
-   
-   .course-search-popup-body {
-     margin: 25px 0;
-   }
-   
-   @keyframes fadeIn {
-     from {
-       opacity: 0;
-       transform: translateY(-20px);
-     }
-     to {
-       opacity: 1;
-       transform: translateY(0);
-     }
-   }
-   
-   .course-search-popup-overlay.active {
-     display: flex;
-   }
-   
-   .course-search-popup-overlay.active .course-search-popup-content {
-     animation: fadeIn 0.3s ease-out forwards;
+     color: #666;
+     padding: 2rem;
    }
    
    /* ===========================
       Responsive Queries
       =========================== */
-   @media (max-width: 1024px) {
-     /* You can start scaling stuff down here if desired */
-   }
-   
    @media (max-width: 768px) {
      .hero {
        flex-direction: column;
@@ -405,39 +330,28 @@
        font-size: 20px;
      }
    
-     .semester {
-       margin: 1rem 0;
-       text-align: center;
-     }
-   
-     .courses-sort {
-       margin: 1rem 0;
-     }
-   
-     .course-card {
+     .filter-sort-container {
        flex-direction: column;
-       margin: 1rem auto;
-       max-width: 90vw; /* narrower on small screens */
+       align-items: flex-start;
+       gap: 10px;
        padding: 1rem;
      }
    
-     .course-info {
-       margin-right: 0;
+     .course-cards {
+       grid-template-columns: 1fr;
+       padding: 1rem;
      }
    
-     .course-right {
-       position: static;
-       margin-top: 1rem;
-       text-align: center;
+     .course-card {
+       padding: 1rem;
      }
    
-     .rating-container img {
-       width: 40px;
-       height: 40px;
+     .course-info h3 {
+       font-size: 20px;
      }
    
-     .rating-number {
-       font-size: 30px;
+     .course-info p {
+       font-size: 14px;
      }
    }
    
@@ -450,17 +364,11 @@
        font-size: 18px;
      }
    
-     .course-info p,
-     .course-right p {
-       font-size: 16px;
+     .course-info h3 {
+       font-size: 18px;
      }
    
-     .rating-container img {
-       width: 30px;
-       height: 30px;
-     }
-   
-     .rating-number {
-       font-size: 24px;
+     .course-info p {
+       font-size: 12px;
      }
    }

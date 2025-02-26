@@ -1,247 +1,411 @@
-/* ============================================= */
-/* General                                       */
-/* ============================================= */
-body, html, ul, li, p, h1, h2, select {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-  }
-  
-  body {
-    font-family: 'Montserrat', sans-serif;
-    line-height: 1.6;
-    background-color: #FAF8F0;
-  }
-  
-  @font-face {
-    font-family: 'Agrandir';
-    src: url('../assets/fonts/Agrandir-Regular.otf') format('truetype');
-    font-weight: normal;
-    font-style: normal;
-  }
-  
-  /* ============================================= */
-  /* Navbar Styles                                 */
-  /* ============================================= */
-  .navbar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 1rem 2rem;
-    font-weight: 100;
-    font-size: 20px;
-  }
-  
-  .logo {
-    display: flex;
-    align-items: center;
-    font-size: 1.2rem;
-    font-weight: bold;
-    color: #333333;
-  }
-  
-  .logo img {
-    width: 200px;
-    margin-right: 8px;
-  }
-  
-  .logo-home-btn {
-    border: none;
-    background-color: #FAF8F0;
-  }
-  
-  .nav-links {
-    display: flex;
-    list-style: none;
-  }
-  
-  .nav-links li {
-    margin-left: 2rem;
-  }
-  
-  .nav-links a {
-    text-decoration: none;
-    color: #333333;
-    font-weight: bold;
-  }
-  
-  .nav-links a:hover {
-    color: #005a5b;
-  }
-  
-  .actions {
-    display: flex;
-    align-items: center;
-  }
-  
-  .register-btn {
-    background-color: #005a5b;
-    color: #FAF8F0;
-    border: none;
-    font-family: 'Agrandir', sans-serif;
-    font-size: 20px;
-    padding: 0.5rem 1rem;
-    border-radius: 20px;
-    font-weight: bold;
-    cursor: pointer;
-  }
-  
-  .register-btn:hover {
-    background-color: #007d7d;
-  }
-  
-  /* ============================================= */
-  /* Hero Section                                   */
-  /* ============================================= */
-  .hero {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 2rem 2rem 0.5rem 2rem; /* Reduced bottom padding */
-  }
-  
-  .text-container {
-    position: relative;
-    z-index: 1;
-  }
-  
-  .text-content {
-    max-width: 100%;
-    font-family: 'Agrandir', sans-serif;
-  }
-  
-  .text-content h1 {
-    font-family: 'Agrandir', sans-serif;
-    font-weight: 100;
-    font-size: 65px;
-    color: #ff743e;
-    margin-left: 50px;
-    margin-top: -50px;
-  }
-  
-  .text-content p {
-    margin-top: 0.5rem;
-    font-family: 'Poppins-light', sans-serif;
-    font-weight: 50;
-    font-size: 25px;
-    color: black;
-  }
-  
-  .semester {
-    font-size: 25px;
-    margin-left: 50px;
-  }
+/* ===========================
+   Base Resets and Fonts
+   =========================== */
+   *,
+   *::before,
+   *::after {
+     margin: 0;
+     padding: 0;
+     box-sizing: border-box;
+   }
+   
+   body, html {
+     width: 100%;
+     height: 100%;
+     font-family: 'Montserrat', sans-serif;
+     background-color: #FAF8F0;
+     line-height: 1.6;
+   }
+   
+   @font-face {
+     font-family: 'Agrandir';
+     src: url('../assets/fonts/Agrandir-Regular.otf') format('truetype');
+     font-weight: normal;
+     font-style: normal;
+   }
+   
+   /* ===========================
+      Navbar
+      =========================== */
+   .navbar {
+     display: flex;
+     justify-content: space-between;
+     align-items: center;
+     padding: 1rem 2rem;
+     font-weight: 100;
+     font-size: 20px;
+   }
+   
+   .logo {
+     display: flex;
+     align-items: center;
+     font-size: 1.2rem;
+     font-weight: bold;
+     color: #333333;
+   }
+   
+   .logo img {
+     width: 200px;
+     margin-right: 8px;
+   }
+   
+   .logo-home-btn {
+     border: none;
+     background-color: #FAF8F0;
+   }
+   
+   .nav-links {
+     display: flex;
+     list-style: none;
+   }
+   
+   .nav-links li {
+     margin-left: 2rem;
+   }
+   
+   .nav-links a {
+     text-decoration: none;
+     color: #333333;
+     font-weight: bold;
+   }
+   
+   .nav-links a:hover {
+     color: #007d7d;
+   }
+   
+   .actions {
+     display: flex;
+     align-items: center;
+   }
+   
+   .register-btn {
+     background-color: #005a5b;
+     color: #FAF8F0;
+     border: none;
+     font-family: 'Agrandir', sans-serif;
+     font-size: 20px;
+     padding: 0.5rem 1rem;
+     border-radius: 20px;
+     font-weight: bold;
+     cursor: pointer;
+   }
+   
+   .register-btn:hover {
+     background-color: #007d7d;
+   }
+   
+   /* ===========================
+      Hero Section
+      =========================== */
+   .hero {
+     display: flex;
+     justify-content: space-between;
+     align-items: center;
+     padding: 2rem;
+   }
+   
+   .text-content {
+     max-width: 100%;
+     font-family: 'Agrandir', sans-serif;
+   }
+   
+   .text-content h1 {
+     font-family: 'Agrandir', sans-serif;
+     font-weight: 100;
+     font-size: 65px;
+     color: #ff743e;
+     margin-bottom: 0.5rem;
+   }
+   
+   .text-content p {
+     font-family: 'Poppins-light', sans-serif;
+     font-weight: 50;
+     font-size: 25px;
+     color: black;
+     margin-top: 1rem;
+   }
+   
+   /* ===========================
+      Filter and Sort Section
+      =========================== */
+   .filter-sort-container {
+     display: flex;
+     align-items: center;
+     justify-content: flex-start;
+     gap: 20px;
+     padding: 1rem 2rem;
+     background-color: #ffffff;
+     border-radius: 8px;
+     margin: 1rem auto;
+     max-width: 1000px;
+     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+   }
+   
+   .filter-sort-container label {
+     font-size: 16px;
+     font-weight: 600;
+     color: #005a5b;
+   }
+   
+   .filter-sort-container select {
+     padding: 8px 12px;
+     border: 1px solid #ccc;
+     border-radius: 4px;
+     font-size: 14px;
+     background-color: #fff;
+     cursor: pointer;
+   }
+   
+   .filter-sort-container select:hover {
+     border-color: #005a5b;
+   }
+   
+   /* ===========================
+      Professor Cards
+      =========================== */
+   .professor-cards-container {
+     display: grid;
+     grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+     gap: 20px;
+     padding: 1rem 2rem;
+     max-width: 1200px;
+     margin: 0 auto;
+   }
+   
+   .professor-card {
+     background-color: #ffffff;
+     border: 3px solid black;
+     border-radius: 8px;
+     padding: 1.5rem;
+     position: relative;
+     display: flex;
+     flex-direction: column;
+     justify-content: space-between;
+     cursor: pointer;
+     transition: all 0.3s ease;
+     text-decoration: none;
+     color: inherit;
+   }
+   
+   .professor-card:hover {
+     transform: translateY(-5px);
+     box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+     border-color: #005a5b;
+   }
+   
+   .professor-info {
+     flex: 1;
+   }
+   
+   .professor-info h3 {
+     font-size: 24px;
+     margin: 0 0 10px;
+     color: #005a5b;
+   }
+   
+   .professor-info p {
+     font-size: 16px;
+     margin: 8px 0;
+     color: #333;
+   }
+   
+   .professor-info .rating,
+   .professor-info .difficulty {
+     font-weight: 600;
+     padding: 3px 8px;
+     border-radius: 5px;
+     color: #fff;
+   }
+   
+   .professor-info .rating {
+     background-color: #4CAF50;
+   }
+   
+   .professor-info .difficulty {
+     background-color: #FFA500;
+   }
+   
+   .professor-actions {
+     margin-top: 15px;
+     text-align: right;
+   }
+   
+   .remove-professor-btn {
+     background-color: #F44336;
+     color: #fff;
+     border: none;
+     padding: 8px 16px;
+     border-radius: 4px;
+     font-size: 14px;
+     cursor: pointer;
+     transition: background-color 0.3s ease;
+   }
+   
+   .remove-professor-btn:hover {
+     background-color: #d32f2f;
+   }
+   
+   /* ===========================
+      No Professors Message
+      =========================== */
+   #no-professors-message {
+     text-align: center;
+     font-size: 1.25rem;
+     color: #666;
+     padding: 2rem;
+   }
+   
+   /* ===========================
+      Responsive Queries
+      =========================== */
+   @media (max-width: 768px) {
+     .hero {
+       flex-direction: column;
+       text-align: center;
+       padding: 2rem 1rem;
+     }
+   
+     .text-content h1 {
+       font-size: 45px;
+       margin-left: 0;
+     }
+   
+     .text-content p {
+       font-size: 20px;
+     }
+   
+     .filter-sort-container {
+       flex-direction: column;
+       align-items: flex-start;
+       gap: 10px;
+       padding: 1rem;
+     }
+   
+     .professor-cards-container {
+       grid-template-columns: 1fr;
+       padding: 1rem;
+     }
+   
+     .professor-card {
+       padding: 1rem;
+     }
+   
+     .professor-info h3 {
+       font-size: 20px;
+     }
+   
+     .professor-info p {
+       font-size: 14px;
+     }
+   
+     .remove-professor-btn {
+       padding: 6px 12px;
+       font-size: 12px;
+     }
+   }
+/* Search Input Styles */
+.search-input {
+  padding: 8px 12px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 14px;
+  flex: 1;
+  margin-right: 10px;
+}
 
-  .semester select {
-    font-size: 20px;
-    font-family: 'Agrandir', sans-serif;
-  }
+.search-input:focus {
+  border-color: #005a5b;
+  outline: none;
+}
 
-  .my-professors {
-    width: 100%;
-    max-width: 1650px;
-    padding: 2rem;
-  }
-  
-  .professors-sort {
-    padding: 0.5rem 1rem;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    background-color: #fff;
-    font-size: 1rem;
-    margin-left: 50px;
-  }
+/* Filter and Sort Container */
+.filter-sort-container {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 1rem 2rem;
+  background-color: #ffffff;
+  border-radius: 8px;
+  margin: 1rem auto;
+  max-width: 1000px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+  /* Star styles */
+.rating-stars {
+  display: flex;
+  gap: 5px;
+}
 
-  .professors-sort select{
-    font-size: 25px;
-    font-family: 'Agrandir', sans-serif;
-  }
-  
-  .professor-card {
-    margin-left: 75px;
-    margin-right: 75px;
-    background-color: #ffffff;
-    border: 3px solid black;
-    border-radius: 8px;
-    padding: 1.5rem;
-    position: relative;
-    min-height: 130px;
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 15px;
-  }
-  
-  .professor-info {
-    flex: 1;
-    margin-right: 200px;
-  }
+.star {
+  font-size: 24px;
+  color: #ccc; /* Default color for empty stars */
+}
 
-  .title-section {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    margin-bottom: 15px;
-  }
-  
-  .title-section h3 {
-    font-size: 24px;
-    margin: 0;
-  }
-  
-  .required {
-    color: #ff4444;
-    padding: 4px 8px;
-    border-radius: 8px;
-    font-size: 20px;
-    font-weight: bold;
-    white-space: nowrap;
-  }
-  
-  .professor-info p {
-    margin-bottom: 10px;
-    font-size: 18px;
-  }
-  
-  .professor-info p {
-    margin-bottom: 10px;
-    font-size: 18px;
-  }
-  
-  .difficulty-rating {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-  
-  .difficulty-rating img {
-    width: 18%;
-    vertical-align: bottom;
-  }
-  
-  .professor-right {
-    position: absolute;
-    right: 24px;
-    bottom: 24px;
-    text-align: right;
-  }
-  
-  .professor-right p {
-    margin-bottom: 10px;
-    font-size: 20px;
-  }
-    
-    .rating-container {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    justify-content: flex-end;
-    }
-    
-    .rating-container img {
-    width: 80px;
-    height: 80px;
-    }
-    
-    .rating-number {
-    font-size: 60px;
-    }
+.star.filled {
+  color: #ffd700; /* Gold color for filled stars */
+}
+
+.star.partial {
+  position: relative;
+  display: inline-block;
+}
+
+.star.partial .filled {
+  position: absolute;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+/* Difficulty circle styles */
+.difficulty-rating {
+  display: flex;
+  gap: 5px;
+}
+
+.difficulty-circle {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background-color: #e0e0e0; /* Default color for empty circles */
+}
+
+.difficulty-circle.filled {
+  background-color: #4CAF50; /* Green for low difficulty */
+}
+
+.difficulty-circle.filled.yellow {
+  background-color: #FFC107; /* Yellow for medium difficulty */
+}
+
+.difficulty-circle.filled.red {
+  background-color: #F44336; /* Red for high difficulty */
+}
+
+.difficulty-circle.partial {
+  position: relative;
+  display: inline-block;
+}
+
+.difficulty-circle.partial .filled {
+  position: absolute;
+  overflow: hidden;
+  white-space: nowrap;
+}
+   
+   @media (max-width: 480px) {
+     .text-content h1 {
+       font-size: 35px;
+     }
+   
+     .text-content p {
+       font-size: 18px;
+     }
+   
+     .professor-info h3 {
+       font-size: 18px;
+     }
+   
+     .professor-info p {
+       font-size: 12px;
+     }
+   }
