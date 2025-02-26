@@ -1,6 +1,7 @@
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js';
 import { getAuth, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js';
 
+// Firebase configuration
 const firebaseConfig = {
   apiKey: "AIzaSyD0wF4R9GdY2m7eAwVL_j_mihLit4rRZ5Q",
   authDomain: "unicentral-b6c23.firebaseapp.com",
@@ -17,25 +18,25 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 
 document.addEventListener("DOMContentLoaded", () => {
-  let myCourses = [];
+  let myCourses = []; // Stores the user's courses
   const courseCardsContainer = document.querySelector('.course-cards');
   const noCoursesMessage = document.getElementById('no-courses-message');
   const sortBy = document.getElementById('sort-by');
   const searchInput = document.getElementById('search-input');
 
-  // Initialize the page with authentication check
+  // Check authentication state
   onAuthStateChanged(auth, (user) => {
     if (user) {
       const emailAddress = user.email;
       console.log("User is signed in with email:", emailAddress);
-      fetchMyCourses(emailAddress);
+      fetchMyCourses(emailAddress); // Fetch courses for the logged-in user
     } else {
       console.log("No user signed in, redirecting to login");
-      window.location.href = '/login/';
+      window.location.href = '/login/'; // Redirect to login if not authenticated
     }
   });
 
-  // Fetch the user's added courses
+  // Fetch the user's courses from the backend
   async function fetchMyCourses(emailAddress) {
     try {
       const response = await fetch(`/api/my_courses/${encodeURIComponent(emailAddress)}/`);
@@ -44,25 +45,25 @@ document.addEventListener("DOMContentLoaded", () => {
       }
       const data = await response.json();
       myCourses = data;
-      displayCourses(myCourses);
+      displayCourses(myCourses); // Display the fetched courses
     } catch (error) {
       console.error("Error fetching courses:", error);
-      noCoursesMessage.style.display = "block";
+      noCoursesMessage.style.display = "block"; // Show "no courses" message on error
     }
   }
 
-  // Display courses in the UI with clickable cards
+  // Display courses in the UI
   function displayCourses(courses) {
     courseCardsContainer.innerHTML = ''; // Clear existing cards
 
     if (courses.length === 0) {
-      noCoursesMessage.style.display = "block";
+      noCoursesMessage.style.display = "block"; // Show "no courses" message if empty
       return;
     }
 
     noCoursesMessage.style.display = "none";
     courses.forEach((course) => {
-      // Create an anchor element for the clickable course card
+      // Create a clickable course card
       const cardLink = document.createElement('a');
       cardLink.href = `/courses/${course.id}/`; // Link to course details page
       cardLink.className = 'course-card';
@@ -98,7 +99,7 @@ document.addEventListener("DOMContentLoaded", () => {
         e.preventDefault();
         e.stopPropagation(); // Prevent the click from bubbling to the anchor element
         const courseId = button.getAttribute('data-course-id');
-        removeCourse(courseId);
+        removeCourse(courseId); // Remove the course
       });
     });
   }
@@ -106,7 +107,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // Remove a course from the user's list
   async function removeCourse(courseId) {
     const emailAddress = auth.currentUser.email;
-    
+
     try {
       const response = await fetch(`/api/courses/${courseId}/reviews/un_enroll/`, {
         method: 'DELETE',
@@ -116,7 +117,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const data = await response.json();
       if (data.message) {
         alert(data.message);
-        fetchMyCourses(emailAddress); // Refresh the list
+        fetchMyCourses(emailAddress); // Refresh the list after removal
       } else if (data.error) {
         alert(data.error);
       }
@@ -125,7 +126,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  // Sort courses
+  // Sort courses based on the selected option
   sortBy.addEventListener('change', () => {
     const sortType = sortBy.value;
     let sortedCourses = [...myCourses];
@@ -145,7 +146,7 @@ document.addEventListener("DOMContentLoaded", () => {
         break;
     }
 
-    displayCourses(sortedCourses);
+    displayCourses(sortedCourses); // Display sorted courses
   });
 
   // Search functionality
@@ -155,7 +156,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const courseName = course.title.toLowerCase();
       return courseName.includes(searchQuery);
     });
-    displayCourses(filteredCourses);
+    displayCourses(filteredCourses); // Display filtered courses
   });
 
   /**

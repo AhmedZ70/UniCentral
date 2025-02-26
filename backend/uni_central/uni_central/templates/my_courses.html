@@ -1,57 +1,54 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  {% load static %}
-  <meta charset="UTF-8">
-  <link rel="icon" href="/static/assets/logo_black.png">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>UniCentral - My Courses</title>
+<!-- templates/my_courses.html -->
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}UniCentral - My Courses{% endblock %}
+
+{% block extra_css %}
+  <!-- Page-specific CSS -->
   <link rel="stylesheet" href="{% static 'css/my_courses.css' %}">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
+{% endblock %}
+
+{% block content %}
+  <!-- Hero Section -->
+  <section class="hero">
+    <div class="text-content">
+      <h1>My Courses</h1>
+    </div>
+  </section>
+
+  <!-- Search and Sort Section -->
+  <div class="filter-sort-container">
+    <!-- Search Input -->
+    <input
+      type="text"
+      id="search-input"
+      placeholder="Search by course name..."
+      class="search-input"
+    />
+
+    <!-- Sort Dropdown -->
+    <label for="sort-by">Sort by:</label>
+    <select id="sort-by">
+      <option value="name-asc">Name (A-Z)</option>
+      <option value="name-desc">Name (Z-A)</option>
+      <option value="rating-asc">Rating (Low to High)</option>
+      <option value="rating-desc">Rating (High to Low)</option>
+    </select>
+  </div>
+
+  <!-- Course Cards Container -->
+  <div class="course-cards">
+    <!-- Course cards will be dynamically inserted here by JavaScript -->
+  </div>
+
+  <!-- No Courses Message -->
+  <div id="no-courses-message" style="display: none;">
+    <p>You haven't added any courses yet. Visit a course's page to add them to your list.</p>
+  </div>
+{% endblock %}
+
+{% block extra_js %}
+  <!-- Page-specific JS -->
   <script type="module" src="{% static 'js/my_courses.js' %}"></script>
-</head>
-<body>
-  {% include 'partials/navbar.html' %}
-
-  <main class="main-content">
-    <!-- Hero Section -->
-    <section class="hero">
-      <div class="text-content">
-        <h1>My Courses</h1>
-      </div>
-    </section>
-
-    <!-- Search and Sort Section -->
-    <div class="filter-sort-container">
-      <!-- Search Input -->
-      <input
-        type="text"
-        id="search-input"
-        placeholder="Search by course name..."
-        class="search-input"
-      />
-
-      <!-- Sort Dropdown -->
-      <label for="sort-by">Sort by:</label>
-      <select id="sort-by">
-        <option value="name-asc">Name (A-Z)</option>
-        <option value="name-desc">Name (Z-A)</option>
-        <option value="rating-asc">Rating (Low to High)</option>
-        <option value="rating-desc">Rating (High to Low)</option>
-      </select>
-    </div>
-
-    <!-- Course Cards Container -->
-    <div class="course-cards">
-      <!-- Course cards will be dynamically inserted here by JavaScript -->
-    </div>
-
-    <!-- No Courses Message -->
-    <div id="no-courses-message" style="display: none;">
-      <p>You haven't added any courses yet. Visit a course's page to add them to your list.</p>
-    </div>
-  </main>
-</body>
-</html>
+{% endblock %}
