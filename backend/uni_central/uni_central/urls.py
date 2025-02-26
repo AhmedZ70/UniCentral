@@ -49,7 +49,7 @@ from .views import (
     my_reviews,
     course_planner, 
     professor_detail,
-    discussion_board
+    discussion_board,
 )
 
 urlpatterns = [
@@ -83,7 +83,7 @@ urlpatterns = [
     path('my_classmates/', my_classmates, name='my_classmates'),
     path('my_reviews/', my_reviews, name='my_reviews'),
     path('course_planner/', course_planner, name='course_planner'),
-    path('discussion_board/', discussion_board, name='discussion_board'),    
+    path('discussion_board/<int:context_id>', discussion_board, name='discussion_board'),   
     
     ############
     # API URLs #
@@ -123,7 +123,6 @@ urlpatterns = [
     path('api/users/<str:email_address>/details/', MyAccountView.as_view(), name='user-details'),
     path('api/users/details/edit-details', EditAccountView.as_view(), name='edit-user-details'),
     path('api/users/update-course-plan/', CoursePlanUpdateAPIView.as_view(), name='update-course-plan'),
-        
      
     # Course Filtering URLs
     path('api/filter-courses/', CourseFilteringView.as_view(), name='api-filter_courses'),
