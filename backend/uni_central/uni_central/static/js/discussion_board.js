@@ -112,11 +112,16 @@ function formatRelativeTime(dateString) {
 }
 
 function loadThreads() {
-    const searchTerm = document.getElementById('search-discussions').value;
-    const sortBy = document.getElementById('sort-by').value;
-    const filterBy = document.getElementById('filter-by').value;
+    const searchTerm = document.getElementById('search-discussions')?.value || '';
+    const sortBy = document.getElementById('sort-by')?.value || 'recent';
+    const filterBy = document.getElementById('filter-by')?.value || 'all';
     
     const threadsContainer = document.querySelector('.discussion-threads');
+    if (!threadsContainer) {
+        console.error('Threads container not found. Make sure .discussion-threads exists in your HTML');
+        return;
+    }
+    
     threadsContainer.innerHTML = '<div class="loading">Loading discussions...</div>';
     
     const params = new URLSearchParams();
@@ -126,6 +131,14 @@ function loadThreads() {
     
     const contextType = document.body.dataset.contextType;
     const contextId = document.body.dataset.contextId;
+    
+    console.log('Loading threads with params:', {
+        contextType, 
+        contextId, 
+        searchTerm, 
+        sortBy, 
+        filterBy
+    });
     
     if (!contextType || !contextId) {
         threadsContainer.innerHTML = `
@@ -150,64 +163,93 @@ function loadThreads() {
         return;
     }
     
-    // Fetch threads from the appropriate API
-    fetch(endpoint)
-        .then(response => {
-            if (!response.ok) {
-                throw new Error(`Server returned ${response.status}: ${response.statusText}`);
-            }
-            return response.json();
-        })
-        .then(data => {
-            displayThreads(data);
-        })
-        .catch(error => {
-            console.error('Error loading threads:', error);
-            threadsContainer.innerHTML = `
-                <div class="error-message">
-                    <p>Failed to load discussions. Please try again later.</p>
-                    <p>Error: ${error.message}</p>
-                </div>
-            `;
-        });
+    fetch(endpoint, { 
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(response => {
+        console.log('Response status:', response.status);
+        if (!response.ok) {
+            throw new Error(`Server returned ${response.status}: ${response.statusText}`);
+        }
+        return response.json();
+    })
+    .then(data => {
+        console.log('Threads data received:', JSON.stringify(data, null, 2));
+        displayThreads(data);
+    })
+    .catch(error => {
+        console.error('Error loading threads:', error);
+        threadsContainer.innerHTML = `
+            <div class="error-message">
+                <p>Failed to load discussions. Please check the following:</p>
+                <ul>
+                    <li>Check your network connection</li>
+                    <li>Verify the API endpoint is correct</li>
+                </ul>
+                <p>Error: ${error.message}</p>
+            </div>
+        `;
+    });
 }
 
-// Display threads in the container
 function displayThreads(threads) {
     const threadsContainer = document.querySelector('.discussion-threads');
+    
+    // Clear any existing content
     threadsContainer.innerHTML = '';
+    
+    console.log('Displaying threads:', threads);
     
     if (!threads || threads.length === 0) {
         threadsContainer.innerHTML = `
             <div class="no-results">
-                <p>No discussions found.</p>
+                <p>No discussions found. Be the first to start a thread!</p>
             </div>
         `;
         return;
     }
     
-    // Create a thread element for each thread
+    // Validate thread structure
     threads.forEach(thread => {
-        const threadElement = createThreadElement(thread);
-        threadsContainer.appendChild(threadElement);
+        if (!thread) {
+            console.warn('Skipping invalid thread:', thread);
+            return;
+        }
+        
+        try {
+            const threadElement = createThreadElement(thread);
+            threadsContainer.appendChild(threadElement);
+            
+            // Fetch and display comments for this thread
+            loadThreadComments(thread.id);
+        } catch (error) {
+            console.error('Error creating thread element:', error, thread);
+        }
     });
     
-    // Add event listeners to reply buttons
+    // Attach listeners after creating threads
     attachReplyListeners();
 }
 
-// Create HTML element for a thread
 function createThreadElement(thread) {
+    // Validate thread object
+    if (!thread || typeof thread !== 'object') {
+        console.error('Invalid thread object:', thread);
+        throw new Error('Invalid thread object');
+    }
+    
     const threadElement = document.createElement('div');
     threadElement.className = 'thread';
-    threadElement.dataset.threadId = thread.id;
+    threadElement.dataset.threadId = thread.id || 'unknown';
     
-    // Create thread header
     const headerElement = document.createElement('div');
     headerElement.className = 'thread-header';
     
     const titleElement = document.createElement('h3');
-    titleElement.textContent = thread.title;
+    titleElement.textContent = thread.title || 'Untitled Thread';
     
     const metaElement = document.createElement('div');
     metaElement.className = 'thread-meta';
@@ -222,7 +264,10 @@ function createThreadElement(thread) {
     
     const replyCount = document.createElement('span');
     replyCount.className = 'reply-count';
-    replyCount.textContent = `${thread.comments ? thread.comments.length : 0} replies`;
+    
+    // Ensure comments are an array before counting
+    const commentCount = Array.isArray(thread.comments) ? thread.comments.length : 0;
+    replyCount.textContent = `${commentCount} replies`;
     
     metaElement.appendChild(topicTag);
     metaElement.appendChild(timestamp);
@@ -231,19 +276,18 @@ function createThreadElement(thread) {
     headerElement.appendChild(titleElement);
     headerElement.appendChild(metaElement);
     
-    // Create thread content
     const contentElement = document.createElement('div');
     contentElement.className = 'thread-content';
     
     const questionElement = document.createElement('p');
     questionElement.className = 'question';
-    questionElement.textContent = thread.content;
+    questionElement.textContent = thread.content || 'No content';
     
     const responsesElement = document.createElement('div');
     responsesElement.className = 'responses';
     
     // Add responses/comments if any
-    if (thread.comments && thread.comments.length > 0) {
+    if (Array.isArray(thread.comments) && thread.comments.length > 0) {
         thread.comments.forEach(comment => {
             const responseElement = createResponseElement(comment);
             responsesElement.appendChild(responseElement);
@@ -258,28 +302,40 @@ function createThreadElement(thread) {
     contentElement.appendChild(responsesElement);
     contentElement.appendChild(replyButton);
     
-    // Assemble the thread
     threadElement.appendChild(headerElement);
     threadElement.appendChild(contentElement);
     
     return threadElement;
 }
 
-// Create HTML element for a comment/response
 function createResponseElement(comment) {
+    if (!comment) {
+        console.warn('Skipping invalid comment:', comment);
+        return document.createElement('div');
+    }
+
     const responseElement = document.createElement('div');
     responseElement.className = 'response';
     responseElement.dataset.commentId = comment.id;
     
     const contentParagraph = document.createElement('p');
-    contentParagraph.textContent = comment.content;
+    contentParagraph.textContent = comment.content || 'No comment content';
     
     const metaElement = document.createElement('div');
     metaElement.className = 'response-meta';
     
     const authorSpan = document.createElement('span');
     authorSpan.className = 'author';
-    authorSpan.textContent = comment.author || 'Anonymous Student';
+    
+    // Handle author information
+    if (comment.user && comment.user.fname) {
+        authorSpan.textContent = comment.user.fname;
+    } else if (comment.user && comment.user.email_address) {
+        // Fallback to email username if no name
+        authorSpan.textContent = comment.user.email_address.split('@')[0];
+    } else {
+        authorSpan.textContent = 'Anonymous Student';
+    }
     
     const timestampSpan = document.createElement('span');
     timestampSpan.className = 'timestamp';
@@ -288,9 +344,6 @@ function createResponseElement(comment) {
     const upvoteButton = document.createElement('button');
     upvoteButton.className = 'upvote';
     upvoteButton.textContent = `👍 ${comment.upvotes || 0}`;
-    upvoteButton.addEventListener('click', function() {
-        upvoteComment(comment.id, this);
-    });
     
     metaElement.appendChild(authorSpan);
     metaElement.appendChild(timestampSpan);
@@ -302,7 +355,40 @@ function createResponseElement(comment) {
     return responseElement;
 }
 
-// Attach listeners to reply buttons
+function loadThreadComments(threadId) {
+    // Fetch comments for a specific thread
+    fetch(`/api/threads/${threadId}/comments/`)
+        .then(response => {
+            console.log('Comments fetch response:', response);
+            if (!response.ok) {
+                throw new Error(`Failed to fetch comments. Status: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(comments => {
+            console.log('Comments received:', comments);
+            
+            const threadElement = document.querySelector(`.thread[data-thread-id="${threadId}"]`);
+            if (threadElement) {
+                const responsesContainer = threadElement.querySelector('.responses');
+                responsesContainer.innerHTML = ''; // Clear existing responses
+                
+                // Update reply count
+                const replyCountElement = threadElement.querySelector('.reply-count');
+                replyCountElement.textContent = `${comments.length} replies`;
+                
+                // Add comments
+                comments.forEach(comment => {
+                    const responseElement = createResponseElement(comment);
+                    responsesContainer.appendChild(responseElement);
+                });
+            }
+        })
+        .catch(error => {
+            console.error('Error loading comments:', error);
+        });
+}
+
 function attachReplyListeners() {
     document.querySelectorAll('.reply-button').forEach(button => {
         button.addEventListener('click', function() {
@@ -441,7 +527,7 @@ async function submitReply(form) {
             return;
         }
         
-        // Get user email from Firebase
+        // Get user from Firebase
         const user = auth.currentUser;
         if (!user) {
             alert('You must be logged in to post a reply');
@@ -449,8 +535,9 @@ async function submitReply(form) {
         }
         
         const replyData = {
-            content,
-            email_address: user.email
+            content: content,
+            email_address: user.email,
+            thread_id: threadId  // Explicitly add thread_id to the payload
         };
         
         const response = await fetch(`/api/threads/${threadId}/comments/create/`, {
@@ -500,3 +587,5 @@ async function upvoteComment(commentId, button) {
         console.error('Error upvoting comment:', error);
     }
 }
+
+document.addEventListener('DOMContentLoaded', loadThreads);

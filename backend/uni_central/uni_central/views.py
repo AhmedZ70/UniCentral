@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.views import APIView
@@ -95,26 +95,39 @@ def course_filtering(request):
     """
     return render(request, 'course_filtering.html')
 
-def discussion_board(request, context_type=None, context_id=None):
+def discussion_board(request, context_id, context_type):
     """
-    Render the Discussion Board page with optional context for a specific course or professor.
+    Render discussion board for either a course or professor
+    
+    Args:
+        request: HTTP request
+        context_id: ID of the course or professor
+        context_type: 'course' or 'professor'
     """
-    context = {}
+    # Validate context_type
+    if context_type not in ['course', 'professor']:
+        raise ValueError("Invalid context type")
+
+    # Fetch the appropriate object based on context type
+    if context_type == 'course':
+        context_object = CourseService.get_course(context_id)
+        name = context_object.title  # Using 'title' from your Course model
+    elif context_type == 'professor':
+        context_object = ProfessorService.get_professor(context_id)
+        name = f"{context_object.fname} {context_object.lname}"  # Using fname/lname from your Professor model
     
-    if context_type and context_id:
-        if context_type == 'course':
-            # Get course data
-            course = CourseService.get_course(context_id)
-            context['name'] = course.title
-            context['context_type'] = 'course'
-            context['context_id'] = context_id
-        elif context_type == 'professor':
-            # Get professor data
-            professor = ProfessorService.get_professor(context_id)
-            context['name'] = f"{professor.fname} {professor.lname}"
-            context['context_type'] = 'professor'
-            context['context_id'] = context_id
-    
+    # Fetch threads for this context
+    if context_type == 'course':
+        threads = ThreadService.get_threads_by_course(context_id)
+    else:
+        threads = ThreadService.get_threads_by_professor(context_id)
+
+    context = {
+        'context_id': context_id,
+        'context_type': context_type,
+        'name': name,
+        'threads': threads
+    }
     return render(request, 'discussion_board.html', context)
 
 def about_page(request):
@@ -675,7 +688,7 @@ class CourseThreadsAPIView(APIView):
 
         serialized = ThreadSerializer(threads, many=True)
         return Response(serialized.data)
-    
+
 class ProfessorThreadsAPIView(APIView):
     """
     API View to fetch all threads related to a specific professor.
@@ -759,7 +772,7 @@ class CreateCommentAPIView(APIView):
 
     def post(self, request, thread_id):
         user = UserService.get_user(request.data.get("email_address"))
-        result = CommentService.create_comment(user, thread_id, request.data)
+        result = CommentService.create_comment(thread_id, request.data)
 
         if result["success"]:
             serializer = CommentSerializer(result["comment"])

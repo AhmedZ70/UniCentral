@@ -83,7 +83,14 @@ urlpatterns = [
     path('my_classmates/', my_classmates, name='my_classmates'),
     path('my_reviews/', my_reviews, name='my_reviews'),
     path('course_planner/', course_planner, name='course_planner'),
-    path('discussion_board/<int:context_id>', discussion_board, name='discussion_board'),   
+    path('courses/<int:context_id>/discussion_board/', 
+         discussion_board, 
+         {'context_type': 'course'}, 
+         name='course_discussion_board'),
+    path('professors/<int:context_id>/discussion_board/', 
+         discussion_board, 
+         {'context_type': 'professor'}, 
+         name='professor_discussion_board'),
     
     ############
     # API URLs #

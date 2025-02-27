@@ -10,7 +10,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Corben:wght@400;700&family=Montserrat:ital,wght@0,100..900;1,100..900&family=Sigmar&family=Sniglet:wght@400;800&display=swap" rel="stylesheet">
-    <script src="{% static 'js/course_detail.js' %}"></script>
+    <script type="module" src="{% static 'js/course_detail.js' %}"></script>
     <!-- <style>
         body {
             font-family: 'Montserrat', sans-serif;
@@ -246,7 +246,7 @@
             </div>
             <div class="course-buttons">
                 <button id="enroll-btn" class="leave-review-button">Enroll</button>
-                <a id="discussion-board-btn" href="{% url 'discussion_board' context_id=course_id %}" class="go-to-discussion-board-button">                    Discussion Board
+                <a id="discussion-board-btn" href="{% url 'course_discussion_board' context_id=course_id %}" class="go-to-discussion-board-button">                    Discussion Board
                 </a>
             </div>
         </section>
