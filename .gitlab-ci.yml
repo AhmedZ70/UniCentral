@@ -4,7 +4,8 @@ image: python:3.9-slim
 # Enable Docker-in-Docker for Testcontainers support
 services:
   - name: docker:dind
-    command: ["--tls=false"]
+    pull_policy: if-not-present
+      
 
 # Set environment variables to connect to Docker daemon
 variables:
