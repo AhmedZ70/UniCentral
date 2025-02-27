@@ -631,10 +631,9 @@ class CourseFilteringView(APIView):
     
     def get(self, request):
         try:
-            filters = request.data
+            filters = request.query_params  # <-- Changed from request.data to request.query_params
             filtered_courses = CourseFilteringService.filter_courses(filters)
             serialized = CourseSerializer(filtered_courses, many=True)
-
             return Response(serialized.data, status=status.HTTP_200_OK)
         except Exception as e:
             return Response(
