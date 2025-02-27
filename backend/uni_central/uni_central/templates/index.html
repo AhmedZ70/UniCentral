@@ -1,53 +1,42 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  {% load static %}
-  <meta charset="UTF-8">
-  <link rel="icon" href="/static/assets/logo_black.png">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>UniCentral</title>
-  
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}UniCentral - Home{% endblock %}
+
+{% block extra_css %}
+  <!-- Page-specific CSS -->
   <link rel="stylesheet" href="{% static 'css/style.css' %}">
-  
-  <!-- Fonts -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Corben:wght@400;700&family=Montserrat:ital,wght@0,100..900;1,100..900&family=Sigmar&family=Sniglet:wght@400;800&display=swap" rel="stylesheet">
-  <script type="module" src="{% static 'js/auth.js' %}"></script>
-</head>
+{% endblock %}
 
-{% include 'partials/navbar.html' %}
-
-<main class="main-content">
-  <section class="hero">
-    <div class="text-content">
-      <div class="text-container">
-        <h1><span class="overlap-arrow">Everything you need to know about your courses all in one place</h1>
+{% block content %}
+  <main class="main-content">
+    <!-- Hero Section -->
+    <section class="hero">
+      <div class="text-content">
+        <div class="text-container">
+          <h1><span class="overlap-arrow">Everything you need to know about your courses all in one place</span></h1>
+        </div>
+        <img src="{% static 'assets/orange_arrow_transparent.png' %}" alt="Orange Arrow" class="orange-arrow">
+        <p>Empowering students, one class at a time.</p>
+        <div class="search-bar">
+          <input type="text" placeholder="University of ..." class="search-input">
+          <button class="search-btn">SEARCH &#10140;</button>
+        </div>
+        <p class="subtext">Search for your university to find course information.<br>Aims to redefine the way that college students research and ultimately choose their courses each term.</p>
       </div>
-      <img src="{%static 'assets/orange_arrow_transparent.png' %}" alt="Orange Arrow" class="orange-arrow">
-      <p>Empowering students, one class at a time.</p>
-      <div class="search-bar">
-        <input type="text" placeholder="University of ..." class="search-input">
-        <button class="search-btn">SEARCH &#10140;</button>
+      <div class="illustrations">
+        <img src="{% static 'assets/student_studying_transparent.png' %}" alt="Student Illustration">
       </div>
-      <p class="subtext">Search for your university to find course information. 
-        <br>Aims to redefine the way that college students research and ultimately choose their courses each term.</br>
-      </p>
-    </div>
-    <div class="illustrations">
-      <!-- Corrected image path with Django static tag -->
-      <img src="{% static 'assets/student_studying_transparent.png' %}" alt="Student Illustration">
-    </div>
-  </section>
-  <div class="orange-bar"></div>
-  <!-- React Root Element -->
-  <div id="react-root"></div>
-</main>
+    </section>
+    <div class="orange-bar"></div>
+    <!-- React Root Element -->
+    <div id="react-root"></div>
+  </main>
+{% endblock %}
 
-<!-- Include the React Bundle -->
-<script src="{% static 'frontend/bundle.js' %}"></script>
-
-<!-- Corrected JavaScript file path with Django static tag -->
-<script src="{% static 'js/index.js' %}"></script>
-</body>
-</html>
+{% block extra_js %}
+  <!-- Include the React Bundle -->
+  <script src="{% static 'frontend/bundle.js' %}"></script>
+  <!-- Page-specific JS -->
+  <script src="{% static 'js/index.js' %}"></script>
+{% endblock %}

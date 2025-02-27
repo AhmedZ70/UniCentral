@@ -1,20 +1,14 @@
+{% extends 'base.html' %}
 {% load static %}
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <link rel="icon" href="/static/assets/logo_black.png">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Professors - UniCentral</title>
-  <link rel="stylesheet" href="{% static 'css/professors.css' %}">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Corben:wght@400;700&family=Montserrat:ital,wght@0,100..900;1,100..900&family=Sigmar&family=Sniglet:wght@400;800&display=swap" rel="stylesheet">
-</head>
-<body>
-  {% include 'partials/navbar.html' %}
+{% block title %}Professors - UniCentral{% endblock %}
 
+{% block extra_css %}
+  <!-- Page-specific CSS -->
+  <link rel="stylesheet" href="{% static 'css/professors.css' %}">
+{% endblock %}
+
+{% block content %}
   <main class="main-content professors-page">
     <div class="professors-header">
       <h1>Professors @</h1>
@@ -24,7 +18,7 @@
         <option value="MIT">MIT</option>
       </select>
     </div>
-  
+
     <h2 id="departments-title">Departments</h2>
     <div class="departments" id="departments">
       <p class="loading-message">Loading departments...</p>
@@ -38,7 +32,9 @@
       <p class="loading-message">Select a department to view its professors.</p>
     </div>
   </main>
+{% endblock %}
 
+{% block extra_js %}
+  <!-- Page-specific JS -->
   <script src="{% static 'js/professors.js' %}"></script>
-</body>
-</html>
+{% endblock %}
