@@ -1,44 +1,40 @@
+{% extends 'base.html' %}
 {% load static %}
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <link rel="icon" href="/static/assets/logo_black.png">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Courses - UniCentral</title>
-  <link rel="stylesheet" href="{% static 'css/style.css' %}">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Corben:wght@400;700&family=Montserrat:ital,wght@0,100..900;1,100..900&family=Sigmar&family=Sniglet:wght@400;800&display=swap" rel="stylesheet">
-</head>
+{% block title %}Courses - UniCentral{% endblock %}
 
-{% include 'partials/navbar.html' %}
+{% block extra_css %}
+  <!-- Page-specific CSS -->
+  <link rel="stylesheet" href="{% static 'css/courses.css' %}">
+{% endblock %}
 
-<main class="main-content courses-page">
-  <div class="courses-header">
-    <h1>Courses @</h1>
-    <select id="university" class="university-select">
-      <option value="University of Utah">University of Utah</option>
-      <option value="Stanford University">Stanford University</option>
-      <option value="MIT">MIT</option>
-    </select>
-  </div>
+{% block content %}
+  <main class="main-content courses-page">
+    <div class="courses-header">
+      <h1>Courses @</h1>
+      <select id="university" class="university-select">
+        <option value="University of Utah">University of Utah</option>
+        <option value="Stanford University">Stanford University</option>
+        <option value="MIT">MIT</option>
+      </select>
+    </div>
 
-  <h2 id="departments-title">Departments</h2>
-  <div class="departments" id="departments">
-    <p class="loading-message">Loading departments...</p>
-  </div>
+    <h2 id="departments-title">Departments</h2>
+    <div class="departments" id="departments">
+      <p class="loading-message">Loading departments...</p>
+    </div>
 
-  <!-- Breadcrumb container -->
-  <div id="breadcrumb">Departments</div>
+    <!-- Breadcrumb container -->
+    <div id="breadcrumb">Departments</div>
 
-  <h2 id="courses-title">Courses</h2>
-  <div class="courses" id="courses">
-    <p class="loading-message">Select a department to view its courses.</p>
-  </div>
-</main>
+    <h2 id="courses-title">Courses</h2>
+    <div class="courses" id="courses">
+      <p class="loading-message">Select a department to view its courses.</p>
+    </div>
+  </main>
+{% endblock %}
 
-<script src="{% static 'js/courses.js' %}"></script>
-</body>
-</html>
+{% block extra_js %}
+  <!-- Page-specific JS -->
+  <script src="{% static 'js/courses.js' %}"></script>
+{% endblock %}

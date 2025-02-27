@@ -1,62 +1,92 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  {% load static %}
-  <meta charset="UTF-8">
-  <link rel="icon" href="/static/assets/logo_black.png">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>UniCentral</title>
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Course Filtering - UniCentral{% endblock %}
+
+{% block extra_css %}
   <link rel="stylesheet" href="{% static 'css/course_filtering.css' %}">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Corben:wght@400;700&family=Montserrat:ital,wght@0,100..900;1,100..900&family=Sigmar&family=Sniglet:wght@400;800&display=swap" rel="stylesheet">
+{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero">
+  <div class="text-content">
+    <h1>Course Filters</h1>
+  </div>
+</section>
+
+<!-- Filter Form (submits on Enter or when clicking the button) -->
+<form id="filter-form" class="filter-sort-container">
+  <input type="text" id="department-input" placeholder="Department (e.g., CS)">
+  <input type="text" id="course-title-input" placeholder="Course Title (e.g., Intro)">
+  <input type="number" id="min-course-number-input" placeholder="Min Course Number">
+  <input type="number" id="max-course-number-input" placeholder="Max Course Number">
+  <input type="text" id="professor-input" placeholder="Professor (e.g., Smith)">
+  <input type="number" id="credits-input" placeholder="Credits">
+  <!-- New fields for ratings and difficulty -->
+  <input type="number" step="0.1" id="min-rating-input" placeholder="Min Avg Rating">
+  <input type="number" step="0.1" id="max-rating-input" placeholder="Max Avg Rating">
+  <input type="number" step="0.1" id="min-difficulty-input" placeholder="Min Avg Difficulty">
+  <input type="number" step="0.1" id="max-difficulty-input" placeholder="Max Avg Difficulty">
+  <button type="submit" class="search-button">SEARCH &#10140;</button>
+  <!-- Unsupported fields – commented out because they are not supported by the backend right now -->
+    <!--
+    {#
+    <label for="subject" class="subject-label">Subject: 
+      <input type="text" class="subject-input">
+    </label>
+    <label for="time-per-week" class="time-per-week-label">Time spent per week: 
+      <input type="number" class="time-per-week-input"> hours
+    </label>
+    <label for="avg-grade" class="avg-grade-label">Average grade: 
+      <input type="text" class="avg-grade-input">
+    </label>
+    <label for="mandatory-attendance" class="mandatory-attendance-label">Mandatory attendance
+      <input type="checkbox" class="mandatory-attendance-input">
+    </label>
+    <label for="in-person" class="in-person-label">In person
+      <input type="checkbox" class="in-person-input">
+    </label>
+    <label for="online" class="online-label">Online
+      <input type="checkbox" class="online-input">
+    </label>
+    <label for="hybrid" class="hybrid-label">Hybrid
+      <input type="checkbox" class="hybrid-input">
+    </label>
+    <label for="required-course" class="required-course-label">Required course
+      <input type="checkbox" class="required-course-input">
+    </label>
+    <label for="GenEd" class="gened-label">GenEd
+      <input type="checkbox" class="gened-input">
+    </label>
+    <label for="no-exams" class="no-exams-label">No exams
+      <input type="checkbox" class="no-exams-input">
+    </label>
+    <label for="presenting-required" class="presenting-required-label">Presenting required
+      <input type="checkbox" class="presenting-required-input">
+    </label>
+    <label for="high-course-rating" class="high-course-rating-label">High course rating
+      <input type="checkbox" class="high-course-rating-input">
+    </label>
+    <label for="high-professor-rating" class="high-professor-rating-label">High professor rating
+      <input type="checkbox" class="high-professor-rating-input">
+    </label>
+    #}
+    -->
+</form>
+
+<!-- Results Container -->
+<div class="course-cards">
+  <!-- Course cards will be dynamically inserted here -->
+</div>
+<div id="no-courses-message" class="no-courses-message" style="display: none;">
+  <p>No courses match your search criteria.</p>
+</div>
+{% endblock %}
+
+{% block extra_js %}
   <script src="{% static 'js/course_filtering.js' %}"></script>
-</head>
+{% endblock %}
 
-{% include 'partials/navbar.html' %}
 
-<main class="main-content">
-    <section class="hero">
-      <div class="text-content">
-        <div class="text-container">
-          <h1>Course Filters</h1>
-        </div>
-      </div>
-    </section>
 
-    <div class="filters">
-        <label for="school" class="school-label">School:
-        <input type="text" class="school-input"></label>
-        <label for="subject" class="subject-label">Subject: 
-        <input type="text" class="subject-input"></label>
-        <label for="course-level" class="course-level-label">Course Level: 
-        <input type="number" class="course-level-input"></label>
-        <label for="professor" class="professor-label">Professor:
-        <input type="text" class="professor-input"></label>
-        <label for="time-per-week" class="time-per-week-label">Time spent per week: 
-        <input type="number" class="time-per-week-input"> hours</label>
-        <label for="avg-grade" class="avg-grade-label">Average grade: 
-        <input type="text" class="avg-grade-input"></label>  
-        <label for="mandatory-attendance" class="mandatory-attendance-label">Mandatory attendance
-        <input type="checkbox" class="mandatory-attendance-input"></label>
-        <label for="in-person" class="in-person-label">In person
-        <input type="checkbox" class="in-person-input"></label>
-        <label for="online" class="online-label">Online
-        <input type="checkbox" class="online-input"></label>
-        <label for="hybrid" class="hybrid-label">Hybrid
-        <input type="checkbox" class="hybrid-input"></label>
-        <label for="required-course" class="required-course-label">Required course
-        <input type="checkbox" class="required-course-input"></label>
-        <label for="GenEd" class="gened-label">GenEd
-        <input type="checkbox" class="gened-input"></label>
-        <label for="no-exams" class="no-exams-label">No exams
-        <input type="checkbox" class="no-exams-input"></label>
-        <label for="presenting-required" class="presenting-required-label">Presenting required
-        <input type="checkbox" class="presenting-required-input"></label>
-        <label for="high-course-rating" class="high-course-rating-label">High course rating
-        <input type="checkbox" class="high-course-rating-input"></label>
-        <label for="high-professor-rating" class="high-professor-rating-label">High professor rating
-        <input type="checkbox" class="high-professor-rating-input"></label>
-        <button type="submit" class="search-button">SEARCH &#10140;</button>
-      </div>
-    </div>

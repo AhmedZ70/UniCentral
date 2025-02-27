@@ -1,0 +1,34 @@
+<!-- templates/base.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  {% load static %}
+  <meta charset="UTF-8">
+  <link rel="icon" href="{% static 'assets/logo_black.png' %}">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}UniCentral{% endblock %}</title>
+  <!-- Global CSS -->
+  <link rel="stylesheet" href="{% static 'css/navbar.css' %}">
+  <link rel="stylesheet" href="{% static 'css/dropdown.css' %}">
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
+  <!-- Block for page-specific CSS -->
+  {% block extra_css %}{% endblock %}
+</head>
+<body>
+  <!-- Include Navbar -->
+  {% include 'partials/navbar.html' %}
+
+  <!-- Main Content -->
+  <main class="main-content">
+    {% block content %}
+    <!-- Content will be overridden by child templates -->
+    {% endblock %}
+  </main>
+
+  <!-- Block for page-specific JS -->
+  {% block extra_js %}{% endblock %}
+</body>
+</html>

@@ -1,133 +1,150 @@
-// import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js';
-// import { getAuth, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js';
-
-// const firebaseConfig = {
-//     apiKey: "AIzaSyD0wF4R9GdY2m7eAwVL_j_mihLit4rRZ5Q",
-//     authDomain: "unicentral-b6c23.firebaseapp.com",
-//     projectId: "unicentral-b6c23",
-//     storageBucket: "unicentral-b6c23.firebasestorage.app",
-//     messagingSenderId: "554502030441",
-//     appId: "1:554502030441:web:6dccab580dbcfdb974cef8",
-//     measurementId: "G-M4L04508RH",
-//     clientId: "554502030441-g68f3tti18fiip1hpr6ehn6q6u5sn8fh.apps.googleusercontent.com"
-// };
-
-// // Initialize Firebase only once
-// const app = initializeApp(firebaseConfig);
-// const auth = getAuth(app);
-
 document.addEventListener('DOMContentLoaded', function() {
-    const searchButton = document.querySelector('.search-button');
-    if (searchButton) {
-        searchButton.addEventListener('click', performSearch);
-        console.log("Search button listener added");
-    } else {
-        console.error("Search button not found");
-    }
-});
-
-async function performSearch() {
-    // Get values from form inputs
+    const filterForm = document.getElementById('filter-form');
+    
+    // Submit the form on Enter (or button click)
+    filterForm.addEventListener('submit', function(e) {
+      e.preventDefault();
+      performSearch();
+    });
+  });
+  
+  async function performSearch() {
+    // Gather values from filter inputs (semester removed)
     const filters = {
-        department: document.querySelector('.school-input').value.trim(),
-        title: document.querySelector('.subject-input').value.trim(),
-        number: document.querySelector('.course-level-input').value,
-        professor: document.querySelector('.professor-input').value.trim(),
-        
-        // Convert checkboxes to review query params
-        mandatory_attendance: document.querySelector('.mandatory-attendance-input').checked,
-        in_person: document.querySelector('.in-person-input').checked,
-        online: document.querySelector('.online-input').checked,
-        hybrid: document.querySelector('.hybrid-input').checked,
-        required_course: document.querySelector('.required-course-input').checked,
-        is_gened: document.querySelector('.gened-input').checked,
-        no_exams: document.querySelector('.no-exams-input').checked,
-        presentations: document.querySelector('.presenting-required-input').checked
+      department: document.getElementById('department-input').value.trim(),
+      title: document.getElementById('course-title-input').value.trim(),
+      min_number: document.getElementById('min-course-number-input').value,
+      max_number: document.getElementById('max-course-number-input').value,
+      professor: document.getElementById('professor-input').value.trim(),
+      credits: document.getElementById('credits-input').value,
+      min_rating: document.getElementById('min-rating-input').value,
+      max_rating: document.getElementById('max-rating-input').value,
+      min_difficulty: document.getElementById('min-difficulty-input').value,
+      max_difficulty: document.getElementById('max-difficulty-input').value
     };
-
-    // Remove empty/null/undefined values
+  
+    // Remove empty or falsey values
     Object.keys(filters).forEach(key => {
-        if (!filters[key] && filters[key] !== false) {
-            delete filters[key];
-        }
+      if (!filters[key]) {
+        delete filters[key];
+      }
     });
-
+  
     try {
-        // Convert filters object to URL search params
-        const queryString = new URLSearchParams(filters).toString();
-        const response = await fetch(`/api/filter-courses/?${queryString}`, {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json',
-            }
-        });
-
-        const data = await response.json();
-        displayResults(data);
+      // Build query string and send GET request to API
+      const queryString = new URLSearchParams(filters).toString();
+      const response = await fetch(`/api/filter-courses/?${queryString}`, {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json' }
+      });
+      const data = await response.json();
+      displayResults(data);
     } catch (error) {
-        console.error('Error:', error);
-        displayError('An error occurred while searching for courses.');
+      console.error('Error:', error);
+      displayError('An error occurred while searching for courses.');
     }
-}
-
-function displayResults(courses) {
-    let resultsContainer = document.querySelector('.search-results');
-    if (!resultsContainer) {
-        resultsContainer = document.createElement('div');
-        resultsContainer.className = 'search-results';
-        document.querySelector('.main-content').appendChild(resultsContainer);
-    }
+  }
+  
+  function displayResults(courses) {
+    const resultsContainer = document.querySelector('.course-cards');
     resultsContainer.innerHTML = '';
-
-    if (courses.length === 0) {
-        resultsContainer.innerHTML = `
-            <div class="no-results">
-                <p>No courses match your search criteria.</p>
-            </div>
-        `;
-        return;
+  
+    if (!courses || courses.length === 0) {
+      document.getElementById('no-courses-message').style.display = "block";
+      return;
     }
-
+    document.getElementById('no-courses-message').style.display = "none";
+  
     courses.forEach(course => {
-        const courseCard = document.createElement('div');
-        courseCard.className = 'course-card';
-        courseCard.innerHTML = `
-            <div class="course-info">
-                <h2>${course.subject} ${course.number} ${course.title}</h2>
-                
-                <div class="course-details">
-                    <p>Credits: ${course.credits}</p>
-                    ${course.avg_rating ? `<p>Average Rating: ${course.avg_rating.toFixed(1)}/5.0</p>` : ''}
-                    ${course.avg_difficulty ? `<p>Average Difficulty: ${course.avg_difficulty.toFixed(1)}/5.0</p>` : ''}
-                    ${course.semester ? `<p>Semester: ${course.semester}</p>` : ''}
-                    
-                    <div class="course-attributes">
-                        ${course.mandatory_attendance ? '<span class="attribute">Mandatory Attendance</span>' : ''}
-                        ${course.in_person ? '<span class="attribute">In Person</span>' : ''}
-                        ${course.online ? '<span class="attribute">Online</span>' : ''}
-                        ${course.hybrid ? '<span class="attribute">Hybrid</span>' : ''}
-                        ${course.required_course ? '<span class="attribute">Required</span>' : ''}
-                        ${course.is_gened ? '<span class="attribute">GenEd</span>' : ''}
-                        ${course.no_exams ? '<span class="attribute">No Exams</span>' : ''}
-                        ${course.presentations ? '<span class="attribute">Presentations Required</span>' : ''}
-                    </div>
-                </div>
-            </div>
-        `;
-        resultsContainer.appendChild(courseCard);
-    });
-}
-
-function displayError(message) {
-    let resultsContainer = document.querySelector('.search-results');
-    if (!resultsContainer) {
-        resultsContainer = document.createElement('div');
-        resultsContainer.className = 'search-results';
-        document.querySelector('.main-content').appendChild(resultsContainer);
-    }
-    resultsContainer.innerHTML = `
-        <div class="error-message">
-            <p>${message}</p>
+      // Create clickable card linking to course details page
+      const cardLink = document.createElement('a');
+      cardLink.href = `/courses/${course.id}/`;
+      cardLink.className = 'course-card';
+  
+      cardLink.innerHTML = `
+        <div class="course-info">
+          <h3>${course.subject} ${course.number}: ${course.title}</h3>
+          <p><strong>Department:</strong> ${course.department ? course.department.name : "N/A"}</p>
+          <div class="rating-container">
+            <p><strong>Average Rating:</strong></p>
+            <div class="rating-stars">${createRatingStars(course.avg_rating)}</div>
+          </div>
+          <div class="difficulty-container">
+            <p><strong>Average Difficulty:</strong></p>
+            <div class="difficulty-rating">${createDifficultyCircles(course.avg_difficulty)}</div>
+          </div>
+          <p><strong>Credits:</strong> ${course.credits || "N/A"}</p>
         </div>
+      `;
+      resultsContainer.appendChild(cardLink);
+    });
+  }
+  
+  function displayError(message) {
+    const resultsContainer = document.querySelector('.course-cards');
+    resultsContainer.innerHTML = `
+      <div class="error-message">
+        <p>${message}</p>
+      </div>
     `;
-}
+  }
+  
+  // Functions for rendering rating stars and difficulty circles
+  
+  function createRatingStars(rating) {
+    const maxStars = 5;
+    let starsHTML = '';
+  
+    for (let i = 1; i <= maxStars; i++) {
+      if (i <= rating) {
+        starsHTML += '<span class="star filled">★</span>';
+      } else if (i - 1 < rating && rating < i) {
+        const percentage = (rating - (i - 1)) * 100;
+        starsHTML += `
+          <span class="star partial" style="position: relative;">
+            <span class="star filled" style="position: absolute; width: ${percentage}%; overflow: hidden;">★</span>
+            <span class="star">★</span>
+          </span>
+        `;
+      } else {
+        starsHTML += '<span class="star">★</span>';
+      }
+    }
+    return starsHTML;
+  }
+  
+  function createDifficultyCircles(difficulty) {
+    const maxCircles = 6;
+    let circlesHTML = '';
+  
+    for (let i = 1; i <= maxCircles; i++) {
+      if (i <= difficulty) {
+        let colorClass = '';
+        if (i <= 2) {
+          colorClass = 'green';
+        } else if (i <= 4) {
+          colorClass = 'yellow';
+        } else {
+          colorClass = 'red';
+        }
+        circlesHTML += `<span class="difficulty-circle filled ${colorClass}"></span>`;
+      } else if (i - 1 < difficulty && difficulty < i) {
+        const percentage = (difficulty - (i - 1)) * 100;
+        let colorClass = '';
+        if (i <= 2) {
+          colorClass = 'green';
+        } else if (i <= 4) {
+          colorClass = 'yellow';
+        } else {
+          colorClass = 'red';
+        }
+        circlesHTML += `
+          <span class="difficulty-circle partial" style="--percentage: ${percentage}%; --color: ${colorClass};"></span>
+        `;
+      } else {
+        circlesHTML += '<span class="difficulty-circle"></span>';
+      }
+    }
+    return circlesHTML;
+  }
+  
