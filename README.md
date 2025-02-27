@@ -28,6 +28,8 @@ UniCentral not only addresses a real and recurring student need but also serves 
 
 ---
 
+[![pipeline status](https://capstone.cs.utah.edu/unicentral/unicentral/badges/main/pipeline.svg)](https://capstone.cs.utah.edu/unicentral/unicentral/-/commits/main)
+
 
 ## **Summary of Technologies**
 
