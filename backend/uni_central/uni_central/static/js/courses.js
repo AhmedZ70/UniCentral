@@ -9,16 +9,6 @@ document.addEventListener("DOMContentLoaded", () => {
     // ------------------------------------------------------------------------
     // [Section 1: Setup constants and initial UI state]
     // ------------------------------------------------------------------------
-    /**
-     * 1. We define the key HTML elements we'll manipulate:
-     *    - departmentsContainer: where departments will be listed
-     *    - coursesContainer: where courses will be listed
-     *    - breadcrumbContainer: a simple breadcrumb navigation element
-     *
-     * 2. We also set the initial visibility of these containers:
-     *    - Show the departmentsContainer
-     *    - Hide the coursesContainer
-     */
     const departmentsApiUrl = "/api/departments/";
     const departmentsContainer = document.getElementById("departments");
     const coursesContainer = document.getElementById("courses");
@@ -31,11 +21,6 @@ document.addEventListener("DOMContentLoaded", () => {
     // ------------------------------------------------------------------------
     // [Section 2: Fetch and Display Departments]
     // ------------------------------------------------------------------------
-    /**
-     * We fetch the list of departments from the server (departmentsApiUrl) and pass
-     * the response to the renderDepartments function if successful. If there's an
-     * error, we display a message to the user in the departmentsContainer.
-     */
     fetch(departmentsApiUrl)
         .then((response) => response.json())
         .then((data) => renderDepartments(data))
@@ -48,13 +33,6 @@ document.addEventListener("DOMContentLoaded", () => {
     // ------------------------------------------------------------------------
     // [Function: Render Departments]
     // ------------------------------------------------------------------------
-    /**
-     * Renders the list of departments in alphabetical groups based on the first
-     * letter of the department name. Clicking on any department triggers a call
-     * to 'showCourses' to display the department's courses.
-     *
-     * @param {Array} departments - Array of department objects from the server.
-     */
     function renderDepartments(departments) {
         if (!departments || departments.length === 0) {
             departmentsContainer.innerHTML = "<p>No departments available.</p>";
@@ -113,23 +91,17 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Cache courses for the selected department
     let cachedCourses = {};
+
     // ------------------------------------------------------------------------
     // [Function: Show Courses for a Selected Department]
     // ------------------------------------------------------------------------
-    /**
-     * Fetches the courses for a specific department (by departmentId) and then
-     * calls 'renderCourses' to display them. If there's an error, a message is shown.
-     *
-     * @param {number} departmentId - The ID of the department to fetch courses for.
-     * @param {string} departmentName - The name of the department for breadcrumb display.
-     */
     async function showCourses(departmentId, departmentName) {
         // Check if courses are already cached
         if (cachedCourses[departmentId]) {
             renderCourses(cachedCourses[departmentId], departmentName);
             return;
         }
-    
+
         try {
             const response = await fetch(`/api/departments/${departmentId}/courses/`);
             if (!response.ok) {
@@ -144,29 +116,19 @@ document.addEventListener("DOMContentLoaded", () => {
             renderCourses([], departmentName);
         }
     }
-    
-
 
     // ------------------------------------------------------------------------
     // [Function: Render Courses in the UI]
     // ------------------------------------------------------------------------
-    /**
-     * Takes an array of courses and the department's name, updates the breadcrumb,
-     * and displays each course in a clickable link. Also hides the department list
-     * and shows the courses container.
-     *
-     * @param {Array} courses - Array of course objects.
-     * @param {string} departmentName - The name of the department for the breadcrumb.
-     */
     function renderCourses(courses, departmentName) {
         console.log("Rendering courses for department:", departmentName, courses);
-    
+
         // Update breadcrumb
         breadcrumbContainer.innerHTML = `
             <a href="#" id="show-departments" class="breadcrumb-link">Departments</a> / ${departmentName}
         `;
         coursesContainer.innerHTML = ""; // Clear existing content
-    
+
         // Check if the courses list is empty
         if (!courses || courses.length === 0) {
             coursesContainer.innerHTML = "<p>No courses available for this department.</p>";
@@ -175,7 +137,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 const courseLink = document.createElement("a");
                 courseLink.href = `/courses/${course.id}/`; // Link to course detail page
                 courseLink.classList.add("course-link");
-    
+
                 const courseDiv = document.createElement("div");
                 courseDiv.classList.add("course-item");
                 courseDiv.innerHTML = `
@@ -187,13 +149,13 @@ document.addEventListener("DOMContentLoaded", () => {
                 coursesContainer.appendChild(courseLink);
             });
         }
-    
+
         // Switch visibility: hide departments, show courses
         departmentsContainer.classList.remove("visible");
         departmentsContainer.classList.add("hidden");
         coursesContainer.classList.remove("hidden");
         coursesContainer.classList.add("visible");
-    
+
         // Add event listener to the breadcrumb "Departments" link to go back
         const showDeptsLink = document.getElementById("show-departments");
         showDeptsLink.addEventListener("click", (e) => {
@@ -201,14 +163,10 @@ document.addEventListener("DOMContentLoaded", () => {
             showDepartmentsView();
         });
     }
-    
 
     // ------------------------------------------------------------------------
     // [Function: Show Departments View]
     // ------------------------------------------------------------------------
-    /**
-     * Resets the UI to display the department list and hides the courses container.
-     */
     function showDepartmentsView() {
         breadcrumbContainer.textContent = "Departments";
         coursesContainer.classList.remove("visible");

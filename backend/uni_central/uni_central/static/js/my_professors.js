@@ -1,11 +1,34 @@
-import { auth, onAuthStateChanged } from './auth.js';
+import { initializeApp, getApps } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js';
+import { getAuth, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js';
+
+const firebaseConfig = {
+  apiKey: "AIzaSyD0wF4R9GdY2m7eAwVL_j_mihLit4rRZ5Q",
+  authDomain: "unicentral-b6c23.firebaseapp.com",
+  projectId: "unicentral-b6c23",
+  storageBucket: "unicentral-b6c23.appspot.com",
+  messagingSenderId: "554502030441",
+  appId: "1:554502030441:web:6dccab580dbcfdb974cef8",
+  measurementId: "G-M4L04508RH",
+  clientId: "554502030441-g68f3tti18fiip1hpr6ehn6q6u5sn8fh.apps.googleusercontent.com"
+};
+
+// Initialize Firebase only if it hasn't been initialized already
+let app;
+const apps = getApps();
+if (!apps.length) {
+  app = initializeApp(firebaseConfig);
+} else {
+  app = apps[0]; // Use the existing app
+}
+
+const auth = getAuth(app);
 
 document.addEventListener("DOMContentLoaded", () => {
   let myProfessors = [];
   const professorCardsContainer = document.querySelector('.professor-cards-container');
   const noProfessorsMessage = document.getElementById('no-professors-message');
   const sortBy = document.getElementById('sort-by');
-  const searchInput = document.getElementById('search-input'); // New search input
+  const searchInput = document.getElementById('search-input');
 
   // Initialize the page with authentication check
   onAuthStateChanged(auth, (user) => {
@@ -28,7 +51,7 @@ document.addEventListener("DOMContentLoaded", () => {
       }
       const data = await response.json();
       myProfessors = data;
-      displayProfessors(myProfessors); // Display all professors initially
+      displayProfessors(myProfessors);
     } catch (error) {
       console.error("Error fetching professors:", error);
       noProfessorsMessage.style.display = "block";
@@ -75,7 +98,7 @@ document.addEventListener("DOMContentLoaded", () => {
       professorCardsContainer.appendChild(cardLink);
     });
 
-    // Add event listeners to "Remove" buttons and prevent the card's navigation when clicked
+    // Add event listeners to "Remove" buttons
     document.querySelectorAll('.remove-professor-btn').forEach((button) => {
       button.addEventListener('click', (e) => {
         e.preventDefault();
@@ -172,12 +195,14 @@ document.addEventListener("DOMContentLoaded", () => {
    * Create difficulty circles HTML with fractional support
    */
   function createDifficultyCircles(difficulty) {
+    // Convert to a number and floor it (no partial circles)
+    const flooredDifficulty = Math.floor(parseFloat(difficulty) || 0);
     const maxCircles = 6;
     let circlesHTML = '';
-
+  
     for (let i = 1; i <= maxCircles; i++) {
-      if (i <= difficulty) {
-        // Full circle
+      if (i <= flooredDifficulty) {
+        // Determine color based on circle index
         let colorClass = '';
         if (i <= 2) {
           colorClass = 'green';
@@ -187,25 +212,13 @@ document.addEventListener("DOMContentLoaded", () => {
           colorClass = 'red';
         }
         circlesHTML += `<span class="difficulty-circle filled ${colorClass}"></span>`;
-      } else if (i - 1 < difficulty && difficulty < i) {
-        // Partial circle
-        const percentage = (difficulty - (i - 1)) * 100;
-        let colorClass = '';
-        if (i <= 2) {
-          colorClass = 'green';
-        } else if (i <= 4) {
-          colorClass = 'yellow';
-        } else {
-          colorClass = 'red';
-        }
-        circlesHTML += `
-          <span class="difficulty-circle partial" style="--percentage: ${percentage}%; --color: ${colorClass};"></span>
-        `;
       } else {
         // Empty circle
-        circlesHTML += '<span class="difficulty-circle"></span>';
+        circlesHTML += `<span class="difficulty-circle"></span>`;
       }
     }
+  
     return circlesHTML;
   }
+  
 });

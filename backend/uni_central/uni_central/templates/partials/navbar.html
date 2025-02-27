@@ -1,5 +1,9 @@
 <!-- templates/partials/navbar.html -->
 {% load static %}
+<!-- Include the CSS files for navbar and dropdown -->
+<link rel="stylesheet" href="{% static 'css/navbar.css' %}">
+<link rel="stylesheet" href="{% static 'css/dropdown.css' %}">
+
 <header class="navbar">
     <div class="logo">
       <button class="logo-home-btn">
@@ -19,4 +23,4 @@
       </ul>
     </nav>
     {% include 'partials/dropdown.html' %}
-  </header>
+</header>

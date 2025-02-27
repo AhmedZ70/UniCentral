@@ -1,4 +1,4 @@
-import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js';
+import { initializeApp, getApps } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js';
 import { getAuth, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js';
 
 const firebaseConfig = {
@@ -12,8 +12,15 @@ const firebaseConfig = {
   clientId: "554502030441-g68f3tti18fiip1hpr6ehn6q6u5sn8fh.apps.googleusercontent.com"
 };
 
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
+// Initialize Firebase only if it hasn't been initialized already
+let app;
+const apps = getApps();
+if (!apps.length) {
+  app = initializeApp(firebaseConfig);
+} else {
+  app = apps[0]; // Use the existing app
+}
+
 const auth = getAuth(app);
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -85,7 +92,7 @@ document.addEventListener("DOMContentLoaded", () => {
           <p><strong>Credits:</strong> ${course.credits || "N/A"}</p>
         </div>
         <div class="course-actions">
-          <button class="remove-course-btn" data-course-id="${course.id}">Remove</button>
+          <button class="remove-course-btn" data-course-id="${course.id}">Unenroll</button>
         </div>
       `;
 
@@ -190,12 +197,14 @@ document.addEventListener("DOMContentLoaded", () => {
    * Create difficulty circles HTML with fractional support
    */
   function createDifficultyCircles(difficulty) {
+    // Convert to a number and floor it (no partial circles)
+    const flooredDifficulty = Math.floor(parseFloat(difficulty) || 0);
     const maxCircles = 6;
     let circlesHTML = '';
-
+  
     for (let i = 1; i <= maxCircles; i++) {
-      if (i <= difficulty) {
-        // Full circle
+      if (i <= flooredDifficulty) {
+        // Determine color based on circle index
         let colorClass = '';
         if (i <= 2) {
           colorClass = 'green';
@@ -205,25 +214,13 @@ document.addEventListener("DOMContentLoaded", () => {
           colorClass = 'red';
         }
         circlesHTML += `<span class="difficulty-circle filled ${colorClass}"></span>`;
-      } else if (i - 1 < difficulty && difficulty < i) {
-        // Partial circle
-        const percentage = (difficulty - (i - 1)) * 100;
-        let colorClass = '';
-        if (i <= 2) {
-          colorClass = 'green';
-        } else if (i <= 4) {
-          colorClass = 'yellow';
-        } else {
-          colorClass = 'red';
-        }
-        circlesHTML += `
-          <span class="difficulty-circle partial" style="--percentage: ${percentage}%; --color: ${colorClass};"></span>
-        `;
       } else {
         // Empty circle
-        circlesHTML += '<span class="difficulty-circle"></span>';
+        circlesHTML += `<span class="difficulty-circle"></span>`;
       }
     }
+  
     return circlesHTML;
   }
+  
 });

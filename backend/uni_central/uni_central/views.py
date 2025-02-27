@@ -531,6 +531,43 @@ class MyClassmatesView(APIView):
         serialized = UserSerializer(classmates, many=True)
         return Response(serialized.data, status=status.HTTP_200_OK)
     
+class CoursePlanUpdateAPIView(APIView):
+    """
+    API View to update the user's course plan only.
+    """
+
+    def put(self, request):
+        try:
+            email_address = request.data.get("email_address")
+            user = UserService.get_user(email_address=email_address)
+
+            if not user:
+                return Response(
+                    {"error": "User not found"}, 
+                    status=status.HTTP_404_NOT_FOUND
+                )
+
+            course_plan = request.data.get("course_plan")
+            if course_plan is None:
+                return Response(
+                    {"error": "course_plan is required"}, 
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+
+            updated_user = UserService.update_course_plan(user, course_plan)
+
+            return Response({
+                "message": "Course plan updated successfully",
+                "course_plan": updated_user.course_plan
+            }, status=status.HTTP_200_OK)
+
+        except Exception as e:
+            return Response(
+                {"error": str(e)}, 
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+
+    
 class CreateUserView(APIView):
     """
     Handles user creation requests.
@@ -594,10 +631,9 @@ class CourseFilteringView(APIView):
     
     def get(self, request):
         try:
-            filters = request.data
+            filters = request.query_params  # <-- Changed from request.data to request.query_params
             filtered_courses = CourseFilteringService.filter_courses(filters)
             serialized = CourseSerializer(filtered_courses, many=True)
-
             return Response(serialized.data, status=status.HTTP_200_OK)
         except Exception as e:
             return Response(
