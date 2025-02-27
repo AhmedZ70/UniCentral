@@ -130,8 +130,8 @@ class ReviewService:
         )
 
         course.update_averages()
-        professor.update_averages()
-
+        if professor:
+            professor.update_averages()
 
         return review
     
@@ -173,7 +173,8 @@ class ReviewService:
         )
 
         professor.update_averages()
-        course.update_averages()
+        if course:
+            course.update_averages()
 
         return review
 
