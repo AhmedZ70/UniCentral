@@ -43,7 +43,6 @@ class ReviewSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Review
-        fields = '__all__'
         
 class ThreadSerializer(serializers.ModelSerializer):
     user = UserSerializer(read_only=True)

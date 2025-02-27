@@ -264,23 +264,28 @@ body, html, ul, li, p, h1, h2, select {
 /* Modal Styles                                  */
 /* ============================================= */
 .modal {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0,0,0,0.5);
-    display: flex;
-    justify-content: center;
-    align-items: center;
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0,0,0,0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
 }
 
 .modal-content {
-    background-color: white;
-    padding: 2rem;
-    border-radius: 10px;
-    width: 600px;
-    max-width: 90%;
+  background-color: white;
+  padding: 2rem;
+  border-radius: 10px;
+  width: 600px;
+  max-width: 90%;
+  z-index: 10000; 
+  position: relative; 
 }
 
 .modal-content h2 {
@@ -289,26 +294,48 @@ body, html, ul, li, p, h1, h2, select {
     font-family: 'Agrandir', sans-serif;
 }
 
-.modal-content input,
-.modal-content select,
-.modal-content textarea {
-    width: 100%;
-    padding: 0.8rem;
-    margin-bottom: 1rem;
-    border: 2px solid #005a5b;
-    border-radius: 8px;
-    font-family: 'Montserrat', sans-serif;
+.modal-content form {
+  display: flex;
+  flex-direction: column;
+}
+
+.modal-content textarea,
+.modal-content select {
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  padding: 0.8rem;
+  margin-bottom: 1rem;
+  border: 2px solid #005a5b;
+  border-radius: 8px;
+  font-family: 'Montserrat', sans-serif;
 }
 
 .modal-content textarea {
-    min-height: 150px;
-    resize: vertical;
+  min-height: 100px;
+  max-height: 150px;
+  resize: vertical;
+}
+
+.reply-button {
+  width: 10%;
+  height: 30px;
+  background-color: #005a5b;
+  border: none;
+  color: white;
+  border-radius: 20px;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 18px;
+}
+
+.reply-button:hover {
+  background-color: #007d7d;
 }
 
 .form-controls {
     display: flex;
     justify-content: flex-end;
-    gap: 1rem;
+    gap: 1rem; 
 }
 
 .cancel-button,

@@ -504,7 +504,6 @@ class ThreadService:
         """
         Creates a new thread linked to either a course or a professor.
         """
-        
         course_id = thread_data.get("course_id")
         professor_id = thread_data.get("professor_id")
 
@@ -547,6 +546,16 @@ class ThreadService:
         return {"success": True, "thread": thread}
 
     @staticmethod
+    def get_thread_by_id(thread_id):
+        """
+        Fetch a thread by its ID.
+        """
+        try:
+            return Thread.objects.get(id=thread_id)
+        except Thread.DoesNotExist:
+            return None
+        
+    @staticmethod
     def delete_thread(thread_id):
         """
         Deletes a thread by ID.
@@ -577,16 +586,31 @@ class CommentService:
             return None
 
         return Comment.objects.filter(thread=thread)
-
+   
     @staticmethod
-    def create_comment(user, thread_id, comment_data):
+    def create_comment(comment_data):
         """
         Creates a new comment under a thread.
-        """
         
+        Args:
+            comment_data (dict): Dictionary containing comment details
+        """
+        thread_id = comment_data.get("thread_id")
         thread = ThreadService.get_thread_by_id(thread_id)
         if not thread:
             return {"success": False, "error": "Thread not found"}
+
+        # Extract email from comment data
+        email_address = comment_data.get("email_address")
+        
+        # Try to find existing user by email
+        try:
+            user = User.objects.get(email_address=email_address)
+        except User.DoesNotExist:
+            user = User.objects.create(
+                email_address=email_address,
+                fname=email_address.split('@')[0],  # Use part of email as name if no name provided
+            )
 
         try:
             comment = Comment.objects.create(
@@ -614,6 +638,16 @@ class CommentService:
         comment.save()
         return {"success": True, "comment": comment}
 
+    @staticmethod
+    def get_comment_by_id(comment_id):
+        """
+        Fetch a comment by its ID.
+        """
+        try:
+            return Comment.objects.get(id=comment_id)
+        except Comment.DoesNotExist:
+            return None
+    
     @staticmethod
     def delete_comment(comment_id):
         """
