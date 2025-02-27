@@ -548,16 +548,17 @@ class MyReviewsView(APIView):
         serialized = ReviewSerializer(reviews, many=True)
         return Response(serialized.data, status=status.HTTP_200_OK)
     
+
 class MyClassmatesView(APIView):
-    """
-    API View to fetch classmates in the courses of a user
-    """
-    def get(self, request):
-        email_address = request.data.get('email_address')
+    def get(self, request, email_address, *args, **kwargs):
         user = UserService.get_user(email_address)
         
+        if user is None:
+            # Return a custom 404 response or a JSON error message
+            return Response({"error": "User not found"}, status=status.HTTP_404_NOT_FOUND)
         classmates = UserService.get_classmates(user)
-        serialized = UserSerializer(classmates, many=True)
+        serialized = UserSerializer(classmates, many=True, context={'current_user': user})
+        
         return Response(serialized.data, status=status.HTTP_200_OK)
     
 class CoursePlanUpdateAPIView(APIView):
