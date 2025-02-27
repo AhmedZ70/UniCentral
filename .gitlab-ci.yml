@@ -37,6 +37,8 @@ lint:
 # Test stage: run your Django test suite (which will pick up tests from test_services.py, test_urls.py, and test_views.py)
 test:
   stage: test
+  tags:
+    - macos
   script:
     - echo "Running Django tests..."
     - python backend/uni_central/manage.py test
