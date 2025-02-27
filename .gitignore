@@ -17,4 +17,5 @@ backend/uni_central/uni_central/migrations/__pycache__/0001_initial.cpython-312.
 uploads/*
 *.pyc
 autotester
+/venv
 *~
