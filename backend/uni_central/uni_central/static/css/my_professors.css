@@ -9,11 +9,12 @@
      box-sizing: border-box;
    }
    
-   body, html {
+   body,
+   html {
      width: 100%;
      height: 100%;
      font-family: 'Montserrat', sans-serif;
-     background-color: #FAF8F0;
+     background-color: #faf8f0;
      line-height: 1.6;
    }
    
@@ -22,76 +23,6 @@
      src: url('../assets/fonts/Agrandir-Regular.otf') format('truetype');
      font-weight: normal;
      font-style: normal;
-   }
-   
-   /* ===========================
-      Navbar
-      =========================== */
-   .navbar {
-     display: flex;
-     justify-content: space-between;
-     align-items: center;
-     padding: 1rem 2rem;
-     font-weight: 100;
-     font-size: 20px;
-   }
-   
-   .logo {
-     display: flex;
-     align-items: center;
-     font-size: 1.2rem;
-     font-weight: bold;
-     color: #333333;
-   }
-   
-   .logo img {
-     width: 200px;
-     margin-right: 8px;
-   }
-   
-   .logo-home-btn {
-     border: none;
-     background-color: #FAF8F0;
-   }
-   
-   .nav-links {
-     display: flex;
-     list-style: none;
-   }
-   
-   .nav-links li {
-     margin-left: 2rem;
-   }
-   
-   .nav-links a {
-     text-decoration: none;
-     color: #333333;
-     font-weight: bold;
-   }
-   
-   .nav-links a:hover {
-     color: #007d7d;
-   }
-   
-   .actions {
-     display: flex;
-     align-items: center;
-   }
-   
-   .register-btn {
-     background-color: #005a5b;
-     color: #FAF8F0;
-     border: none;
-     font-family: 'Agrandir', sans-serif;
-     font-size: 20px;
-     padding: 0.5rem 1rem;
-     border-radius: 20px;
-     font-weight: bold;
-     cursor: pointer;
-   }
-   
-   .register-btn:hover {
-     background-color: #007d7d;
    }
    
    /* ===========================
@@ -131,8 +62,7 @@
    .filter-sort-container {
      display: flex;
      align-items: center;
-     justify-content: flex-start;
-     gap: 20px;
+     gap: 10px;
      padding: 1rem 2rem;
      background-color: #ffffff;
      border-radius: 8px;
@@ -141,13 +71,20 @@
      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
    }
    
-   .filter-sort-container label {
-     font-size: 16px;
-     font-weight: 600;
-     color: #005a5b;
+   .search-input {
+     padding: 8px 12px;
+     border: 1px solid #ccc;
+     border-radius: 4px;
+     font-size: 14px;
+     flex: 1;
    }
    
-   .filter-sort-container select {
+   .search-input:focus {
+     border-color: #005a5b;
+     outline: none;
+   }
+   
+   .sort-by {
      padding: 8px 12px;
      border: 1px solid #ccc;
      border-radius: 4px;
@@ -156,7 +93,7 @@
      cursor: pointer;
    }
    
-   .filter-sort-container select:hover {
+   .sort-by:hover {
      border-color: #005a5b;
    }
    
@@ -209,29 +146,78 @@
      color: #333;
    }
    
-   .professor-info .rating,
-   .professor-info .difficulty {
-     font-weight: 600;
-     padding: 3px 8px;
-     border-radius: 5px;
-     color: #fff;
+   .rating-container,
+   .difficulty-container {
+     margin: 15px 0;
+     display: flex;
+     align-items: center;
+     gap: 10px;
    }
    
-   .professor-info .rating {
-     background-color: #4CAF50;
+   .rating-stars {
+     display: flex;
+     gap: 5px;
    }
    
-   .professor-info .difficulty {
-     background-color: #FFA500;
+   .star {
+     font-size: 20px;
+     color: #ccc; /* Default color for empty stars */
    }
    
+   .star.filled {
+     color: #ffd700; /* Gold color for filled stars */
+   }
+   
+   .star.partial {
+     position: relative;
+   }
+   
+   .star.partial .filled {
+     position: absolute;
+     overflow: hidden;
+   }
+   
+   .difficulty-rating {
+     display: flex;
+     gap: 5px;
+   }
+   
+   .difficulty-circle {
+     width: 14px;
+     height: 14px;
+     border-radius: 50%;
+     background-color: #e0e0e0; /* Default color for empty circles */
+   }
+   
+   .difficulty-circle.filled {
+     background-color: var(--color, #4caf50); /* Green for low difficulty */
+   }
+   
+   .difficulty-circle.filled.yellow {
+     background-color: #ffc107; /* Yellow for medium difficulty */
+   }
+   
+   .difficulty-circle.filled.red {
+     background-color: #f44336; /* Red for high difficulty */
+   }
+   
+   .difficulty-circle.partial {
+     background: conic-gradient(
+       var(--color, #4caf50) 0% calc(var(--percentage, 0) * 1%),
+       #e0e0e0 calc(var(--percentage, 0) * 1%) 100%
+     );
+   }
+   
+   /* ===========================
+      Professor Actions (Remove Button)
+      =========================== */
    .professor-actions {
      margin-top: 15px;
      text-align: right;
    }
    
    .remove-professor-btn {
-     background-color: #F44336;
+     background-color: #f44336;
      color: #fff;
      border: none;
      padding: 8px 16px;
@@ -248,7 +234,7 @@
    /* ===========================
       No Professors Message
       =========================== */
-   #no-professors-message {
+   .no-professors-message {
      text-align: center;
      font-size: 1.25rem;
      color: #666;
@@ -297,100 +283,7 @@
      .professor-info p {
        font-size: 14px;
      }
-   
-     .remove-professor-btn {
-       padding: 6px 12px;
-       font-size: 12px;
-     }
    }
-/* Search Input Styles */
-.search-input {
-  padding: 8px 12px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  font-size: 14px;
-  flex: 1;
-  margin-right: 10px;
-}
-
-.search-input:focus {
-  border-color: #005a5b;
-  outline: none;
-}
-
-/* Filter and Sort Container */
-.filter-sort-container {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 1rem 2rem;
-  background-color: #ffffff;
-  border-radius: 8px;
-  margin: 1rem auto;
-  max-width: 1000px;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-}
-  /* Star styles */
-.rating-stars {
-  display: flex;
-  gap: 5px;
-}
-
-.star {
-  font-size: 24px;
-  color: #ccc; /* Default color for empty stars */
-}
-
-.star.filled {
-  color: #ffd700; /* Gold color for filled stars */
-}
-
-.star.partial {
-  position: relative;
-  display: inline-block;
-}
-
-.star.partial .filled {
-  position: absolute;
-  overflow: hidden;
-  white-space: nowrap;
-}
-
-/* Difficulty circle styles */
-.difficulty-rating {
-  display: flex;
-  gap: 5px;
-}
-
-.difficulty-circle {
-  width: 20px;
-  height: 20px;
-  border-radius: 50%;
-  background-color: #e0e0e0; /* Default color for empty circles */
-}
-
-.difficulty-circle.filled {
-  background-color: #4CAF50; /* Green for low difficulty */
-}
-
-.difficulty-circle.filled.yellow {
-  background-color: #FFC107; /* Yellow for medium difficulty */
-}
-
-.difficulty-circle.filled.red {
-  background-color: #F44336; /* Red for high difficulty */
-}
-
-.difficulty-circle.partial {
-  position: relative;
-  display: inline-block;
-}
-
-.difficulty-circle.partial .filled {
-  position: absolute;
-  overflow: hidden;
-  white-space: nowrap;
-}
    
    @media (max-width: 480px) {
      .text-content h1 {
