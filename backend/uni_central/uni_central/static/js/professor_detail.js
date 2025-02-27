@@ -1,6 +1,6 @@
 import { auth, onAuthStateChanged } from './auth.js';
-document.addEventListener("DOMContentLoaded", () => {
 
+document.addEventListener("DOMContentLoaded", () => {
     // Get professor ID from the hidden input
     const professorId = document.getElementById("professorId").value;
 
@@ -23,11 +23,27 @@ document.addEventListener("DOMContentLoaded", () => {
             // Populate professor info
             const professor = data.professor || {};
             professorNameEl.textContent = `${professor.fname} ${professor.lname}`;
-            professorDetailsEl.innerHTML = `
+
+            // Create a container for professor details
+            const detailsContainer = document.createElement('div');
+            detailsContainer.innerHTML = `
                 <p><strong>Department:</strong> ${professor.department?.name || "N/A"}</p>
-                <p><strong>Average Rating:</strong> <span class="rating">${(professor.avg_rating || 0).toFixed(1)}</span></p>
-                <p><strong>Average Difficulty:</strong> <span class="difficulty">${(professor.avg_difficulty || 0).toFixed(1)}</span></p>
             `;
+
+            // Add rating stars
+            const ratingContainer = document.createElement('p');
+            ratingContainer.innerHTML = `<strong>Average Rating:</strong> `;
+            ratingContainer.appendChild(createRatingStars(professor.avg_rating));
+            detailsContainer.appendChild(ratingContainer);
+
+            // Add difficulty circles
+            const difficultyContainer = document.createElement('p');
+            difficultyContainer.innerHTML = `<strong>Average Difficulty:</strong> `;
+            difficultyContainer.appendChild(createDifficultyCircles(professor.avg_difficulty));
+            detailsContainer.appendChild(difficultyContainer);
+
+            // Append the details container to the professor details section
+            professorDetailsEl.appendChild(detailsContainer);
 
             // Add bold "Courses taught" heading
             const coursesHeading = document.createElement("p");
@@ -145,3 +161,50 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 });
+
+// Function to create rating stars
+function createRatingStars(rating) {
+    const maxStars = 5;
+    const filledStars = Math.round(rating); // Round to the nearest whole number
+    const starsContainer = document.createElement('div');
+    starsContainer.className = 'rating-stars';
+
+    for (let i = 1; i <= maxStars; i++) {
+        const star = document.createElement('span');
+        star.className = i <= filledStars ? 'star filled' : 'star';
+        star.innerHTML = '★'; // Unicode star character
+        starsContainer.appendChild(star);
+    }
+
+    return starsContainer;
+}
+
+// Function to create difficulty circles
+function createDifficultyCircles(difficulty) {
+    const maxCircles = 6;
+    const filledCircles = Math.round(difficulty); // Round to the nearest whole number
+    const circlesContainer = document.createElement('div');
+    circlesContainer.className = 'difficulty-rating';
+
+    for (let i = 1; i <= maxCircles; i++) {
+        const circle = document.createElement('div');
+        circle.className = 'difficulty-circle';
+
+        if (i <= filledCircles) {
+            circle.classList.add('filled');
+
+            // Add color based on difficulty level
+            if (i <= 2) {
+                circle.classList.add('green');
+            } else if (i <= 4) {
+                circle.classList.add('yellow');
+            } else {
+                circle.classList.add('red');
+            }
+        }
+
+        circlesContainer.appendChild(circle);
+    }
+
+    return circlesContainer;
+}

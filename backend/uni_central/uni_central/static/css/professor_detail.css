@@ -156,3 +156,41 @@ body {
         margin-bottom: 5px;
     }
 }
+
+.rating-stars {
+    display: flex;
+    gap: 5px;
+}
+
+.star {
+    font-size: 24px;
+    color: #ccc; /* Default color for empty stars */
+}
+
+.star.filled {
+    color: #ffd700; /* Gold color for filled stars */
+}
+
+.difficulty-rating {
+    display: flex;
+    gap: 5px;
+}
+
+.difficulty-circle {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background-color: #e0e0e0; /* Default color for empty circles */
+}
+
+.difficulty-circle.filled {
+    background-color: #4CAF50; /* Green for low difficulty */
+}
+
+.difficulty-circle.filled.yellow {
+    background-color: #FFC107; /* Yellow for medium difficulty */
+}
+
+.difficulty-circle.filled.red {
+    background-color: #F44336; /* Red for high difficulty */
+}
