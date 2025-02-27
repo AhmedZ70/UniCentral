@@ -1,0 +1,44 @@
+# Use a slim Python image
+image: python:3.9-slim
+
+# Enable Docker-in-Docker for Testcontainers support
+services:
+  - name: docker:dind
+    command: ["--tls=false"]
+
+# Set environment variables to connect to Docker daemon
+variables:
+  DOCKER_HOST: tcp://docker:2375
+  DOCKER_TLS_CERTDIR: ""
+
+# Define the stages of the pipeline
+stages:
+  - lint
+  - test
+
+# Cache pip packages to speed up builds
+cache:
+  paths:
+    - .cache/pip
+
+# Global before_script: update packages, install gcc and docker.io, upgrade pip and install Python dependencies
+before_script:
+  - apt-get update -y && apt-get install -y gcc docker.io
+  - pip install --upgrade pip
+  - pip install -r requirements.txt
+
+# Lint stage: run flake8 for code style checking
+lint:
+  stage: lint
+  script:
+    - pip install flake8
+    - flake8 .
+
+# Test stage: run your Django test suite (which will pick up tests from test_services.py, test_urls.py, and test_views.py)
+test:
+  stage: test
+  script:
+    - echo "Running Django tests..."
+    - python manage.py test
+    # If you prefer using pytest, comment out the above line and uncomment the following:
+    # - pytest --maxfail=1 --disable-warnings -q
