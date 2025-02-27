@@ -770,15 +770,16 @@ class CreateCommentAPIView(APIView):
     """
 
     def post(self, request, thread_id):
-        user = UserService.get_user(request.data.get("email_address"))
-        result = CommentService.create_comment(thread_id, request.data)
+        comment_data = request.data.copy()
+        comment_data['thread_id'] = thread_id
+
+        result = CommentService.create_comment(comment_data)
 
         if result["success"]:
             serializer = CommentSerializer(result["comment"])
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         
         return Response({"error": result["error"]}, status=status.HTTP_400_BAD_REQUEST)
-
 
 class UpdateCommentAPIView(APIView):
     """
