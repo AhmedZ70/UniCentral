@@ -39,6 +39,6 @@ test:
   stage: test
   script:
     - echo "Running Django tests..."
-    - python manage.py test
+    - python backend/uni_central/manage.py test
     # If you prefer using pytest, comment out the above line and uncomment the following:
     # - pytest --maxfail=1 --disable-warnings -q
