@@ -195,12 +195,14 @@ document.addEventListener("DOMContentLoaded", () => {
    * Create difficulty circles HTML with fractional support
    */
   function createDifficultyCircles(difficulty) {
+    // Convert to a number and floor it (no partial circles)
+    const flooredDifficulty = Math.floor(parseFloat(difficulty) || 0);
     const maxCircles = 6;
     let circlesHTML = '';
-
+  
     for (let i = 1; i <= maxCircles; i++) {
-      if (i <= difficulty) {
-        // Full circle
+      if (i <= flooredDifficulty) {
+        // Determine color based on circle index
         let colorClass = '';
         if (i <= 2) {
           colorClass = 'green';
@@ -210,25 +212,13 @@ document.addEventListener("DOMContentLoaded", () => {
           colorClass = 'red';
         }
         circlesHTML += `<span class="difficulty-circle filled ${colorClass}"></span>`;
-      } else if (i - 1 < difficulty && difficulty < i) {
-        // Partial circle
-        const percentage = (difficulty - (i - 1)) * 100;
-        let colorClass = '';
-        if (i <= 2) {
-          colorClass = 'green';
-        } else if (i <= 4) {
-          colorClass = 'yellow';
-        } else {
-          colorClass = 'red';
-        }
-        circlesHTML += `
-          <span class="difficulty-circle partial" style="--percentage: ${percentage}%; --color: ${colorClass};"></span>
-        `;
       } else {
         // Empty circle
-        circlesHTML += '<span class="difficulty-circle"></span>';
+        circlesHTML += `<span class="difficulty-circle"></span>`;
       }
     }
+  
     return circlesHTML;
   }
+  
 });
