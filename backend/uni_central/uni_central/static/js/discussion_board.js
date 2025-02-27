@@ -14,11 +14,8 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
-let userEmail = null;
-let isEditing = false;
 
 document.addEventListener('DOMContentLoaded', function() {
-    // Create discussion-threads container if it doesn't exist
     if (!document.querySelector('.discussion-threads')) {
         const mainContent = document.querySelector('.main-content');
         const threadsContainer = document.createElement('section');
@@ -26,10 +23,8 @@ document.addEventListener('DOMContentLoaded', function() {
         mainContent.appendChild(threadsContainer);
     }
     
-    // Load threads when page loads
     loadThreads();
     
-    // Set up new thread button listener
     const newThreadButton = document.querySelector('.new-thread-button');
     if (newThreadButton) {
         newThreadButton.addEventListener('click', showNewThreadModal);
@@ -38,7 +33,6 @@ document.addEventListener('DOMContentLoaded', function() {
         console.error("New thread button not found");
     }
     
-    // Set up form listeners
     const newThreadForm = document.getElementById('new-thread-form');
     if (newThreadForm) {
         newThreadForm.addEventListener('submit', function(e) {
@@ -55,12 +49,10 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
-    // Set up modal close buttons
     document.querySelectorAll('.cancel-button').forEach(button => {
         button.addEventListener('click', closeModals);
     });
     
-    // Set up search and filter listeners
     const searchInput = document.getElementById('search-discussions');
     if (searchInput) {
         searchInput.addEventListener('input', debounce(loadThreads, 500));
@@ -77,7 +69,6 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 
-// Utility function for debouncing search input
 function debounce(func, wait) {
     let timeout;
     return function() {
@@ -88,7 +79,6 @@ function debounce(func, wait) {
     };
 }
 
-// Format relative time for thread timestamps
 function formatRelativeTime(dateString) {
     const date = new Date(dateString);
     const now = new Date();
@@ -198,7 +188,6 @@ function loadThreads() {
 function displayThreads(threads) {
     const threadsContainer = document.querySelector('.discussion-threads');
     
-    // Clear any existing content
     threadsContainer.innerHTML = '';
     
     console.log('Displaying threads:', threads);
@@ -212,7 +201,6 @@ function displayThreads(threads) {
         return;
     }
     
-    // Validate thread structure
     threads.forEach(thread => {
         if (!thread) {
             console.warn('Skipping invalid thread:', thread);
@@ -223,19 +211,15 @@ function displayThreads(threads) {
             const threadElement = createThreadElement(thread);
             threadsContainer.appendChild(threadElement);
             
-            // Fetch and display comments for this thread
             loadThreadComments(thread.id);
         } catch (error) {
             console.error('Error creating thread element:', error, thread);
         }
     });
-    
-    // Attach listeners after creating threads
     attachReplyListeners();
 }
 
 function createThreadElement(thread) {
-    // Validate thread object
     if (!thread || typeof thread !== 'object') {
         console.error('Invalid thread object:', thread);
         throw new Error('Invalid thread object');
@@ -265,7 +249,6 @@ function createThreadElement(thread) {
     const replyCount = document.createElement('span');
     replyCount.className = 'reply-count';
     
-    // Ensure comments are an array before counting
     const commentCount = Array.isArray(thread.comments) ? thread.comments.length : 0;
     replyCount.textContent = `${commentCount} replies`;
     
@@ -276,17 +259,9 @@ function createThreadElement(thread) {
     headerElement.appendChild(titleElement);
     headerElement.appendChild(metaElement);
     
-    const contentElement = document.createElement('div');
-    contentElement.className = 'thread-content';
-    
-    const questionElement = document.createElement('p');
-    questionElement.className = 'question';
-    questionElement.textContent = thread.content || 'No content';
-    
     const responsesElement = document.createElement('div');
     responsesElement.className = 'responses';
     
-    // Add responses/comments if any
     if (Array.isArray(thread.comments) && thread.comments.length > 0) {
         thread.comments.forEach(comment => {
             const responseElement = createResponseElement(comment);
@@ -298,12 +273,9 @@ function createThreadElement(thread) {
     replyButton.className = 'reply-button';
     replyButton.textContent = 'Reply';
     
-    contentElement.appendChild(questionElement);
-    contentElement.appendChild(responsesElement);
-    contentElement.appendChild(replyButton);
-    
     threadElement.appendChild(headerElement);
-    threadElement.appendChild(contentElement);
+    threadElement.appendChild(responsesElement);
+    threadElement.appendChild(replyButton);
     
     return threadElement;
 }
@@ -327,11 +299,9 @@ function createResponseElement(comment) {
     const authorSpan = document.createElement('span');
     authorSpan.className = 'author';
     
-    // Handle author information
     if (comment.user && comment.user.fname) {
         authorSpan.textContent = comment.user.fname;
     } else if (comment.user && comment.user.email_address) {
-        // Fallback to email username if no name
         authorSpan.textContent = comment.user.email_address.split('@')[0];
     } else {
         authorSpan.textContent = 'Anonymous Student';
@@ -356,7 +326,6 @@ function createResponseElement(comment) {
 }
 
 function loadThreadComments(threadId) {
-    // Fetch comments for a specific thread
     fetch(`/api/threads/${threadId}/comments/`)
         .then(response => {
             console.log('Comments fetch response:', response);
@@ -371,13 +340,11 @@ function loadThreadComments(threadId) {
             const threadElement = document.querySelector(`.thread[data-thread-id="${threadId}"]`);
             if (threadElement) {
                 const responsesContainer = threadElement.querySelector('.responses');
-                responsesContainer.innerHTML = ''; // Clear existing responses
+                responsesContainer.innerHTML = '';
                 
-                // Update reply count
                 const replyCountElement = threadElement.querySelector('.reply-count');
                 replyCountElement.textContent = `${comments.length} replies`;
                 
-                // Add comments
                 comments.forEach(comment => {
                     const responseElement = createResponseElement(comment);
                     responsesContainer.appendChild(responseElement);
@@ -406,11 +373,12 @@ function showNewThreadModal() {
     
     const modal = document.getElementById('new-thread-modal');
     if (modal) {
-        // Change this from 'block' to 'flex' to match your CSS
         modal.style.display = 'flex';
         setTimeout(() => {
-            // Focus on the title input after a brief delay
-            modal.querySelector('input[name="title"]').focus();
+            const titleTextarea = modal.querySelector('textarea[name="title"]');
+            if (titleTextarea) {
+                titleTextarea.focus();
+            }
         }, 50);
     } else {
         console.error("New thread modal not found");
@@ -442,19 +410,16 @@ function closeModals() {
     });
 }
 
-// Create a new thread
 function createNewThread(form) {
     try {
-        const title = form.querySelector('input[name="title"]').value.trim();
+        const title = form.querySelector('textarea[name="title"]').value.trim();
         const category = form.querySelector('select[name="category"]').value;
-        const content = form.querySelector('textarea[name="content"]').value.trim();
         
-        if (!title || !category || !content) {
+        if (!title || !category) {
             alert('Please fill out all fields');
             return;
         }
         
-        // Get context data from the page
         const contextType = document.body.dataset.contextType;
         const contextId = document.body.dataset.contextId;
         
@@ -463,11 +428,9 @@ function createNewThread(form) {
             return;
         }
         
-        // Build the thread data object with required fields
         const threadData = {
             title,
-            category,
-            content
+            category
         };
 
         const user = auth.currentUser;
@@ -478,14 +441,12 @@ function createNewThread(form) {
             return;
         }
         
-        // Add the appropriate context field automatically based on current page
         if (contextType === 'course') {
             threadData.course_id = contextId;
         } else if (contextType === 'professor') {
             threadData.professor_id = contextId;
         }
         
-        // Send the request to create thread endpoint
         fetch('/api/threads/create/', {
             method: 'POST',
             headers: {
@@ -500,11 +461,9 @@ function createNewThread(form) {
             return response.json();
         })
         .then(data => {
-            // Close modal and reset form
             document.getElementById('new-thread-modal').style.display = 'none';
             form.reset();
             
-            // Reload threads to show the new one
             loadThreads();
         })
         .catch(error => {
@@ -527,7 +486,6 @@ async function submitReply(form) {
             return;
         }
         
-        // Get user from Firebase
         const user = auth.currentUser;
         if (!user) {
             alert('You must be logged in to post a reply');
@@ -537,7 +495,7 @@ async function submitReply(form) {
         const replyData = {
             content: content,
             email_address: user.email,
-            thread_id: threadId  // Explicitly add thread_id to the payload
+            thread_id: threadId 
         };
         
         const response = await fetch(`/api/threads/${threadId}/comments/create/`, {
@@ -555,11 +513,9 @@ async function submitReply(form) {
         const data = await response.json();
         console.log('Reply posted successfully:', data);
         
-        // Close modal and reset form
         closeModals();
         form.reset();
         
-        // Reload threads to show the new reply
         loadThreads();
     } catch (error) {
         console.error('Error posting reply:', error);
@@ -567,7 +523,6 @@ async function submitReply(form) {
     }
 }
 
-// Upvote a comment
 async function upvoteComment(commentId, button) {
     try {
         const response = await fetch(`/api/comments/${commentId}/upvote/`, {

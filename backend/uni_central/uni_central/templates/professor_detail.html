@@ -6,8 +6,10 @@
     <link rel="icon" href="{% static 'assets/logo_black.png' %}">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Professor Details</title>
-    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <link rel="stylesheet" href="{% static 'css/professor_detail.css' %}">
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
+    <script type="module" src="{% static 'js/professor_detail.js' %}"></script>
+    <script type="module" src="{% static 'js/auth.js' %}"></script>
 </head>
 <body>
     {% include 'partials/navbar.html' %}
@@ -22,6 +24,9 @@
             <div class="professor-details" id="professor-details"></div>
             <!-- Add Professor Button -->
             <button id="add-professor-btn" class="professor-leave-review-button">Add Professor</button>
+            <a id="discussion-board-btn" href="{% url 'professor_discussion_board' context_id=professor_id %}" class="go-to-discussion-board-button">                    
+                Discussion Board
+            </a>
         </section>
 
         <!-- Reviews Section -->
@@ -36,169 +41,4 @@
             Leave a Review
         </a>
     </main>
-
-    <style>
-        body {
-            font-family: 'Montserrat', sans-serif;
-            background-color: #FAF8F0;
-            color: #333333;
-            line-height: 1.6;
-        }
-
-        .professor-detail-page {
-            max-width: 1000px;
-            margin: 2rem auto;
-            padding: 0 20px;
-        }
-
-        .professor-info, .professor-reviews {
-            background: #fff;
-            padding: 30px;
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-            margin-bottom: 2rem;
-            transition: all 0.3s ease;
-        }
-
-        .professor-info:hover, .professor-reviews:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
-        }
-
-        .professor-title {
-            font-size: 2.5rem;
-            color: #005a5b;
-            margin-bottom: 1.5rem;
-            text-align: center;
-            font-weight: 700;
-            letter-spacing: 1px;
-        }
-
-        .professor-details p {
-            font-size: 1.1rem;
-            margin: 15px 0;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .detail-label {
-            font-weight: 600;
-            color: #005a5b;
-            min-width: 200px;
-        }
-
-        .reviews-title {
-            font-size: 2rem;
-            color: #005a5b;
-            margin-bottom: 1.5rem;
-            text-align: center;
-            font-weight: 700;
-        }
-
-        .reviews-list {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-        }
-
-        .review-item {
-            margin-bottom: 2rem;
-            padding-bottom: 2rem;
-            border-bottom: 2px solid #e0e0e0;
-        }
-
-        .review-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-size: 1.3rem;
-            font-weight: bold;
-            color: #005a5b;
-            margin-bottom: 1rem;
-        }
-
-        .review-header span {
-            font-weight: normal;
-            font-size: 1.1rem;
-            color: #666666;
-        }
-
-        .review-content p {
-            margin: 0.7rem 0;
-            font-size: 1.1rem;
-            color: #333;
-            line-height: 1.6;
-        }
-
-        .rating, .difficulty {
-            font-weight: 600;
-            padding: 3px 8px;
-            border-radius: 5px;
-            color: #fff;
-        }
-
-        .rating {
-            background-color: #4CAF50;
-        }
-
-        .difficulty {
-            background-color: #FFA500;
-        }
-
-        .yes {
-            color: #4CAF50;
-            font-weight: 600;
-        }
-
-        .no {
-            color: #F44336;
-            font-weight: 600;
-        }
-
-        .professor-leave-review-button, #add-professor-btn {
-            display: inline-block;
-            margin-top: 20px;
-            padding: 12px 25px;
-            background-color: #005a5b;
-            color: #fff;
-            text-decoration: none;
-            border-radius: 30px;
-            font-weight: 600;
-            transition: all 0.3s ease;
-            text-align: center;
-            border: none;
-            cursor: pointer;
-        }
-
-        .professor-leave-review-button:hover, #add-professor-btn:hover {
-            background-color: #004e4f;
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0, 90, 91, 0.3);
-        }
-
-        #add-professor-btn:disabled {
-            background-color: #cccccc;
-            cursor: not-allowed;
-        }
-
-        @media (max-width: 768px) {
-            .professor-title {
-                font-size: 2rem;
-            }
-
-            .professor-details p {
-                flex-direction: column;
-                align-items: flex-start;
-            }
-
-            .detail-label {
-                margin-bottom: 5px;
-            }
-        }
-    </style>
-
-    <script type="module" src="{% static 'js/professor_detail.js' %}"></script>
-    <script type="module" src="{% static 'js/auth.js' %}"></script>
 </body>
-</html>

@@ -30,8 +30,6 @@
         </div>
       </div>
     </section>
-
-    <!-- Filter and Search Section -->
     <section class="discussion-controls">
         <div class="search-bar">
             <input type="text" placeholder="Search discussions..." id="search-discussions">
@@ -55,9 +53,9 @@
 
     <div id="new-thread-modal" class="modal" style="display: none;">
         <div class="modal-content">
-            <h2>Create New Thread</h2>
+            <h2>New Thread</h2>
             <form id="new-thread-form">
-                <input type="text" name="title" placeholder="Thread title" required>
+                <textarea name="title" placeholder="Write your question or discussion topic here..." required></textarea>
                 <select name="category" required>
                     <option value="">Select topic</option>
                     <option value="general">General</option>
@@ -65,7 +63,6 @@
                     <option value="homework">Homework</option>
                     <option value="projects">Projects</option>
                 </select>
-                <textarea name="content" placeholder="Write your question or discussion topic here..." required></textarea>
                 <div class="form-controls">
                     <button type="button" class="cancel-button">Cancel</button>
                     <button type="submit" class="submit-button">Post Thread</button>
@@ -73,11 +70,9 @@
             </form>
         </div>
     </div>
-
-    <!-- Update the reply modal to include the thread ID -->
     <div id="reply-modal" class="modal" style="display: none;">
         <div class="modal-content">
-            <h2>Post Reply</h2>
+            <h2>Reply</h2>
             <form id="reply-form">
                 <textarea name="content" placeholder="Write your reply here..." required></textarea>
                 <div class="form-controls">
@@ -87,12 +82,9 @@
             </form>
         </div>
     </div>
-
-    <!-- Add a container for external search results (optional) -->
     <section class="external-results" style="display: none;">
         <h3>Related discussions from around the web</h3>
         <div class="external-threads-container">
-            <!-- External results will be populated here -->
         </div>
     </section>
 </main>

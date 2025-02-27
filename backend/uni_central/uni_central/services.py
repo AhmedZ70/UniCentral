@@ -607,7 +607,6 @@ class CommentService:
         try:
             user = User.objects.get(email_address=email_address)
         except User.DoesNotExist:
-            # Create a new user if not exists
             user = User.objects.create(
                 email_address=email_address,
                 fname=email_address.split('@')[0],  # Use part of email as name if no name provided
