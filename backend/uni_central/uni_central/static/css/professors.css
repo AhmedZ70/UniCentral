@@ -386,11 +386,11 @@ body {
   width: 160px;
   height: 130px;
   padding: 10px;
-  border: 2px solid #2ecc71;
+  border: 2px solid #218a67;
   border-radius: 8px;
   text-align: center;
   font-size: 18px;
-  color: #2ecc71;
+  color: #218a67;
   background-color: #fff;
   cursor: pointer;
   transition: all 0.3s ease;
@@ -400,8 +400,8 @@ body {
 }
 
 .department:hover {
-  background-color: #2ecc71;
-  color: #fff;
+  background-color: #218a67a4;
+  font-weight: bold;
 }
 
 /* ============================================= */
