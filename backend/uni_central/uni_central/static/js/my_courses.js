@@ -26,7 +26,8 @@ const auth = getAuth(app);
 document.addEventListener("DOMContentLoaded", () => {
   let myCourses = [];
   const courseCardsContainer = document.querySelector('.course-cards');
-  const noCoursesMessage = document.getElementById('no-courses-message');
+  const noCoursesAddedMessage = document.getElementById('no-courses-added-message');
+  const noCoursesMatchSearchMessage = document.getElementById('no-courses-match-search-message');
   const sortBy = document.getElementById('sort-by');
   const searchInput = document.getElementById('search-input');
 
@@ -54,7 +55,8 @@ document.addEventListener("DOMContentLoaded", () => {
       displayCourses(myCourses);
     } catch (error) {
       console.error("Error fetching courses:", error);
-      noCoursesMessage.style.display = "block";
+      noCoursesAddedMessage.style.display = "block";
+      noCoursesMatchSearchMessage.style.display = "none";
     }
   }
 
@@ -63,11 +65,20 @@ document.addEventListener("DOMContentLoaded", () => {
     courseCardsContainer.innerHTML = ''; // Clear existing cards
 
     if (courses.length === 0) {
-      noCoursesMessage.style.display = "block";
+      if (searchInput.value.trim() === '') {
+        noCoursesAddedMessage.style.display = "block";
+        noCoursesMatchSearchMessage.style.display = "none";
+      } else {
+          // No professors match the search
+          noCoursesAddedMessage.style.display = "none";
+          noCoursesMatchSearchMessage.style.display = "block";
+      }
       return;
     }
 
-    noCoursesMessage.style.display = "none";
+    noCoursesAddedMessage.style.display = "none";
+    noCoursesMatchSearchMessage.style.display = "none";    
+    
     courses.forEach((course) => {
       // Create an anchor element for the clickable course card
       const cardLink = document.createElement('a');

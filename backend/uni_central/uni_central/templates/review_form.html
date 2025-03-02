@@ -6,123 +6,9 @@
     <link rel="icon" href="{% static 'assets/logo_black.png' %}">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Create a Review</title>
-    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <link rel="stylesheet" href="{% static 'css/review_form.css' %}">
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
-    <style>
-        body {
-            font-family: 'Montserrat', sans-serif;
-            background-color: #FAF8F0;
-            margin: 0;
-            padding: 0;
-            color: #333;
-            line-height: 1.6;
-        }
-
-        .main-content.review-form-page {
-            max-width: 800px;
-            margin: 3rem auto;
-            padding: 40px;
-            background: #ffffff;
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-            transition: all 0.3s ease;
-        }
-
-        .main-content.review-form-page h1 {
-            text-align: center;
-            margin-bottom: 30px;
-            font-size: 2.5rem;
-            color: #005a5b;
-            font-weight: 700;
-            letter-spacing: 1px;
-        }
-
-        label {
-            margin-top: 20px;
-            font-weight: 600;
-            font-size: 1.1rem;
-            color: #005a5b;
-        }
-
-        textarea,
-        input[type="number"],
-        input[type="text"],
-        select {
-            width: 100%;
-            padding: 12px 15px;
-            margin-top: 8px;
-            border: 1px solid #ccc;
-            border-radius: 8px;
-            font-size: 1rem;
-            transition: all 0.3s ease;
-        }
-
-        textarea:focus,
-        input[type="number"]:focus,
-        input[type="text"]:focus,
-        select:focus {
-            border-color: #005a5b;
-            outline: none;
-            box-shadow: 0 0 10px rgba(0, 90, 91, 0.2);
-        }
-
-        .submit-review-button {
-            margin-top: 40px;
-            padding: 15px 25px;
-            background-color: #005a5b;
-            color: #ffffff;
-            border: none;
-            border-radius: 30px;
-            font-size: 1.2rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            align-self: center;
-        }
-
-        .submit-review-button:hover {
-            background-color: #004e4f;
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0, 90, 91, 0.3);
-        }
-        .show-container {
-            display: block;
-        }
-        .hide-container {
-            display: none;
-        }
-        .error-message {
-            color: red;
-            font-size: 0.9rem;
-            display: none; /* Initially hidden */
-            margin-top: 5px;
-        }
-
-        input.error,
-        textarea.error {
-            border-color: red;
-            outline: none;
-            box-shadow: 0 0 5px red;
-        }
-
-
-        @media (max-width: 768px) {
-            .main-content.review-form-page {
-                margin: 2rem 1rem;
-                padding: 30px;
-            }
-
-            .main-content.review-form-page h1 {
-                font-size: 2rem;
-            }
-
-            .submit-review-button {
-                font-size: 1.1rem;
-                padding: 12px 20px;
-            }
-        }
-    </style>
-</head>
+</head>    
 <body>
     {% include 'partials/navbar.html' %}
 
@@ -161,20 +47,20 @@
         <textarea id="reviewText" rows="5"></textarea>
         <span id="reviewTextError" class="error-message"></span>
 
-        <label for="rating">Rating (1-5):</label>
-        <input type="number" id="rating" min="1" max="5">
+        <!-- Interactive Rating (stars) will be inserted here by JS -->
+        <input type="number" id="rating" min="1" max="5" style="display: none;">
         <span id="ratingError" class="error-message"></span>
 
-        <label for="difficulty">Difficulty (1-6):</label>
-        <input type="number" id="difficulty" min="1" max="6">
+        <!-- Interactive Difficulty (circles) will be inserted here by JS -->
+        <input type="number" id="difficulty" min="1" max="6" style="display: none;">
         <span id="difficultyError" class="error-message"></span>
-
 
         <label for="estimatedHours">Estimated Weekly Hours:</label>
         <input type="number" id="estimatedHours" step="0.1" min="0">
 
         <label for="grade">Grade Received:</label>
         <input type="text" id="grade" maxlength="2" placeholder="e.g., A, B+">
+        
         <!-- Boolean checkboxes (match IDs to what your JS uses) -->
         <div class="checkbox-group">
             <label for="wouldTakeAgain">

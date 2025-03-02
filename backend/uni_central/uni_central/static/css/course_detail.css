@@ -223,6 +223,7 @@ body, html, ul, li, p, h1, h2, select {
     text-align: center;
     border: none;
     cursor: pointer;
+    font-size: 18px;
 }
 
 .leave-review-button:hover, #enroll-btn:hover, #discussion-board-btn:hover {
