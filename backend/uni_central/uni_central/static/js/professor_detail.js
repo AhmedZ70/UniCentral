@@ -22,6 +22,7 @@ document.addEventListener("DOMContentLoaded", () => {
         .then((data) => {
             // Populate professor info
             const professor = data.professor || {};
+            professorNameEl.className = 'professor-title';
             professorNameEl.textContent = `${professor.fname} ${professor.lname}`;
 
             // Create a container for professor details
@@ -83,8 +84,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
                     li.innerHTML = `
                         <div class="review-header">
-                            <span class="detail-label">Review by:</span> Anonymous
-                            <span class="detail-label">Grade: ${review.grade || "N/A"}</span>
+                            <strong>Review by: anonymous</strong>
+                            <span>Grade: ${review.grade || "N/A"}</span>
                         </div>
                         <div class="review-content">
                             <p><span class="detail-label">Review:</span> ${review.review || "No comments provided."}</p>
