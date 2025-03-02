@@ -63,11 +63,13 @@ document.addEventListener("DOMContentLoaded", () => {
                         </div>
                         <div class="review-content">
                             <p><span class="detail-label">Review:</span> ${review.review || ""}</p>
-                            <p><span class="detail-label">Rating:</span> 
-                               <span class="rating">${review.rating || 0}/5</span></p>
-                            <p><span class="detail-label">Difficulty:</span> 
-                               <span class="difficulty">${review.difficulty || 0}/6</span></p>
-                            <p><span class="detail-label">Estimated Weekly Hours:</span> 
+                            <div><span class="detail-label">Rating:</span> 
+                               <span class="rating-container" style="display: inline-block; vertical-align: middle; margin-left: 5px;"></span>
+                            </div>
+                            <div><span class="detail-label">Difficulty:</span> 
+                               <span class="difficulty-container" style="display: inline-block; vertical-align: middle; margin-left: 5px;"></span>
+                            </div>
+                            <p><span class="detail-label">Estimated Weekly Hours:</span>
                                ${review.estimated_hours || "N/A"}</p>
                             <p><span class="detail-label">Professor:</span> 
                                ${
@@ -97,6 +99,11 @@ document.addEventListener("DOMContentLoaded", () => {
                     `;
 
                     reviewsListEl.appendChild(li);
+                    const ratingContainer = li.querySelector('.rating-container');
+                    ratingContainer.appendChild(createRatingStars(review.rating));
+
+                    const difficultyContainer = li.querySelector('.difficulty-container');
+                    difficultyContainer.appendChild(createDifficultyCircles(review.difficulty));
                 });
             }
         })

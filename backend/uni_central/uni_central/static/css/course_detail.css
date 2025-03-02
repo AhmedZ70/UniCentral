@@ -223,6 +223,7 @@ body, html, ul, li, p, h1, h2, select {
     text-align: center;
     border: none;
     cursor: pointer;
+    font-size: 18px;
 }
 
 .leave-review-button:hover, #enroll-btn:hover, #discussion-board-btn:hover {
@@ -242,15 +243,19 @@ body, html, ul, li, p, h1, h2, select {
 }
 
 .rating-container, .difficulty-container {
-    margin: 15px 0;
     display: flex;
+    justify-content: space-between;
     align-items: center;
-    gap: 10px;
+    font-weight: 600;
+    color: #005a5b;
+    min-width: 200px;
 }
 
 .rating-stars {
-    display: flex;
-    gap: 5px;
+    display: inline-flex;
+    align-items: center;
+    margin-left: 5px;
+    vertical-align: middle;
 }
 
 .star {
@@ -263,8 +268,10 @@ body, html, ul, li, p, h1, h2, select {
 }
 
 .difficulty-rating {
-    display: flex;
-    gap: 5px;
+    display: inline-flex;
+    align-items: center;
+    margin-left: 5px; /* Adds some space between the label and stars */
+    vertical-align: middle;
 }
 
 .difficulty-circle {

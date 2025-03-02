@@ -110,7 +110,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     document.getElementById('university').value = data.university || '';
                     document.getElementById('major').value = data.major || '';
                     document.getElementById('year').value = data.year || '';
-                    console.log("Raw API response:", data); // Add this line to see the complete response
+                    console.log("Raw API response:", data); 
                     console.log("Fetching user data: fname: ", data.fname, " lname: ", data.lname, " university", data.university, "major: ", data.major, " year: ", data.year);
                 })
                 .catch((error) => {

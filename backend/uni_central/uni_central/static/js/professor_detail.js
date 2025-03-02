@@ -22,23 +22,24 @@ document.addEventListener("DOMContentLoaded", () => {
         .then((data) => {
             // Populate professor info
             const professor = data.professor || {};
+            professorNameEl.className = 'professor-title';
             professorNameEl.textContent = `${professor.fname} ${professor.lname}`;
 
             // Create a container for professor details
             const detailsContainer = document.createElement('div');
             detailsContainer.innerHTML = `
-                <p><strong>Department:</strong> ${professor.department?.name || "N/A"}</p>
+                <p><span class="detail-label">Department:</strong> ${professor.department?.name || "N/A"}</p>
             `;
 
             // Add rating stars
             const ratingContainer = document.createElement('p');
-            ratingContainer.innerHTML = `<strong>Average Rating:</strong> `;
+            ratingContainer.innerHTML = `<span class="detail-label">Average Rating:</span> `;
             ratingContainer.appendChild(createRatingStars(professor.avg_rating));
             detailsContainer.appendChild(ratingContainer);
 
             // Add difficulty circles
             const difficultyContainer = document.createElement('p');
-            difficultyContainer.innerHTML = `<strong>Average Difficulty:</strong> `;
+            difficultyContainer.innerHTML = `<span class="detail-label">Average Difficulty:</span> `;
             difficultyContainer.appendChild(createDifficultyCircles(professor.avg_difficulty));
             detailsContainer.appendChild(difficultyContainer);
 
@@ -47,7 +48,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
             // Add bold "Courses taught" heading
             const coursesHeading = document.createElement("p");
-            coursesHeading.innerHTML = `<strong>Courses taught:</strong>`;
+            coursesHeading.innerHTML = `<span class="detail-label">Courses taught:</span>`;
             professorDetailsEl.appendChild(coursesHeading);
 
             // Populate courses taught
@@ -56,10 +57,13 @@ document.addEventListener("DOMContentLoaded", () => {
             coursesTaughtList.classList.add("courses-taught-list");
 
             if (courses.length > 0) {
+                // Instead of creating a ul/li list, create individual p elements
                 courses.forEach((course) => {
-                    const li = document.createElement("li");
-                    li.innerHTML = `${course.title} (${course.subject} ${course.number})`;
-                    coursesTaughtList.appendChild(li);
+                    const courseItem = document.createElement("p");
+                    courseItem.style.marginTop = "5px";
+                    courseItem.style.marginBottom = "5px";
+                    courseItem.innerHTML = `• ${course.title} (${course.subject} ${course.number})`;
+                    professorDetailsEl.appendChild(courseItem);
                 });
             } else {
                 const noCoursesMsg = document.createElement("p");
@@ -80,24 +84,28 @@ document.addEventListener("DOMContentLoaded", () => {
 
                     li.innerHTML = `
                         <div class="review-header">
-                            <strong>Review by:</strong> Anonymous
+                            <strong>Review by: anonymous</strong>
                             <span>Grade: ${review.grade || "N/A"}</span>
                         </div>
                         <div class="review-content">
-                            <p><strong>Review:</strong> ${review.review || "No comments provided."}</p>
-                            <p><strong>Rating:</strong> <span class="rating">${review.rating || "N/A"}/5</span></p>
-                            <p><strong>Difficulty:</strong> <span class="difficulty">${review.difficulty || "N/A"}/6</span></p>
-                            <p><strong>Estimated Weekly Hours:</strong> ${review.estimated_hours || "N/A"}</p>
-                            <p><strong>Course:</strong> ${review.course?.title || "N/A"} (${review.course?.subject || ""} ${review.course?.number || ""})</p>
-                            <p><strong>Would Take Again:</strong> ${review.would_take_again ? "Yes" : "No"}</p>
-                            <p><strong>For Credit:</strong> ${review.for_credit ? "Yes" : "No"}</p>
-                            <p><strong>Mandatory Attendance:</strong> ${review.mandatory_attendance ? "Yes" : "No"}</p>
-                            <p><strong>Class Format:</strong> 
+                            <p><span class="detail-label">Review:</span> ${review.review || "No comments provided."}</p>
+                            <div><span class="detail-label">Rating:</span> 
+                            <span class="rating-container" style="display: inline-block; vertical-align: middle; margin-left: 5px;"></span>
+                            </div>
+                            <div><span class="detail-label">Difficulty:</span> 
+                                <span class="difficulty-container" style="display: inline-block; vertical-align: middle; margin-left: 5px;"></span>
+                            </div>
+                            <p><span class="detail-label">Estimated Weekly Hours:</span> ${review.estimated_hours || "N/A"}</p>
+                            <p><span class="detail-label">Course:</span> ${review.course?.title || "N/A"} (${review.course?.subject || ""} ${review.course?.number || ""})</p>
+                            <p><span class="detail-label">Would Take Again:</span> ${review.would_take_again ? "Yes" : "No"}</p>
+                            <p><span class="detail-label">For Credit:</span> ${review.for_credit ? "Yes" : "No"}</p>
+                            <p><span class="detail-label">Mandatory Attendance:</span> ${review.mandatory_attendance ? "Yes" : "No"}</p>
+                            <p><span class="detail-label">Class Format:</span> 
                                 ${review.in_person ? "In Person " : ""}
                                 ${review.online ? "Online " : ""}
                                 ${review.hybrid ? "Hybrid" : ""}
                             </p>
-                            <p><strong>Other Notes:</strong> 
+                            <p><span class="detail-label">Other Notes:</span> 
                                 ${review.no_exams ? "No Exams " : ""}
                                 ${review.presentations ? "Presentations" : ""}
                             </p>
@@ -105,6 +113,11 @@ document.addEventListener("DOMContentLoaded", () => {
                     `;
 
                     reviewsListEl.appendChild(li);
+
+                    const ratingContainer = li.querySelector('.rating-container');
+                    ratingContainer.appendChild(createRatingStars(review.rating || 0));
+                    const difficultyContainer = li.querySelector('.difficulty-container');
+                    difficultyContainer.appendChild(createDifficultyCircles(review.difficulty || 0));
                 });
             }
         })

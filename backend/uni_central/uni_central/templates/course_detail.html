@@ -41,22 +41,20 @@
             </div>
             <div class="course-buttons">
                 <button id="enroll-btn" class="leave-review-button">Enroll</button>
-                <a id="discussion-board-btn" href="{% url 'course_discussion_board' context_id=course_id %}" class="go-to-discussion-board-button">                    Discussion Board
-                </a>
+                <a id="discussion-board-btn" href="{% url 'course_discussion_board' context_id=course_id %}" class="go-to-discussion-board-button">Discussion Board</a>
             </div>
         </section>
 
         <!-- Reviews Section -->
         <section class="course-reviews" id="course-reviews">
-            <h2 class="reviews-title">Reviews</h2>
-            <!-- The <ul> will be filled by JS. If no reviews, we'll show a "no reviews" message. -->
-            <ul class="reviews-list" id="reviews-list"></ul>
-            <p class="no-reviews-message" id="no-reviews-message" style="display: none;">No reviews available for this course.</p>
-
             <!-- "Leave a Review" link uses the course_id passed from Django to build the correct URL -->
             <a id="leave-review-btn" href="{% url 'course-review-form' context_id=course_id %}" class="leave-review-button">
                 Leave a Review
             </a>
+            <h2 class="reviews-title">Reviews</h2>
+            <!-- The <ul> will be filled by JS. If no reviews, we'll show a "no reviews" message. -->
+            <ul class="reviews-list" id="reviews-list"></ul>
+            <p class="no-reviews-message" id="no-reviews-message" style="display: none;">No reviews available for this course.</p>
         </section>
     </main>
 </body>

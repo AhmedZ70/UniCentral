@@ -26,7 +26,8 @@ const auth = getAuth(app);
 document.addEventListener("DOMContentLoaded", () => {
   let myProfessors = [];
   const professorCardsContainer = document.querySelector('.professor-cards-container');
-  const noProfessorsMessage = document.getElementById('no-professors-message');
+  const noProfessorsAddedMessage = document.getElementById('no-professors-added-message');
+  const noProfessorsMatchSearchMessage = document.getElementById('no-professors-match-search-message');
   const sortBy = document.getElementById('sort-by');
   const searchInput = document.getElementById('search-input');
 
@@ -54,8 +55,8 @@ document.addEventListener("DOMContentLoaded", () => {
       displayProfessors(myProfessors);
     } catch (error) {
       console.error("Error fetching professors:", error);
-      noProfessorsMessage.style.display = "block";
-    }
+      noProfessorsAddedMessage.style.display = "block";
+      noProfessorsMatchSearchMessage.style.display = "none";    }
   }
 
   // Display professors in the UI with clickable cards
@@ -63,12 +64,20 @@ document.addEventListener("DOMContentLoaded", () => {
     professorCardsContainer.innerHTML = ''; // Clear existing cards
 
     if (professors.length === 0) {
-      noProfessorsMessage.style.display = "block";
+      if (searchInput.value.trim() === '') {
+        // No professors added at all
+        noProfessorsAddedMessage.style.display = "block";
+        noProfessorsMatchSearchMessage.style.display = "none";
+      } else {
+        // No professors match the search
+        noProfessorsAddedMessage.style.display = "none";
+        noProfessorsMatchSearchMessage.style.display = "block";
+      }
       return;
     }
 
-    noProfessorsMessage.style.display = "none";
-    professors.forEach((professor) => {
+    noProfessorsAddedMessage.style.display = "none";
+    noProfessorsMatchSearchMessage.style.display = "none";    professors.forEach((professor) => {
       // Create an anchor element for the clickable professor card
       const cardLink = document.createElement('a');
       cardLink.href = `/professors/${professor.id}/`; // Link to professor details page
