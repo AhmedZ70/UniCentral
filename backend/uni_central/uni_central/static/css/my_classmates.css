@@ -159,6 +159,8 @@ body {
 }
 
 .search-input {
+  display: flex;
+  align-items: center;
   font-family: 'Agrandir', sans-serif;
   font-size: 20px;
   color: #02634f;
@@ -170,12 +172,18 @@ body {
 }
 
 .search-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 50px;
+  line-height: 1;
+  padding: 0 1rem;
+  margin: 0;
   background-color: #005a5b;
   font-family: 'Agrandir', sans-serif;
   font-size: 25px;
   color: white;
   border: none;
-  padding: 0.5rem 1rem;
   border-radius: 10px;
   cursor: pointer;
   font-weight: bold;
@@ -184,8 +192,10 @@ body {
 
 .search-input::placeholder {
   font-family: 'Agrandir', sans-serif;
-  font-size: 25px;
+  font-size: 20px;
   color: #02634f;
+  line-height: 1;
+  vertical-align: middle;
 }
 
 .search-btn:hover {
