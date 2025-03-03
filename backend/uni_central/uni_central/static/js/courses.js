@@ -121,23 +121,45 @@ document.addEventListener("DOMContentLoaded", () => {
     // [Function: Render Courses in the UI]
     // ------------------------------------------------------------------------
     function renderCourses(courses, departmentName) {
+        window.scrollTo(0, 0);
         console.log("Rendering courses for department:", departmentName, courses);
-
+    
         // Update breadcrumb
         breadcrumbContainer.innerHTML = `
             <a href="#" id="show-departments" class="breadcrumb-link">Departments</a> / ${departmentName}
         `;
         coursesContainer.innerHTML = ""; // Clear existing content
-
+    
+        const sortedCourses = [...courses].sort((a, b) => {
+            // Safely extract numeric part of the course number
+            const extractNumber = (course) => {
+                // If number is already a number, return it
+                if (typeof course.number === 'number') return course.number;
+                
+                // If it's a string, try to extract numeric part
+                if (typeof course.number === 'string') {
+                    const numMatch = course.number.match(/\d+/);
+                    return numMatch ? parseInt(numMatch[0], 10) : 0;
+                }
+                
+                // If no number found, return 0
+                return 0;
+            };
+    
+            const numA = extractNumber(a);
+            const numB = extractNumber(b);
+            return numA - numB;
+        });
+    
         // Check if the courses list is empty
-        if (!courses || courses.length === 0) {
+        if (!sortedCourses || sortedCourses.length === 0) {
             coursesContainer.innerHTML = "<p>No courses available for this department.</p>";
         } else {
-            courses.forEach((course) => {
+            sortedCourses.forEach((course) => {
                 const courseLink = document.createElement("a");
                 courseLink.href = `/courses/${course.id}/`; // Link to course detail page
                 courseLink.classList.add("course-link");
-
+    
                 const courseDiv = document.createElement("div");
                 courseDiv.classList.add("course-item");
                 courseDiv.innerHTML = `
