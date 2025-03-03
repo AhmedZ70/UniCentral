@@ -159,6 +159,7 @@ document.addEventListener("DOMContentLoaded", () => {
      * @param {string} departmentName - The name of the department for the breadcrumb.
      */
     function renderProfessors(professors, departmentName) {
+        window.scrollTo(0, 0);
         console.log("Rendering professors for department:", departmentName, professors);
     
         // Update breadcrumb
@@ -167,11 +168,16 @@ document.addEventListener("DOMContentLoaded", () => {
         `;
         professorsContainer.innerHTML = ""; // Clear existing content
     
+        // Sort professors by first name
+        const sortedProfessors = [...professors].sort((a, b) => 
+            a.fname.localeCompare(b.fname)
+        );
+    
         // Check if the professors list is empty
-        if (!professors || professors.length === 0) {
+        if (!sortedProfessors || sortedProfessors.length === 0) {
             professorsContainer.innerHTML = "<p>No professors available for this department.</p>";
         } else {
-            professors.forEach((professor) => {
+            sortedProfessors.forEach((professor) => {
                 console.log('Professor object:', professor); 
                 const professorLink = document.createElement("a");
                 professorLink.href = `/professors/${professor.id}/`; // Link to professor detail page
