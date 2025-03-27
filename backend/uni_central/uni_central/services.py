@@ -291,7 +291,7 @@ class UserService:
     
     @staticmethod
     def get_reviews(user):
-        reviews = Review.objects.filter(user)
+        reviews = Review.objects.filter(user=user)
         return reviews
     
     @staticmethod
