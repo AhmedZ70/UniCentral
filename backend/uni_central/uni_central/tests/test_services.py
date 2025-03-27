@@ -2,7 +2,7 @@ from django.test import TestCase
 from uni_central.models import User, Review, Course, Professor, Department, Thread, Comment
 from uni_central.services import (
     DepartmentService, CourseService, ReviewService, 
-    ProfessorService, UserService, ThreadService, CommentService
+    ProfessorService, UserService, CourseFilteringService, ThreadService, CommentService
 )
 
 #####################################
@@ -342,7 +342,87 @@ class UserServiceTestCase(TestCase):
         result = UserService.delete_user(user_id)
         self.assertTrue(result)
         self.assertFalse(User.objects.filter(id=user_id).exists())
+        
+###########################################
+# Course-Filtering-Related Services Tests #
+###########################################
 
+class CourseFilteringServiceTestCase(TestCase):
+    def setUp(self):
+        self.department = Department.objects.create(name="Mathematics", code="MATH")
+
+        self.professor = Professor.objects.create(
+            fname="Daniel",
+            lname="Kopta",
+            department=self.department
+        )
+
+        self.course = Course.objects.create(
+            title="Discrete Math",
+            subject="MATH",
+            number=2100,
+            department=self.department,
+            avg_difficulty=3.5,
+            avg_rating=4.2,
+            credits=3,
+            semester="Fall 2024"
+        )
+        self.course.professors.add(self.professor)
+
+    def test_filter_by_department(self):
+        """Test filtering by department code."""
+        filters = {'department': 'MATH'}
+        results = CourseFilteringService.filter_courses(filters)
+        self.assertEqual(results.count(), 1)
+        self.assertEqual(results[0], self.course)
+
+    def test_filter_by_min_and_max_number(self):
+        """Test filtering by course number range."""
+        filters = {'min_number': 2000, 'max_number': 2200}
+        results = CourseFilteringService.filter_courses(filters)
+        self.assertEqual(results.count(), 1)
+
+    def test_filter_by_title(self):
+        """Test filtering by title substring."""
+        filters = {'title': 'Discrete'}
+        results = CourseFilteringService.filter_courses(filters)
+        self.assertEqual(results.count(), 1)
+
+    def test_filter_by_difficulty(self):
+        """Test filtering by difficulty range."""
+        filters = {'min_difficulty': 3, 'max_difficulty': 4}
+        results = CourseFilteringService.filter_courses(filters)
+        self.assertEqual(results.count(), 1)
+
+    def test_filter_by_rating(self):
+        """Test filtering by rating range."""
+        filters = {'min_rating': 4, 'max_rating': 5}
+        results = CourseFilteringService.filter_courses(filters)
+        self.assertEqual(results.count(), 1)
+
+    def test_filter_by_credits(self):
+        """Test filtering by number of credits."""
+        filters = {'credits': 3}
+        results = CourseFilteringService.filter_courses(filters)
+        self.assertEqual(results.count(), 1)
+
+    def test_filter_by_semester(self):
+        """Test filtering by semester name."""
+        filters = {'semester': 'Fall'}
+        results = CourseFilteringService.filter_courses(filters)
+        self.assertEqual(results.count(), 1)
+
+    def test_filter_by_professor_name(self):
+        """Test filtering by professor's first or last name."""
+        filters = {'professor': 'Kopta'}
+        results = CourseFilteringService.filter_courses(filters)
+        self.assertEqual(results.count(), 1)
+
+    def test_filter_with_no_match(self):
+        """Test filtering that returns no matches."""
+        filters = {'title': 'Nonexistent'}
+        results = CourseFilteringService.filter_courses(filters)
+        self.assertEqual(results.count(), 0)
 
 #################################
 # Thread-Related Services Tests #
@@ -352,25 +432,133 @@ class ThreadServiceTestCase(TestCase):
     """Test cases for ThreadService methods."""
 
     def setUp(self):
-        self.department = Department.objects.create(name="Artificial Intelligence", code="AI")
+        self.user = User.objects.create(email_address="thread@test.com", fname="John", lname="Doe")
+        self.department = Department.objects.create(name="Mathematics", code="MATH")
+
+        self.professor = Professor.objects.create(fname="Daniel", lname="Kopta", department=self.department)
+
         self.course = Course.objects.create(
-            title="Deep Learning",
-            subject="AI",
-            number=501,
+            title="Discrete Math",
+            subject="MATH",
+            number=2100,
             department=self.department,
             credits=3
         )
-        self.user = User.objects.create(email_address="user@example.com", fname="John", lname="Doe")
-        self.thread = Thread.objects.create(title="Neural Networks", user=self.user, course=self.course)
+
+        self.prof_thread = Thread.objects.create(
+            title="Office Hours Question",
+            user=self.user,
+            professor=self.professor
+        )
+
+        self.course_thread = Thread.objects.create(
+            title="Homework 1 Discussion",
+            user=self.user,
+            course=self.course
+        )
 
     def test_get_threads_by_course(self):
-        """Test fetching threads by course."""
+        """Test getting all threads for a given course."""
         threads = ThreadService.get_threads_by_course(self.course.id)
         self.assertEqual(threads.count(), 1)
+        self.assertEqual(threads[0], self.course_thread)
 
-    def test_create_thread(self):
-        """Test creating a new thread."""
-        thread_data = {"title": "Convolutional Networks", "course_id": self.course.id}
-        response = ThreadService.create_thread(self.user, thread_data)
+    def test_get_threads_by_professor(self):
+        """Test getting all threads for a given professor."""
+        threads = ThreadService.get_threads_by_professor(self.professor.id)
+        self.assertEqual(threads.count(), 1)
+        self.assertEqual(threads[0], self.prof_thread)
+
+    def test_create_thread_with_course(self):
+        """Test creating a thread linked to a course."""
+        data = {"title": "Midterm Prep", "course_id": self.course.id}
+        response = ThreadService.create_thread(self.user, data)
         self.assertTrue(response["success"])
-        self.assertEqual(response["thread"].title, "Convolutional Networks")
+        self.assertEqual(response["thread"].course, self.course)
+        self.assertIsNone(response["thread"].professor)
+
+    def test_create_thread_with_professor(self):
+        """Test creating a thread linked to a professor."""
+        data = {"title": "Grading Policy", "professor_id": self.professor.id}
+        response = ThreadService.create_thread(self.user, data)
+        self.assertTrue(response["success"])
+        self.assertEqual(response["thread"].professor, self.professor)
+        self.assertIsNone(response["thread"].course)
+
+    def test_create_thread_with_both_links(self):
+        """Test error when trying to link thread to both course and professor."""
+        data = {"title": "Invalid", "course_id": self.course.id, "professor_id": self.professor.id}
+        response = ThreadService.create_thread(self.user, data)
+        self.assertFalse(response["success"])
+        self.assertIn("error", response)
+
+    def test_update_thread_title(self):
+        """Test updating the title of a thread."""
+        new_title = "Updated Thread Title"
+        response = ThreadService.update_thread(self.prof_thread.id, {"title": new_title})
+        self.assertTrue(response["success"])
+        self.assertEqual(response["thread"].title, new_title)
+
+    def test_get_thread_by_id(self):
+        """Test retrieving a thread by ID."""
+        thread = ThreadService.get_thread_by_id(self.course_thread.id)
+        self.assertIsNotNone(thread)
+        self.assertEqual(thread, self.course_thread)
+
+    def test_delete_thread(self):
+        """Test deleting a thread by ID."""
+        response = ThreadService.delete_thread(self.prof_thread.id)
+        self.assertTrue(response["success"])
+        self.assertFalse(Thread.objects.filter(id=self.prof_thread.id).exists())
+    
+##################################
+# Comment-Related Services Tests #
+##################################
+
+class CommentServiceTestCase(TestCase):
+    def setUp(self):
+        self.user = User.objects.create(email_address="john@test.com", fname="John", lname="Doe")
+        self.department = Department.objects.create(name="Mathematics", code="MATH")
+        self.professor = Professor.objects.create(fname="Daniel", lname="Kopta", department=self.department)
+        self.course = Course.objects.create(title="Discrete Math", subject="MATH", number=2100,
+                                            department=self.department, credits=3)
+        self.thread = Thread.objects.create(title="Test Thread", user=self.user, course=self.course)
+        self.comment = Comment.objects.create(thread=self.thread, user=self.user, content="First!")
+
+    def test_get_comments_by_thread(self):
+        """Test fetching all comments under a thread."""
+        comments = CommentService.get_comments_by_thread(self.thread.id)
+        self.assertEqual(comments.count(), 1)
+        self.assertEqual(comments[0], self.comment)
+
+    def test_create_comment(self):
+        """Test creating a comment with an existing user."""
+        data = {
+            "thread_id": self.thread.id,
+            "email_address": "john@test.com",
+            "content": "Another comment"
+        }
+        response = CommentService.create_comment(data)
+        self.assertTrue(response["success"])
+        self.assertEqual(response["comment"].thread, self.thread)
+        self.assertEqual(response["comment"].user, self.user)
+        self.assertEqual(response["comment"].content, "Another comment")
+
+    def test_update_comment(self):
+        """Test updating the content of a comment."""
+        response = CommentService.update_comment(self.comment.id, {"content": "Updated content"})
+        self.assertTrue(response["success"])
+        self.comment.refresh_from_db()
+        self.assertEqual(self.comment.content, "Updated content")
+
+    def test_get_comment_by_id(self):
+        """Test retrieving a comment by its ID."""
+        comment = CommentService.get_comment_by_id(self.comment.id)
+        self.assertIsNotNone(comment)
+        self.assertEqual(comment, self.comment)
+
+    def test_delete_comment(self):
+        """Test deleting a comment by its ID."""
+        response = CommentService.delete_comment(self.comment.id)
+        self.assertTrue(response["success"])
+        self.assertFalse(Comment.objects.filter(id=self.comment.id).exists())
