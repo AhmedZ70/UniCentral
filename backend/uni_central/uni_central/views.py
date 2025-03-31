@@ -540,8 +540,7 @@ class MyReviewsView(APIView):
     """
     API View to fetch reviews of courses that a user has made.
     """
-    def get(self, request):
-        email_address = request.data.get('email_address')
+    def get(self, request, email_address):
         user = UserService.get_user(email_address)
         
         reviews = UserService.get_reviews(user)
