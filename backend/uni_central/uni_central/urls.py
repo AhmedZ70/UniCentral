@@ -124,8 +124,8 @@ urlpatterns = [
     # User URLs
     path('api/create_user/', CreateUserView.as_view(), name='create_user'),
     path('api/my_courses/<str:email_address>/', MyCoursesView.as_view(), name='api-my_courses'),
-    path('api/my_professors/<str:email_address>/', MyProfessorsView.as_view(), name='api-my_professors'),  # Added this line
-    path('api/my_reviews/', MyReviewsView.as_view(), name='api-my_reviews'),
+    path('api/my_professors/<str:email_address>/', MyProfessorsView.as_view(), name='api-my_professors'),
+    path('api/my_reviews/<str:email_address>/', MyReviewsView.as_view(), name='api-my_reviews'),
     path('api/my_classmates/<str:email_address>/', MyClassmatesView.as_view(), name='api-my_classmates'),
     path('api/users/<str:email_address>/details/', MyAccountView.as_view(), name='user-details'),
     path('api/users/details/edit-details', EditAccountView.as_view(), name='edit-user-details'),
