@@ -132,8 +132,21 @@ body {
     height: auto;
 }
 
-#thumbs-down:hover, #thumbs-up:hover {
-    opacity: 70%;
+[id^="thumbs-down-"]:hover, [id^="thumbs-up-"]:hover {
+    opacity: 60%;
+}
+
+.helpful-review-button.active img {
+    filter: brightness(0.8);
+    transform: scale(1.3);
+}
+
+.likes .helpful-review-button.active img {
+    filter: brightness(0.8) sepia(100%) saturate(5000%) hue-rotate(80deg);
+}
+
+.dislikes .helpful-review-button.active img {
+    filter: brightness(0.8) sepia(100%) saturate(5000%) hue-rotate(320deg);
 }
 
 .rating, .difficulty {

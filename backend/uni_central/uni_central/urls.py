@@ -33,6 +33,9 @@ from .views import (
     UpdateCommentAPIView,
     DeleteCommentAPIView,
     CoursePlanUpdateAPIView,
+    ReviewVotesView,
+    UserReviewVoteView,
+    SubmitReviewVoteView,
     home,
     courses,
     about_page,
@@ -115,6 +118,11 @@ urlpatterns = [
     path('api/professors/<int:professor_id>/reviews/create/', CreateProfessorReviewAPIView.as_view(), name='create-professor-review'),
     path('api/professors/<int:professor_id>/reviews/add/', AddProfessorView.as_view(), name='api-professor-add'),
     path('api/professors/<int:professor_id>/reviews/remove/', RemoveProfessorView.as_view(), name='api-professor-remove'),
+    
+    # Review Votes URLs
+    path('api/reviews/<int:review_id>/votes/', ReviewVotesView.as_view(), name='review-votes'),
+    path('api/reviews/<int:review_id>/user-vote/', UserReviewVoteView.as_view(), name='user-review-vote'),
+    path('api/reviews/<int:review_id>/vote/', SubmitReviewVoteView.as_view(), name='submit-review-vote'),
     
     # Professor URLs
     path('api/courses/<int:course_id>/professors/', CourseProfessorsAPIView.as_view(), name='course-professors'),

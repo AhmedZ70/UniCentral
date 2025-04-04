@@ -237,6 +237,90 @@ class ReviewService:
             professor.update_averages()
             
         return {"success": True, "message": "Review deleted successfully"}
+    
+################################
+# Review Vote-Related Services #
+################################
+class ReviewVoteService:
+    """
+    Service class for handling operations related to review votes.
+    """
+    
+    @staticmethod
+    def count_votes(review, vote_type):
+        """
+        Count the number of votes of a specific type for a review.
+        
+        Args:
+            review: Review object
+            vote_type: String ('like' or 'dislike')
+            
+        Returns:
+            int: Number of votes
+        """
+        from .models import ReviewVote
+        return ReviewVote.objects.filter(review=review, vote_type=vote_type).count()
+    
+    @staticmethod
+    def get_user_vote(user, review):
+        """
+        Check if a user has voted on a review.
+        
+        Args:
+            user: User object
+            review: Review object
+            
+        Returns:
+            ReviewVote object or None
+        """
+        from .models import ReviewVote
+        try:
+            return ReviewVote.objects.get(user=user, review=review)
+        except ReviewVote.DoesNotExist:
+            return None
+    
+    @staticmethod
+    def submit_vote(user, review, vote_type):
+        """
+        Submit or update a vote.
+        
+        Args:
+            user: User object
+            review: Review object
+            vote_type: String ('like' or 'dislike')
+            
+        Returns:
+            dict: Result with updated vote counts and user vote
+        """
+        from .models import ReviewVote
+        
+        # Check if user has already voted
+        existing_vote = ReviewVoteService.get_user_vote(user, review)
+        
+        if existing_vote:
+            if existing_vote.vote_type == vote_type:
+                # If clicking the same button again, remove the vote
+                existing_vote.delete()
+                user_vote = None
+            else:
+                # Update the vote
+                existing_vote.vote_type = vote_type
+                existing_vote.save()
+                user_vote = vote_type
+        else:
+            # Create new vote
+            ReviewVote.objects.create(user=user, review=review, vote_type=vote_type)
+            user_vote = vote_type
+        
+        # Count likes and dislikes after the update
+        likes = ReviewVoteService.count_votes(review, 'like')
+        dislikes = ReviewVoteService.count_votes(review, 'dislike')
+        
+        return {
+            'likes': likes,
+            'dislikes': dislikes,
+            'user_vote': user_vote
+        }
 
 ##############################
 # Professor-Related Services #

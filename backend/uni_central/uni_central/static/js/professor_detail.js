@@ -111,13 +111,13 @@ document.addEventListener("DOMContentLoaded", () => {
                             </p>
                             <div class="thumb-buttons">
                                 <div class="dislikes">
-                                    <button class="helpful-review-button" id="thumbs-down">
+                                    <button class="helpful-review-button" id="thumbs-down-${review.id}">
                                         <img src="${'/static/assets/thumbs_down.png'}" alt="thumbs down">
                                     </button>
                                     <p>0</p>
                                 </div>
                                 <div class="likes">
-                                    <button class="helpful-review-button" id="thumbs-up">
+                                    <button class="helpful-review-button" id="thumbs-up-${review.id}">
                                         <img src="${'/static/assets/thumbs_up.png'}" alt="thumbs up">
                                     </button>
                                     <p>0</p>
@@ -130,8 +130,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
                     const ratingContainer = li.querySelector('.rating-container');
                     ratingContainer.appendChild(createRatingStars(review.rating || 0));
+                    
                     const difficultyContainer = li.querySelector('.difficulty-container');
                     difficultyContainer.appendChild(createDifficultyCircles(review.difficulty || 0));
+
+                    setupThumbsButtons(review.id, li);
                 });
             }
         })
@@ -234,4 +237,93 @@ function createDifficultyCircles(difficulty) {
     }
 
     return circlesContainer;
+}
+
+function setupThumbsButtons(reviewId, liElement) {
+    const thumbsUpBtn = liElement.querySelector(`#thumbs-up-${reviewId}`);
+    const thumbsDownBtn = liElement.querySelector(`#thumbs-down-${reviewId}`); 
+    const likesCountEl = liElement.querySelector('.likes p');
+    const dislikesCountEl = liElement.querySelector('.dislikes p');
+    
+    fetchVoteCounts(reviewId, likesCountEl, dislikesCountEl);
+    
+    checkUserVote(reviewId, thumbsUpBtn, thumbsDownBtn);
+    
+    thumbsUpBtn.addEventListener('click', () => {
+        handleVote(reviewId, 'like', thumbsUpBtn, thumbsDownBtn, likesCountEl, dislikesCountEl);
+    });
+    
+    thumbsDownBtn.addEventListener('click', () => {
+        handleVote(reviewId, 'dislike', thumbsUpBtn, thumbsDownBtn, likesCountEl, dislikesCountEl);
+    });
+}
+
+function fetchVoteCounts(reviewId, likesEl, dislikesEl) {
+    fetch(`/api/reviews/${reviewId}/votes/`)
+        .then(response => response.json())
+        .then(data => {
+            likesEl.textContent = data.likes || 0;
+            dislikesEl.textContent = data.dislikes || 0;
+        })
+        .catch(error => console.error('Error fetching vote counts:', error));
+}
+
+function checkUserVote(reviewId, thumbsUpBtn, thumbsDownBtn) {
+    onAuthStateChanged(auth, (user) => {
+        if (user) {
+            fetch(`/api/reviews/${reviewId}/user-vote/?email=${user.email}`)
+                .then(response => response.json())
+                .then(data => {
+                    thumbsUpBtn.classList.remove('active');
+                    thumbsDownBtn.classList.remove('active');
+                    
+                    if (data.vote === 'like') {
+                        thumbsUpBtn.classList.add('active');
+                    } else if (data.vote === 'dislike') {
+                        thumbsDownBtn.classList.add('active');
+                    }
+                })
+                .catch(error => console.error('Error checking user vote:', error));
+        }
+    });
+}
+
+function handleVote(reviewId, voteType, thumbsUpBtn, thumbsDownBtn, likesEl, dislikesEl) {
+    onAuthStateChanged(auth, (user) => {
+        if (!user) {
+            alert('Please log in to vote on reviews');
+            return;
+        }
+        
+        fetch(`/api/reviews/${reviewId}/vote/`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                email: user.email,
+                vote_type: voteType
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.error) {
+                alert(data.error);
+                return;
+            }
+            
+            likesEl.textContent = data.likes || 0;
+            dislikesEl.textContent = data.dislikes || 0;
+            
+            thumbsUpBtn.classList.remove('active');
+            thumbsDownBtn.classList.remove('active');
+            
+            if (data.user_vote === 'like') {
+                thumbsUpBtn.classList.add('active');
+            } else if (data.user_vote === 'dislike') {
+                thumbsDownBtn.classList.add('active');
+            }
+        })
+        .catch(error => console.error('Error submitting vote:', error));
+    });
 }

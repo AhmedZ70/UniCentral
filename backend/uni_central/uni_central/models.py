@@ -208,6 +208,36 @@ class Review(models.Model):
     def __str__(self):
         course_name = self.course.title if self.course else "No Course"
         return f"Review by {self.user.fname} for {course_name}"
+    
+####################
+# REVIEWVOTE MODEL #
+####################
+class ReviewVote(models.Model):
+    """
+    A model for tracking likes and dislikes on reviews.
+
+    Attributes:
+        user (ForeignKey): The user who voted.
+        review (ForeignKey): The review being voted on.
+        vote_type (CharField): Type of vote ('like' or 'dislike').
+        created_at (DateTimeField): When the vote was created.
+    """
+    user = models.ForeignKey('User', on_delete=models.CASCADE, related_name='review_votes')
+    review = models.ForeignKey('Review', on_delete=models.CASCADE, related_name='votes')
+    vote_type = models.CharField(max_length=10, choices=[
+        ('like', 'Like'),
+        ('dislike', 'Dislike')
+    ])
+    created_at = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        db_table = 'review_votes'
+        unique_together = ('user', 'review')
+        verbose_name = 'Review Vote'
+        verbose_name_plural = 'Review Votes'
+        
+    def __str__(self):
+        return f"{self.user.email_address} {self.vote_type}d review #{self.review.id}"
 
 ####################
 # THREAD MODEL #
