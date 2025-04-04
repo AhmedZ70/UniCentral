@@ -745,3 +745,54 @@ class CommentService:
 
         comment.delete()
         return {"success": True, "message": "Comment deleted successfully"}
+    
+class CommentUpvoteService:
+    """
+    Service class for handling operations related to comment upvotes.
+    """
+    
+    @staticmethod
+    def count_upvotes(comment):
+        """
+        Count the number of upvotes for a comment.
+        """
+        from .models import CommentUpvote
+        return CommentUpvote.objects.filter(comment=comment).count()
+    
+    @staticmethod
+    def get_user_upvote(user, comment):
+        """
+        Check if a user has upvoted a comment.
+        """
+        from .models import CommentUpvote
+        try:
+            return CommentUpvote.objects.get(user=user, comment=comment)
+        except CommentUpvote.DoesNotExist:
+            return None
+    
+    @staticmethod
+    def toggle_upvote(user, comment):
+        """
+        Toggle upvote for a comment.
+        """
+        from .models import CommentUpvote
+        
+        # Check if user has already upvoted
+        existing_upvote = CommentUpvoteService.get_user_upvote(user, comment)
+        
+        if existing_upvote:
+            # User already upvoted, so remove it
+            existing_upvote.delete()
+            user_upvoted = False
+        else:
+            # User hasn't upvoted, so add it
+            CommentUpvote.objects.create(user=user, comment=comment)
+            user_upvoted = True
+        
+        # Count upvotes after the update
+        upvotes = CommentUpvoteService.count_upvotes(comment)
+        
+        return {
+            'upvotes': upvotes,
+            'user_upvoted': user_upvoted
+        }

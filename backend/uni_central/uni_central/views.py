@@ -12,6 +12,7 @@ from .services import (
     CourseFilteringService,
     ThreadService,
     CommentService,
+    CommentUpvoteService,
     )
 from .serializers import (
     DepartmentSerializer,
@@ -20,7 +21,7 @@ from .serializers import (
     ProfessorSerializer,
     ReviewSerializer,
     ThreadSerializer,
-    CommentSerializer
+    CommentSerializer,
 )
 
 ######################
@@ -892,3 +893,70 @@ class DeleteCommentAPIView(APIView):
             return Response({"message": result["message"]}, status=status.HTTP_200_OK)
         
         return Response({"error": result["error"]}, status=status.HTTP_400_BAD_REQUEST)
+    
+class CommentUpvotesView(APIView):
+    """
+    API View to get upvote count for a comment.
+    """
+    def get(self, request, comment_id):
+        try:
+            comment = CommentService.get_comment_by_id(comment_id)
+            if not comment:
+                return Response({'error': 'Comment not found'}, status=status.HTTP_404_NOT_FOUND)
+                
+            upvotes = CommentUpvoteService.count_upvotes(comment)
+            
+            return Response({
+                'upvotes': upvotes
+            })
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+class UserCommentUpvoteView(APIView):
+    """
+    API View to check if a user has upvoted a comment.
+    """
+    def get(self, request, comment_id):
+        try:
+            email = request.GET.get('email')
+            if not email:
+                return Response({'error': 'Email required'}, status=status.HTTP_400_BAD_REQUEST)
+            
+            user = UserService.get_user(email)
+            comment = CommentService.get_comment_by_id(comment_id)
+            if not comment:
+                return Response({'error': 'Comment not found'}, status=status.HTTP_404_NOT_FOUND)
+                
+            upvote = CommentUpvoteService.get_user_upvote(user, comment)
+            
+            return Response({
+                'upvoted': upvote is not None
+            })
+                
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+class ToggleCommentUpvoteView(APIView):
+    """
+    API View to toggle an upvote on a comment.
+    """
+    def post(self, request, comment_id):
+        try:
+            email = request.data.get('email')
+            if not email:
+                return Response({'error': 'Email required'}, status=status.HTTP_400_BAD_REQUEST)
+            
+            user = UserService.get_user(email)
+            comment = CommentService.get_comment_by_id(comment_id)
+            if not comment:
+                return Response({'error': 'Comment not found'}, status=status.HTTP_404_NOT_FOUND)
+                
+            result = CommentUpvoteService.toggle_upvote(user, comment)
+            
+            return Response({
+                'upvotes': result['upvotes'],
+                'user_upvoted': result['user_upvoted']
+            })
+                
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

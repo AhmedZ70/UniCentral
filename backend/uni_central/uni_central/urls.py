@@ -32,6 +32,9 @@ from .views import (
     CreateCommentAPIView,
     UpdateCommentAPIView,
     DeleteCommentAPIView,
+    CommentUpvotesView,
+    UserCommentUpvoteView,
+    ToggleCommentUpvoteView,
     CoursePlanUpdateAPIView,
     ReviewVotesView,
     UserReviewVoteView,
@@ -153,5 +156,8 @@ urlpatterns = [
     path("api/threads/<int:thread_id>/comments/create/", CreateCommentAPIView.as_view(), name="api-create-comment"),
     path("api/comments/<int:comment_id>/update/", UpdateCommentAPIView.as_view(), name="api-update-comment"),
     path("api/comments/<int:comment_id>/delete/", DeleteCommentAPIView.as_view(), name="api-delete-comment"),
+    path('api/comments/<int:comment_id>/upvotes/', CommentUpvotesView.as_view(), name='comment-upvotes'),
+    path('api/comments/<int:comment_id>/user-upvote/', UserCommentUpvoteView.as_view(), name='user-comment-upvote'),
+    path('api/comments/<int:comment_id>/upvote/', ToggleCommentUpvoteView.as_view(), name='toggle-comment-upvote'),
     path("api/threads/<int:thread_id>/comments/", ThreadCommentsAPIView.as_view(), name="thread-comments"),
 ]

@@ -310,10 +310,27 @@ function createResponseElement(comment) {
     const timestampSpan = document.createElement('span');
     timestampSpan.className = 'timestamp';
     timestampSpan.textContent = formatRelativeTime(comment.created_at);
-    
+
     const upvoteButton = document.createElement('button');
-    upvoteButton.className = 'upvote';
-    upvoteButton.textContent = `👍 ${comment.upvotes || 0}`;
+    upvoteButton.className = 'upvote-button';
+    upvoteButton.dataset.commentId = comment.id;
+
+    const likeContainer = document.createElement('div');
+    likeContainer.className = 'like-container';
+    
+    const thumbsUpImg = document.createElement('img');
+    thumbsUpImg.src = '/static/assets/thumbs_up.png';
+    thumbsUpImg.alt = 'thumbs up';
+    thumbsUpImg.className = 'thumbs-up-img'
+
+    const countSpan = document.createElement('span');
+    countSpan.className = 'like-count';
+    countSpan.textContent = comment.upvotes || 0;
+    
+    // Assemble the button
+    likeContainer.appendChild(thumbsUpImg);
+    likeContainer.appendChild(countSpan);
+    upvoteButton.appendChild(likeContainer);
     
     metaElement.appendChild(authorSpan);
     metaElement.appendChild(timestampSpan);
@@ -321,6 +338,10 @@ function createResponseElement(comment) {
     
     responseElement.appendChild(contentParagraph);
     responseElement.appendChild(metaElement);
+
+    upvoteButton.addEventListener('click', function() {
+        upvoteComment(comment.id, this);
+    });
     
     return responseElement;
 }
@@ -328,15 +349,12 @@ function createResponseElement(comment) {
 function loadThreadComments(threadId) {
     fetch(`/api/threads/${threadId}/comments/`)
         .then(response => {
-            console.log('Comments fetch response:', response);
             if (!response.ok) {
                 throw new Error(`Failed to fetch comments. Status: ${response.status}`);
             }
             return response.json();
         })
         .then(comments => {
-            console.log('Comments received:', comments);
-            
             const threadElement = document.querySelector(`.thread[data-thread-id="${threadId}"]`);
             if (threadElement) {
                 const responsesContainer = threadElement.querySelector('.responses');
@@ -345,7 +363,15 @@ function loadThreadComments(threadId) {
                 const replyCountElement = threadElement.querySelector('.reply-count');
                 replyCountElement.textContent = `${comments.length} replies`;
                 
+                const user = auth.currentUser;
+                const userEmail = user ? user.email : null;
+                
                 comments.forEach(comment => {
+                    if (userEmail && comment.user_upvotes && 
+                        comment.user_upvotes.includes(userEmail)) {
+                        comment.userVoted = true;
+                    }
+                    
                     const responseElement = createResponseElement(comment);
                     responsesContainer.appendChild(responseElement);
                 });
@@ -525,21 +551,49 @@ async function submitReply(form) {
 
 async function upvoteComment(commentId, button) {
     try {
+        const user = auth.currentUser;
+        if (!user) {
+            alert('You must be logged in to upvote a comment');
+            return;
+        }
+        
+        const requestBody = {
+            email: user.email
+        };
+        
+        console.log('Sending upvote request for comment', commentId, 'with data:', requestBody);
+        
         const response = await fetch(`/api/comments/${commentId}/upvote/`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
-            }
+            },
+            body: JSON.stringify(requestBody)
         });
         
+        // Try to get more detailed error info if response is not OK
         if (!response.ok) {
+            const errorText = await response.text();
+            console.error('Server error response:', errorText);
             throw new Error(`Server returned ${response.status}: ${response.statusText}`);
         }
         
         const data = await response.json();
-        button.textContent = `👍 ${data.upvotes}`;
+        console.log('Upvote successful, response:', data);
+        
+        const countSpan = button.querySelector('.like-count');
+        if (countSpan) {
+            countSpan.textContent = data.upvotes;
+        }
+        
+        if (data.user_upvoted) {
+            button.classList.add('active');
+        } else {
+            button.classList.remove('active');
+        }
     } catch (error) {
         console.error('Error upvoting comment:', error);
+        alert('Failed to upvote. Please try again later.');
     }
 }
 

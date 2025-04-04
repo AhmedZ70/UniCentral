@@ -253,11 +253,34 @@ body, html, ul, li, p, h1, h2, select {
     color: #666;
 }
 
-.upvote {
-    background: none;
-    border: none;
-    cursor: pointer;
-    font-size: 16px;
+.like-container {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.thumbs-up-img {
+  width: 20px;
+  height: auto;
+}
+
+.upvote-button {
+  display: flex;
+  align-items: center;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 5px;
+  border-radius: 4px;
+  transition: background-color 0.2s;
+}
+
+.upvote-button:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+.upvote-button.active .thumbs-up-img {
+  filter: brightness(0.8) sepia(100%) saturate(5000%) hue-rotate(80deg);
 }
 
 /* ============================================= */

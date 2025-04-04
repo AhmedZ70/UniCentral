@@ -301,3 +301,18 @@ class Comment(models.Model):
 
     def __str__(self):
         return f"Comment by {self.user.fname} on {self.thread.title}"
+    
+class CommentUpvote(models.Model):
+    """
+    A model for tracking upvotes on comments.
+    """
+    user = models.ForeignKey('User', on_delete=models.CASCADE, related_name='comment_upvotes')
+    comment = models.ForeignKey('Comment', on_delete=models.CASCADE, related_name='upvotes')
+    created_at = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        db_table = 'comment_upvotes'
+        unique_together = ('user', 'comment')
+        
+    def __str__(self):
+        return f"{self.user.email_address} upvoted comment #{self.comment.id}"
