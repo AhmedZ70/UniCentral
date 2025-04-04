@@ -109,6 +109,20 @@ document.addEventListener("DOMContentLoaded", () => {
                                 ${review.no_exams ? "No Exams " : ""}
                                 ${review.presentations ? "Presentations" : ""}
                             </p>
+                            <div class="thumb-buttons">
+                                <div class="dislikes">
+                                    <button class="helpful-review-button" id="thumbs-down">
+                                        <img src="${'/static/assets/thumbs_down.png'}" alt="thumbs down">
+                                    </button>
+                                    <p>0</p>
+                                </div>
+                                <div class="likes">
+                                    <button class="helpful-review-button" id="thumbs-up">
+                                        <img src="${'/static/assets/thumbs_up.png'}" alt="thumbs up">
+                                    </button>
+                                    <p>0</p>
+                                </div>
+                           </div>
                         </div>
                     `;
 
