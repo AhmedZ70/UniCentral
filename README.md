@@ -41,3 +41,75 @@ UniCentral not only addresses a real and recurring student need but also serves 
 - **Databases Used**: SQLite3
 
 ---
+
+## **Development and Testing**
+
+### **Backend Testing**
+
+The backend uses Django's testing framework with pytest for more advanced test cases:
+
+```bash
+# Run all backend tests
+cd backend/uni_central
+python manage.py test
+
+# Run tests with pytest and coverage
+pytest --cov=uni_central
+
+# Run specific test module
+python manage.py test uni_central.tests.test_views
+```
+
+### **Frontend Testing**
+
+The frontend uses Jest and React Testing Library for component testing:
+
+```bash
+# Run all frontend tests
+npm test
+
+# Run tests in watch mode
+npm run test:watch
+
+# Generate coverage report
+npm run test:coverage
+```
+
+### **Code Quality**
+
+We use several tools to maintain code quality:
+
+- **Backend**:
+  - Flake8 for PEP8 style checking
+  - Black for code formatting
+  - Pylint for code quality
+  - Bandit for security scanning
+
+- **Frontend**:
+  - ESLint for code quality
+  - Prettier for code formatting
+
+```bash
+# Backend linting
+flake8 backend/
+black backend/
+pylint backend/
+
+# Frontend linting
+npm run lint
+npm run format
+```
+
+### **CI/CD Pipeline**
+
+Our CI/CD pipeline automatically runs:
+
+1. **Linting** - Code style and quality checks
+2. **Testing** - Comprehensive test suites for both backend and frontend
+3. **Security Scanning** - Checks for security vulnerabilities
+4. **Building** - Builds optimized assets for deployment
+5. **Deployment** - Automated deployments to staging and production (manual approval required)
+
+The pipeline configuration is defined in `.gitlab-ci.yml`.
+
+---
