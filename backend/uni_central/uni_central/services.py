@@ -9,6 +9,13 @@ from .models import (
     )
 from django.shortcuts import get_object_or_404
 from django.db.models import Q
+import pytesseract
+from pdf2image import convert_from_path
+import csv
+import io
+from PIL import Image
+import re
+from fuzzywuzzy import fuzz
 
 ###############################
 # Department-Related Services #
@@ -661,3 +668,133 @@ class CommentService:
 
         comment.delete()
         return {"success": True, "message": "Comment deleted successfully"}
+
+############################
+# Transcript-Related Services #
+############################
+
+class TranscriptService:
+    """
+    Service class for handling transcript processing and course extraction.
+    """
+    
+    @staticmethod
+    def process_transcript(file_obj, file_type):
+        """
+        Process uploaded transcript file and extract course information.
+        
+        Args:
+            file_obj: The uploaded file object
+            file_type: The MIME type of the file
+        
+        Returns:
+            list: List of dictionaries containing course information with confidence scores
+        """
+        if file_type == 'application/pdf':
+            return TranscriptService._process_pdf(file_obj)
+        elif file_type.startswith('image/'):
+            return TranscriptService._process_image(file_obj)
+        elif file_type == 'text/csv':
+            return TranscriptService._process_csv(file_obj)
+        else:
+            raise ValueError('Unsupported file type')
+
+    @staticmethod
+    def _process_pdf(file_obj):
+        """
+        Process PDF transcript and extract course information.
+        """
+        # Convert PDF to images
+        images = convert_from_path(file_obj.temporary_file_path())
+        
+        courses = []
+        for image in images:
+            page_courses = TranscriptService._extract_courses_from_image(image)
+            courses.extend(page_courses)
+        
+        return TranscriptService._match_courses(courses)
+
+    @staticmethod
+    def _process_image(file_obj):
+        """
+        Process image transcript and extract course information.
+        """
+        image = Image.open(file_obj)
+        courses = TranscriptService._extract_courses_from_image(image)
+        return TranscriptService._match_courses(courses)
+
+    @staticmethod
+    def _process_csv(file_obj):
+        """
+        Process CSV transcript and extract course information.
+        """
+        decoded_file = file_obj.read().decode('utf-8')
+        csv_reader = csv.DictReader(io.StringIO(decoded_file))
+        
+        courses = []
+        for row in csv_reader:
+            if 'course_code' in row and 'course_name' in row:
+                courses.append({
+                    'code': row['course_code'],
+                    'name': row['course_name']
+                })
+        
+        return TranscriptService._match_courses(courses)
+
+    @staticmethod
+    def _extract_courses_from_image(image):
+        """
+        Extract course information from an image using OCR.
+        """
+        # Convert image to text using Tesseract OCR
+        text = pytesseract.image_to_string(image)
+        
+        # Regular expressions for course code and name patterns
+        course_pattern = r'([A-Z]{2,4}\s*\d{4}[A-Z]?)\s*[-–]\s*([^\n]+)'
+        
+        courses = []
+        matches = re.finditer(course_pattern, text)
+        
+        for match in matches:
+            code = match.group(1).strip()
+            name = match.group(2).strip()
+            
+            courses.append({
+                'code': code,
+                'name': name
+            })
+        
+        return courses
+
+    @staticmethod
+    def _match_courses(extracted_courses):
+        """
+        Match extracted courses with courses in the database using fuzzy matching.
+        """
+        matched_courses = []
+        all_courses = Course.objects.all()
+        
+        for extracted_course in extracted_courses:
+            best_match = None
+            highest_confidence = 0
+            
+            for db_course in all_courses:
+                # Calculate confidence score based on code and name similarity
+                code_similarity = fuzz.ratio(extracted_course['code'], db_course.code)
+                name_similarity = fuzz.ratio(extracted_course['name'], db_course.name)
+                
+                # Weight code matching more heavily than name matching
+                confidence = (code_similarity * 0.7 + name_similarity * 0.3) / 100
+                
+                if confidence > highest_confidence:
+                    highest_confidence = confidence
+                    best_match = db_course
+            
+            if best_match and highest_confidence > 0.4:  # Minimum confidence threshold
+                matched_courses.append({
+                    'code': best_match.code,
+                    'name': best_match.name,
+                    'confidence': highest_confidence
+                })
+        
+        return matched_courses

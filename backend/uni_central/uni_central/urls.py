@@ -50,6 +50,7 @@ from .views import (
     course_planner, 
     professor_detail,
     discussion_board,
+    TranscriptUploadView,
 )
 
 urlpatterns = [
@@ -146,4 +147,7 @@ urlpatterns = [
     path("api/comments/<int:comment_id>/update/", UpdateCommentAPIView.as_view(), name="api-update-comment"),
     path("api/comments/<int:comment_id>/delete/", DeleteCommentAPIView.as_view(), name="api-delete-comment"),
     path("api/threads/<int:thread_id>/comments/", ThreadCommentsAPIView.as_view(), name="thread-comments"),
+
+    # Transcript Upload URL
+    path('api/transcript/upload/', TranscriptUploadView.as_view(), name='transcript-upload'),
 ]

@@ -5,11 +5,14 @@
   <meta charset="UTF-8">
   <link rel="icon" href="/static/assets/logo_black.png">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>UniCentral</title>
+  <title>UniCentral - Course Planner</title>
   <link rel="stylesheet" href="{% static 'css/course_planner.css' %}">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Corben:wght@400;700&family=Montserrat:ital,wght@0,100..900;1,100..900&family=Sigmar&family=Sniglet:wght@400;800&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/tesseract.js@v2.1.0/dist/tesseract.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.6.347/pdf.min.js"></script>
   <script src="{% static 'js/course_planner.js' %}"></script>
 </head>
 
@@ -24,6 +27,46 @@
         </div>
       </div>
     </section>
+    
+    <!-- Transcript Upload Section -->
+    <div class="transcript-upload-section">
+        <div class="upload-container">
+            <h2>Quick Add from Transcript</h2>
+            <p>Upload your transcript to automatically add courses to your planner</p>
+            
+            <div class="upload-box" id="upload-box">
+                <div class="upload-icon">
+                    <i class="fas fa-file-upload"></i>
+                </div>
+                <div class="upload-text">
+                    <p>Drag & drop your transcript here or</p>
+                    <label for="transcript-file" class="upload-button">Choose File</label>
+                    <input type="file" id="transcript-file" accept=".pdf,.jpg,.jpeg,.png,.csv" hidden>
+                </div>
+                <div class="supported-formats">
+                    <p>Supported formats: PDF, JPG, PNG, CSV</p>
+                </div>
+            </div>
+            
+            <div id="upload-progress" class="upload-progress hidden">
+                <div class="progress-bar">
+                    <div class="progress-fill"></div>
+                </div>
+                <p class="progress-text">Processing transcript...</p>
+            </div>
+            
+            <div id="results-preview" class="results-preview hidden">
+                <h3>Found Courses</h3>
+                <div class="courses-list" id="parsed-courses-list">
+                    <!-- Parsed courses will be listed here -->
+                </div>
+                <div class="action-buttons">
+                    <button id="confirm-courses" class="confirm-btn">Add Selected Courses</button>
+                    <button id="cancel-parsing" class="cancel-btn">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
     
     <div id="course-planner">
         <button class="add-semester" onclick="showSemesterPopup()">Add Semester +</button>      <div id="course-planner-container">
@@ -66,3 +109,6 @@
       </div>
     </div>
   </main>
+
+  {% csrf_token %}
+</rewritten_file>

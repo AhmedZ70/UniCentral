@@ -193,3 +193,198 @@ document.addEventListener('DOMContentLoaded', function() {
     
     renderSemesters();
 });
+
+class TranscriptParser {
+    constructor() {
+        this.uploadBox = document.getElementById('upload-box');
+        this.fileInput = document.getElementById('transcript-file');
+        this.progressContainer = document.getElementById('upload-progress');
+        this.progressBar = this.progressContainer.querySelector('.progress-fill');
+        this.progressText = this.progressContainer.querySelector('.progress-text');
+        this.resultsPreview = document.getElementById('results-preview');
+        this.coursesList = document.getElementById('parsed-courses-list');
+        this.confirmButton = document.getElementById('confirm-courses');
+        this.cancelButton = document.getElementById('cancel-parsing');
+        
+        this.setupEventListeners();
+    }
+
+    setupEventListeners() {
+        // File input change event
+        this.fileInput.addEventListener('change', (e) => this.handleFileSelect(e));
+
+        // Drag and drop events
+        this.uploadBox.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            this.uploadBox.style.borderColor = '#007bff';
+        });
+
+        this.uploadBox.addEventListener('dragleave', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            this.uploadBox.style.borderColor = '#ccc';
+        });
+
+        this.uploadBox.addEventListener('drop', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            this.uploadBox.style.borderColor = '#ccc';
+            
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                this.handleFile(files[0]);
+            }
+        });
+
+        // Click to upload
+        this.uploadBox.addEventListener('click', () => {
+            this.fileInput.click();
+        });
+
+        // Confirm and cancel buttons
+        this.confirmButton.addEventListener('click', () => this.confirmSelectedCourses());
+        this.cancelButton.addEventListener('click', () => this.resetUpload());
+    }
+
+    handleFileSelect(event) {
+        const file = event.target.files[0];
+        if (file) {
+            this.handleFile(file);
+        }
+    }
+
+    async handleFile(file) {
+        // Validate file type and size
+        const validTypes = ['application/pdf', 'image/jpeg', 'image/png', 'text/csv'];
+        const maxSize = 10 * 1024 * 1024; // 10MB
+
+        if (!validTypes.includes(file.type)) {
+            alert('Please upload a valid PDF, image, or CSV file.');
+            return;
+        }
+
+        if (file.size > maxSize) {
+            alert('File size must be less than 10MB.');
+            return;
+        }
+
+        // Show progress
+        this.showProgress();
+        this.updateProgress(0, 'Starting file processing...');
+
+        try {
+            const formData = new FormData();
+            formData.append('transcript', file);
+
+            // Get CSRF token
+            const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
+            // Send file to backend
+            const response = await fetch('/api/transcript/upload/', {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': csrfToken
+                },
+                body: formData
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to process transcript');
+            }
+
+            const data = await response.json();
+            this.updateProgress(100, 'Processing complete!');
+            
+            // Show results
+            setTimeout(() => {
+                this.hideProgress();
+                this.showResults(data.courses);
+            }, 500);
+
+        } catch (error) {
+            console.error('Error processing transcript:', error);
+            this.updateProgress(0, 'Error processing file. Please try again.');
+            setTimeout(() => {
+                this.resetUpload();
+            }, 2000);
+        }
+    }
+
+    showProgress() {
+        this.uploadBox.classList.add('hidden');
+        this.progressContainer.classList.remove('hidden');
+        this.resultsPreview.classList.add('hidden');
+    }
+
+    hideProgress() {
+        this.progressContainer.classList.add('hidden');
+    }
+
+    updateProgress(percent, message) {
+        this.progressBar.style.width = `${percent}%`;
+        this.progressText.textContent = message;
+    }
+
+    showResults(courses) {
+        this.coursesList.innerHTML = '';
+        
+        courses.forEach(course => {
+            const courseElement = document.createElement('div');
+            courseElement.className = 'course-item';
+            
+            const confidenceClass = course.confidence >= 0.8 ? 'high' : 
+                                  course.confidence >= 0.6 ? 'medium' : 'low';
+            
+            courseElement.innerHTML = `
+                <input type="checkbox" class="course-checkbox" ${course.confidence >= 0.8 ? 'checked' : ''}>
+                <div class="course-info">
+                    <div class="course-code">${course.code}</div>
+                    <div class="course-name">${course.name}</div>
+                </div>
+                <span class="match-confidence confidence-${confidenceClass}">
+                    ${Math.round(course.confidence * 100)}% match
+                </span>
+            `;
+            
+            this.coursesList.appendChild(courseElement);
+        });
+        
+        this.resultsPreview.classList.remove('hidden');
+    }
+
+    async confirmSelectedCourses() {
+        const selectedCourses = Array.from(this.coursesList.querySelectorAll('.course-item'))
+            .filter(item => item.querySelector('.course-checkbox').checked)
+            .map(item => ({
+                code: item.querySelector('.course-code').textContent,
+                name: item.querySelector('.course-name').textContent
+            }));
+
+        if (selectedCourses.length === 0) {
+            alert('Please select at least one course to add.');
+            return;
+        }
+
+        // Add selected courses to the planner
+        selectedCourses.forEach(course => {
+            // Assuming addCourse is a global function that adds a course to the current semester
+            addCourse(course.code, course.name);
+        });
+
+        this.resetUpload();
+    }
+
+    resetUpload() {
+        this.fileInput.value = '';
+        this.uploadBox.classList.remove('hidden');
+        this.progressContainer.classList.add('hidden');
+        this.resultsPreview.classList.add('hidden');
+        this.progressBar.style.width = '0%';
+    }
+}
+
+// Initialize TranscriptParser when the DOM is loaded
+document.addEventListener('DOMContentLoaded', () => {
+    const transcriptParser = new TranscriptParser();
+});

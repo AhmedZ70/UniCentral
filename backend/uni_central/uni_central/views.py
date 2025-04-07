@@ -11,6 +11,7 @@ from .services import (
     CourseFilteringService,
     ThreadService,
     CommentService,
+    TranscriptService,
     )
 from .serializers import (
     DepartmentSerializer,
@@ -808,3 +809,21 @@ class DeleteCommentAPIView(APIView):
             return Response({"message": result["message"]}, status=status.HTTP_200_OK)
         
         return Response({"error": result["error"]}, status=status.HTTP_400_BAD_REQUEST)
+
+class TranscriptUploadView(APIView):
+    def post(self, request):
+        if 'file' not in request.FILES:
+            return Response(
+                {'error': 'No file provided'}, 
+                status=status.HTTP_400_BAD_REQUEST
+            )
+            
+        try:
+            file = request.FILES['file']
+            courses = TranscriptService.process_transcript(file)
+            return Response({'courses': courses}, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response(
+                {'error': str(e)}, 
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
