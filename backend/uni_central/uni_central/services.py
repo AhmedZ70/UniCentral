@@ -704,23 +704,53 @@ class TranscriptService:
             print(f"OCR Text extracted: {len(text)} characters")
             print(f"Extracted text:\n{text}")
             
-            # Regular expression for course information
-            pattern = r'([A-Z]{2,4})\s*(\d{4}[A-Z]?)\s*(?:[-–]\s*)?([^\n\d]+?)(?:\s+\d|\s*$)'
-            
+            # First, split text into lines for better context analysis
+            lines = text.split('\n')
             courses = []
-            matches = re.finditer(pattern, text)
             
-            for match in matches:
-                dept = match.group(1).strip()
+            # Keywords that indicate a line is not a course
+            non_course_keywords = {
+                'term gpa', 'dean\'s list', 'semester', 'fall', 'spring', 'summer', 
+                'winter', 'quarter', 'year', 'total', 'credit', 'grade', 'units',
+                'intensive', 'exploration', 'requirement'
+            }
+            
+            # Pattern to match course lines with credits and grades
+            course_pattern = r'^([A-Za-z]{2,4})\s*(\d{4}[A-Za-z]?)\s+([^0-9\n](?:[^\n]*[^0-9\n])?)'
+            
+            for line in lines:
+                line = line.strip()
+                if not line:
+                    continue
+                    
+                # Skip lines that are clearly not courses
+                lower_line = line.lower()
+                if any(keyword in lower_line for keyword in non_course_keywords):
+                    continue
+                
+                # Look for course pattern
+                match = re.match(course_pattern, line)
+                if not match:
+                    continue
+                    
+                dept = match.group(1).strip().upper()  # Convert to uppercase for consistency
                 num = match.group(2).strip()
                 name = match.group(3).strip()
                 
+                # Additional validation: must have both department code and course number
+                if not dept or not num:
+                    continue
+                    
                 # Clean up the course name
                 name = re.sub(r'\s+[A-F][+-]?\s*$', '', name)  # Remove grade
                 name = re.sub(r'\s+\d+\.\d+\s*$', '', name)    # Remove credits
+                name = re.sub(r'\s+\([^)]*\)', '', name)       # Remove parenthetical notes
+                
+                # Additional validation: course name should be reasonable length
+                if len(name) < 3 or len(name) > 100:
+                    continue
                 
                 code = f"{dept} {num}"
-                print(f"Found course: {code} - {name}")
                 
                 # Try to find the course in the database
                 try:
@@ -743,22 +773,11 @@ class TranscriptService:
                         })
                     else:
                         print(f"No database match found for: {code}")
-                        courses.append({
-                            'code': code,
-                            'name': name,
-                            'confidence': 0.8,  # Lower confidence for non-DB matches
-                            'db_match': False
-                        })
                 except Exception as e:
                     print(f"Error matching course {code} in database: {str(e)}")
-                    courses.append({
-                        'code': code,
-                        'name': name,
-                        'confidence': 0.8,
-                        'db_match': False
-                    })
+                    continue
             
-            print(f"Total courses found in image: {len(courses)}")
+            print(f"Total database-matched courses found: {len(courses)}")
             return courses
             
         except Exception as e:
