@@ -22,6 +22,7 @@ from .serializers import (
     ThreadSerializer,
     CommentSerializer
 )
+from django.http import JsonResponse
 
 ######################
 # General Page Views #
@@ -813,17 +814,37 @@ class DeleteCommentAPIView(APIView):
 class TranscriptUploadView(APIView):
     def post(self, request):
         if 'file' not in request.FILES:
-            return Response(
+            return JsonResponse(
                 {'error': 'No file provided'}, 
-                status=status.HTTP_400_BAD_REQUEST
+                status=400
             )
             
         try:
             file = request.FILES['file']
-            courses = TranscriptService.process_transcript(file)
-            return Response({'courses': courses}, status=status.HTTP_200_OK)
+            print(f"Processing file: {file.name}, type: {file.content_type}, size: {file.size}")
+            
+            if not file.content_type.startswith(('image/', 'application/pdf', 'text/csv')):
+                return JsonResponse(
+                    {'error': f'Unsupported file type: {file.content_type}'}, 
+                    status=400
+                )
+            
+            courses = TranscriptService.process_transcript(file, file.content_type)
+            print(f"Found {len(courses)} courses in transcript")
+            
+            if not courses:
+                return JsonResponse(
+                    {'courses': []}, 
+                    status=200  # Return empty array instead of 404
+                )
+                
+            return JsonResponse({'courses': courses}, status=200)
+            
         except Exception as e:
-            return Response(
+            import traceback
+            print(f"Error processing transcript: {str(e)}")
+            print(f"Traceback: {traceback.format_exc()}")
+            return JsonResponse(
                 {'error': str(e)}, 
-                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+                status=500
             )

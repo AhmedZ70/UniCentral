@@ -259,6 +259,9 @@ class TranscriptParser {
         const validTypes = ['application/pdf', 'image/jpeg', 'image/png', 'text/csv'];
         const maxSize = 10 * 1024 * 1024; // 10MB
 
+        console.log('File type:', file.type);
+        console.log('File size:', file.size);
+
         if (!validTypes.includes(file.type)) {
             alert('Please upload a valid PDF, image, or CSV file.');
             return;
@@ -275,11 +278,12 @@ class TranscriptParser {
 
         try {
             const formData = new FormData();
-            formData.append('transcript', file);
+            formData.append('file', file);
 
             // Get CSRF token
             const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
 
+            console.log('Sending file to server...');
             // Send file to backend
             const response = await fetch('/api/transcript/upload/', {
                 method: 'POST',
@@ -289,13 +293,27 @@ class TranscriptParser {
                 body: formData
             });
 
-            if (!response.ok) {
-                throw new Error('Failed to process transcript');
+            console.log('Server response status:', response.status);
+            let data;
+            try {
+                data = await response.json();
+                console.log('Server response data:', data);
+            } catch (e) {
+                console.error('Error parsing JSON response:', e);
+                throw new Error('Server returned invalid response format');
             }
 
-            const data = await response.json();
+            if (!response.ok) {
+                throw new Error(data.error || `Server error: ${response.status}`);
+            }
+
             this.updateProgress(100, 'Processing complete!');
             
+            if (!data.courses || data.courses.length === 0) {
+                this.updateProgress(100, 'No courses found in transcript. Please try a different file.');
+                return;
+            }
+
             // Show results
             setTimeout(() => {
                 this.hideProgress();
@@ -304,10 +322,11 @@ class TranscriptParser {
 
         } catch (error) {
             console.error('Error processing transcript:', error);
-            this.updateProgress(0, 'Error processing file. Please try again.');
+            this.updateProgress(0, `Error: ${error.message}`);
+            // Keep the error message visible for longer
             setTimeout(() => {
                 this.resetUpload();
-            }, 2000);
+            }, 5000);  // Show error for 5 seconds before resetting
         }
     }
 
