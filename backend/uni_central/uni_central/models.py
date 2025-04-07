@@ -271,3 +271,18 @@ class Comment(models.Model):
 
     def __str__(self):
         return f"Comment by {self.user.fname} on {self.thread.title}"
+
+
+class CoursePlan(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    data = models.JSONField(default=dict)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        db_table = 'course_plans'
+        verbose_name = 'Course Plan'
+        verbose_name_plural = 'Course Plans'
+
+    def __str__(self):
+        return f"Course Plan for {self.user.email}"

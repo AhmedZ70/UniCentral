@@ -427,10 +427,11 @@ body {
     background-color: #faf8f0;
 }
 
-.upload-box:hover {
+.upload-box.drag-over {
     border-color: #ff743e;
     transform: translateY(-2px);
     box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+    background-color: rgba(255, 116, 62, 0.05);
 }
 
 .upload-icon {
@@ -476,9 +477,15 @@ body {
 
 .upload-progress {
     margin: 2rem 0;
+    display: none;
+}
+
+.upload-progress.visible {
+    display: block;
 }
 
 .progress-bar {
+    width: 100%;
     height: 10px;
     background-color: #e0e0e0;
     border-radius: 5px;
@@ -498,15 +505,21 @@ body {
     color: #000000;
     font-size: 16px;
     font-family: 'Montserrat', sans-serif;
+    text-align: center;
 }
 
 .results-preview {
+    display: none;
     margin-top: 2rem;
     text-align: left;
     background-color: #faf8f0;
     border: 3px solid #000000;
     border-radius: 8px;
     padding: 1.5rem;
+}
+
+.results-preview.visible {
+    display: block;
 }
 
 .results-preview h3 {
@@ -564,6 +577,14 @@ body {
     color: #000000;
     margin-top: 0.25rem;
     font-family: 'Montserrat', sans-serif;
+}
+
+.course-credits {
+    font-size: 14px;
+    color: #005a5b;
+    margin-top: 0.25rem;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 600;
 }
 
 .match-confidence {
@@ -635,4 +656,33 @@ body {
 
 .hidden {
     display: none;
+}
+
+.semester-section {
+    margin-bottom: 1.5rem;
+    padding: 1rem;
+    background-color: #ffffff;
+    border: 2px solid #005a5b;
+    border-radius: 8px;
+}
+
+.semester-section:last-child {
+    margin-bottom: 0;
+}
+
+.semester-header {
+    color: #ff743e;
+    font-family: 'Agrandir', sans-serif;
+    font-size: 20px;
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid #005a5b;
+}
+
+.course-semester {
+    font-size: 12px;
+    color: #666;
+    margin-top: 0.25rem;
+    font-family: 'Montserrat', sans-serif;
+    font-style: italic;
 }

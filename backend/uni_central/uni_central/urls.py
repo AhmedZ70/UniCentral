@@ -33,6 +33,7 @@ from .views import (
     UpdateCommentAPIView,
     DeleteCommentAPIView,
     CoursePlanUpdateAPIView,
+    CoursePlanGetAPIView,
     home,
     courses,
     about_page,
@@ -149,5 +150,9 @@ urlpatterns = [
     path("api/threads/<int:thread_id>/comments/", ThreadCommentsAPIView.as_view(), name="thread-comments"),
 
     # Transcript Upload URL
-    path('api/transcript/upload/', TranscriptUploadView.as_view(), name='transcript-upload'),
+    path('api/transcript/upload/', TranscriptUploadView.as_view(), name='upload_transcript'),
+
+    # Course Plan URLs
+    path('api/get-course-plan/<str:email_address>/', CoursePlanGetAPIView.as_view(), name='get_course_plan'),
+    path('api/update-course-plan/<str:email_address>/', CoursePlanUpdateAPIView.as_view(), name='update_course_plan'),
 ]

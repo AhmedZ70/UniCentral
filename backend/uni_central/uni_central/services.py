@@ -17,6 +17,7 @@ from PIL import Image
 import re
 from fuzzywuzzy import fuzz
 from django.core.files.uploadedfile import InMemoryUploadedFile
+import logging
 
 ###############################
 # Department-Related Services #
@@ -286,8 +287,17 @@ class UserService:
     
     @staticmethod
     def get_user(email_address):
-        return get_object_or_404(User, email_address=email_address)
-    
+        """Get a user by their email address."""
+        try:
+            return User.objects.get(email_address=email_address)
+        except User.DoesNotExist:
+            return None
+
+    @staticmethod
+    def get_course_plan(user):
+        """Get a user's course plan."""
+        return user.course_plan
+
     @staticmethod
     def get_courses(user):
         courses = user.courses.all()
@@ -345,15 +355,35 @@ class UserService:
     
     @staticmethod
     def update_course_plan(user, course_plan):
-        """
-        Updates the user's course plan.
-        """
-        if not user:
-            raise ValueError("User not found")
+        """Update a user's course plan."""
+        try:
+            # Validate the course plan structure
+            if not isinstance(course_plan, dict):
+                raise ValueError("Course plan must be a dictionary")
+            
+            if 'semesters' not in course_plan:
+                course_plan = {'semesters': []}
+            
+            # Ensure each semester has the required fields
+            for semester in course_plan['semesters']:
+                if not all(key in semester for key in ['id', 'term', 'year', 'courses']):
+                    raise ValueError("Invalid semester structure")
+                
+                if not isinstance(semester['courses'], list):
+                    raise ValueError("Courses must be a list")
+                
+                # Ensure each course has the required fields
+                for course in semester['courses']:
+                    if not all(key in course for key in ['courseCode', 'courseName', 'credits', 'id']):
+                        raise ValueError("Invalid course structure")
 
-        user.course_plan = course_plan
-        user.save()
-        return user
+            # Save the course plan
+            user.course_plan = course_plan
+            user.save()
+            return user
+        except Exception as e:
+            print(f"Error updating course plan: {e}")
+            raise
     
     @staticmethod
     def create_user(email_address, fname, lname):
@@ -680,14 +710,108 @@ class TranscriptService:
     """
     
     @staticmethod
-    def process_transcript(file_obj, file_type):
+    def process_transcript(file_obj, file_type, user=None):
         """
         Process uploaded transcript file and extract course information.
+        Args:
+            file_obj: The uploaded file object
+            file_type: The MIME type of the file
+            user: Optional User instance to update course plan
         """
         if file_type.startswith('image/'):
-            return TranscriptService._process_image(file_obj)
+            courses = TranscriptService._process_image(file_obj)
+            
+            # If user is provided, update their course plan
+            if user and courses:
+                TranscriptService._update_user_course_plan(user, courses)
+                
+            return courses
         else:
             raise ValueError('Currently only supporting image files')
+
+    @staticmethod
+    def _update_user_course_plan(user, courses):
+        """
+        Update the user's course plan with the processed courses.
+        Args:
+            user: User instance to update
+            courses: List of course dictionaries from transcript processing
+        """
+        try:
+            print(f"Updating course plan for user {user.email_address}")
+            
+            # Initialize course plan if it doesn't exist
+            if not user.course_plan:
+                user.course_plan = {"semesters": []}
+            
+            # Group courses by semester
+            courses_by_semester = {}
+            for course in courses:
+                semester = course['semester']  # This comes from _process_image
+                if semester not in courses_by_semester:
+                    courses_by_semester[semester] = []
+                courses_by_semester[semester].append(course)
+            
+            # Update each semester in the course plan
+            for semester_name, semester_courses in courses_by_semester.items():
+                # Parse semester information
+                try:
+                    term, year = semester_name.split(' ')
+                    year = int(year)
+                except (ValueError, TypeError) as e:
+                    print(f"Error parsing semester '{semester_name}': {e}")
+                    continue
+
+                # Find or create semester in course plan
+                semester_entry = None
+                for s in user.course_plan["semesters"]:
+                    if s.get("term") == term and s.get("year") == year:
+                        semester_entry = s
+                        break
+                
+                if not semester_entry:
+                    semester_entry = {
+                        "id": f"{term.lower()}-{year}",
+                        "term": term,
+                        "year": year,
+                        "courses": []
+                    }
+                    user.course_plan["semesters"].append(semester_entry)
+                
+                # Add new courses to semester
+                for course in semester_courses:
+                    # Check if course already exists
+                    course_exists = any(
+                        c.get("courseCode", "").lower() == course["code"].lower()
+                        for c in semester_entry["courses"]
+                    )
+                    
+                    if not course_exists:
+                        new_course = {
+                            "id": f"{course['code'].replace(' ', '-')}-{len(semester_entry['courses'])}",
+                            "courseCode": course["code"],
+                            "courseName": course["name"],
+                            "credits": course["credits"]
+                        }
+                        semester_entry["courses"].append(new_course)
+                        print(f"Added course {course['code']} to {semester_name}")
+
+            # Sort semesters by year and term
+            term_order = {"spring": 0, "summer": 1, "fall": 2, "winter": 3}
+            user.course_plan["semesters"].sort(
+                key=lambda x: (x["year"], term_order.get(x["term"].lower(), 0))
+            )
+
+            # Save changes to database
+            print(f"Saving updated course plan: {user.course_plan}")
+            user.save()
+            return True
+            
+        except Exception as e:
+            print(f"Error updating course plan: {e}")
+            import traceback
+            print(f"Traceback: {traceback.format_exc()}")
+            return False
 
     @staticmethod
     def _process_image(file_obj):
@@ -707,11 +831,12 @@ class TranscriptService:
             # First, split text into lines for better context analysis
             lines = text.split('\n')
             courses = []
+            current_semester = None
+            default_semester = None  # Will be set to the most recent semester found
             
             # Keywords that indicate a line is not a course
             non_course_keywords = {
-                'term gpa', 'dean\'s list', 'semester', 'fall', 'spring', 'summer', 
-                'winter', 'quarter', 'year', 'total', 'grade', 'units',
+                'term gpa', 'dean\'s list', 'semester', 'quarter', 'year', 'total', 'grade', 'units',
                 'intensive', 'exploration', 'requirement', 'continued'
             }
             
@@ -722,16 +847,48 @@ class TranscriptService:
                 '€S': 'CS',
                 'cS': 'CS',
                 'cs': 'CS',
+                'CS.': 'CS',
+                '€S_' : 'CS',
                 'ETHNC': 'ETHNC',
                 'ECON9': 'ECON'
             }
             
+            # Pattern to match semester lines (e.g., "Fall 2023", "Spring 2024")
+            semester_pattern = r'(Spring|Summer|Fall|Winter)\s+(\d{4})'
+            
             # Pattern to match course lines, more permissive to handle OCR artifacts
             course_pattern = r'^([A-Za-z€)]\S{1,4})\s*[~\'"_\s]*\s*(\d{3,4}[A-Za-z]?)[\\.\s]*\s+([^0-9\n](?:[^\n]*[^0-9\n])?)'
             
+            # First pass: find the most recent semester
+            for line in lines:
+                semester_match = re.search(semester_pattern, line, re.IGNORECASE)
+                if semester_match:
+                    term = semester_match.group(1).capitalize()
+                    year = semester_match.group(2)
+                    semester = f"{term} {year}"
+                    if not default_semester or int(year) > int(default_semester.split()[-1]):
+                        default_semester = semester
+
+            if not default_semester:
+                # If no semester found, use current year
+                from datetime import datetime
+                current_year = datetime.now().year
+                default_semester = f"Fall {current_year}"  # Default to Fall of current year
+                print(f"No semester found in transcript, using default: {default_semester}")
+
+            # Second pass: process courses
             for line in lines:
                 line = line.strip()
                 if not line:
+                    continue
+                
+                # Check for semester header
+                semester_match = re.search(semester_pattern, line, re.IGNORECASE)
+                if semester_match:
+                    term = semester_match.group(1).capitalize()
+                    year = semester_match.group(2)
+                    current_semester = f"{term} {year}"
+                    print(f"Found semester: {current_semester}")
                     continue
                     
                 # Skip lines that are clearly not courses
@@ -766,7 +923,7 @@ class TranscriptService:
                 name = re.sub(r'\s+\d+\.\d+\s*$', '', name)    # Remove credits
                 name = re.sub(r'\s+\([^)]*\)', '', name)       # Remove parenthetical notes
                 name = re.sub(r'[\\©*=]+', '', name)           # Remove special characters
-                name = re.sub(r'\s+', ' ', name)               # Normalize spaces
+                name = re.sub(r'\s+', ' ', name)
                 
                 # Additional validation: course name should be reasonable length
                 if len(name) < 3 or len(name) > 100:
@@ -794,7 +951,8 @@ class TranscriptService:
                             'credits': db_course.credits,
                             'confidence': 1.0,
                             'db_match': True,
-                            'course_id': db_course.id
+                            'course_id': db_course.id,
+                            'semester': current_semester or default_semester  # Use current semester or default
                         })
                     else:
                         print(f"No database match found for: {code}")

@@ -562,31 +562,57 @@ class MyClassmatesView(APIView):
         
         return Response(serialized.data, status=status.HTTP_200_OK)
     
-class CoursePlanUpdateAPIView(APIView):
+class CoursePlanGetAPIView(APIView):
     """
-    API View to update the user's course plan only.
+    API View to get the user's course plan.
     """
-
-    def put(self, request):
+    def get(self, request, email_address):
         try:
-            email_address = request.data.get("email_address")
             user = UserService.get_user(email_address=email_address)
-
             if not user:
                 return Response(
                     {"error": "User not found"}, 
                     status=status.HTTP_404_NOT_FOUND
                 )
 
-            course_plan = request.data.get("course_plan")
-            if course_plan is None:
+            # Initialize default course plan if none exists
+            if not user.course_plan:
+                user.course_plan = {
+                    "semesters": []
+                }
+                user.save()
+
+            return Response({
+                "course_plan": user.course_plan
+            }, status=status.HTTP_200_OK)
+
+        except Exception as e:
+            return Response(
+                {"error": str(e)}, 
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+
+class CoursePlanUpdateAPIView(APIView):
+    """
+    API View to update the user's course plan.
+    """
+    def put(self, request, email_address):
+        try:
+            user = UserService.get_user(email_address=email_address)
+            if not user:
                 return Response(
-                    {"error": "course_plan is required"}, 
+                    {"error": "User not found"}, 
+                    status=status.HTTP_404_NOT_FOUND
+                )
+
+            course_plan = request.data.get('course_plan')
+            if not course_plan:
+                return Response(
+                    {"error": "No course plan provided"}, 
                     status=status.HTTP_400_BAD_REQUEST
                 )
 
             updated_user = UserService.update_course_plan(user, course_plan)
-
             return Response({
                 "message": "Course plan updated successfully",
                 "course_plan": updated_user.course_plan
@@ -820,6 +846,21 @@ class TranscriptUploadView(APIView):
             )
             
         try:
+            # Get user from email in request data
+            email_address = request.data.get('email_address')
+            if not email_address:
+                return JsonResponse(
+                    {'error': 'No email address provided'}, 
+                    status=400
+                )
+            
+            user = UserService.get_user(email_address)
+            if not user:
+                return JsonResponse(
+                    {'error': 'User not found'}, 
+                    status=404
+                )
+            
             file = request.FILES['file']
             print(f"Processing file: {file.name}, type: {file.content_type}, size: {file.size}")
             
@@ -829,7 +870,8 @@ class TranscriptUploadView(APIView):
                     status=400
                 )
             
-            courses = TranscriptService.process_transcript(file, file.content_type)
+            # Pass user to process_transcript
+            courses = TranscriptService.process_transcript(file, file.content_type, user)
             print(f"Found {len(courses)} courses in transcript")
             
             if not courses:
@@ -838,7 +880,10 @@ class TranscriptUploadView(APIView):
                     status=200  # Return empty array instead of 404
                 )
                 
-            return JsonResponse({'courses': courses}, status=200)
+            return JsonResponse({
+                'courses': courses,
+                'message': 'Courses have been added to your course plan'
+            }, status=200)
             
         except Exception as e:
             import traceback
