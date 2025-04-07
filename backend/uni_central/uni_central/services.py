@@ -13,12 +13,10 @@ import pytesseract
 from pdf2image import convert_from_path
 import csv
 import io
-from PIL import Image, ImageEnhance, ImageFilter
+from PIL import Image
 import re
 from fuzzywuzzy import fuzz
 from django.core.files.uploadedfile import InMemoryUploadedFile
-import numpy as np
-import cv2
 
 ###############################
 # Department-Related Services #
@@ -692,66 +690,17 @@ class TranscriptService:
             raise ValueError('Currently only supporting image files')
 
     @staticmethod
-    def preprocess_image(image):
-        """
-        Preprocess image to improve OCR quality.
-        """
-        try:
-            # Convert PIL Image to cv2 format
-            img = cv2.cvtColor(np.array(image), cv2.COLOR_RGB2BGR)
-            
-            # Convert to grayscale
-            gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-            
-            # Apply thresholding to get black and white image
-            _, binary = cv2.threshold(gray, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
-            
-            # Remove noise
-            denoised = cv2.fastNlMeansDenoising(binary)
-            
-            # Increase contrast
-            enhanced = cv2.convertScaleAbs(denoised, alpha=1.2, beta=0)
-            
-            # Convert back to PIL Image
-            enhanced_pil = Image.fromarray(enhanced)
-            
-            # Increase resolution (can help with OCR)
-            width, height = enhanced_pil.size
-            enhanced_pil = enhanced_pil.resize((width*2, height*2), Image.Resampling.LANCZOS)
-            
-            # Sharpen the image
-            sharpener = ImageEnhance.Sharpness(enhanced_pil)
-            enhanced_pil = sharpener.enhance(2.0)
-            
-            # Increase contrast one more time
-            contraster = ImageEnhance.Contrast(enhanced_pil)
-            enhanced_pil = contraster.enhance(2.0)
-            
-            return enhanced_pil
-        except Exception as e:
-            print(f"Warning: Image preprocessing failed: {str(e)}")
-            return image
-
-    @staticmethod
     def _process_image(file_obj):
         """
         Process image transcript and extract course information.
         """
         print("Processing image file...")
         try:
-            # Open and preprocess the image
             image = Image.open(file_obj)
             print(f"Image opened successfully: size={image.size}, mode={image.mode}")
             
-            # Preprocess the image
-            enhanced_image = TranscriptService.preprocess_image(image)
-            print("Image preprocessing completed")
-            
-            # Configure Tesseract for better accuracy
-            custom_config = r'--oem 3 --psm 6 -c tessedit_char_whitelist="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789.,-() \'"'
-            
             # Convert image to text using Tesseract OCR
-            text = pytesseract.image_to_string(enhanced_image, config=custom_config)
+            text = pytesseract.image_to_string(image)
             print(f"OCR Text extracted: {len(text)} characters")
             print(f"Extracted text:\n{text}")
             
@@ -779,8 +728,6 @@ class TranscriptService:
             
             # Pattern to match course lines, more permissive to handle OCR artifacts
             course_pattern = r'^([A-Za-z€)]\S{1,4})\s*[~\'"_\s]*\s*(\d{3,4}[A-Za-z]?)[\\.\s]*\s+([^0-9\n](?:[^\n]*[^0-9\n])?)'
-            
-            processed_codes = set()  # Keep track of processed courses to avoid duplicates
             
             for line in lines:
                 line = line.strip()
@@ -826,11 +773,6 @@ class TranscriptService:
                     continue
                 
                 code = f"{dept} {num}"
-                
-                # Skip if we've already processed this course
-                if code in processed_codes:
-                    continue
-                    
                 print(f"Attempting to match course: {code} - {name}")
                 
                 # Try to find the course in the database
@@ -854,7 +796,6 @@ class TranscriptService:
                             'db_match': True,
                             'course_id': db_course.id
                         })
-                        processed_codes.add(code)
                     else:
                         print(f"No database match found for: {code}")
                 except Exception as e:
