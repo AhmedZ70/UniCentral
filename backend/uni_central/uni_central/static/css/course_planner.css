@@ -389,12 +389,13 @@ body {
 
 /* Transcript Upload Section */
 .transcript-upload-section {
-    max-width: 800px;
-    margin: 2rem auto;
+    max-width: 1400px;
+    margin: 1rem auto;
     padding: 2rem;
     background-color: #ffffff;
-    border-radius: 12px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    border: 3px solid black;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
 }
 
 .upload-container {
@@ -402,58 +403,75 @@ body {
 }
 
 .upload-container h2 {
-    color: #333;
+    color: #ff743e;
     margin-bottom: 1rem;
-    font-family: 'Montserrat', sans-serif;
-    font-weight: 600;
+    font-family: 'Agrandir', sans-serif;
+    font-size: 32px;
+    font-weight: 100;
 }
 
 .upload-container p {
-    color: #666;
+    color: #000000;
     margin-bottom: 2rem;
+    font-family: 'Poppins-light', sans-serif;
+    font-size: 18px;
 }
 
 .upload-box {
-    border: 2px dashed #ccc;
+    border: 3px dashed #005a5b;
     border-radius: 8px;
-    padding: 2rem;
-    margin: 1rem 0;
+    padding: 2.5rem;
+    margin: 1.5rem 0;
     cursor: pointer;
-    transition: border-color 0.3s ease;
+    transition: all 0.3s ease;
+    background-color: #faf8f0;
 }
 
 .upload-box:hover {
-    border-color: #007bff;
+    border-color: #ff743e;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
 }
 
 .upload-icon {
-    font-size: 3rem;
-    color: #007bff;
-    margin-bottom: 1rem;
+    font-size: 3.5rem;
+    color: #005a5b;
+    margin-bottom: 1.5rem;
+    transition: color 0.3s ease;
+}
+
+.upload-box:hover .upload-icon {
+    color: #ff743e;
 }
 
 .upload-text p {
     margin-bottom: 1rem;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 16px;
 }
 
 .upload-button {
     display: inline-block;
-    padding: 0.5rem 1.5rem;
-    background-color: #007bff;
-    color: white;
-    border-radius: 4px;
+    padding: 0.75rem 2rem;
+    background-color: #005a5b;
+    color: #faf8f0;
+    border-radius: 20px;
+    font-family: 'Agrandir', sans-serif;
+    font-size: 18px;
     cursor: pointer;
-    transition: background-color 0.3s ease;
+    transition: all 0.3s ease;
 }
 
 .upload-button:hover {
-    background-color: #0056b3;
+    background-color: #ff743e;
+    transform: translateY(-2px);
 }
 
 .supported-formats {
-    margin-top: 1rem;
-    font-size: 0.9rem;
-    color: #888;
+    margin-top: 1.5rem;
+    font-size: 14px;
+    color: #666;
+    font-family: 'Montserrat', sans-serif;
 }
 
 .upload-progress {
@@ -461,48 +479,62 @@ body {
 }
 
 .progress-bar {
-    height: 8px;
-    background-color: #f0f0f0;
-    border-radius: 4px;
+    height: 10px;
+    background-color: #e0e0e0;
+    border-radius: 5px;
     overflow: hidden;
     margin-bottom: 1rem;
+    border: 1px solid #005a5b;
 }
 
 .progress-fill {
     height: 100%;
-    background-color: #007bff;
+    background-color: #005a5b;
     width: 0%;
     transition: width 0.3s ease;
 }
 
 .progress-text {
-    color: #666;
-    font-size: 0.9rem;
+    color: #000000;
+    font-size: 16px;
+    font-family: 'Montserrat', sans-serif;
 }
 
 .results-preview {
     margin-top: 2rem;
     text-align: left;
+    background-color: #faf8f0;
+    border: 3px solid #000000;
+    border-radius: 8px;
+    padding: 1.5rem;
 }
 
 .results-preview h3 {
-    color: #333;
-    margin-bottom: 1rem;
+    color: #ff743e;
+    margin-bottom: 1.5rem;
+    font-family: 'Agrandir', sans-serif;
+    font-size: 24px;
 }
 
 .courses-list {
-    max-height: 300px;
+    max-height: 400px;
     overflow-y: auto;
-    border: 1px solid #eee;
-    border-radius: 4px;
+    border: 2px solid #005a5b;
+    border-radius: 8px;
     padding: 1rem;
+    background-color: #ffffff;
 }
 
 .course-item {
     display: flex;
     align-items: center;
-    padding: 0.75rem;
-    border-bottom: 1px solid #eee;
+    padding: 1rem;
+    border-bottom: 1px solid #e0e0e0;
+    transition: background-color 0.3s ease;
+}
+
+.course-item:hover {
+    background-color: #f5f5f5;
 }
 
 .course-item:last-child {
@@ -511,6 +543,9 @@ body {
 
 .course-checkbox {
     margin-right: 1rem;
+    width: 20px;
+    height: 20px;
+    accent-color: #005a5b;
 }
 
 .course-info {
@@ -519,68 +554,83 @@ body {
 
 .course-code {
     font-weight: 600;
-    color: #333;
+    color: #005a5b;
+    font-size: 16px;
+    font-family: 'Montserrat', sans-serif;
 }
 
 .course-name {
-    font-size: 0.9rem;
-    color: #666;
+    font-size: 14px;
+    color: #000000;
+    margin-top: 0.25rem;
+    font-family: 'Montserrat', sans-serif;
 }
 
 .match-confidence {
-    font-size: 0.8rem;
-    padding: 0.25rem 0.5rem;
-    border-radius: 12px;
+    font-size: 14px;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
     margin-left: 1rem;
+    font-family: 'Montserrat', sans-serif;
 }
 
 .confidence-high {
-    background-color: #e6ffe6;
-    color: #008000;
+    background-color: #e6fff0;
+    color: #005a5b;
+    border: 1px solid #005a5b;
 }
 
 .confidence-medium {
     background-color: #fff3e6;
-    color: #cc7700;
+    color: #ff743e;
+    border: 1px solid #ff743e;
 }
 
 .confidence-low {
     background-color: #ffe6e6;
-    color: #cc0000;
+    color: #dc3545;
+    border: 1px solid #dc3545;
 }
 
 .action-buttons {
-    margin-top: 1.5rem;
+    margin-top: 2rem;
     text-align: right;
+    display: flex;
+    gap: 1rem;
+    justify-content: flex-end;
 }
 
 .confirm-btn, .cancel-btn {
-    padding: 0.5rem 1.5rem;
-    border-radius: 4px;
+    padding: 0.75rem 2rem;
+    border-radius: 20px;
     cursor: pointer;
     font-weight: 500;
+    font-family: 'Agrandir', sans-serif;
+    font-size: 16px;
     transition: all 0.3s ease;
 }
 
 .confirm-btn {
-    background-color: #007bff;
-    color: white;
+    background-color: #005a5b;
+    color: #faf8f0;
     border: none;
-    margin-right: 1rem;
 }
 
 .confirm-btn:hover {
-    background-color: #0056b3;
+    background-color: #007d7d;
+    transform: translateY(-2px);
 }
 
 .cancel-btn {
-    background-color: #f8f9fa;
-    color: #6c757d;
-    border: 1px solid #dee2e6;
+    background-color: #faf8f0;
+    color: #ff743e;
+    border: 2px solid #ff743e;
 }
 
 .cancel-btn:hover {
-    background-color: #e9ecef;
+    background-color: #ff743e;
+    color: #faf8f0;
+    transform: translateY(-2px);
 }
 
 .hidden {
