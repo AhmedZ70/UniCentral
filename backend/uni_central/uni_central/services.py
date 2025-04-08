@@ -9,7 +9,7 @@ from .models import (
     CommentUpvote,
     )
 from django.shortcuts import get_object_or_404
-from django.db.models import Q, Count
+from django.db.models import Q, Count, F, ExpressionWrapper, IntegerField
 
 ###############################
 # Department-Related Services #
@@ -34,7 +34,6 @@ class CourseService:
     """
     Provides utility methods for retrieving Course data.
     """
-    
     @staticmethod
     def get_courses_by_department(department_id):
         department = DepartmentService.get_department(department_id)
@@ -65,24 +64,44 @@ class ReviewService:
             return Review.objects.get(id=review_id)
         except Review.DoesNotExist:
             return None
-
+    
     @staticmethod
-    def get_reviews_by_course(course_id):
+    def get_reviews_by_course_sorted(course_id):
         """
-        Fetch all reviews for a given course ID.
-        """
+        Fetch all reviews for a given course ID, sorted by net upvotes (likes - dislikes)
+        with a fallback to creation date for reviews with equal upvotes.
+        """        
         course = CourseService.get_course(course_id)
         reviews = Review.objects.filter(course=course)
-        return reviews
         
+        reviews = reviews.annotate(
+            likes=Count('votes', filter=Q(votes__vote_type='like')),
+            dislikes=Count('votes', filter=Q(votes__vote_type='dislike')),
+        )
+        reviews = reviews.annotate(
+            score=ExpressionWrapper(F('likes') - F('dislikes'), output_field=IntegerField())
+        )
+        
+        return reviews.order_by('-score', '-id')
+    
     @staticmethod
-    def get_reviews_by_professor(professor_id):
+    def get_reviews_by_professor_sorted(professor_id):
         """
-        Fetch all reviews for a given professor ID.
+        Fetch all reviews for a given professor ID, sorted by net upvotes.
         """
-        professor = ProfessorService.get_professor(professor_id)  # Use ProfessorService to fetch the professor
+        professor = ProfessorService.get_professor(professor_id)
         reviews = Review.objects.filter(professor=professor)
-        return reviews
+        
+        reviews = reviews.annotate(
+            likes=Count('votes', filter=Q(votes__vote_type='like')),
+            dislikes=Count('votes', filter=Q(votes__vote_type='dislike')),
+        )
+    
+        reviews = reviews.annotate(
+            score=ExpressionWrapper(F('likes') - F('dislikes'), output_field=IntegerField())
+        )
+        
+        return reviews.order_by('-score', '-id')
     
     @staticmethod
     def create_review_for_course(course_id, user, review_data):

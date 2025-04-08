@@ -215,7 +215,7 @@ class CourseReviewListView(APIView):
     def get(self, request, course_id):
         # Use service layer to retrieve data
         course = CourseService.get_course(course_id)
-        reviews = ReviewService.get_reviews_by_course(course_id)
+        reviews = ReviewService.get_reviews_by_course_sorted(course_id)
 
         # Serialize data
         course_serializer = CourseSerializer(course)
@@ -439,19 +439,15 @@ class ProfessorReviewListView(APIView):
     API View to fetch professor details, their reviews, and courses taught.
     """
     def get(self, request, professor_id):
-        # Fetch professor and reviews using the service layer
         professor = ProfessorService.get_professor(professor_id)
-        reviews = ReviewService.get_reviews_by_professor(professor_id)
+        reviews = ReviewService.get_reviews_by_professor_sorted(professor_id)
 
-        # Fetch courses taught by the professor using the service layer
         courses_taught = CourseService.get_courses_by_professor(professor_id)
 
-        # Serialize the data
         professor_serializer = ProfessorSerializer(professor)
         review_serializer = ReviewSerializer(reviews, many=True)
         course_serializer = CourseSerializer(courses_taught, many=True)
 
-        # Return the combined data
         data = {
             'professor': professor_serializer.data,
             'reviews': review_serializer.data,
