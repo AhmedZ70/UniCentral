@@ -239,9 +239,6 @@ class ReviewVote(models.Model):
     def __str__(self):
         return f"{self.user.email_address} {self.vote_type}d review #{self.review.id}"
 
-####################
-# THREAD MODEL #
-####################
 class Thread(models.Model):
     """
     A model representing a discussion thread.
@@ -249,15 +246,26 @@ class Thread(models.Model):
     Attributes:
         id (AutoField): The primary key of the thread. Automatically generated.
         title (CharField): The title of the discussion thread.
+        category (CharField): The category of the thread (e.g., Exams, Homework, etc.).
         user (ForeignKey): The user who started the thread.
-        courses (ManyToManyField): The courses related to this thread.
-        professors (ManyToManyField): The professors related to this thread.
+        course (ForeignKey): The course related to this thread.
+        professor (ForeignKey): The professor related to this thread.
         created_at (DateTimeField): The timestamp when the thread was created.
         updated_at (DateTimeField): The timestamp when the thread was last updated.
     """
 
     id = models.AutoField(primary_key=True)
     title = models.CharField(max_length=255)
+    category = models.CharField(
+        max_length=50, 
+        choices=[
+            ('general', 'General'),
+            ('exams', 'Exams'),
+            ('homework', 'Homework'),
+            ('projects', 'Projects')
+        ],
+        default='general'
+    )
     user = models.ForeignKey('User', on_delete=models.CASCADE, related_name='threads')
     course = models.ForeignKey('Course', on_delete=models.CASCADE, 
                                related_name='threads', blank=True, null=True)

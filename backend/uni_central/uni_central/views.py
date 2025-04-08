@@ -858,15 +858,27 @@ class CreateThreadAPIView(APIView):
     API View to create a new thread.
     """
     def post(self, request):
+        print(f"Thread creation request data: {request.data}")
+        
         user = UserService.get_user(request.data.get("email_address"))
-        result = ThreadService.create_thread(user, request.data)
+        
+        if 'category' not in request.data:
+            print("No category provided, using default")
+            request_data = request.data.copy()
+            request_data['category'] = 'general'
+        else:
+            request_data = request.data
+            print(f"Category provided: {request_data['category']}")
+        
+        result = ThreadService.create_thread(user, request_data)
 
         if result["success"]:
             serializer = ThreadSerializer(result["thread"])
+            print(f"Thread created successfully with data: {serializer.data}")
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         
+        print(f"Thread creation failed: {result['error']}")
         return Response({"error": result["error"]}, status=status.HTTP_400_BAD_REQUEST)
-
 
 class UpdateThreadAPIView(APIView):
     """

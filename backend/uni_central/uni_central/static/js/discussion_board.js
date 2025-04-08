@@ -283,6 +283,8 @@ function createThreadElement(thread) {
         throw new Error('Invalid thread object');
     }
     
+    console.log("Creating thread element with data:", thread);
+    
     const threadElement = document.createElement('div');
     threadElement.className = 'thread';
     threadElement.dataset.threadId = thread.id || 'unknown';
@@ -298,7 +300,13 @@ function createThreadElement(thread) {
     
     const topicTag = document.createElement('span');
     topicTag.className = 'topic-tag';
-    topicTag.textContent = thread.category || 'General';
+    
+    console.log("Thread category value:", thread.category);
+    
+    const categoryValue = thread.category || thread.topic || thread.type || 'general';
+    topicTag.textContent = categoryValue;
+    
+    topicTag.classList.add(`category-${categoryValue.toLowerCase()}`);
     
     const timestamp = document.createElement('span');
     timestamp.className = 'timestamp';
@@ -505,6 +513,8 @@ async function createNewThread(form) {
         const title = form.querySelector('textarea[name="title"]').value.trim();
         const category = form.querySelector('select[name="category"]').value;
         
+        console.log("Creating new thread with category:", category);
+        
         if (!title || !category) {
             alert('Please fill out all fields');
             return;
@@ -538,6 +548,8 @@ async function createNewThread(form) {
             threadData.professor_id = contextId;
         }
         
+        console.log("Sending thread data to server:", threadData);
+        
         const response = await fetch('/api/threads/create/', {
             method: 'POST',
             headers: {
@@ -551,6 +563,7 @@ async function createNewThread(form) {
         }
         
         const data = await response.json();
+        console.log("Server response after thread creation:", data);
         
         document.getElementById('new-thread-modal').style.display = 'none';
         form.reset();

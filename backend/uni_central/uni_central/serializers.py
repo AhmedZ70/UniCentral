@@ -53,7 +53,7 @@ class ThreadSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Thread
-        fields = '__all__'
+        fields = '__all__' 
 
     def validate(self, data):
         """
@@ -62,8 +62,14 @@ class ThreadSerializer(serializers.ModelSerializer):
         course = data.get('course')
         professor = data.get('professor')
 
-        if bool(course) == bool(professor):  # True == True or False == False → Invalid
+        if bool(course) == bool(professor):  
             raise serializers.ValidationError("A thread must be linked to either a course or a professor, not both.")
+
+        category = data.get('category')
+        valid_categories = ['general', 'exams', 'homework', 'projects']
+        
+        if category and category not in valid_categories:
+            raise serializers.ValidationError(f"Invalid category. Must be one of: {', '.join(valid_categories)}")
 
         return data
 
