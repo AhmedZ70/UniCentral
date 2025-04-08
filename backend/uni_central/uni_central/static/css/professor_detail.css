@@ -84,11 +84,69 @@ body {
     color: #666666;
 }
 
+.review-content {
+    position: relative;
+    padding-bottom: 40px; 
+}
+
 .review-content p {
     margin: 0.7rem 0;
     font-size: 1.1rem;
     color: #333;
     line-height: 1.6;
+}
+
+.thumb-buttons {
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+    display: flex;
+    gap: 20px; 
+}
+
+.likes, .dislikes {
+    display: flex;
+    align-items: center;
+    gap: 5px; 
+}
+  
+.likes p, .dislikes p {
+    margin: 0;
+    font-size: 0.9rem;
+    font-weight: 600;
+    min-width: 20px;
+    text-align: center;
+}
+  
+.helpful-review-button {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    display: flex;
+    align-items: center;
+}
+  
+.helpful-review-button img {
+    width: 2.5rem;
+    height: auto;
+}
+
+[id^="thumbs-down-"]:hover, [id^="thumbs-up-"]:hover {
+    opacity: 60%;
+}
+
+.helpful-review-button.active img {
+    filter: brightness(0.8);
+    transform: scale(1.3);
+}
+
+.likes .helpful-review-button.active img {
+    filter: brightness(0.8) sepia(100%) saturate(5000%) hue-rotate(80deg);
+}
+
+.dislikes .helpful-review-button.active img {
+    filter: brightness(0.8) sepia(100%) saturate(5000%) hue-rotate(320deg);
 }
 
 .rating, .difficulty {

@@ -208,6 +208,36 @@ class Review(models.Model):
     def __str__(self):
         course_name = self.course.title if self.course else "No Course"
         return f"Review by {self.user.fname} for {course_name}"
+    
+####################
+# REVIEWVOTE MODEL #
+####################
+class ReviewVote(models.Model):
+    """
+    A model for tracking likes and dislikes on reviews.
+
+    Attributes:
+        user (ForeignKey): The user who voted.
+        review (ForeignKey): The review being voted on.
+        vote_type (CharField): Type of vote ('like' or 'dislike').
+        created_at (DateTimeField): When the vote was created.
+    """
+    user = models.ForeignKey('User', on_delete=models.CASCADE, related_name='review_votes')
+    review = models.ForeignKey('Review', on_delete=models.CASCADE, related_name='votes')
+    vote_type = models.CharField(max_length=10, choices=[
+        ('like', 'Like'),
+        ('dislike', 'Dislike')
+    ])
+    created_at = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        db_table = 'review_votes'
+        unique_together = ('user', 'review')
+        verbose_name = 'Review Vote'
+        verbose_name_plural = 'Review Votes'
+        
+    def __str__(self):
+        return f"{self.user.email_address} {self.vote_type}d review #{self.review.id}"
 
 ####################
 # THREAD MODEL #
@@ -272,6 +302,20 @@ class Comment(models.Model):
     def __str__(self):
         return f"Comment by {self.user.fname} on {self.thread.title}"
 
+class CommentUpvote(models.Model):
+    """
+    A model for tracking upvotes on comments.
+    """
+    user = models.ForeignKey('User', on_delete=models.CASCADE, related_name='comment_upvotes')
+    comment = models.ForeignKey('Comment', on_delete=models.CASCADE, related_name='upvotes')
+    created_at = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        db_table = 'comment_upvotes'
+        unique_together = ('user', 'comment')
+        
+    def __str__(self):
+        return f"{self.user.email_address} upvoted comment #{self.comment.id}"
 
 class CoursePlan(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
@@ -286,3 +330,4 @@ class CoursePlan(models.Model):
 
     def __str__(self):
         return f"Course Plan for {self.user.email}"
+    

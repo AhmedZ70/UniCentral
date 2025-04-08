@@ -100,15 +100,15 @@ class ReviewServiceTestCase(TestCase):
         self.assertEqual(review.review, "Great class!")
         self.assertEqual(review.rating, 4.5)
 
-    def test_get_reviews_by_course(self):
+    def test_get_reviews_by_course_sorted(self):
         """Test retrieving all reviews for a course."""
-        reviews = ReviewService.get_reviews_by_course(self.course.id)
+        reviews = ReviewService.get_reviews_by_course_sorted(self.course.id)
         self.assertEqual(reviews.count(), 1)
         self.assertEqual(reviews.first().course, self.course)
 
-    def test_get_reviews_by_professor(self):
+    def test_get_reviews_by_professor_sorted(self):
         """Test retrieving all reviews for a professor."""
-        reviews = ReviewService.get_reviews_by_professor(self.professor.id)
+        reviews = ReviewService.get_reviews_by_professor_sorted(self.professor.id)
         self.assertEqual(reviews.count(), 1)
         self.assertEqual(reviews.first().professor, self.professor)
 

@@ -6,9 +6,10 @@ from .models import (
     Professor,
     Thread,
     Comment,
+    CommentUpvote,
     )
 from django.shortcuts import get_object_or_404
-from django.db.models import Q
+from django.db.models import Q, Count, F, ExpressionWrapper, IntegerField
 import pytesseract
 from pdf2image import convert_from_path
 import csv
@@ -42,7 +43,6 @@ class CourseService:
     """
     Provides utility methods for retrieving Course data.
     """
-    
     @staticmethod
     def get_courses_by_department(department_id):
         department = DepartmentService.get_department(department_id)
@@ -73,24 +73,44 @@ class ReviewService:
             return Review.objects.get(id=review_id)
         except Review.DoesNotExist:
             return None
-
+    
     @staticmethod
-    def get_reviews_by_course(course_id):
+    def get_reviews_by_course_sorted(course_id):
         """
-        Fetch all reviews for a given course ID.
-        """
+        Fetch all reviews for a given course ID, sorted by net upvotes (likes - dislikes)
+        with a fallback to creation date for reviews with equal upvotes.
+        """        
         course = CourseService.get_course(course_id)
         reviews = Review.objects.filter(course=course)
-        return reviews
         
+        reviews = reviews.annotate(
+            likes=Count('votes', filter=Q(votes__vote_type='like')),
+            dislikes=Count('votes', filter=Q(votes__vote_type='dislike')),
+        )
+        reviews = reviews.annotate(
+            score=ExpressionWrapper(F('likes') - F('dislikes'), output_field=IntegerField())
+        )
+        
+        return reviews.order_by('-score', '-id')
+    
     @staticmethod
-    def get_reviews_by_professor(professor_id):
+    def get_reviews_by_professor_sorted(professor_id):
         """
-        Fetch all reviews for a given professor ID.
+        Fetch all reviews for a given professor ID, sorted by net upvotes.
         """
-        professor = ProfessorService.get_professor(professor_id)  # Use ProfessorService to fetch the professor
+        professor = ProfessorService.get_professor(professor_id)
         reviews = Review.objects.filter(professor=professor)
-        return reviews
+        
+        reviews = reviews.annotate(
+            likes=Count('votes', filter=Q(votes__vote_type='like')),
+            dislikes=Count('votes', filter=Q(votes__vote_type='dislike')),
+        )
+    
+        reviews = reviews.annotate(
+            score=ExpressionWrapper(F('likes') - F('dislikes'), output_field=IntegerField())
+        )
+        
+        return reviews.order_by('-score', '-id')
     
     @staticmethod
     def create_review_for_course(course_id, user, review_data):
@@ -246,6 +266,90 @@ class ReviewService:
             professor.update_averages()
             
         return {"success": True, "message": "Review deleted successfully"}
+    
+################################
+# Review Vote-Related Services #
+################################
+class ReviewVoteService:
+    """
+    Service class for handling operations related to review votes.
+    """
+    
+    @staticmethod
+    def count_votes(review, vote_type):
+        """
+        Count the number of votes of a specific type for a review.
+        
+        Args:
+            review: Review object
+            vote_type: String ('like' or 'dislike')
+            
+        Returns:
+            int: Number of votes
+        """
+        from .models import ReviewVote
+        return ReviewVote.objects.filter(review=review, vote_type=vote_type).count()
+    
+    @staticmethod
+    def get_user_vote(user, review):
+        """
+        Check if a user has voted on a review.
+        
+        Args:
+            user: User object
+            review: Review object
+            
+        Returns:
+            ReviewVote object or None
+        """
+        from .models import ReviewVote
+        try:
+            return ReviewVote.objects.get(user=user, review=review)
+        except ReviewVote.DoesNotExist:
+            return None
+    
+    @staticmethod
+    def submit_vote(user, review, vote_type):
+        """
+        Submit or update a vote.
+        
+        Args:
+            user: User object
+            review: Review object
+            vote_type: String ('like' or 'dislike')
+            
+        Returns:
+            dict: Result with updated vote counts and user vote
+        """
+        from .models import ReviewVote
+        
+        # Check if user has already voted
+        existing_vote = ReviewVoteService.get_user_vote(user, review)
+        
+        if existing_vote:
+            if existing_vote.vote_type == vote_type:
+                # If clicking the same button again, remove the vote
+                existing_vote.delete()
+                user_vote = None
+            else:
+                # Update the vote
+                existing_vote.vote_type = vote_type
+                existing_vote.save()
+                user_vote = vote_type
+        else:
+            # Create new vote
+            ReviewVote.objects.create(user=user, review=review, vote_type=vote_type)
+            user_vote = vote_type
+        
+        # Count likes and dislikes after the update
+        likes = ReviewVoteService.count_votes(review, 'like')
+        dislikes = ReviewVoteService.count_votes(review, 'dislike')
+        
+        return {
+            'likes': likes,
+            'dislikes': dislikes,
+            'user_vote': user_vote
+        }
 
 ##############################
 # Professor-Related Services #
@@ -605,6 +709,24 @@ class ThreadService:
 
         thread.delete()
         return {"success": True, "message": "Thread deleted successfully"}
+    
+    @staticmethod
+    def get_threads_with_stats(threads):
+        """
+        Enhance thread data with stats including upvote counts
+        """
+        for thread in threads:
+            comments = CommentService.get_comments_by_thread(thread.id)
+            thread.comment_count = len(comments)
+            
+            total_upvotes = 0
+            for comment in comments:
+                upvotes = CommentUpvoteService.count_upvotes(comment)
+                total_upvotes += upvotes
+            
+            thread.total_upvotes = total_upvotes
+        
+        return threads
 
 ############################
 # Comment-Related Services #
@@ -639,10 +761,8 @@ class CommentService:
         if not thread:
             return {"success": False, "error": "Thread not found"}
 
-        # Extract email from comment data
         email_address = comment_data.get("email_address")
         
-        # Try to find existing user by email
         try:
             user = User.objects.get(email_address=email_address)
         except User.DoesNotExist:
@@ -686,7 +806,15 @@ class CommentService:
             return Comment.objects.get(id=comment_id)
         except Comment.DoesNotExist:
             return None
-    
+        
+    @staticmethod
+    def sort_comments_by_popularity(comments):
+        """
+        Sort comments by upvote count (descending), then by date (descending) if upvotes are equal.
+        """        
+        comments_with_counts = comments.annotate(upvote_count=Count('upvotes'))
+        return comments_with_counts.order_by('-upvote_count', '-created_at')
+        
     @staticmethod
     def delete_comment(comment_id):
         """
@@ -698,7 +826,68 @@ class CommentService:
             return {"success": False, "error": "Comment not found"}
 
         comment.delete()
-        return {"success": True, "message": "Comment deleted successfully"}
+        return {"success": True, "message": "Comment deleted successfully"}   
+
+class CommentUpvoteService:
+    """
+    Service class for handling operations related to comment upvotes.
+    """
+    
+    @staticmethod
+    def count_upvotes(comment):
+        """
+        Count the number of upvotes for a comment.
+        """
+        return CommentUpvote.objects.filter(comment=comment).count()
+    
+    @staticmethod
+    def get_user_upvote(user, comment):
+        """
+        Check if a user has upvoted a comment.
+        """
+        from .models import CommentUpvote
+        try:
+            return CommentUpvote.objects.get(user=user, comment=comment)
+        except CommentUpvote.DoesNotExist:
+            return None
+    
+    def get_user_has_upvoted(self, obj):
+        request = self.context.get('request')
+        if request and hasattr(request, 'user_email'):
+            email = request.user_email
+            try:
+                from .services import UserService, CommentUpvoteService
+                user = UserService.get_user(email)
+                if user:
+                    upvote = CommentUpvoteService.get_user_upvote(user, obj)
+                    return upvote is not None
+            except Exception as e:
+                print(f"Error in get_user_has_upvoted: {e}")
+                return False
+        return False
+    
+    @staticmethod
+    def toggle_upvote(user, comment):
+        """
+        Toggle upvote for a comment.
+        """
+        from .models import CommentUpvote
+        
+        existing_upvote = CommentUpvoteService.get_user_upvote(user, comment)
+        
+        if existing_upvote:
+            existing_upvote.delete()
+            user_upvoted = False
+        else:
+            CommentUpvote.objects.create(user=user, comment=comment)
+            user_upvoted = True
+        
+        upvotes = CommentUpvoteService.count_upvotes(comment)
+        
+        return {
+            'upvotes': upvotes,
+            'user_upvoted': user_upvoted
+        } 
 
 ############################
 # Transcript-Related Services #
