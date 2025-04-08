@@ -6,9 +6,10 @@ from .models import (
     Professor,
     Thread,
     Comment,
+    CommentUpvote,
     )
 from django.shortcuts import get_object_or_404
-from django.db.models import Q
+from django.db.models import Q, Count
 
 ###############################
 # Department-Related Services #
@@ -651,6 +652,24 @@ class ThreadService:
 
         thread.delete()
         return {"success": True, "message": "Thread deleted successfully"}
+    
+    @staticmethod
+    def get_threads_with_stats(threads):
+        """
+        Enhance thread data with stats including upvote counts
+        """
+        for thread in threads:
+            comments = CommentService.get_comments_by_thread(thread.id)
+            thread.comment_count = len(comments)
+            
+            total_upvotes = 0
+            for comment in comments:
+                upvotes = CommentUpvoteService.count_upvotes(comment)
+                total_upvotes += upvotes
+            
+            thread.total_upvotes = total_upvotes
+        
+        return threads
 
 ############################
 # Comment-Related Services #
@@ -685,10 +704,8 @@ class CommentService:
         if not thread:
             return {"success": False, "error": "Thread not found"}
 
-        # Extract email from comment data
         email_address = comment_data.get("email_address")
         
-        # Try to find existing user by email
         try:
             user = User.objects.get(email_address=email_address)
         except User.DoesNotExist:
@@ -732,7 +749,15 @@ class CommentService:
             return Comment.objects.get(id=comment_id)
         except Comment.DoesNotExist:
             return None
-    
+        
+    @staticmethod
+    def sort_comments_by_popularity(comments):
+        """
+        Sort comments by upvote count (descending), then by date (descending) if upvotes are equal.
+        """        
+        comments_with_counts = comments.annotate(upvote_count=Count('upvotes'))
+        return comments_with_counts.order_by('-upvote_count', '-created_at')
+        
     @staticmethod
     def delete_comment(comment_id):
         """
@@ -756,7 +781,6 @@ class CommentUpvoteService:
         """
         Count the number of upvotes for a comment.
         """
-        from .models import CommentUpvote
         return CommentUpvote.objects.filter(comment=comment).count()
     
     @staticmethod
@@ -770,6 +794,21 @@ class CommentUpvoteService:
         except CommentUpvote.DoesNotExist:
             return None
     
+    def get_user_has_upvoted(self, obj):
+        request = self.context.get('request')
+        if request and hasattr(request, 'user_email'):
+            email = request.user_email
+            try:
+                from .services import UserService, CommentUpvoteService
+                user = UserService.get_user(email)
+                if user:
+                    upvote = CommentUpvoteService.get_user_upvote(user, obj)
+                    return upvote is not None
+            except Exception as e:
+                print(f"Error in get_user_has_upvoted: {e}")
+                return False
+        return False
+    
     @staticmethod
     def toggle_upvote(user, comment):
         """
@@ -777,19 +816,15 @@ class CommentUpvoteService:
         """
         from .models import CommentUpvote
         
-        # Check if user has already upvoted
         existing_upvote = CommentUpvoteService.get_user_upvote(user, comment)
         
         if existing_upvote:
-            # User already upvoted, so remove it
             existing_upvote.delete()
             user_upvoted = False
         else:
-            # User hasn't upvoted, so add it
             CommentUpvote.objects.create(user=user, comment=comment)
             user_upvoted = True
         
-        # Count upvotes after the update
         upvotes = CommentUpvoteService.count_upvotes(comment)
         
         return {

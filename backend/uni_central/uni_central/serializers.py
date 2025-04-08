@@ -1,4 +1,5 @@
 from rest_framework import serializers
+from django.contrib.auth import get_user_model
 from .models import Department, User, Course, Professor, Review, Thread, Comment
 
 class DepartmentSerializer(serializers.ModelSerializer):
@@ -69,7 +70,19 @@ class ThreadSerializer(serializers.ModelSerializer):
 class CommentSerializer(serializers.ModelSerializer):
     user = UserSerializer(read_only=True)
     thread = ThreadSerializer(read_only=True)
-
+    upvotes_count = serializers.IntegerField(source='upvotes.count', read_only=True)
+    user_has_upvoted = serializers.SerializerMethodField()
+    
     class Meta:
         model = Comment
         fields = '__all__'
+    
+    def get_user_has_upvoted(self, obj):
+        request = self.context.get('request')
+        if request and hasattr(request, 'user_email'):
+            try:
+                user = User.objects.get(email_address=request.user_email)
+                return obj.upvotes.filter(user=user).exists()
+            except Exception:
+                return False
+        return False

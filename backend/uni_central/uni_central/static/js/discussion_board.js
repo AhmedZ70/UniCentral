@@ -167,7 +167,18 @@ function loadThreads() {
         return response.json();
     })
     .then(data => {
-        console.log('Threads data received:', JSON.stringify(data, null, 2));
+        displayThreads(data);
+
+        let sortedData = [...data];
+    
+        if (sortBy === 'recent') {
+            sortedData = sortThreadsByDate(sortedData);
+        } else if (sortBy === 'popular') {
+            sortedData = sortThreadsByPopularity(sortedData);
+        } else if (sortBy === 'unanswered') { 
+            sortedData = sortThreadsByUnanswered(sortedData);
+        }
+        
         displayThreads(data);
     })
     .catch(error => {
@@ -189,9 +200,7 @@ function displayThreads(threads) {
     const threadsContainer = document.querySelector('.discussion-threads');
     
     threadsContainer.innerHTML = '';
-    
-    console.log('Displaying threads:', threads);
-    
+        
     if (!threads || threads.length === 0) {
         threadsContainer.innerHTML = `
             <div class="no-results">
@@ -314,20 +323,29 @@ function createResponseElement(comment) {
     const upvoteButton = document.createElement('button');
     upvoteButton.className = 'upvote-button';
     upvoteButton.dataset.commentId = comment.id;
+    
+    if (comment.user_has_upvoted) {
+        upvoteButton.classList.add('active');
+    }
 
     const likeContainer = document.createElement('div');
     likeContainer.className = 'like-container';
-    
-    const thumbsUpImg = document.createElement('img');
-    thumbsUpImg.src = '/static/assets/thumbs_up.png';
-    thumbsUpImg.alt = 'thumbs up';
-    thumbsUpImg.className = 'thumbs-up-img'
 
     const countSpan = document.createElement('span');
     countSpan.className = 'like-count';
     countSpan.textContent = comment.upvotes || 0;
     
-    // Assemble the button
+    const upvoteCount = comment.upvotes_count !== undefined ? comment.upvotes_count : 
+                        (comment.upvotes !== undefined ? comment.upvotes : 0);
+    
+    console.log(`Creating response element for comment ${comment.id} with upvote count: ${upvoteCount}`);
+    countSpan.textContent = upvoteCount;
+    
+    const thumbsUpImg = document.createElement('img');
+    thumbsUpImg.src = '/static/assets/thumbs_up.png';
+    thumbsUpImg.alt = 'thumbs up';
+    thumbsUpImg.className = 'thumbs-up-img'
+    
     likeContainer.appendChild(thumbsUpImg);
     likeContainer.appendChild(countSpan);
     upvoteButton.appendChild(likeContainer);
@@ -347,7 +365,18 @@ function createResponseElement(comment) {
 }
 
 function loadThreadComments(threadId) {
-    fetch(`/api/threads/${threadId}/comments/`)
+    const user = auth.currentUser;
+    const userEmail = user ? user.email : null;
+    
+    let endpoint = `/api/threads/${threadId}/comments/`;
+    if (userEmail) {
+        endpoint += `?email=${encodeURIComponent(userEmail)}`;
+        console.log(`Loading comments for thread ${threadId} with email ${userEmail}`);
+    } else {
+        console.log(`Loading comments for thread ${threadId} without email`);
+    }
+    
+    fetch(endpoint)
         .then(response => {
             if (!response.ok) {
                 throw new Error(`Failed to fetch comments. Status: ${response.status}`);
@@ -355,6 +384,8 @@ function loadThreadComments(threadId) {
             return response.json();
         })
         .then(comments => {
+            console.log(`Received ${comments.length} comments for thread ${threadId}`);
+            console.log('First comment:', comments.length > 0 ? comments[0] : 'No comments');
             const threadElement = document.querySelector(`.thread[data-thread-id="${threadId}"]`);
             if (threadElement) {
                 const responsesContainer = threadElement.querySelector('.responses');
@@ -363,13 +394,10 @@ function loadThreadComments(threadId) {
                 const replyCountElement = threadElement.querySelector('.reply-count');
                 replyCountElement.textContent = `${comments.length} replies`;
                 
-                const user = auth.currentUser;
-                const userEmail = user ? user.email : null;
-                
                 comments.forEach(comment => {
-                    if (userEmail && comment.user_upvotes && 
-                        comment.user_upvotes.includes(userEmail)) {
-                        comment.userVoted = true;
+                    console.log(`Comment ${comment.id}: upvotes=${comment.upvotes_count}, user_has_upvoted=${comment.user_has_upvoted}`);    
+                    if (comment.user_has_upvoted) {
+                        console.log("User has upvoted comment:", comment.id);
                     }
                     
                     const responseElement = createResponseElement(comment);
@@ -557,11 +585,11 @@ async function upvoteComment(commentId, button) {
             return;
         }
         
+        console.log(`Upvoting comment ${commentId} as ${user.email}`);
+        
         const requestBody = {
             email: user.email
         };
-        
-        console.log('Sending upvote request for comment', commentId, 'with data:', requestBody);
         
         const response = await fetch(`/api/comments/${commentId}/upvote/`, {
             method: 'POST',
@@ -571,7 +599,6 @@ async function upvoteComment(commentId, button) {
             body: JSON.stringify(requestBody)
         });
         
-        // Try to get more detailed error info if response is not OK
         if (!response.ok) {
             const errorText = await response.text();
             console.error('Server error response:', errorText);
@@ -579,22 +606,63 @@ async function upvoteComment(commentId, button) {
         }
         
         const data = await response.json();
-        console.log('Upvote successful, response:', data);
+        console.log('Upvote response:', data);
         
         const countSpan = button.querySelector('.like-count');
         if (countSpan) {
             countSpan.textContent = data.upvotes;
+            console.log(`Updated upvote count to ${data.upvotes}`);
         }
         
         if (data.user_upvoted) {
             button.classList.add('active');
+            console.log('Added active class to button');
         } else {
             button.classList.remove('active');
+            console.log('Removed active class from button');
         }
     } catch (error) {
         console.error('Error upvoting comment:', error);
         alert('Failed to upvote. Please try again later.');
     }
+}
+
+function sortThreadsByDate(threads) {
+    return [...threads].sort((a, b) => {
+        return new Date(b.created_at) - new Date(a.created_at);
+    });
+}
+
+function sortThreadsByPopularity(threads) {
+    return [...threads].sort((a, b) => {
+        const commentDiff = (b.total_comments || 0) - (a.total_comments || 0);
+        const upvoteDiff = (b.total_upvotes || 0) - (a.total_upvotes || 0);
+        
+        if (commentDiff === 0) {
+            if (upvoteDiff === 0) {
+                return new Date(b.created_at) - new Date(a.created_at);
+            }
+            return upvoteDiff;
+        }
+        
+        return commentDiff;
+    });
+}
+
+function sortThreadsByUnanswered(threads) {
+    return [...threads].sort((a, b) => {
+        const aHasComments = a.comments && a.comments.length > 0;
+        const bHasComments = b.comments && b.comments.length > 0;
+        
+        if (!aHasComments && bHasComments) {
+            return -1;
+        }
+        if (aHasComments && !bHasComments) {
+            return 1;
+        }
+        
+        return new Date(b.created_at) - new Date(a.created_at);
+    });
 }
 
 document.addEventListener('DOMContentLoaded', loadThreads);

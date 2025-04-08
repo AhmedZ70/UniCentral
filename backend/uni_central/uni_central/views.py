@@ -816,7 +816,6 @@ class UpdateThreadAPIView(APIView):
         
         return Response({"error": result["error"]}, status=status.HTTP_400_BAD_REQUEST)
 
-
 class DeleteThreadAPIView(APIView):
     """
     API View to delete an existing thread.
@@ -834,21 +833,32 @@ class DeleteThreadAPIView(APIView):
 ##########################
 # Comment Views and APIs #
 ##########################
-
+    
 class ThreadCommentsAPIView(APIView):
     """
     API View to fetch all comments related to a specific thread.
     """
-
     def get(self, request, thread_id):
-        comments = CommentService.get_comments_by_thread(thread_id)
-
-        if comments is None:
-            return Response({"error": "Thread not found"}, status=status.HTTP_404_NOT_FOUND)
-
-        serialized = CommentSerializer(comments, many=True)
-        return Response(serialized.data)
-
+        try:
+            # Get comments for the thread
+            thread = ThreadService.get_thread_by_id(thread_id)
+            if not thread:
+                return Response({"error": "Thread not found"}, status=status.HTTP_404_NOT_FOUND)
+            
+            comments = CommentService.get_comments_by_thread(thread_id)
+            
+            sorted_comments = CommentService.sort_comments_by_popularity(comments)
+            
+            email = request.GET.get('email')
+            if email:
+                request.user_email = email
+                
+            serializer = CommentSerializer(sorted_comments, many=True, context={'request': request})
+            return Response(serializer.data)
+        
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
 class CreateCommentAPIView(APIView):
     """
     API View to create a new comment.
@@ -943,20 +953,30 @@ class ToggleCommentUpvoteView(APIView):
     def post(self, request, comment_id):
         try:
             email = request.data.get('email')
+            print(f"Received upvote request for comment {comment_id} from email: {email}")
+            
             if not email:
                 return Response({'error': 'Email required'}, status=status.HTTP_400_BAD_REQUEST)
             
             user = UserService.get_user(email)
             comment = CommentService.get_comment_by_id(comment_id)
+            
             if not comment:
                 return Response({'error': 'Comment not found'}, status=status.HTTP_404_NOT_FOUND)
-                
+            
+            existing = CommentUpvoteService.get_user_upvote(user, comment)
+            print(f"User {email} has existing upvote: {existing is not None}")
+            
             result = CommentUpvoteService.toggle_upvote(user, comment)
+            print(f"Toggle result: {result}")
             
             return Response({
                 'upvotes': result['upvotes'],
                 'user_upvoted': result['user_upvoted']
             })
-                
+            
         except Exception as e:
+            import traceback
+            print(f"Error in ToggleCommentUpvoteView: {str(e)}")
+            print(traceback.format_exc())
             return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
