@@ -24,6 +24,12 @@ document.addEventListener("DOMContentLoaded", () => {
     const professorsContainer = document.getElementById("professors");
     const breadcrumbContainer = document.getElementById("breadcrumb");
 
+    const alphabetNavContainer = document.createElement("div");
+    alphabetNavContainer.id = "alphabet-nav";
+    alphabetNavContainer.className = "alphabet-navigation";
+    
+    departmentsContainer.parentNode.insertBefore(alphabetNavContainer, departmentsContainer);
+
     // Set initial visibility
     departmentsContainer.classList.add("visible");
     professorsContainer.classList.add("hidden");
@@ -38,12 +44,53 @@ document.addEventListener("DOMContentLoaded", () => {
      */
     fetch(departmentsApiUrl)
         .then((response) => response.json())
-        .then((data) => renderDepartments(data))
+        .then((data) => {
+            renderDepartments(data);
+            createAlphabetNav(data);
+        })
         .catch((error) => {
             console.error("Error fetching departments:", error);
             departmentsContainer.innerHTML =
                 "<p>Failed to load departments. Please try again later.</p>";
         });
+
+
+    // ------------------------------------------------------------------------
+    // [Function: Create Alphabet Navigation]
+    // ------------------------------------------------------------------------
+    function createAlphabetNav(departments) {
+        const firstLetters = new Set(
+            departments.map(dept => dept.name.charAt(0).toUpperCase())
+        );
+        
+        const sortedLetters = Array.from(firstLetters).sort();
+        
+        alphabetNavContainer.innerHTML = '';
+        
+        sortedLetters.forEach(letter => {
+            const letterLink = document.createElement('a');
+            letterLink.href = `#letter-${letter}`;
+            letterLink.className = 'alphabet-link';
+            letterLink.textContent = letter;
+            
+            letterLink.addEventListener('click', (e) => {
+                e.preventDefault();
+                const letterSection = document.getElementById(`letter-${letter}`);
+                if (letterSection) {
+                    const rect = letterSection.getBoundingClientRect();
+                    
+                    const scrollPosition = window.pageYOffset + rect.top - 70;
+                    
+                    window.scrollTo({
+                        top: scrollPosition,
+                        behavior: 'smooth'
+                    });
+                }
+            });
+            
+            alphabetNavContainer.appendChild(letterLink);
+        });
+    }
 
     // ------------------------------------------------------------------------
     // [Function: Render Departments]
@@ -81,6 +128,8 @@ document.addEventListener("DOMContentLoaded", () => {
             const letterGroup = document.createElement("div");
             letterGroup.classList.add("letter-group");
 
+            letterGroup.id = `letter-${letter}`;
+
             const letterHeader = document.createElement("h3");
             letterHeader.classList.add("letter-header");
             letterHeader.textContent = letter;
@@ -111,7 +160,6 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
-    // Cache professors for the selected department
     let cachedProfessors = {};
     // ------------------------------------------------------------------------
     // [Function: Show Professors for a Selected Department]
@@ -124,7 +172,8 @@ document.addEventListener("DOMContentLoaded", () => {
      * @param {string} departmentName - The name of the department for breadcrumb display.
      */
     async function showProfessors(departmentId, departmentName) {
-        // Check if professors are already cached
+        alphabetNavContainer.style.display = 'none';
+
         if (cachedProfessors[departmentId]) {
             renderProfessors(cachedProfessors[departmentId], departmentName);
             return;
@@ -140,13 +189,10 @@ document.addEventListener("DOMContentLoaded", () => {
             renderProfessors(professors, departmentName); // Always call renderProfessors
         } catch (error) {
             console.error("Error fetching professors:", error);
-            // Call renderProfessors with an empty array on error
             renderProfessors([], departmentName);
         }
     }
     
-
-
     // ------------------------------------------------------------------------
     // [Function: Render Professors in the UI]
     // ------------------------------------------------------------------------
@@ -220,5 +266,7 @@ document.addEventListener("DOMContentLoaded", () => {
         professorsContainer.classList.add("hidden");
         departmentsContainer.classList.remove("hidden");
         departmentsContainer.classList.add("visible");
+
+        alphabetNavContainer.style.display = 'flex';
     }
 });

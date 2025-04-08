@@ -28,6 +28,17 @@
     {% endblock %}
   </main>
 
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      setTimeout(function() {
+        const header = document.querySelector('.App-header');
+        if (header) {
+          header.remove();
+        }
+      }, 200); // Small delay to ensure React has rendered
+    });
+  </script>
+
   <!-- Block for page-specific JS -->
   {% block extra_js %}{% endblock %}
 </body>
