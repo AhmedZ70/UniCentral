@@ -11,6 +11,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Corben:wght@400;700&family=Montserrat:ital,wght@0,100..900;1,100..900&family=Sigmar&family=Sniglet:wght@400;800&display=swap" rel="stylesheet">
     <script type="module" src="{% static 'js/course_detail.js' %}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
     {% include 'partials/navbar.html' %}
@@ -39,6 +40,15 @@
                 <button id="enroll-btn" class="leave-review-button">Enroll</button>
                 <a id="discussion-board-btn" href="{% url 'course_discussion_board' context_id=course_id %}" class="go-to-discussion-board-button">Discussion Board</a>
             </div>
+            <!-- Add the link to display the chart -->
+            <a href="#" id="showChartLink" class="view-grade-distribution-link">View Grade Distribution</a>
+
+            <!-- Canvas where the chart will be rendered -->
+            <canvas id="gradeAverageChart" style="display:none;"></canvas>
+
+            <p id="no-grade-message" style="display: none; font-weight: bold; text-align: center;">
+                No grade distribution available.
+            </p>
         </section>
 
         <section class="course-reviews" id="course-reviews">

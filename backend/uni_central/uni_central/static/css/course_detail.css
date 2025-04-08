@@ -351,6 +351,48 @@ body, html, ul, li, p, h1, h2, select {
     background-color: #F44336; 
 }
 
+.no-grade-message {
+    display: none;
+    color: #666666;
+    font-weight: bold;
+    text-align: center;
+    margin-top: 20px;
+}
+
+.no-grade-message {
+    transition: all 0.3s ease;
+}
+
+#gradeAverageChart {
+    width: 30px;  /* Set the desired width */
+    height: 15px; /* Set the desired height */
+    display: none; /* Initially hide the chart */
+    max-width: 100%;  /* Allow responsiveness */
+    margin-top: 20px;
+}
+
+.view-grade-distribution-link {
+    display: inline-block;
+    margin-top: 20px;
+    padding: 10px 20px;
+    background-color: #005a5b;
+    color: white;
+    text-decoration: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.view-grade-distribution-link:hover {
+    background-color: #004e4f;
+}
+
+body {
+    overflow-x: hidden; /* Prevent horizontal scrolling */
+    overflow-y: auto; /* Allow vertical scrolling */
+}
+
+
+
 @media (max-width: 768px) {
     .course-title {
         font-size: 2rem;
