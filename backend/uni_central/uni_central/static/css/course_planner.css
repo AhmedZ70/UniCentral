@@ -386,3 +386,303 @@ body {
 .semester-popup-overlay.active .semester-popup-content {
     animation: fadeIn 0.3s ease-out forwards;
 }
+
+/* Transcript Upload Section */
+.transcript-upload-section {
+    max-width: 1400px;
+    margin: 1rem auto;
+    padding: 2rem;
+    background-color: #ffffff;
+    border: 3px solid black;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.upload-container {
+    text-align: center;
+}
+
+.upload-container h2 {
+    color: #ff743e;
+    margin-bottom: 1rem;
+    font-family: 'Agrandir', sans-serif;
+    font-size: 32px;
+    font-weight: 100;
+}
+
+.upload-container p {
+    color: #000000;
+    margin-bottom: 2rem;
+    font-family: 'Poppins-light', sans-serif;
+    font-size: 18px;
+}
+
+.upload-box {
+    border: 3px dashed #005a5b;
+    border-radius: 8px;
+    padding: 2.5rem;
+    margin: 1.5rem 0;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    background-color: #faf8f0;
+}
+
+.upload-box.drag-over {
+    border-color: #ff743e;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+    background-color: rgba(255, 116, 62, 0.05);
+}
+
+.upload-icon {
+    font-size: 3.5rem;
+    color: #005a5b;
+    margin-bottom: 1.5rem;
+    transition: color 0.3s ease;
+}
+
+.upload-box:hover .upload-icon {
+    color: #ff743e;
+}
+
+.upload-text p {
+    margin-bottom: 1rem;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 16px;
+}
+
+.upload-button {
+    display: inline-block;
+    padding: 0.75rem 2rem;
+    background-color: #005a5b;
+    color: #faf8f0;
+    border-radius: 20px;
+    font-family: 'Agrandir', sans-serif;
+    font-size: 18px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.upload-button:hover {
+    background-color: #ff743e;
+    transform: translateY(-2px);
+}
+
+.supported-formats {
+    margin-top: 1.5rem;
+    font-size: 14px;
+    color: #666;
+    font-family: 'Montserrat', sans-serif;
+}
+
+.upload-progress {
+    margin: 2rem 0;
+    display: none;
+}
+
+.upload-progress.visible {
+    display: block;
+}
+
+.progress-bar {
+    width: 100%;
+    height: 10px;
+    background-color: #e0e0e0;
+    border-radius: 5px;
+    overflow: hidden;
+    margin-bottom: 1rem;
+    border: 1px solid #005a5b;
+}
+
+.progress-fill {
+    height: 100%;
+    background-color: #005a5b;
+    width: 0%;
+    transition: width 0.3s ease;
+}
+
+.progress-text {
+    color: #000000;
+    font-size: 16px;
+    font-family: 'Montserrat', sans-serif;
+    text-align: center;
+}
+
+.results-preview {
+    display: none;
+    margin-top: 2rem;
+    text-align: left;
+    background-color: #faf8f0;
+    border: 3px solid #000000;
+    border-radius: 8px;
+    padding: 1.5rem;
+}
+
+.results-preview.visible {
+    display: block;
+}
+
+.results-preview h3 {
+    color: #ff743e;
+    margin-bottom: 1.5rem;
+    font-family: 'Agrandir', sans-serif;
+    font-size: 24px;
+}
+
+.courses-list {
+    max-height: 400px;
+    overflow-y: auto;
+    border: 2px solid #005a5b;
+    border-radius: 8px;
+    padding: 1rem;
+    background-color: #ffffff;
+}
+
+.course-item {
+    display: flex;
+    align-items: center;
+    padding: 1rem;
+    border-bottom: 1px solid #e0e0e0;
+    transition: background-color 0.3s ease;
+}
+
+.course-item:hover {
+    background-color: #f5f5f5;
+}
+
+.course-item:last-child {
+    border-bottom: none;
+}
+
+.course-checkbox {
+    margin-right: 1rem;
+    width: 20px;
+    height: 20px;
+    accent-color: #005a5b;
+}
+
+.course-info {
+    flex-grow: 1;
+}
+
+.course-code {
+    font-weight: 600;
+    color: #005a5b;
+    font-size: 16px;
+    font-family: 'Montserrat', sans-serif;
+}
+
+.course-name {
+    font-size: 14px;
+    color: #000000;
+    margin-top: 0.25rem;
+    font-family: 'Montserrat', sans-serif;
+}
+
+.course-credits {
+    font-size: 14px;
+    color: #005a5b;
+    margin-top: 0.25rem;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 600;
+}
+
+.match-confidence {
+    font-size: 14px;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    margin-left: 1rem;
+    font-family: 'Montserrat', sans-serif;
+}
+
+.confidence-high {
+    background-color: #e6fff0;
+    color: #005a5b;
+    border: 1px solid #005a5b;
+}
+
+.confidence-medium {
+    background-color: #fff3e6;
+    color: #ff743e;
+    border: 1px solid #ff743e;
+}
+
+.confidence-low {
+    background-color: #ffe6e6;
+    color: #dc3545;
+    border: 1px solid #dc3545;
+}
+
+.action-buttons {
+    margin-top: 2rem;
+    text-align: right;
+    display: flex;
+    gap: 1rem;
+    justify-content: flex-end;
+}
+
+.confirm-btn, .cancel-btn {
+    padding: 0.75rem 2rem;
+    border-radius: 20px;
+    cursor: pointer;
+    font-weight: 500;
+    font-family: 'Agrandir', sans-serif;
+    font-size: 16px;
+    transition: all 0.3s ease;
+}
+
+.confirm-btn {
+    background-color: #005a5b;
+    color: #faf8f0;
+    border: none;
+}
+
+.confirm-btn:hover {
+    background-color: #007d7d;
+    transform: translateY(-2px);
+}
+
+.cancel-btn {
+    background-color: #faf8f0;
+    color: #ff743e;
+    border: 2px solid #ff743e;
+}
+
+.cancel-btn:hover {
+    background-color: #ff743e;
+    color: #faf8f0;
+    transform: translateY(-2px);
+}
+
+.hidden {
+    display: none;
+}
+
+.semester-section {
+    margin-bottom: 1.5rem;
+    padding: 1rem;
+    background-color: #ffffff;
+    border: 2px solid #005a5b;
+    border-radius: 8px;
+}
+
+.semester-section:last-child {
+    margin-bottom: 0;
+}
+
+.semester-header {
+    color: #ff743e;
+    font-family: 'Agrandir', sans-serif;
+    font-size: 20px;
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid #005a5b;
+}
+
+.course-semester {
+    font-size: 12px;
+    color: #666;
+    margin-top: 0.25rem;
+    font-family: 'Montserrat', sans-serif;
+    font-style: italic;
+}
