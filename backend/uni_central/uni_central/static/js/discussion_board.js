@@ -148,9 +148,11 @@ async function loadThreads() {
     
     const sortBySelect = document.getElementById('sort-by');
     const sortBy = sortBySelect ? sortBySelect.value : 'recent';
+    console.log("Sort selection:", sortBy);
     
     const filterBySelect = document.getElementById('filter-by');
     const filterBy = filterBySelect ? filterBySelect.value : 'all';
+    console.log("Filter selection:", filterBy);
     
     const includeCommentsCheckbox = document.getElementById('include-comments');
     const includeComments = includeCommentsCheckbox ? includeCommentsCheckbox.checked : true;
@@ -177,8 +179,8 @@ async function loadThreads() {
     
     const params = new URLSearchParams();
     if (searchTerm) params.append('search', searchTerm);
-    if (sortBy) params.append('sort_by', sortBy);
-    if (filterBy && filterBy !== 'all') params.append('category', filterBy);
+    params.append('sort_by', sortBy);
+    if (filterBy && filterBy !== 'all') params.append('filter_by', filterBy);
     params.append('include_comments', includeComments);
     
     let endpoint;
@@ -220,8 +222,35 @@ async function loadThreads() {
         const data = await response.json();
         console.log('Received data:', data);
         
-        displayThreads(data);
-    
+        let filteredData = [...data];
+        if (filterBy && filterBy !== 'all') {
+            filteredData = filteredData.filter(thread => 
+                thread.category && thread.category.toLowerCase() === filterBy.toLowerCase()
+            );
+            console.log(`Filtered to ${filteredData.length} threads with category: ${filterBy}`);
+        }
+        
+        let sortedData = [...filteredData];
+        console.log(`Sorting ${sortedData.length} threads by: ${sortBy}`);
+        
+        if (sortBy === 'recent') {
+            sortedData = sortThreadsByDate(sortedData);
+        } else if (sortBy === 'popular') {
+            sortedData = sortThreadsByPopularity(sortedData);
+        } else if (sortBy === 'unanswered') {
+            sortedData = sortThreadsByUnanswered(sortedData);
+        }
+        
+        displayThreads(sortedData);
+        
+        if (searchTerm && sortedData && sortedData.length > 0) {
+            highlightSearchMatches(searchTerm);
+        }
+        
+        const resultCounter = document.querySelector('.result-counter');
+        if (resultCounter) {
+            resultCounter.textContent = `${sortedData.length} discussion${sortedData.length !== 1 ? 's' : ''} found`;
+        }
     } catch (error) {
         console.error('Error loading threads:', error);
         threadsContainer.innerHTML = `
@@ -235,6 +264,63 @@ async function loadThreads() {
             </div>
         `;
     }
+}
+
+function sortThreadsByPopularity(threads) {
+    console.log("Sorting by popularity");
+    
+    threads.forEach(thread => {
+        const commentCount = Array.isArray(thread.comments) ? thread.comments.length : 0;
+        console.log(`Thread ID ${thread.id}: ${commentCount} comments, title: ${thread.title}`);
+    });
+    
+    return [...threads].sort((a, b) => {
+        const aComments = Array.isArray(a.comments) ? a.comments.length : 0;
+        const bComments = Array.isArray(b.comments) ? b.comments.length : 0;
+        
+        if (bComments !== aComments) {
+            return bComments - aComments;
+        }
+        
+        return new Date(b.created_at) - new Date(a.created_at);
+    });
+}
+
+function sortThreadsByDate(threads) {
+    console.log("Sorting by date");
+    return [...threads].sort((a, b) => {
+        return new Date(b.created_at) - new Date(a.created_at);
+    });
+}
+
+function sortThreadsByUnanswered(threads) {
+    console.log("Sorting by unanswered");
+    return [...threads].sort((a, b) => {
+        const aHasComments = Array.isArray(a.comments) && a.comments.length > 0;
+        const bHasComments = Array.isArray(b.comments) && b.comments.length > 0;
+        
+        // Threads with no comments should come first
+        if (!aHasComments && bHasComments) {
+            return -1;
+        }
+        if (aHasComments && !bHasComments) {
+            return 1;
+        }
+    
+        return new Date(b.created_at) - new Date(a.created_at);
+    });
+}
+
+function debugThreadData(threads) {
+    console.log("=== Thread Data Debug ===");
+    threads.forEach(thread => {
+        console.log(`Thread ID: ${thread.id}`);
+        console.log(`  Title: ${thread.title}`);
+        console.log(`  Category: ${thread.category}`);
+        console.log(`  Created: ${thread.created_at}`);
+        console.log(`  Comments: ${Array.isArray(thread.comments) ? thread.comments.length : 'N/A'}`);
+        console.log("  ------------------");
+    });
 }
 
 function displayThreads(threads) {

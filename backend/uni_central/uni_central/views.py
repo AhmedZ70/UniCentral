@@ -2,6 +2,7 @@ from django.shortcuts import render, get_object_or_404
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.views import APIView
+from .models import Comment
 from .services import (
     UserService,
     DepartmentService,
@@ -787,6 +788,10 @@ class CourseThreadsAPIView(APIView):
     def get(self, request, course_id):
         search_term = request.GET.get('search', '').strip().lower()
         include_comments = request.GET.get('include_comments', 'true').lower() == 'true'
+        sort_by = request.GET.get('sort_by', 'recent')  
+        filter_by = request.GET.get('filter_by', '') 
+        
+        print(f"Course threads request - search: '{search_term}', sort: '{sort_by}', filter: '{filter_by}', include_comments: {include_comments}")
         
         threads = ThreadService.get_threads_by_course(course_id)
 
@@ -805,13 +810,46 @@ class CourseThreadsAPIView(APIView):
                 
                 if include_comments:
                     comments = CommentService.get_comments_by_thread(thread.id)
-                    
                     comment_match = any(search_term in comment.content.lower() for comment in comments if hasattr(comment, 'content'))
                     
                     if comment_match:
                         filtered_threads.append(thread)
             
             threads = filtered_threads
+            
+        if filter_by and filter_by.lower() != 'all':
+            threads = [t for t in threads if hasattr(t, 'category') and t.category.lower() == filter_by.lower()]
+            print(f"Filtered to {len(threads)} threads with category: {filter_by}")
+            
+        print(f"Applying sort_by: {sort_by}")
+        if sort_by == 'recent':
+            threads = sorted(threads, key=lambda x: x.created_at, reverse=True)
+        elif sort_by == 'popular':
+            thread_comments = {}
+            for thread in threads:
+                comments = Comment.objects.filter(thread=thread)
+                thread_comments[thread.id] = list(comments)
+                print(f"Thread {thread.id} has {len(thread_comments[thread.id])} comments")
+            
+            threads = sorted(
+                threads, 
+                key=lambda x: (len(thread_comments.get(x.id, [])), x.created_at.timestamp() if hasattr(x, 'created_at') else 0),
+                reverse=True
+            )
+        elif sort_by == 'unanswered':
+            thread_comments = {}
+            for thread in threads:
+                comments = Comment.objects.filter(thread=thread)
+                thread_comments[thread.id] = list(comments)
+            
+            threads = sorted(
+                threads, 
+                key=lambda x: (len(thread_comments.get(x.id, [])), -(x.created_at.timestamp() if hasattr(x, 'created_at') else 0))
+            )
+        
+        for thread in threads[:5]:  
+            comment_count = Comment.objects.filter(thread=thread).count()
+            print(f"Thread {thread.id}: '{thread.title}', category: {getattr(thread, 'category', 'N/A')}, comments: {comment_count}")
 
         serialized = ThreadSerializer(threads, many=True)
         return Response(serialized.data)
@@ -824,8 +862,11 @@ class ProfessorThreadsAPIView(APIView):
     def get(self, request, professor_id):
         search_term = request.GET.get('search', '').strip().lower()
         include_comments = request.GET.get('include_comments', 'true').lower() == 'true'
+        sort_by = request.GET.get('sort_by', 'recent')  # Default to recent
+        filter_by = request.GET.get('filter_by', '')  # Category filter
         
-        # Get all threads for this professor
+        print(f"Professor threads request - search: '{search_term}', sort: '{sort_by}', filter: '{filter_by}', include_comments: {include_comments}")
+        
         threads = ThreadService.get_threads_by_professor(professor_id)
 
         if threads is None:
@@ -842,17 +883,51 @@ class ProfessorThreadsAPIView(APIView):
                     continue
                 
                 if include_comments:
-                    comments = CommentService.get_comments_by_thread(thread.id)
+                    comments = CommentService.get_comments_by_thread(thread.id)                    
                     comment_match = any(search_term in comment.content.lower() for comment in comments if hasattr(comment, 'content'))
                     
                     if comment_match:
                         filtered_threads.append(thread)
             
             threads = filtered_threads
+            
+        if filter_by and filter_by.lower() != 'all':
+            threads = [t for t in threads if hasattr(t, 'category') and t.category.lower() == filter_by.lower()]
+            print(f"Filtered to {len(threads)} threads with category: {filter_by}")
+            
+        print(f"Applying sort_by: {sort_by}")
+        if sort_by == 'recent':
+            threads = sorted(threads, key=lambda x: x.created_at, reverse=True)
+        elif sort_by == 'popular':
+            thread_comments = {}
+            for thread in threads:
+                comments = Comment.objects.filter(thread=thread)
+                thread_comments[thread.id] = list(comments)
+                print(f"Thread {thread.id} has {len(thread_comments[thread.id])} comments")
+            
+            threads = sorted(
+                threads, 
+                key=lambda x: (len(thread_comments.get(x.id, [])), x.created_at.timestamp() if hasattr(x, 'created_at') else 0),
+                reverse=True
+            )
+        elif sort_by == 'unanswered':
+            thread_comments = {}
+            for thread in threads:
+                comments = Comment.objects.filter(thread=thread)
+                thread_comments[thread.id] = list(comments)
+            
+            threads = sorted(
+                threads, 
+                key=lambda x: (len(thread_comments.get(x.id, [])), -(x.created_at.timestamp() if hasattr(x, 'created_at') else 0))
+            )
+
+        for thread in threads[:5]:  
+            comment_count = Comment.objects.filter(thread=thread).count()
+            print(f"Thread {thread.id}: '{thread.title}', category: {getattr(thread, 'category', 'N/A')}, comments: {comment_count}")
 
         serialized = ThreadSerializer(threads, many=True)
         return Response(serialized.data)
-
+    
 class CreateThreadAPIView(APIView):
     """
     API View to create a new thread.
