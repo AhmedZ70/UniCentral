@@ -10,6 +10,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
     <script type="module" src="{% static 'js/professor_detail.js' %}"></script>
     <script type="module" src="{% static 'js/auth.js' %}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
     {% include 'partials/navbar.html' %}
@@ -26,6 +27,17 @@
                 <button id="add-professor-btn" class="professor-leave-review-button">Add Professor</button>
                 <a id="discussion-board-btn" href="{% url 'professor_discussion_board' context_id=professor_id %}" class="go-to-discussion-board-button">Discussion Board</a>
             </div>
+
+            <!-- Link to toggle chart visibility -->
+            <a href="#" id="showProfessorChartLink" class="view-grade-distribution-link">View Professor Grade Distribution</a>
+
+            <!-- Canvas where the chart will be rendered -->
+            <canvas id="gradeAverageChart" style="display:none;"></canvas>
+
+            <!-- Message when no grade data is available -->
+            <p id="no-grade-message" style="display: none; font-weight: bold; text-align: center;">
+                No grade distribution available.
+            </p>
         </section>
 
         <!-- Reviews Section -->

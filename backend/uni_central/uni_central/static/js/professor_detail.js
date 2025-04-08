@@ -137,6 +137,77 @@ document.addEventListener("DOMContentLoaded", () => {
                     setupThumbsButtons(review.id, li);
                 });
             }
+            // Prof grade dist.
+            const professorGradeData = { A: 0, B: 0, C: 0, D: 0, F: 0 };
+
+            reviews.forEach((review) => {
+                if (review.grade) {
+                    professorGradeData[review.grade] = (professorGradeData[review.grade] || 0) + 1;
+                }
+            });
+            const showProfessorChartLink = document.getElementById("showProfessorChartLink");
+            const professorChartCanvas = document.getElementById("gradeAverageChart");
+            const noProfessorGradeMessage = document.getElementById("no-grade-message");
+
+            showProfessorChartLink.addEventListener("click", function (event) {
+                event.preventDefault(); // Prevent the link from navigating
+
+                console.log("View Distribution clicked!");
+                // Check if there is no professor grade data
+                if (Object.values(professorGradeData).every(value => value === 0)) {
+                    // Show the message that no grade data is available
+                    noProfessorGradeMessage.style.display = "block";
+                    professorChartCanvas.style.display = "none"; // Hide the chart
+                    showProfessorChartLink.textContent = "View Professor Grade Distribution"; // Reset the link text
+                } else {
+                    // Toggle chart visibility and link text
+                    if (professorChartCanvas.style.display === "none" || professorChartCanvas.style.display === "") {
+                        // Show the chart
+                        professorChartCanvas.style.display = "block";
+                        noProfessorGradeMessage.style.display = "none"; // Hide the "No grade data" message
+
+                        // Change the link text to "Close Chart"
+                        showProfessorChartLink.textContent = "Close Chart";
+
+                        // Create the chart (Pie Chart for grade distribution)
+                        const ctx = professorChartCanvas.getContext('2d');
+
+                        new Chart(ctx, {
+                            type: 'pie',
+                            data: {
+                                labels: Object.keys(professorGradeData),
+                                datasets: [{
+                                    label: 'Professor Grade Distribution',
+                                    data: Object.values(professorGradeData),
+                                    backgroundColor: [
+                                        '#4CAF50', // Dark Green for A
+                                        '#8BC34A', // Lighter Green for A
+                                        '#9C27B0', // Slightly Lighter Green/Purple for B
+                                        '#FFEB3B', // Yellow-green for C
+                                        '#FF9800', // Orange for D
+                                        '#F44336', // Red for F
+                                    ]
+                                }]
+                            },
+                            options: {
+                                responsive: true,
+                                plugins: {
+                                    legend: {
+                                        position: 'top',
+                                    }
+                                }
+                            }
+                        });
+                    } else {
+                        // Hide the chart
+                        professorChartCanvas.style.display = "none";
+                        noProfessorGradeMessage.style.display = "none"; // Hide message when chart is closed
+
+                        // Change the link text back to "View Professor Grade Distribution"
+                        showProfessorChartLink.textContent = "View Professor Grade Distribution";
+                    }
+                }
+            });
         })
         .catch((error) => {
             console.error("Error fetching professor data:", error);

@@ -258,3 +258,34 @@ body {
 .difficulty-circle.filled.red {
     background-color: #F44336; /* Red for high difficulty */
 }
+
+.view-grade-distribution-link {
+    display: inline-block;
+    margin-top: 20px;
+    padding: 10px 20px;
+    background-color: #005a5b;
+    color: white;
+    text-decoration: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.view-grade-distribution-link:hover {
+    background-color: #004e4f;
+}
+
+#gradeAverageChart {
+    width: 300px;
+    height: 300px;
+    display: none; /* Initially hidden */
+    max-width: 100%;
+    margin-top: 20px;
+}
+
+.no-grade-message {
+    display: none;
+    color: #FF0000;
+    font-weight: bold;
+    text-align: center;
+    margin-top: 20px;
+}
