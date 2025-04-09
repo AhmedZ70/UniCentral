@@ -422,3 +422,34 @@ input[type="checkbox"] {
     margin-top: 5px;
   }
 }
+
+/* Chart container styles */
+#chart-container {
+  width: 300px;  /* Adjust the width */
+  height: 200px;  /* Adjust the height */
+  margin: 0 auto;  /* Center the chart container */
+  min-width: 0;  /* Prevent chart from expanding beyond container */
+}
+
+/* Button styling */
+#showChartButton {
+  background-color: #005a5b;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  font-size: 16px;
+  border-radius: 20px;
+  cursor: pointer;
+  font-family: 'Montserrat', sans-serif;
+  transition: background-color 0.3s;
+  display: inline-block;
+  margin-bottom: 10px;
+}
+
+#showChartButton:hover {
+  background-color: #007d7d;
+}
+
+#showChartButton:focus {
+  outline: none;
+}

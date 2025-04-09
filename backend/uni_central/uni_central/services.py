@@ -740,6 +740,14 @@ class ThreadService:
             thread.total_upvotes = total_upvotes
         
         return threads
+    
+    @staticmethod
+    def get_category_thread_count():
+        """
+        Returns the count of threads per category.
+        """
+        category_counts = Thread.objects.values('category').annotate(thread_count=Count('category')).order_by('-thread_count')
+        return category_counts
 
 ############################
 # Comment-Related Services #

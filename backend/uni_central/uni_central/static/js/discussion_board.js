@@ -20,7 +20,81 @@ document.addEventListener('DOMContentLoaded', function() {
     initializeDiscussionBoard();
     loadThreads();
     setupEventListeners();
+    setupShowChartButton();
 });
+
+// Setup the event listener for the "Show Topic Chart" button
+function setupShowChartButton() {
+    const showChartButton = document.getElementById('showChartButton');
+    const chartContainer = document.getElementById('chart-container');
+
+    // Button click handler to toggle chart visibility and render the chart
+    showChartButton.addEventListener('click', function () {
+        toggleChartVisibility(chartContainer, showChartButton);
+        
+        // Render chart only when the container is shown
+        if (chartContainer.style.display === "block") {
+            const categoryCounts = {
+                'General': 12,
+                'Exams': 5,
+                'Homework': 8,
+                'Projects': 3
+            }; // Sample data for demonstration purposes, you should fetch this dynamically
+            renderCategoryChart(categoryCounts);
+        }
+    });
+}
+
+// Toggle the chart visibility and update button text
+function toggleChartVisibility(chartContainer, showChartButton) {
+    if (chartContainer.style.display === "none") {
+        chartContainer.style.display = "block";  // Show chart
+        showChartButton.textContent = "Hide Topic Chart";  // Change button text
+    } else {
+        chartContainer.style.display = "none";  // Hide chart
+        showChartButton.textContent = "Show Topic Chart";  // Reset button text
+    }
+}
+
+// Function to render the category chart (Bar Chart)
+function renderCategoryChart(categoryCounts) {
+    const ctx = document.getElementById('categoryChart').getContext('2d');
+
+    const chartData = {
+        labels: Object.keys(categoryCounts),
+        datasets: [{
+            label: 'Threads by Category',
+            data: Object.values(categoryCounts),
+            backgroundColor: ['#FF743E', '#FFEB3B', '#4CAF50', '#FF9800'],
+            borderColor: '#fff',
+            borderWidth: 1
+        }]
+    };
+
+    const chartOptions = {
+        responsive: true,
+        maintainAspectRatio: false,  // Allows custom size based on container
+        plugins: {
+            legend: {
+                position: 'top',
+            },
+            tooltip: {
+                callbacks: {
+                    label: function (tooltipItem) {
+                        return tooltipItem.raw + ' threads';
+                    }
+                }
+            }
+        }
+    };
+
+    // Create the bar chart
+    new Chart(ctx, {
+        type: 'bar',  // Set chart type to bar
+        data: chartData,
+        options: chartOptions
+    });
+}
 
 function initializeDiscussionBoard() {
     if (!document.querySelector('.discussion-threads')) {
