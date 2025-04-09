@@ -1,8 +1,6 @@
-// Import the auth object and onAuthStateChanged from auth.js
 import { auth, onAuthStateChanged } from './auth.js';
 
 document.addEventListener("DOMContentLoaded", () => {
-    // 1. Grab the course_id from a hidden <input> in the template
     const courseIdInput = document.getElementById("courseId");
     if (!courseIdInput) {
         console.error("No #courseId element found in the DOM!");
@@ -10,55 +8,66 @@ document.addEventListener("DOMContentLoaded", () => {
     }
     const courseId = courseIdInput.value;
 
-    // 2. Get references to DOM elements we want to populate
     const courseTitleEl = document.getElementById("course-title");
     const courseDetailsEl = document.getElementById("course-details");
     const reviewsListEl = document.getElementById("reviews-list");
     const noReviewsMsgEl = document.getElementById("no-reviews-message");
     const enrollBtn = document.getElementById("enroll-btn");
 
-    // 3. Fetch course + reviews data from your Django REST API
     fetch(`/api/courses/${courseId}/reviews/`)
         .then((response) => {
             if (!response.ok) {
                 throw new Error(`Failed to load course data (status ${response.status})`);
             }
-            return response.json(); // data = { course: {...}, reviews: [...] }
+            return response.json(); 
         })
         .then((data) => {
-            // 4. Populate course info
             const course = data.course || {};
             courseTitleEl.textContent = course.title || "Untitled Course";
 
-            // Populate rating stars
             const ratingContainer = document.getElementById("course-rating");
             ratingContainer.appendChild(createRatingStars(course.avg_rating));
 
-            // Populate difficulty circles
             const difficultyContainer = document.getElementById("course-difficulty");
             difficultyContainer.appendChild(createDifficultyCircles(course.avg_difficulty));
 
-            // Populate other course details
             document.getElementById("course-subject").textContent = course.subject || "N/A";
             document.getElementById("course-credits").textContent = course.credits || "N/A";
             document.getElementById("course-semester").textContent = course.semester || "Not specified";
             document.getElementById("course-grade").textContent = course.grade || "N/A";
 
-            // 5. Populate reviews list
             const reviews = data.reviews || [];
             if (reviews.length === 0) {
                 noReviewsMsgEl.style.display = "block";
             } else {
                 noReviewsMsgEl.style.display = "none";
-                reviewsListEl.innerHTML = ""; // clear any existing content
+                reviewsListEl.innerHTML = ""; 
 
                 reviews.forEach((review) => {
                     const li = document.createElement("li");
                     li.classList.add("review-item");
 
+                    let reviewAuthor;
+                    if (review.is_anonymous === true || review.is_anonymous === 'true') {
+                        reviewAuthor = "Anonymous";
+                        console.log('Attribution Reason: Review marked as anonymous');
+                    } else {
+                        const firstName = review.user?.fname || '';
+                        const lastName = review.user?.lname || '';
+                        reviewAuthor = (firstName + ' ' + lastName).trim() || "Anonymous";
+                        
+                        console.log('Attribution Details:', {
+                            firstName: firstName,
+                            lastName: lastName,
+                            constructedName: reviewAuthor
+                        });
+                    }
+
+                    console.log('Final Determined Review Author:', reviewAuthor);
+
                     li.innerHTML = `
                         <div class="review-header">
-                            <strong>Review by: anonymous</strong>
+                            <strong>Review by: ${reviewAuthor}</strong>
                             <span>Grade: ${review.grade || "Not provided"}</span>
                         </div>
                         <div class="review-content">
@@ -138,7 +147,7 @@ document.addEventListener("DOMContentLoaded", () => {
             const noGradeMessage = document.getElementById("no-grade-message");  // Add the message element
 
             showChartLink.addEventListener("click", function (event) {
-                event.preventDefault(); // Prevent the link from navigating
+                event.preventDefault(); 
 
                 // Check if there is no grade data
                 if (Object.values(gradeData).every(value => value === 0)) {
@@ -242,7 +251,6 @@ document.addEventListener("DOMContentLoaded", () => {
                         .then((data) => {
                             if (data.message) {
                                 alert(data.message);
-                                // Toggle button text
                                 enrollBtn.textContent = isEnrolled ? "Enroll" : "Unenroll";
                             } else if (data.error) {
                                 alert(data.error);

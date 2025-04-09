@@ -123,29 +123,27 @@ class ReviewService:
         Returns:
             Review: The created review object.
         """
-        # 1. Fetch the course
         course = CourseService.get_course(course_id)
-
-        # 2. Fetch the professor if provided
         professor_id = review_data.get('professor')
         professor = get_object_or_404(Professor, id=professor_id) if professor_id else None
-
-        # 3. Create the Review, carefully converting fields
+        is_anonymous = review_data.get('is_anonymous')
+            
+        if isinstance(is_anonymous, str):
+            is_anonymous = is_anonymous.lower() == 'true'
+        else:
+            is_anonymous = bool(is_anonymous)
         review = Review.objects.create(
             user=user,
             course=course,
             professor=professor,
             
-            # Text / string fields
             review=review_data.get('review'),
             grade=review_data.get('grade'),
 
-            # Numeric fields (convert strings to float/int, or None if empty)
             rating=float(review_data.get('rating')) if review_data.get('rating') else None,
             difficulty=int(review_data.get('difficulty')) if review_data.get('difficulty') else None,
             estimated_hours=float(review_data.get('estimated_hours')) if review_data.get('estimated_hours') else None,
 
-            # Boolean fields (check if the string is 'true')
             would_take_again=(review_data.get('would_take_again') == 'true'),
             for_credit=(review_data.get('for_credit') == 'true'),
             mandatory_attendance=(review_data.get('mandatory_attendance') == 'true'),
@@ -156,6 +154,7 @@ class ReviewService:
             hybrid=(review_data.get('hybrid') == 'true'),
             no_exams=(review_data.get('no_exams') == 'true'),
             presentations=(review_data.get('presentations') == 'true'),
+            is_anonymous=is_anonymous,
         )
 
         course.update_averages()
@@ -174,6 +173,13 @@ class ReviewService:
         # Fetch the course if provided
         course_id = review_data.get("course")
         course = get_object_or_404(Course, id=course_id) if course_id else None
+        is_anonymous = review_data.get('is_anonymous')
+            
+        if isinstance(is_anonymous, str):
+            is_anonymous = is_anonymous.lower() == 'true'
+        else:
+            # Handle None or other non-boolean values
+            is_anonymous = bool(is_anonymous)
 
         # Create the Review object
         review = Review.objects.create(
@@ -199,7 +205,8 @@ class ReviewService:
             hybrid=review_data.get("hybrid") == "true",
             no_exams=review_data.get("no_exams") == "true",
             presentations=review_data.get("presentations") == "true",
-        )
+            is_anonymous=is_anonymous,        
+            )
 
         professor.update_averages()
         if course:

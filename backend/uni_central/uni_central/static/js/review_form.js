@@ -55,11 +55,33 @@ document.addEventListener("DOMContentLoaded", () => {
     // Replace numeric inputs with interactive selectors
     createInteractiveRatingSelector();
     createInteractiveDifficultySelector();
+    
+    // Create the anonymous review option
+    createAnonymousReviewOption();
   
     // Handle form submission
     const submitBtn = document.getElementById("submitReviewBtn");
     submitBtn.addEventListener("click", (e) => {
+        if (!submitBtn) {
+            console.error("Submit button not found!");
+            return;
+        }   
         e.preventDefault();
+
+        let isAnonymous = false;
+        const anonymousCheckbox = document.getElementById("anonymousReview");
+        console.log("Anonymous Checkbox Element:", anonymousCheckbox);
+        console.log("Is Anonymous Checked:", anonymousCheckbox.checked);
+        console.log("Anonymous Checkbox Value:", anonymousCheckbox.value);
+        
+        if (anonymousCheckbox) {
+            isAnonymous = anonymousCheckbox.checked;
+            console.log("Anonymous Checkbox Found:", anonymousCheckbox);
+            console.log("Is Anonymous Checked:", isAnonymous);
+        } else {
+            console.error("Anonymous checkbox not found in the DOM!");
+        }
+        
         // Get field values
         const reviewText = document.getElementById("reviewText").value.trim();
         const rating = document.getElementById("rating").value.trim();
@@ -126,6 +148,7 @@ document.addEventListener("DOMContentLoaded", () => {
             hybrid: document.getElementById("hybrid").checked,
             no_exams: document.getElementById("noExams").checked,
             presentations: document.getElementById("presentations").checked,
+            is_anonymous: document.getElementById("anonymousReview").checked,
 
             email_address: userEmail
         };
@@ -320,15 +343,69 @@ function createInteractiveDifficultySelector() {
         circlesContainer.appendChild(circle);
     }
     
-    // Assemble the components
     difficultyContainer.appendChild(difficultyTitle);
     difficultyContainer.appendChild(circlesContainer);
     difficultyContainer.appendChild(helpText);
     
-    // Replace the original input with our interactive version
     const difficultyParent = difficultyInput.parentNode;
     difficultyParent.insertBefore(difficultyContainer, difficultyInput);
     
-    // Hide the original input but keep it in the DOM for form submission
     difficultyInput.style.display = 'none';
+}
+
+function createAnonymousReviewOption() {
+    // Create container for the anonymous review option
+    const anonymousContainer = document.createElement('div');
+    anonymousContainer.className = 'form-check review-option-container mb-3';
+    
+    // Create input checkbox
+    const anonymousInput = document.createElement('input');
+    anonymousInput.type = 'checkbox';
+    anonymousInput.className = 'form-check-input';
+    anonymousInput.id = 'anonymousReview';
+    anonymousInput.name = 'anonymousReview';
+    // Set default value to ensure it's initialized properly
+    anonymousInput.value = "true";
+    
+    // Create label
+    const anonymousLabel = document.createElement('label');
+    anonymousLabel.className = 'form-check-label ms-2';
+    anonymousLabel.htmlFor = 'anonymousReview';
+    anonymousLabel.textContent = 'Make this review anonymous';
+    
+    // Create help text
+    const helpText = document.createElement('small');
+    helpText.className = 'form-text text-muted d-block mt-1';
+    helpText.textContent = 'When checked, your name will not be displayed with this review';
+    
+    // Assemble components
+    anonymousContainer.appendChild(anonymousInput);
+    anonymousContainer.appendChild(anonymousLabel);
+    anonymousContainer.appendChild(document.createElement('br'));
+    anonymousContainer.appendChild(helpText);
+    
+    const submitBtn = document.getElementById('submitReviewBtn');
+    
+    if (!submitBtn || !submitBtn.parentNode) {
+        console.error("Cannot find submit button or its parent node");
+        const form = document.querySelector('form');
+        if (form) {
+            form.appendChild(anonymousContainer);
+        } else {
+            document.body.appendChild(anonymousContainer);
+        }
+        return;
+    }
+    
+    const submitBtnParent = submitBtn.parentNode;
+    
+    const separator = document.createElement('hr');
+    separator.className = 'mt-3 mb-3';
+    
+    submitBtnParent.insertBefore(separator, submitBtn);
+    submitBtnParent.insertBefore(anonymousContainer, submitBtn);
+    
+    anonymousInput.addEventListener('change', () => {
+        console.log("Anonymous checkbox changed:", anonymousInput.checked);
+    });
 }

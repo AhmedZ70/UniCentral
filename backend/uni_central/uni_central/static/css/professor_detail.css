@@ -174,7 +174,7 @@ body {
     font-weight: 600;
 }
 
-.professor-leave-review-button, #add-professor-btn, #discussion-board-btn {
+.professor-leave-review-button, .view-grade-distribution-link, #add-professor-btn, #discussion-board-btn {
     display: inline-block;
     margin-top: 20px;
     padding: 12px 25px;
@@ -190,7 +190,7 @@ body {
     cursor: pointer;
 }
 
-.professor-leave-review-button:hover, #add-professor-btn:hover, #discussion-board-btn:hover {
+.professor-leave-review-button:hover, .view-grade-distribution-link:hover, #add-professor-btn:hover, #discussion-board-btn:hover {
     background-color: #004e4f;
     transform: translateY(-2px);
     box-shadow: 0 5px 15px rgba(0, 90, 91, 0.3);
@@ -260,18 +260,8 @@ body {
 }
 
 .view-grade-distribution-link {
-    display: inline-block;
-    margin-top: 20px;
-    padding: 10px 20px;
-    background-color: #005a5b;
-    color: white;
-    text-decoration: none;
-    border-radius: 5px;
-    cursor: pointer;
-}
-
-.view-grade-distribution-link:hover {
-    background-color: #004e4f;
+    display: inline-flex;
+    align-items: center;
 }
 
 #gradeAverageChart {

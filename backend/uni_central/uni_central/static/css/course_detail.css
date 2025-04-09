@@ -268,7 +268,7 @@ body, html, ul, li, p, h1, h2, select {
     font-weight: 600;
 }
 
-.leave-review-button, #enroll-btn, #discussion-board-btn {
+.leave-review-button, .view-grade-distribution-link, #enroll-btn, #discussion-board-btn {
     display: inline-block;
     margin-top: 20px;
     padding: 12px 25px;
@@ -284,7 +284,7 @@ body, html, ul, li, p, h1, h2, select {
     font-size: 18px;
 }
 
-.leave-review-button:hover, #enroll-btn:hover, #discussion-board-btn:hover {
+.leave-review-button:hover,.view-grade-distribution-link:hover, #enroll-btn:hover, #discussion-board-btn:hover {
     background-color: #004e4f;
     transform: translateY(-2px);
     box-shadow: 0 5px 15px rgba(0, 90, 91, 0.3);
@@ -369,21 +369,6 @@ body, html, ul, li, p, h1, h2, select {
     display: none; /* Initially hide the chart */
     max-width: 100%;  /* Allow responsiveness */
     margin-top: 20px;
-}
-
-.view-grade-distribution-link {
-    display: inline-block;
-    margin-top: 20px;
-    padding: 10px 20px;
-    background-color: #005a5b;
-    color: white;
-    text-decoration: none;
-    border-radius: 5px;
-    cursor: pointer;
-}
-
-.view-grade-distribution-link:hover {
-    background-color: #004e4f;
 }
 
 body {
