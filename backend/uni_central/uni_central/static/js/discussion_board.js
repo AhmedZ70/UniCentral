@@ -20,7 +20,86 @@ document.addEventListener('DOMContentLoaded', function() {
     initializeDiscussionBoard();
     loadThreads();
     setupEventListeners();
+    setupShowChartButton();
 });
+
+function setupShowChartButton() {
+    const showChartButton = document.getElementById('showChartButton');
+    const chartContainer = document.getElementById('chart-container');
+    const ctx = document.getElementById('categoryChart').getContext('2d');  // Get the canvas context
+
+    // Button click handler to toggle chart visibility and render the chart
+    showChartButton.addEventListener('click', function () {
+        // Toggle chart visibility and update button text
+        if (chartContainer.style.display === "none") {
+            chartContainer.style.display = "block";  // Show chart
+            showChartButton.textContent = "Hide Topic Chart";  // Change button text
+
+            // Fetch category counts dynamically and render the chart
+            const contextId = document.body.dataset.contextId;  // Get the course ID from the body tag
+
+            fetch(`/api/courses/${contextId}/category-counts/`)  // Fetch data from server
+                .then(response => response.json())
+                .then(categoryCounts => {
+                    renderCategoryChart(categoryCounts);  // Render the chart with the fetched data
+                })
+                .catch(error => {
+                    console.error("Error fetching category data:", error);
+                    // Fallback data in case of an error
+                    const fallbackCategoryCounts = {
+                        'General': 0,
+                        'Exams': 0,
+                        'Homework': 0,
+                        'Projects': 0
+                    };
+                    renderCategoryChart(fallbackCategoryCounts);  // Render the fallback chart
+                });
+        } else {
+            chartContainer.style.display = "none";  // Hide chart
+            showChartButton.textContent = "Show Topic Chart";  // Reset button text
+        }
+    });
+}
+
+// Function to render the category chart (Bar Chart)
+function renderCategoryChart(categoryCounts) {
+    const ctx = document.getElementById('categoryChart').getContext('2d');
+
+    const chartData = {
+        labels: Object.keys(categoryCounts),
+        datasets: [{
+            label: 'Threads by Category',
+            data: Object.values(categoryCounts),
+            backgroundColor: ['#FF743E', '#FFEB3B', '#4CAF50', '#FF9800'],
+            borderColor: '#fff',
+            borderWidth: 1
+        }]
+    };
+
+    const chartOptions = {
+        responsive: true,
+        maintainAspectRatio: false,  // Allows custom size based on container
+        plugins: {
+            legend: {
+                position: 'top',
+            },
+            tooltip: {
+                callbacks: {
+                    label: function (tooltipItem) {
+                        return tooltipItem.raw + ' threads';
+                    }
+                }
+            }
+        }
+    };
+
+    // Create the bar chart
+    new Chart(ctx, {
+        type: 'bar',  // Set chart type to bar
+        data: chartData,
+        options: chartOptions
+    });
+}
 
 function initializeDiscussionBoard() {
     if (!document.querySelector('.discussion-threads')) {

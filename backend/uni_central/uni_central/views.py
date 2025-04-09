@@ -1059,6 +1059,15 @@ class ThreadSearchAPIView(APIView):
             'threads': serialized.data,
             'total_count': len(threads)
         })
+        
+class CategoryCountsView(APIView):
+    """
+    View to get the category counts for a specific course.
+    """
+    def get(self, request, course_id):
+        # Call the service to get category counts
+        category_counts = ThreadService.get_category_counts(course_id)
+        return JsonResponse(category_counts)
     
 ##########################
 # Comment Views and APIs #

@@ -744,6 +744,15 @@ class ThreadService:
             thread.total_upvotes = total_upvotes
         
         return threads
+    
+    @staticmethod
+    def get_category_counts(course_id):
+        """
+        Fetch the count of threads by category for a specific course.
+        """
+        categories = ['general', 'exams', 'homework', 'projects']
+        counts = {category: Thread.objects.filter(course_id=course_id, category=category).count() for category in categories}
+        return counts
 
 ############################
 # Comment-Related Services #
