@@ -26,80 +26,94 @@ document.addEventListener('DOMContentLoaded', function() {
 function setupShowChartButton() {
     const showChartButton = document.getElementById('showChartButton');
     const chartContainer = document.getElementById('chart-container');
-    const ctx = document.getElementById('categoryChart').getContext('2d');  // Get the canvas context
+    const chartCanvas = document.getElementById('categoryChart');
+    const ctx = chartCanvas.getContext('2d');
 
-    // Button click handler to toggle chart visibility and render the chart
+    // Create or select a message element for empty chart
+    let noDataMessage = document.getElementById('no-topic-message');
+    if (!noDataMessage) {
+        noDataMessage = document.createElement('p');
+        noDataMessage.id = 'no-topic-message';
+        noDataMessage.style.display = 'none';
+        noDataMessage.style.fontWeight = 'bold';
+        noDataMessage.style.textAlign = 'center';
+        noDataMessage.style.color = '#666';
+        chartContainer.appendChild(noDataMessage);
+    }
+
+    // Track existing chart instance to destroy before rendering again
+    let currentChart = null;
+
     showChartButton.addEventListener('click', function () {
-        // Toggle chart visibility and update button text
         if (chartContainer.style.display === "none") {
-            chartContainer.style.display = "block";  // Show chart
-            showChartButton.textContent = "Hide Topic Chart";  // Change button text
+            chartContainer.style.display = "block";
+            showChartButton.textContent = "Hide Topic Chart";
 
-            // Fetch category counts dynamically and render the chart
-            const contextId = document.body.dataset.contextId;  // Get the course ID from the body tag
+            const contextId = document.body.dataset.contextId;
 
-            fetch(`/api/courses/${contextId}/category-counts/`)  // Fetch data from server
+            fetch(`/api/courses/${contextId}/category-counts/`)
                 .then(response => response.json())
                 .then(categoryCounts => {
-                    renderCategoryChart(categoryCounts);  // Render the chart with the fetched data
+                    const hasData = Object.values(categoryCounts).some(count => count > 0);
+
+                    if (!hasData) {
+                        chartCanvas.style.display = "none";
+                        noDataMessage.textContent = "No topic information available.";
+                        noDataMessage.style.display = "block";
+                        return;
+                    }
+
+                    noDataMessage.style.display = "none";
+                    chartCanvas.style.display = "block";
+
+                    if (currentChart) {
+                        currentChart.destroy();
+                    }
+
+                    currentChart = new Chart(ctx, {
+                        type: 'bar',
+                        data: {
+                            labels: Object.keys(categoryCounts),
+                            datasets: [{
+                                label: 'Threads by Category',
+                                data: Object.values(categoryCounts),
+                                backgroundColor: ['#FF743E', '#FFEB3B', '#4CAF50', '#FF9800'],
+                                borderColor: '#fff',
+                                borderWidth: 1
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: {
+                                    position: 'top',
+                                },
+                                tooltip: {
+                                    callbacks: {
+                                        label: function (tooltipItem) {
+                                            return tooltipItem.raw + ' threads';
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    });
                 })
                 .catch(error => {
                     console.error("Error fetching category data:", error);
-                    // Fallback data in case of an error
-                    const fallbackCategoryCounts = {
-                        'General': 0,
-                        'Exams': 0,
-                        'Homework': 0,
-                        'Projects': 0
-                    };
-                    renderCategoryChart(fallbackCategoryCounts);  // Render the fallback chart
+                    chartCanvas.style.display = "none";
+                    noDataMessage.textContent = "Failed to load topic information.";
+                    noDataMessage.style.display = "block";
                 });
+
         } else {
-            chartContainer.style.display = "none";  // Hide chart
-            showChartButton.textContent = "Show Topic Chart";  // Reset button text
+            chartContainer.style.display = "none";
+            showChartButton.textContent = "Show Topic Chart";
         }
     });
 }
 
-// Function to render the category chart (Bar Chart)
-function renderCategoryChart(categoryCounts) {
-    const ctx = document.getElementById('categoryChart').getContext('2d');
-
-    const chartData = {
-        labels: Object.keys(categoryCounts),
-        datasets: [{
-            label: 'Threads by Category',
-            data: Object.values(categoryCounts),
-            backgroundColor: ['#FF743E', '#FFEB3B', '#4CAF50', '#FF9800'],
-            borderColor: '#fff',
-            borderWidth: 1
-        }]
-    };
-
-    const chartOptions = {
-        responsive: true,
-        maintainAspectRatio: false,  // Allows custom size based on container
-        plugins: {
-            legend: {
-                position: 'top',
-            },
-            tooltip: {
-                callbacks: {
-                    label: function (tooltipItem) {
-                        return tooltipItem.raw + ' threads';
-                    }
-                }
-            }
-        }
-    };
-
-    // Create the bar chart
-    new Chart(ctx, {
-        type: 'bar',  // Set chart type to bar
-        data: chartData,
-        options: chartOptions
-    });
-}
 
 function initializeDiscussionBoard() {
     if (!document.querySelector('.discussion-threads')) {
