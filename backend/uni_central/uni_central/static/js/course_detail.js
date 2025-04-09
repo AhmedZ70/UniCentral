@@ -132,44 +132,46 @@ document.addEventListener("DOMContentLoaded", () => {
                 });
             }
             // 6. Handle Grade Distribution Chart
-            const gradeData = { A: 0, B: 0, C: 0, D: 0, F: 0 };
+            let gradeChart = null;
 
+            const gradeData = { A: 0, B: 0, C: 0, D: 0, F: 0 };
+            
             // Calculate grade distribution based on reviews
             reviews.forEach((review) => {
                 if (review.grade) {
                     gradeData[review.grade] = (gradeData[review.grade] || 0) + 1;
                 }
             });
-
-            // Add event listener to show/hide the chart and toggle link text
+            
             const showChartLink = document.getElementById("showChartLink");
             const chartCanvas = document.getElementById("gradeAverageChart");
-            const noGradeMessage = document.getElementById("no-grade-message");  // Add the message element
-
+            const chartContainer = document.getElementById("chart-container");
+            const noGradeMessage = document.getElementById("no-grade-message");
+            
             showChartLink.addEventListener("click", function (event) {
-                event.preventDefault(); 
-
-                // Check if there is no grade data
+                event.preventDefault();
+            
                 if (Object.values(gradeData).every(value => value === 0)) {
-                    // Show the message that no grade data is available
-                    noGradeMessage.style.display = "block";  // Show message
-                    chartCanvas.style.display = "none";     // Hide the chart
-                    showChartLink.textContent = "View Grade Distribution"; // Reset the link text
+                    noGradeMessage.style.display = "block";
+                    chartContainer.style.display = "none";
+                    showChartLink.textContent = "View Grade Distribution";
                 } else {
                     // Toggle chart visibility and link text
-                    if (chartCanvas.style.display === "none" || chartCanvas.style.display === "") {
-                        // Show the chart
-                        chartCanvas.style.display = "block"; // Make the chart visible
-                        noGradeMessage.style.display = "none"; // Hide the "No grade data" message
-
-                        // Change the link text to "Close Chart"
+                    if (chartContainer.style.display === "none" || chartContainer.style.display === "") {
+                        chartContainer.style.display = "block";
+                        noGradeMessage.style.display = "none";
+            
                         showChartLink.textContent = "Close Chart";
-
+            
+                        // Destroy the previous chart if it exists
+                        if (gradeChart) {
+                            gradeChart.destroy();
+                        }
+            
                         // Create the chart (Pie Chart for grade distribution)
                         const ctx = chartCanvas.getContext('2d');
-
-                        // Create the chart (Pie Chart for grade distribution)
-                        new Chart(ctx, {
+            
+                        gradeChart = new Chart(ctx, {
                             type: 'pie',
                             data: {
                                 labels: Object.keys(gradeData),
@@ -183,12 +185,12 @@ document.addEventListener("DOMContentLoaded", () => {
                                         '#FFEB3B', // Yellow-green for C
                                         '#FF9800', // Orange for D
                                         '#F44336', // Red for F (or E)
-                                        '#9E9E9E', // Gray for F/E
                                     ]
                                 }]
                             },
                             options: {
                                 responsive: true,
+                                maintainAspectRatio: false,
                                 plugins: {
                                     legend: {
                                         position: 'top',
@@ -197,15 +199,13 @@ document.addEventListener("DOMContentLoaded", () => {
                             }
                         });
                     } else {
-                        // Hide the chart
-                        chartCanvas.style.display = "none";
-                        noGradeMessage.style.display = "none"; // Hide message when chart is closed
-
-                        // Change the link text back to "View Grade Distribution"
+                        chartContainer.style.display = "none";
+                        noGradeMessage.style.display = "none";
+            
                         showChartLink.textContent = "View Grade Distribution";
                     }
                 }
-            });
+            });            
         })
         .catch((error) => {
             console.error("Error fetching course data:", error);

@@ -423,15 +423,14 @@ input[type="checkbox"] {
   }
 }
 
-/* Chart container styles */
+/* Chart code */
 #chart-container {
-  width: 300px;  /* Adjust the width */
-  height: 200px;  /* Adjust the height */
-  margin: 0 auto;  /* Center the chart container */
-  min-width: 0;  /* Prevent chart from expanding beyond container */
+  width: 50%;
+  height: 250px;
+  margin: 0 auto;
+  min-width: 0;
 }
 
-/* Button styling */
 #showChartButton {
   background-color: #005a5b;
   color: white;
