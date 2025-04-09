@@ -1,16 +1,10 @@
-/* ============================================= */
-/* Courses Page Styles                            */
-/* ============================================= */
-
-/* Base Styles for Containers */
 #departments-title, #courses-title {
     margin-top: 2rem;
     font-size: 1.5rem;
     font-weight: bold;
-    padding-left: 50px; /* Ensure proper spacing from the left */
+    padding-left: 50px; 
   }
   
-  /* Visibility Classes */
   .hidden {
     display: none;
   }
@@ -21,7 +15,6 @@
     transition: opacity 0.3s ease;
   }
   
-  /* Fade Transitions */
   .fade-in {
     opacity: 1;
     transition: opacity 0.3s ease;
@@ -32,7 +25,6 @@
     transition: opacity 0.3s ease;
   }
   
-  /* Letter Headers */
   .letter-header {
     display: block;
     font-weight: bold;
@@ -41,12 +33,10 @@
     color: #ff743e;
   }
   
-  /* Letter Group */
   .letter-group {
     margin-bottom: 0;
   }
   
-  /* Breadcrumb Link Styles */
   .breadcrumb-link {
     color: #ff743e;
     text-decoration: none;
@@ -59,12 +49,11 @@
     text-decoration: underline;
   }
   
-  /* Course Item Styles */
   .course-item {
     border: 2px solid #ff743e;
     border-radius: 8px;
     padding: 10px;
-    margin-bottom: 20px; /* Consistent bottom margin */
+    margin-bottom: 20px; 
     color: #333;
     transition: background-color 0.3s ease;
     background-color: #fff;
@@ -77,7 +66,6 @@
     color: #fff;
   }
   
-  /* Courses Header */
   .courses-header {
     display: flex;
     justify-content: center;
@@ -93,7 +81,6 @@
     line-height: 1;
   }
   
-  /* University Select Dropdown */
   .university-select {
     padding: 0.5rem 1rem;
     font-size: 1rem;
@@ -104,7 +91,6 @@
     line-height: 1.5;
   }
   
-  /* Section Headers */
   .courses-page h1 {
     font-size: 2.5rem;
     color: #ff743e;
@@ -117,7 +103,6 @@
     margin: 2rem 0 1rem 0;
   }
   
-  /* Department Link Styling */
   .department-link {
     text-decoration: none;
     color: inherit;
@@ -128,7 +113,6 @@
     cursor: pointer;
   }
   
-  /* Departments Container */
   .departments {
     max-width: 100%;
     margin: 2rem auto;
@@ -136,7 +120,6 @@
     padding-left: 50px;
   }
   
-  /* Departments Grouping */
   .department-container {
     display: flex;
     flex-wrap: wrap;
@@ -145,7 +128,6 @@
     margin-left: 0;
   }
   
-  /* Department Card */
   .department {
     width: 160px;
     height: 130px;
@@ -168,19 +150,13 @@
     font-weight: bold;
   }
   
-  /* ============================================= */
-  /* Courses Container                              */
-  /* ============================================= */
   .courses {
     max-width: 800px;
     margin: 0 auto;
     padding: 0 20px;
     overflow: hidden;
   }
-  
-  /* ============================================= */
-  /* Courses List                                   */
-  /* ============================================= */
+
   .courses-list {
     list-style: none;
     padding: 0;
@@ -241,9 +217,6 @@
   transform: scale(1.3); 
 }
   
-  /* ============================================= */
-  /* Responsive Queries                             */
-  /* ============================================= */
   @media (max-width: 768px) {
     .courses-header {
       flex-direction: column;
@@ -298,3 +271,75 @@
       font-size: 0.9rem;
     }
   }
+
+  .course-search-container {
+    margin: 20px auto;
+    width: 100%; 
+    max-width: 800px;
+    position: relative;
+    padding: 0 20px;
+    display: flex;
+    justify-content: center; 
+}
+
+.course-search-input {
+    width: 100%;
+    padding: 12px 20px;
+    box-sizing: border-box;
+    font-size: 16px;
+    border: 2px solid #005a5b;
+    border-radius: 20px;
+    font-family: 'Montserrat', sans-serif;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+}
+
+.course-search-input:focus {
+    outline: none;
+    border-color: #4a90e2;
+    box-shadow: 0 2px 10px rgba(74, 144, 226, 0.2);
+}
+
+.course-search-input::placeholder {
+    color: #999;
+}
+
+.no-search-results {
+    padding: 20px;
+    text-align: center;
+    color: #666;
+    font-size: 16px;
+    background-color: #f8f8f8;
+    border-radius: 8px;
+    margin: 20px 0;
+}
+
+.course-item {
+    transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.course-link {
+    animation: fadeIn 0.3s ease forwards;
+}
+
+@media (max-width: 768px) {
+    .course-search-container {
+        max-width: 100%;
+    }
+    
+    .course-search-input {
+        padding: 10px 15px;
+        font-size: 14px;
+    }
+}

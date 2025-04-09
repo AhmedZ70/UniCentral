@@ -1,14 +1,5 @@
-/**
- * This file handles the logic for displaying a list of departments and their associated courses. 
- * It fetches department data from the server, renders them in a categorized manner (by first letter), 
- * and provides a mechanism to navigate into each department to fetch and display its courses. 
- * Users can also navigate back to the list of departments from the courses view.
- */
-
 document.addEventListener("DOMContentLoaded", () => {
-    // ------------------------------------------------------------------------
-    // [Section 1: Setup constants and initial UI state]
-    // ------------------------------------------------------------------------
+
     const departmentsApiUrl = "/api/departments/";
     const departmentsContainer = document.getElementById("departments");
     const coursesContainer = document.getElementById("courses");
@@ -23,9 +14,27 @@ document.addEventListener("DOMContentLoaded", () => {
     departmentsContainer.classList.add("visible");
     coursesContainer.classList.add("hidden");
 
-    // ------------------------------------------------------------------------
-    // [Section 2: Fetch and Display Departments]
-    // ------------------------------------------------------------------------
+    const searchContainer = document.createElement("div");
+    searchContainer.id = "course-search-container";
+    searchContainer.className = "course-search-container";
+    searchContainer.style.display = "none"; 
+
+    const searchInput = document.createElement("input");
+    searchInput.type = "text";
+    searchInput.id = "course-search-input";
+    searchInput.className = "course-search-input";
+    searchInput.placeholder = "Search courses...";
+
+    searchContainer.appendChild(searchInput);
+    coursesContainer.parentNode.insertBefore(searchContainer, coursesContainer);
+
+    const noResultsEl = document.createElement("div");
+    noResultsEl.id = "no-search-results";
+    noResultsEl.className = "no-search-results";
+    noResultsEl.style.display = "none";
+    noResultsEl.textContent = "No courses match your search.";
+    coursesContainer.parentNode.insertBefore(searchContainer, coursesContainer);
+
     fetch(departmentsApiUrl)
         .then((response) => response.json())
         .then((data) => {
@@ -38,9 +47,6 @@ document.addEventListener("DOMContentLoaded", () => {
                 "<p>Failed to load departments. Please try again later.</p>";
         });
 
-    // ------------------------------------------------------------------------
-    // [Function: Create Alphabet Navigation]
-    // ------------------------------------------------------------------------
     function createAlphabetNav(departments) {
         const firstLetters = new Set(
             departments.map(dept => dept.name.charAt(0).toUpperCase())
@@ -75,9 +81,6 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    // ------------------------------------------------------------------------
-    // [Function: Render Departments]
-    // ------------------------------------------------------------------------
     function renderDepartments(departments) {
         if (!departments || departments.length === 0) {
             departmentsContainer.innerHTML = "<p>No departments available.</p>";
@@ -138,29 +141,23 @@ document.addEventListener("DOMContentLoaded", () => {
 
     let cachedCourses = {};
 
-    // ------------------------------------------------------------------------
-    // [Function: Show Courses for a Selected Department]
-    // ------------------------------------------------------------------------
     async function showCourses(departmentId, departmentName) {
         console.log("==== SHOW COURSES STARTED ====");
         console.log(`Department: ${departmentName} (ID: ${departmentId})`);
         
-        // Use the correct variables (departmentsContainer and coursesContainer)
-        console.log("Alphabet bar visibility:", alphabetNavContainer.style.display);
-        console.log("Departments container visibility:", window.getComputedStyle(departmentsContainer).display);
-        console.log("Courses container visibility:", window.getComputedStyle(coursesContainer).display);
-        
-        // Hide alphabet navigation
         alphabetNavContainer.style.display = 'none';
         
-        // Use the correct variables for visibility toggling
-        departmentsContainer.style.display = 'none';  // Not departmentsView
-        coursesContainer.style.display = 'block';     // Not coursesView
+        searchContainer.style.display = 'block';
         
-        // Rest of your function...
+        searchInput.value = '';
+        noResultsEl.style.display = 'none';
+        
+        departmentsContainer.style.display = 'none';
+        coursesContainer.style.display = 'block';
         
         if (cachedCourses[departmentId]) {
-            renderCourses(cachedCourses[departmentId], departmentName);
+            currentDepartmentCourses = cachedCourses[departmentId];
+            renderCourses(currentDepartmentCourses, departmentName);
             return;
         }
     
@@ -171,6 +168,7 @@ document.addEventListener("DOMContentLoaded", () => {
             }
             const courses = await response.json();
             cachedCourses[departmentId] = courses;
+            currentDepartmentCourses = courses;
             renderCourses(courses, departmentName);
             
             console.log("==== AFTER RENDERING COURSES ====");
@@ -179,33 +177,31 @@ document.addEventListener("DOMContentLoaded", () => {
             console.log("Courses container visibility:", window.getComputedStyle(coursesContainer).display);
         } catch (error) {
             console.error("Error fetching courses:", error);
+            currentDepartmentCourses = [];
             renderCourses([], departmentName);
         }
     }
 
-    // ------------------------------------------------------------------------
-    // [Function: Render Courses in the UI]
-    // ------------------------------------------------------------------------
     function renderCourses(courses, departmentName) {
         window.scrollTo(0, 0);
-    console.log("Rendering courses for department:", departmentName, courses);
-    
-    if (!breadcrumbContainer) {
-        console.error("breadcrumbContainer is null!");
-        return;
-    }
-    
-    breadcrumbContainer.innerHTML = `
-        <a href="#" id="show-departments" class="breadcrumb-link">Departments</a> / ${departmentName}
-    `;
-    
-    if (!coursesContainer) {
-        console.error("coursesContainer is null!");
-        return;
-    }
-    
-    coursesContainer.innerHTML = "";
-    
+        console.log("Rendering courses for department:", departmentName, courses);
+        
+        if (!breadcrumbContainer) {
+            console.error("breadcrumbContainer is null!");
+            return;
+        }
+        
+        breadcrumbContainer.innerHTML = `
+            <a href="#" id="show-departments" class="breadcrumb-link">Departments</a> / ${departmentName}
+        `;
+        
+        if (!coursesContainer) {
+            console.error("coursesContainer is null!");
+            return;
+        }
+        
+        coursesContainer.innerHTML = "";
+        
         const sortedCourses = [...courses].sort((a, b) => {
             const extractNumber = (course) => {
                 if (typeof course.number === 'number') return course.number;
@@ -255,9 +251,40 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    // ------------------------------------------------------------------------
-    // [Function: Show Departments View]
-    // ------------------------------------------------------------------------
+    function searchCourses(query) {
+        if (!currentDepartmentCourses || currentDepartmentCourses.length === 0) {
+            return;
+        }
+        
+        query = query.toLowerCase().trim();
+        
+        if (!query) {
+            coursesContainer.childNodes.forEach(node => {
+                node.style.display = 'block';
+            });
+            noResultsEl.style.display = 'none';
+            return;
+        }
+        
+        let visibleCount = 0;
+        
+        coursesContainer.childNodes.forEach(courseNode => {
+            const courseText = courseNode.textContent.toLowerCase();
+            if (courseText.includes(query)) {
+                courseNode.style.display = 'block';
+                visibleCount++;
+            } else {
+                courseNode.style.display = 'none';
+            }
+        });
+        
+        if (visibleCount === 0) {
+            noResultsEl.style.display = 'block';
+        } else {
+            noResultsEl.style.display = 'none';
+        }
+    }
+
     function showDepartmentsView() {
         breadcrumbContainer.textContent = "Departments";
         
@@ -266,4 +293,9 @@ document.addEventListener("DOMContentLoaded", () => {
         
         alphabetNavContainer.style.display = 'flex';
     }
+
+    searchInput.addEventListener('input', function() {
+        const query = this.value;
+        searchCourses(query);
+    });
 });
