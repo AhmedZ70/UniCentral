@@ -161,13 +161,19 @@ label {
     color: #005a5b;
 }
 
+#professorSelect {
+  height: 2.5rem;
+  font-family: 'Montserrat', sans-serif;
+}
+
 textarea,
 input[type="number"],
 input[type="text"],
 select {
     width: 100%;
-    padding: 12px 15px;
-    margin-top: 8px;
+    padding: 12px 0px;
+    margin-top: 6px;
+    margin-bottom: 12px;
     border: 1px solid #ccc;
     border-radius: 8px;
     font-size: 1rem;
@@ -181,6 +187,21 @@ select:focus {
     border-color: #005a5b;
     outline: none;
     box-shadow: 0 0 10px rgba(0, 90, 91, 0.2);
+}
+
+.checkbox-group {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  margin: 15px 0 15px 0;
+}
+
+.review-option-container {
+  margin: 15px 0 15px 0;
+}
+
+.form-check-label {
+  margin-left: 5px;
 }
 
 .submit-review-button {
