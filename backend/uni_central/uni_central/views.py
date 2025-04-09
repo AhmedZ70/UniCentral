@@ -1059,6 +1059,17 @@ class ThreadSearchAPIView(APIView):
             'threads': serialized.data,
             'total_count': len(threads)
         })
+        
+class ThreadCategoryStatsAPIView(APIView):
+    """
+    API View to fetch the number of threads in each category.
+    """
+
+    def get(self, request):
+        # Fetch category counts from the ThreadService
+        category_counts = ThreadService.get_category_thread_count()
+        
+        return Response(category_counts)
     
 ##########################
 # Comment Views and APIs #

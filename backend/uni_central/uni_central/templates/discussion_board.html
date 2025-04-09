@@ -11,6 +11,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Corben:wght@400;700&family=Montserrat:ital,wght@0,100..900;1,100..900&family=Sigmar&family=Sniglet:wght@400;800&display=swap" rel="stylesheet">
   <script type="module" src="{% static 'js/discussion_board.js' %}"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 
 <body {% if context_type %}data-context-type="{{ context_type }}" data-context-id="{{ context_id }}"{% endif %}>
@@ -57,9 +58,14 @@
                     <option value="projects">Projects</option>
                     <option value="general">General</option>
                 </select>
+                <button id="showChartButton">Show Chart</button>
             </div>
             <button class="new-thread-button">New thread +</button>
         </section>
+        
+        <div id="chart-container" style="display: none;">
+            <canvas id="categoryChart"></canvas>
+        </div>
     
         <div id="new-thread-modal" class="modal" style="display: none;">
             <div class="modal-content">
