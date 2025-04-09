@@ -212,7 +212,6 @@ document.addEventListener("DOMContentLoaded", () => {
             courseTitleEl.textContent = "Error Loading Course";
         });
 
-    // 7. Handle Enroll/Unenroll Button
     if (enrollBtn) {
         // Use onAuthStateChanged to track the user's authentication state
         onAuthStateChanged(auth, (user) => {

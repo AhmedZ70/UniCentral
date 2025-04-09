@@ -136,14 +136,17 @@ class ReviewService:
             user=user,
             course=course,
             professor=professor,
-            
+
+            # Text / string fields
             review=review_data.get('review'),
             grade=review_data.get('grade'),
 
+            # Numeric fields
             rating=float(review_data.get('rating')) if review_data.get('rating') else None,
             difficulty=int(review_data.get('difficulty')) if review_data.get('difficulty') else None,
             estimated_hours=float(review_data.get('estimated_hours')) if review_data.get('estimated_hours') else None,
 
+            # Boolean fields
             would_take_again=(review_data.get('would_take_again') == 'true'),
             for_credit=(review_data.get('for_credit') == 'true'),
             mandatory_attendance=(review_data.get('mandatory_attendance') == 'true'),
@@ -170,7 +173,6 @@ class ReviewService:
         """
         professor = ProfessorService.get_professor(professor_id)
 
-        # Fetch the course if provided
         course_id = review_data.get("course")
         course = get_object_or_404(Course, id=course_id) if course_id else None
         is_anonymous = review_data.get('is_anonymous')
@@ -178,14 +180,12 @@ class ReviewService:
         if isinstance(is_anonymous, str):
             is_anonymous = is_anonymous.lower() == 'true'
         else:
-            # Handle None or other non-boolean values
             is_anonymous = bool(is_anonymous)
 
-        # Create the Review object
         review = Review.objects.create(
             user=user,
             professor=professor,
-            course=course,  # Associate the selected course
+            course=course,  
 
             # Text / string fields
             review=review_data.get("review"),
@@ -230,7 +230,6 @@ class ReviewService:
         if review == None:
             return None
 
-        # Update fields only if provided in review_data
         if "review" in review_data:
             review.review = review_data["review"]
         if "rating" in review_data:
@@ -246,10 +245,8 @@ class ReviewService:
         if "mandatory_attendance" in review_data:
             review.mandatory_attendance = review_data["mandatory_attendance"] == "true"
 
-        # Save the updated review
         review.save()
 
-        # Update course and professor averages if applicable
         if review.course:
             review.course.update_averages()
         if review.professor:
