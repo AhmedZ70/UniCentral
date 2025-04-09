@@ -129,198 +129,218 @@ body, html, ul, li, p, h1, h2, select {
   
   .review-type {
     font-size: 25px;
-    margin-left: 50px;
+    margin-left: 38px;
   }
 
   .review-type select {
-    font-size: 20px;
     font-family: 'Agrandir', sans-serif;
   }
 
-  .my-reviews {
-    width: 100%;
-    max-width: 1650px;
-    margin: 0 auto;
-    padding: 2rem;
-  }
-  
-  .search-reviews {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 1.5rem;
-  }
-  
-  .reviews-search {
-    flex: 1;
-    padding: 0.5rem 1rem;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-  }
-  
-  .reviews-sort {
-    padding: 0.5rem 1rem;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    background-color: #fff;
-    font-size: 1rem;
-    margin-left: 50px;
-  }
+  #review-type {
+    width: 200px;  
+    height: 40px;  
+    padding: 8px 12px;  
+    font-size: 16px; 
+    box-sizing: border-box;  
+    border-radius: 5px;  
+    border: 1px solid black;  
+    appearance: auto;  
+}
+.my-reviews {
+  max-width: 1000px;
+  margin: 2rem auto;
+  padding: 0 20px;
+}
 
-  .reviews-sort select{
-    font-size: 25px;
-    font-family: 'Agrandir', sans-serif;
-  }
-  
-  .course-review-card {
-    background-color: #ffffff;
-    border: 3px solid black;
-    border-radius: 8px;
-    padding: 1.5rem;
-    position: relative;
-    min-height: 200px;
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 15px;
-    margin-left: 50px;
-    margin-right: 50px;
-  }
-  
-  .review-info {
-    flex: 1;
-    margin-right: 200px;
-  }
+.course-review-card, .professor-review-card {
+  background: #fff;
+  padding: 30px;
+  border-radius: 15px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  margin-bottom: 2rem;
+  transition: all 0.3s ease;
+  position: relative;
+  border: 2px solid black;
+}
 
-  .professor-review-card {
-    background-color: #ffffff;
-    border: 3px solid black;
-    border-radius: 8px;
-    padding: 1.5rem;
-    position: relative;
-    min-height: 200px;
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 15px;
-    margin-left: 50px;
-    margin-right: 50px;
-  }
-  
-  /* .course-info h3 {
-    font-size: 24px;
-    margin-bottom: 15px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-  } */
+.course-review-card:hover, .professor-review-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+}
 
-  .title-section {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    margin-bottom: 15px;
-  }
-  
-  .title-section h3 {
-    font-size: 24px;
-    margin: 0;
-  }
-  
-  .required {
-    color: #ff4444;
-    padding: 4px 8px;
-    border-radius: 8px;
-    font-size: 20px;
-    font-weight: bold;
-    white-space: nowrap;
-  }
-  
-  .review-info p {
-    margin-bottom: 10px;
-    font-size: 18px;
-  }
-  
-  .review-info p {
-    margin-bottom: 10px;
-    font-size: 18px;
-  }
+.review-info {
+  width: 100%;
+}
 
-  .overall-rating  {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
+.title-section {
+  margin-bottom: 1rem;
+  border-bottom: 1px solid #e0e0e0;
+  padding-bottom: 0.5rem;
+}
 
-  .overall-rating img {
-    width: 20%;
-    position:relative;
-    vertical-align: middle;
-  }
-  
-  .difficulty-rating {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-  
-  .difficulty-rating img {
-    width: 20%;
-    position: relative;
-    vertical-align: middle;
-  }
-  
-  .edit-review {
-    position: absolute;
-    right: 1%;
-    top: 5%;
-    transform: translateY(-50%);
-    color: #ff4444;
-    border: none;
-    padding: 8px 16px;
-    border-radius: 8px;
-    font-size: 16px;
-    font-weight: bold;
-    cursor: pointer;
-  }
-  
-  .review-right {
-    position: absolute;
-    right: 24px;
-    bottom: 40px;
-    text-align: right;
-  }
-  
-  .review-right p {
-    margin-bottom: 10px;
-    font-size: 20px;
-  }
-  
-  .rating-container {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    justify-content: flex-end;
-  }
-  
-  .rating-container img {
-    width: 80px;
-    height: 80px;
-  }
-  
-  .rating-number {
-    font-size: 60px;
-  }
+.title-section h3 {
+  font-size: 1.5rem;
+  color: #000;
+  margin: 0;
+  font-weight: 700;
+}
 
-  .delete-btn {
-    position: absolute;
-    bottom: 1%;
-    right: 3%;
-    transform: translateY(-50%);
-    background-color: #ff4444;
-    color: white;
-    border: none;
-    padding: 8px 16px;
-    border-radius: 8px;
-    font-size: 16px;
-    font-weight: bold;
-    cursor: pointer;
-  }
+.review-info p {
+  font-size: 1.1rem;
+  margin: 15px 0;
+  color: #333;
+  line-height: 1.6;
+}
+
+.review-info .label {
+  font-weight: bold;
+  display: inline-block;
+  margin-right: 5px;
+}
+
+.rating-stars {
+  display: inline-flex;
+  align-items: center;
+  vertical-align: middle;
+}
+
+.star {
+  font-size: 24px;
+  color: #ccc;
+  margin-right: 2px;
+}
+
+.star.filled {
+  color: #ffd700;
+}
+
+.difficulty-rating {
+  display: inline-flex;
+  align-items: center;
+  margin-left: 5px;
+  vertical-align: middle;
+}
+
+.difficulty-circle {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background-color: #e0e0e0;
+  margin-right: 5px;
+}
+
+.difficulty-circle.filled.green {
+  background-color: #4CAF50;
+}
+
+.difficulty-circle.filled.yellow {
+  background-color: #FFC107;
+}
+
+.difficulty-circle.filled.red {
+  background-color: #F44336;
+}
+
+/* .buttons {
+  width: 50px;
+  padding: 10px 20px;
+  font-size: 16px;
+  margin: 5px;
+  text-align: center;
+  display: inline-block;
+  cursor: pointer;
+} */
+
+.edit-review, .delete-btn {
+  position: absolute;
+  padding: 10px 20px;
+  border-radius: 30px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  text-align: center;
+  font-size: 16px;
+}
+
+.edit-review {
+  bottom: 20px;
+  right: 130px;
+  background-color: #2d6a6b;
+  color: #fff;
+  text-decoration: none;
+}
+
+.delete-btn {
+  height: 45px;
+  bottom: 20px;
+  right: 20px;
+  background-color: #e74c3c;
+  color: #fff;
+  border: none;
+}
+
+.course-review-card.deleting, .professor-review-card.deleting {
+  opacity: 0.5;
+  transform: scale(0.95);
+  transition: opacity 0.3s, transform 0.3s;
+}
+
+.notification {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  padding: 15px 25px;
+  border-radius: 10px;
+  color: #fff;
+  font-weight: 600;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+  z-index: 1000;
+  opacity: 1;
+  transition: opacity 0.5s;
+}
+
+.notification.success {
+  background-color: #4CAF50;
+}
+
+.notification.error {
+  background-color: #F44336;
+}
+
+.notification.fade-out {
+  opacity: 0;
+}
+
+.no-reviews-message {
+  padding: 2rem;
+  text-align: center;
+  color: #666;
+  font-size: 1.2rem;
+  background-color: #f9f9f9;
+  border-radius: 8px;
+  margin: 2rem 0;
+}
+
+.search-reviews {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 2rem;
+}
+
+.filter-container, .sort-container {
+  display: flex;
+  align-items: center;
+}
+
+.filter-container label, .sort-container label {
+  margin-right: 10px;
+  font-weight: 600;
+  color: #005a5b;
+}
+
+.review-type, .reviews-sort {
+  padding: 8px 15px;
+  border-radius: 5px;
+  font-family: 'Montserrat', sans-serif;
+  color: #333;
+}

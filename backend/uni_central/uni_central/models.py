@@ -1,7 +1,6 @@
 from django.db import models
 from django.db.models import Avg
 
-
 ##############
 # USER MODEL #
 ##############
@@ -83,8 +82,6 @@ class Course(models.Model):
         self.save()
 
 
-
-
 ###################
 # PROFESSOR MODEL #
 ###################
@@ -123,10 +120,17 @@ class Professor(models.Model):
             avg_difficulty=Avg('difficulty')
         )
 
-        # Update the professor's fields with calculated averages
-        self.avg_rating = averages['avg_rating'] or 0  # Default to 0 if no reviews
-        self.avg_difficulty = averages['avg_difficulty'] or 0  # Default to 0 if no reviews
+        self.avg_rating = averages['avg_rating'] or 0  
+        self.avg_difficulty = averages['avg_difficulty'] or 0 
         self.save()
+
+    def get_course_name(self):
+        """Get a course name for display in reviews"""
+        course = self.courses.first()
+        if course:
+            return f"{course.code} {course.title}"
+        return "N/A"
+    
 ####################
 # DEPARTMENT MODEL #
 ####################

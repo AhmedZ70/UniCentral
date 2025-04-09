@@ -1,4 +1,4 @@
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404, redirect
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.views import APIView
@@ -290,30 +290,216 @@ class CreateProfessorReviewAPIView(APIView):
                 {"error": str(e)},
                 status=status.HTTP_400_BAD_REQUEST
             )
+
+####################################
+# Review-Related Views and APIs #
+####################################
+
+class CreateReviewAPIView(APIView):
+    """
+    Handle the creation of a Review for a given course (POST).
+    """
+    def post(self, request, course_id):
+        email_address = request.data.get('email_address')
+        user = UserService.get_user(email_address)
+        review_data = request.data
+
+        try:
+            review = ReviewService.create_review_for_course(course_id, user, review_data)
+            return Response(
+                {"message": "Review created successfully", "review_id": review.id},
+                status=status.HTTP_201_CREATED
+            )
+        except Exception as e:
+            return Response(
+                {"error": str(e)},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+            
+class CreateProfessorReviewAPIView(APIView):
+    """
+    API View to handle the creation of a review for a professor.
+    """
+    def post(self, request, professor_id):
+        email_address = request.data.get('email_address')
+        user = UserService.get_user(email_address)
+        review_data = request.data
+
+        try:
+            review = ReviewService.create_review_for_professor(professor_id, user, review_data)
+            return Response(
+                {"message": "Review created successfully", "review_id": review.id},
+                status=status.HTTP_201_CREATED
+            )
+        except Exception as e:
+            return Response(
+                {"error": str(e)},
+                status=status.HTTP_400_BAD_REQUEST
+            )
             
 class UpdateReviewAPIView(APIView):
     """
     API View to update an existing review by review_id.
     """
 
-    def put(self, request):
-        """
-        Handles PUT requests to update a review.
-        """
+    def put(self, request, review_id):
         try:
-            review_id = request.get.data('review_id')
+            print(f"Update request data: {request.data}")
+            
+            # Get review_id from URL or request data
+            if review_id is None:
+                review_id = request.data.get('review_id')
+            
+            print(f"Using review_id: {review_id}")
+                
+            if not review_id:
+                return Response({"error": "Review ID is required"}, status=status.HTTP_400_BAD_REQUEST)
+                
             updated_review = ReviewService.update_review(review_id, request.data)
             serializer = ReviewSerializer(updated_review)
             return Response({"message": "Review updated successfully", "review": serializer.data}, status=status.HTTP_200_OK)
         except Exception as e:
-            return Response(str(e))
+            import traceback
+            error_traceback = traceback.format_exc()
+            print(f"Error updating review: {str(e)}")
+            print(error_traceback)
+            # Return detailed error info during development
+            return Response({
+                "error": str(e),
+                "traceback": error_traceback.split("\n")
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+class UserCourseReviewsAPIView(APIView):
+    """
+    API View to get all course reviews by a specific user.
+    """
+    def get(self, request):
+        email = request.GET.get('email')
+        if not email:
+            return Response({"error": "Email parameter is required"}, status=status.HTTP_400_BAD_REQUEST)
+        
+        try:
+            user = UserService.get_user(email)
+            reviews = ReviewService.get_user_course_reviews(user)
+            serializer = ReviewSerializer(reviews, many=True)
+            return Response(serializer.data)
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+class UserProfessorReviewsAPIView(APIView):
+    """
+    API View to get all professor reviews by a specific user.
+    """
+    def get(self, request):
+        email = request.GET.get('email')
+        if not email:
+            return Response({"error": "Email parameter is required"}, status=status.HTTP_400_BAD_REQUEST)
+        
+        try:
+            user = UserService.get_user(email)
+            reviews = ReviewService.get_user_professor_reviews(user)
+            serializer = ReviewSerializer(reviews, many=True)
+            return Response(serializer.data)
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+        
+class CourseReviewFormView(APIView):
+    def get(self, request, context_id=None, review_id=None):
+        # This is an edit request if review_id is provided
+        if review_id:
+            # Get the existing review
+            review = ReviewService.get_review_by_id(review_id)
+            course = review.course
+            
+            # Pre-fill form with existing data
+            context = {
+                'course': course,
+                'review': review,
+                'is_edit': True,
+                'form_action': f'/api/reviews/{review_id}/update/'
+            }
+        else:
+            course = CourseService.get_course_by_id(context_id)
+            
+            context = {
+                'course': course,
+                'is_edit': False,
+                'form_action': f'/api/reviews/{context_id}/update/'
+            }
+        return render(request, 'course_review_form.html', context)
+    
+class ProfessorReviewFormView(APIView):
+    def get(self, request, context_id=None, review_id=None):
+        # This is an edit request if review_id is provided
+        if review_id:
+            # Get the existing review
+            review = ReviewService.get_review_by_id(review_id)
+            professor = review.professor
+            
+            # Pre-fill form with existing data
+            context = {
+                'professor': professor,
+                'review': review,
+                'is_edit': True,
+                'form_action': f'/api/reviews/{review_id}/update/'
+            }
+        else:
+            course = ProfessorService.get_professor_by_id(context_id)
+            
+            context = {
+                'professor': professor,
+                'is_edit': False,
+                'form_action': f'/api/reviews/{context_id}/update/'
+            }
+            
+        return render(request, 'review_form.html', context)
+        
+class EditCourseReviewView(APIView):
+    def get(self, request, review_id):
+        try:
+            review = ReviewService.get_review_by_id(review_id)
+            course = review.course
+            
+            context = {
+                'course': course,
+                'course_id': course.id,
+                'review': review,
+                'is_edit': True,
+                'context_type': 'course' 
+            }
+            
+            return render(request, 'edit_review.html', context)
+        except Exception as e:
+            print(f"Error editing review {review_id}: {str(e)}")
+            import traceback
+            print(traceback.format_exc())
+            return redirect('my_reviews')
+
+class EditProfessorReviewView(APIView):
+    def get(self, request, review_id):
+        try:
+            review = ReviewService.get_review_by_id(review_id)
+            professor = review.professor
+            
+            context = {
+                'professor': professor,
+                'professor_id': professor.id,  
+                'review': review,
+                'is_edit': True,
+                'context_type': 'professor' 
+            }
+            
+            return render(request, 'edit_review.html', context)
+        except Exception as e:
+            return redirect('my_reviews')
 
 class DeleteReviewAPIView(APIView):
     """
     API View to delete an existing review by review_id.
     """
     
-    def delete(self, request, review_id):
+    def delete(self, request):
         """
         Calls the ReviewService to delete a review.
         """
@@ -358,11 +544,9 @@ class UserReviewVoteView(APIView):
             if not email:
                 return Response({'error': 'Email required'}, status=status.HTTP_400_BAD_REQUEST)
             
-            # Get the user and review
             user = UserService.get_user(email)
             review = ReviewService.get_review_by_id(review_id)
             
-            # Check if user has voted
             vote = ReviewVoteService.get_user_vote(user, review)
             
             if vote:

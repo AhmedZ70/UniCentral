@@ -1,0 +1,129 @@
+<!-- edit_review.html -->
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="icon" href="{% static 'assets/logo_black.png' %}">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit a Review</title>
+    <link rel="stylesheet" href="{% static 'css/review_form.css' %}">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
+    <script type="module" src="{% static 'js/review_form.js' %}"></script>
+</head>    
+<body>
+    {% include 'partials/navbar.html' %}
+
+    <main class="main-content review-form-page">
+        <!-- Hidden fields for context -->
+        <input type="hidden" id="contextType" value="{{ context_type }}">
+        <input type="hidden" id="contextId" value="{% if context_type == 'course' %}{{ course.id }}{% else %}{{ professor.id }}{% endif %}">
+        <input type="hidden" id="reviewId" value="{{ review.id }}">
+        
+        <!-- Only include courseId if this is a course review -->
+        {% if context_type == 'course' %}
+            <input type="hidden" id="courseId" value="{{ course.id }}">
+            {% if review.professor %}
+                <input type="hidden" id="currentProfessorId" value="{{ review.professor.id }}">
+            {% endif %}
+        {% elif context_type == 'professor' %}
+            {% if review.course %}
+                <input type="hidden" id="currentCourseId" value="{{ review.course.id }}">
+            {% endif %}
+        {% endif %}
+
+        <h1 class="page-title">Edit Your Review</h1>
+
+        <div id="statusMessage" class="status-message"></div>
+        <div id="errorMessage" class="error-message"></div> 
+        
+        <div id="professorSelectContainer" class="{% if context_type == 'course' %}show-container{% else %}hide-container{% endif %}">
+            <label for="professorSelect">Professor:</label>
+            <select id="professorSelect">
+                <!-- Populated by JS -->
+            </select>
+        </div>
+
+        <div id="courseSelectContainer" class="{% if context_type == 'professor' %}show-container{% else %}hide-container{% endif %}">
+            <label for="courseSelect">Course:</label>
+            <select id="courseSelect">
+                <!-- Populated by JS -->
+            </select>
+        </div>
+
+        <!-- Common input fields -->
+        <label for="reviewText">Review Text:</label>
+        <textarea id="reviewText" rows="5">{{ review.review }}</textarea>
+        <span id="reviewTextError" class="error-message"></span>
+
+        <!-- Interactive Rating (stars) will be inserted here by JS -->
+        <input type="number" id="rating" min="1" max="5" value="{{ review.rating }}" style="display: none;">
+        <span id="ratingError" class="error-message"></span>
+
+        <!-- Interactive Difficulty (circles) will be inserted here by JS -->
+        <input type="number" id="difficulty" min="1" max="6" value="{{ review.difficulty }}" style="display: none;">
+        <span id="difficultyError" class="error-message"></span>
+
+        <label for="estimatedHours">Estimated Weekly Hours:</label>
+        <input type="number" id="estimatedHours" step="0.1" min="0" value="{{ review.estimated_hours|default:'' }}">
+
+        <label for="grade">Grade Received:</label>
+        <input type="text" id="grade" maxlength="2" placeholder="e.g., A, B+" value="{{ review.grade|default:'' }}">
+        
+        <!-- Boolean checkboxes - pre-select based on existing review -->
+        <div class="checkbox-group">
+            <label for="wouldTakeAgain">
+                <input type="checkbox" id="wouldTakeAgain" {% if review.would_take_again %}checked{% endif %}>
+                Would Take Again
+            </label>
+
+            <label for="forCredit">
+                <input type="checkbox" id="forCredit" {% if review.for_credit %}checked{% endif %}>
+                For Credit
+            </label>
+
+            <label for="mandatoryAttendance">
+                <input type="checkbox" id="mandatoryAttendance" {% if review.mandatory_attendance %}checked{% endif %}>
+                Mandatory Attendance
+            </label>
+
+            <label for="requiredCourse">
+                <input type="checkbox" id="requiredCourse" {% if review.required_course %}checked{% endif %}>
+                Required Course
+            </label>
+
+            <label for="isGened">
+                <input type="checkbox" id="isGened" {% if review.is_gened %}checked{% endif %}>
+                Gen Ed
+            </label>
+
+            <label for="inPerson">
+                <input type="checkbox" id="inPerson" {% if review.in_person %}checked{% endif %}>
+                In-Person
+            </label>
+
+            <label for="online">
+                <input type="checkbox" id="online" {% if review.online %}checked{% endif %}>
+                Online
+            </label>
+
+            <label for="hybrid">
+                <input type="checkbox" id="hybrid" {% if review.hybrid %}checked{% endif %}>
+                Hybrid
+            </label>
+
+            <label for="noExams">
+                <input type="checkbox" id="noExams" {% if review.no_exams %}checked{% endif %}>
+                No Exams
+            </label>
+
+            <label for="presentations">
+                <input type="checkbox" id="presentations" {% if review.presentations %}checked{% endif %}>
+                Presentations
+            </label>
+        </div>
+
+        <button id="submitReviewBtn" class="submit-review-button">Update Review</button>
+    </main>
+</body>
+</html>

@@ -213,6 +213,20 @@ class ReviewService:
             course.update_averages()
 
         return review
+    
+    @staticmethod
+    def get_user_course_reviews(user):
+        """
+        Get all course reviews by a specific user.
+        """
+        return Review.objects.filter(user=user, course__isnull=False)
+
+    @staticmethod
+    def get_user_professor_reviews(user):
+        """
+        Get all professor reviews by a specific user.
+        """
+        return Review.objects.filter(user=user, professor__isnull=False)
 
     @staticmethod
     def update_review(review_id, review_data):
@@ -244,6 +258,8 @@ class ReviewService:
             review.for_credit = review_data["for_credit"] == "true"
         if "mandatory_attendance" in review_data:
             review.mandatory_attendance = review_data["mandatory_attendance"] == "true"
+        if "is_anonymous" in review_data:
+            review.is_anonymous = review_data["is_anonymous"] == "true"
 
         review.save()
 

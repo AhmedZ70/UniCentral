@@ -66,6 +66,26 @@ class ReviewSerializer(serializers.ModelSerializer):
             }
         return None
     
+    def get_course(self, obj):
+        if obj.course:
+            return {
+                'id': obj.course.id,
+                'code': obj.course.code,
+                'title': obj.course.title,
+                'professor_name': f"{obj.course.professor.fname} {obj.course.professor.lname}" if obj.course.professor else "N/A"
+            }
+        return None
+        
+    def get_professor(self, obj):
+        if obj.professor:
+            return {
+                'id': obj.professor.id,
+                'fname': obj.professor.fname,
+                'lname': obj.professor.lname,
+                'course_name': obj.professor.get_course_name()
+            }
+        return None
+    
     def to_representation(self, instance):
         """
         Override to_representation to ensure is_anonymous is always boolean.
@@ -73,11 +93,7 @@ class ReviewSerializer(serializers.ModelSerializer):
         data = super().to_representation(instance)
         
         if 'is_anonymous' in data:
-            data['is_anonymous'] = bool(data['is_anonymous'])
-            
-            # Debug log
-            print(f"Serialized Review {instance.id} - is_anonymous={data['is_anonymous']}, type={type(data['is_anonymous'])}")
-        
+            data['is_anonymous'] = bool(data['is_anonymous'])        
         return data
         
 class ThreadSerializer(serializers.ModelSerializer):

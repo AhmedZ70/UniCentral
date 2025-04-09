@@ -1,9 +1,21 @@
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js';
 import { getAuth, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js';
 
-// global variable for email
+const firebaseConfig = {
+    apiKey: "AIzaSyD0wF4R9GdY2m7eAwVL_j_mihLit4rRZ5Q",
+    authDomain: "unicentral-b6c23.firebaseapp.com",
+    projectId: "unicentral-b6c23",
+    storageBucket: "unicentral-b6c23.firebasestorage.app",
+    messagingSenderId: "554502030441",
+    appId: "1:554502030441:web:6dccab580dbcfdb974cef8",
+    measurementId: "G-M4L04508RH",
+    clientId: "554502030441-g68f3tti18fiip1hpr6ehn6q6u5sn8fh.apps.googleusercontent.com"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
 let userEmail = null;
 
-const auth = getAuth();
 onAuthStateChanged(auth, (user) => {
     if (user) {
         userEmail = user.email;
@@ -14,32 +26,68 @@ onAuthStateChanged(auth, (user) => {
 });
 
 document.addEventListener("DOMContentLoaded", () => {
+    // Get context information
     const contextType = document.getElementById("contextType").value; // "course" or "professor"
     const contextId = document.getElementById("contextId").value;
-  
+    
+    // Check if this is an edit page by looking for review ID
+    const reviewIdInput = document.getElementById("reviewId");
+    const reviewId = reviewIdInput ? reviewIdInput.value : null;
+    const isEdit = reviewId ? true : false;
+    
     const professorSelectContainer = document.getElementById("professorSelectContainer");
     const courseSelectContainer = document.getElementById("courseSelectContainer");
-  
+
+    // For course reviews, we need to fetch the course ID from the review if this is an edit
+    let courseId = document.getElementById("courseId") ? document.getElementById("courseId").value : null;
+    
     if (contextType === "course") {
+        // If this is an edit form, use the course ID from the form
+        if (isEdit && !courseId) {
+            console.error("Course ID not found in edit form!");
+        }
+        
         // Show professor dropdown and fetch professors
         professorSelectContainer.style.display = "block";
-        fetch(`/api/courses/${contextId}/professors/`)
-            .then((response) => response.json())
-            .then((professors) => {
-                const professorSelect = document.getElementById("professorSelect");
-                professors.forEach((prof) => {
-                    const option = document.createElement("option");
-                    option.value = prof.id;
-                    option.textContent = `${prof.fname} ${prof.lname}`;
-                    professorSelect.appendChild(option);
-                });
-            })
-            .catch((error) => console.error("Error fetching professors:", error));
+        
+        // Only fetch professors if we have a courseId
+        if (courseId) {
+            fetch(`/api/courses/${courseId}/professors/`)
+                .then((response) => {
+                    if (!response.ok) {
+                        throw new Error(`Failed to fetch professors (status ${response.status})`);
+                    }
+                    return response.json();
+                })
+                .then((professors) => {
+                    const professorSelect = document.getElementById("professorSelect");
+                    professors.forEach((prof) => {
+                        const option = document.createElement("option");
+                        option.value = prof.id;
+                        option.textContent = `${prof.fname} ${prof.lname}`;
+                        professorSelect.appendChild(option);
+                    });
+                    
+                    // If this is an edit form, select the right professor
+                    if (isEdit && document.getElementById("currentProfessorId")) {
+                        const currentProfId = document.getElementById("currentProfessorId").value;
+                        professorSelect.value = currentProfId;
+                    }
+                })
+                .catch((error) => console.error("Error fetching professors:", error));
+        } else {
+            console.error("Cannot fetch professors: Course ID is missing");
+        }
     } else if (contextType === "professor") {
         // Show course dropdown and fetch courses
         courseSelectContainer.style.display = "block";
         fetch(`/api/professors/${contextId}/courses/`)
-            .then((response) => response.json())
+            .then((response) => {
+                if (!response.ok) {
+                    throw new Error(`Failed to fetch courses (status ${response.status})`);
+                }
+                return response.json();
+            })
             .then((courses) => {
                 const courseSelect = document.getElementById("courseSelect");
                 courses.forEach((course) => {
@@ -48,6 +96,12 @@ document.addEventListener("DOMContentLoaded", () => {
                     option.textContent = `${course.title} (${course.subject} ${course.number})`;
                     courseSelect.appendChild(option);
                 });
+                
+                // If this is an edit form, select the right course
+                if (isEdit && document.getElementById("currentCourseId")) {
+                    const currentCourseId = document.getElementById("currentCourseId").value;
+                    courseSelect.value = currentCourseId;
+                }
             })
             .catch((error) => console.error("Error fetching courses:", error));
     }
@@ -62,12 +116,14 @@ document.addEventListener("DOMContentLoaded", () => {
     // Handle form submission
     const submitBtn = document.getElementById("submitReviewBtn");
     submitBtn.addEventListener("click", (e) => {
+        // Your existing form submission code...
         if (!submitBtn) {
             console.error("Submit button not found!");
             return;
         }   
         e.preventDefault();
 
+        // Your existing validation code...
         let isAnonymous = false;
         const anonymousCheckbox = document.getElementById("anonymousReview");
         console.log("Anonymous Checkbox Element:", anonymousCheckbox);
@@ -87,6 +143,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const rating = document.getElementById("rating").value.trim();
         const difficulty = document.getElementById("difficulty").value.trim();
 
+        // Your existing validation code...
         // Get error elements
         const reviewTextError = document.getElementById("reviewTextError");
         const ratingError = document.getElementById("ratingError");
@@ -158,32 +215,51 @@ document.addEventListener("DOMContentLoaded", () => {
         } else if (contextType === "professor") {
             bodyData.course = document.getElementById("courseSelect").value;
         }
+        
+        // If this is an edit, we need to include the review ID
+        if (isEdit) {
+            bodyData.review_id = reviewId;
+        }
   
-        const endpoint =
-            contextType === "course"
+        // Determine the endpoint based on whether this is a new review or an edit
+        let endpoint;
+        let method;
+        
+        if (isEdit) {
+            endpoint = `/api/reviews/${reviewId}/update/`;
+            method = "PUT";
+        } else {
+            endpoint = contextType === "course"
                 ? `/api/courses/${contextId}/reviews/create/`
                 : `/api/professors/${contextId}/reviews/create/`;
+            method = "POST";
+        }
   
         fetch(endpoint, {
-            method: "POST",
+            method: method,
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(bodyData),
         })
             .then((response) => {
-                if (!response.ok) throw new Error("Failed to create review.");
+                if (!response.ok) throw new Error(`Failed to ${isEdit ? 'update' : 'create'} review.`);
                 return response.json();
             })
             .then((data) => {
-                // Redirect to course or professor detail page based on context
-                if (contextType === "course") {
-                    window.location.href = `/courses/${contextId}/`;
-                } else if (contextType === "professor") {
-                    window.location.href = `/professors/${contextId}/`;
+                // Redirect based on where the edit came from
+                if (isEdit) {
+                    window.location.href = "/my_reviews/"; // Redirect to my reviews page after edit
+                } else {
+                    // For new reviews, redirect to the course or professor detail page
+                    if (contextType === "course") {
+                        window.location.href = `/courses/${contextId}/`;
+                    } else if (contextType === "professor") {
+                        window.location.href = `/professors/${contextId}/`;
+                    }
                 }
             })
             .catch((error) => {
-                console.error("Error submitting review:", error);
-                alert("Failed to create review.");
+                console.error(`Error ${isEdit ? 'updating' : 'submitting'} review:`, error);
+                alert(`Failed to ${isEdit ? 'update' : 'create'} review.`);
             });
     });
 });
