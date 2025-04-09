@@ -15,76 +15,88 @@
 
 <body {% if context_type %}data-context-type="{{ context_type }}" data-context-id="{{ context_id }}"{% endif %}>
 
-{% include 'partials/navbar.html' %}
-
-<main class="main-content">
-    <section class="hero">
-      <div class="text-content">
-        <div class="text-container">
-            {% if name %}
-                <h1>{{ name }} - Discussion</h1>
-            {% else %}
-                <h1>Discussion</h1>
-            {% endif %}
-          <h2>Ask a question or answer a fellow classmate's question!</h2>
-        </div>
-      </div>
-    </section>
-    <section class="discussion-controls">
-        <div class="search-bar">
-            <input type="text" placeholder="Search discussions..." id="search-discussions">
-        </div>
-        <div class="filters">
-            <select id="sort-by">
-                <option value="recent">Most Recent</option>
-                <option value="popular">Most Popular</option>
-                <option value="unanswered">Unanswered</option>
-            </select>
-            <select id="filter-by">
-                <option value="all">All Topics</option>
-                <option value="exams">Exams</option>
-                <option value="homework">Homework</option>
-                <option value="projects">Projects</option>
-                <option value="general">General</option>
-            </select>
-        </div>
-        <button class="new-thread-button">New thread +</button>
-    </section>
-
-    <div id="new-thread-modal" class="modal" style="display: none;">
-        <div class="modal-content">
-            <h2>New Thread</h2>
-            <form id="new-thread-form">
-                <textarea name="title" placeholder="Write your question or discussion topic here..." required></textarea>
-                <select name="category" required>
-                    <option value="">Select topic</option>
-                    <option value="general">General</option>
+    {% include 'partials/navbar.html' %}
+    
+    <main class="main-content">
+        <section class="hero">
+          <div class="text-content">
+            <div class="text-container">
+                {% if name %}
+                    <h1>{{ name }} - Discussion</h1>
+                {% else %}
+                    <h1>Discussion</h1>
+                {% endif %}
+              <h2>Ask a question or answer a fellow classmate's question!</h2>
+            </div>
+          </div>
+        </section>
+        <section class="discussion-controls">
+            <!-- Replaced the search bar with a search container -->
+            <div class="search-container">
+                <div class="search-bar">
+                    <input type="text" placeholder="Search discussions..." id="search-discussions">
+                </div>
+                <div class="search-options">
+                    <label class="include-comments-label">
+                        <input type="checkbox" id="include-comments" checked>
+                        Search comments
+                    </label>
+                    <span class="result-counter"></span>
+                </div>
+            </div>
+            <div class="filters">
+                <select id="sort-by">
+                    <option value="recent">Most Recent</option>
+                    <option value="popular">Most Popular</option>
+                    <option value="unanswered">Unanswered</option>
+                </select>
+                <select id="filter-by">
+                    <option value="all">All Topics</option>
                     <option value="exams">Exams</option>
                     <option value="homework">Homework</option>
                     <option value="projects">Projects</option>
+                    <option value="general">General</option>
                 </select>
-                <div class="form-controls">
-                    <button type="button" class="cancel-button">Cancel</button>
-                    <button type="submit" class="submit-button">Post Thread</button>
-                </div>
-            </form>
+            </div>
+            <button class="new-thread-button">New thread +</button>
+        </section>
+    
+        <div id="new-thread-modal" class="modal" style="display: none;">
+            <div class="modal-content">
+                <h2>New Thread</h2>
+                <form id="new-thread-form">
+                    <textarea name="title" placeholder="Write your question or discussion topic here..." required></textarea>
+                    <select name="category" required>
+                        <option value="">Select topic</option>
+                        <option value="general">general</option>
+                        <option value="exams">exams</option>
+                        <option value="homework">homework</option>
+                        <option value="projects">projects</option>
+                    </select>
+                    <div class="form-controls">
+                        <button type="button" class="cancel-button">Cancel</button>
+                        <button type="submit" class="submit-button">Post Thread</button>
+                    </div>
+                </form>
+            </div>
         </div>
-    </div>
-    <div id="reply-modal" class="modal" style="display: none;">
-        <div class="modal-content">
-            <h2>Reply</h2>
-            <form id="reply-form">
-                <textarea name="content" placeholder="Write your reply here..." required></textarea>
-                <div class="form-controls">
-                    <button type="button" class="cancel-button">Cancel</button>
-                    <button type="submit" class="submit-button">Post Reply</button>
-                </div>
-            </form>
+        <div id="reply-modal" class="modal" style="display: none;">
+            <div class="modal-content">
+                <h2>Reply</h2>
+                <form id="reply-form">
+                    <textarea name="content" placeholder="Write your reply here..." required></textarea>
+                    <div class="form-controls">
+                        <button type="button" class="cancel-button">Cancel</button>
+                        <button type="submit" class="submit-button">Post Reply</button>
+                    </div>
+                </form>
+            </div>
         </div>
-    </div>
-    <section class="external-results" style="display: none;">
-        <h3>Related discussions from around the web</h3>
-        <div class="external-threads-container">
-        </div>
-    </section>
-</main>
+        <section class="external-results" style="display: none;">
+            <h3>Related discussions from around the web</h3>
+            <div class="external-threads-container">
+            </div>
+        </section>
+    </main>
+</body>
+</html>

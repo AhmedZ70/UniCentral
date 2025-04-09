@@ -641,37 +641,50 @@ class ThreadService:
             return None
 
         return Thread.objects.filter(professor=professor)
-
+    
     @staticmethod
     def create_thread(user, thread_data):
         """
-        Creates a new thread linked to either a course or a professor.
+        Create a new thread.
         """
-        course_id = thread_data.get("course_id")
-        professor_id = thread_data.get("professor_id")
-
-        if bool(course_id) == bool(professor_id):
-            return {"success": False, "error": "A thread must be linked to either a course or a professor, not both."}
-
-        course = CourseService.get_course(course_id) if course_id else None
-        professor = ProfessorService.get_professor(professor_id) if professor_id else None
-
-        if course_id and not course:
-            return {"success": False, "error": "Course not found"}
-        if professor_id and not professor:
-            return {"success": False, "error": "Professor not found"}
-
         try:
-            thread = Thread.objects.create(
-                title=thread_data.get("title"),
-                user=user,
-                course=course,
-                professor=professor
+            print(f"Creating thread with data: {thread_data}")
+            
+            category = thread_data.get('category', 'general')
+            title = thread_data.get('title')
+            
+            if not title:
+                return {"success": False, "error": "Title is required"}
+            
+            thread = Thread(
+                title=title,
+                category=category, 
+                user=user
             )
+            
+            if 'course_id' in thread_data:
+                course_id = thread_data.get('course_id')
+                try:
+                    course = Course.objects.get(id=course_id)
+                    thread.course = course
+                except Course.DoesNotExist:
+                    return {"success": False, "error": f"Course with ID {course_id} not found"}
+                
+            elif 'professor_id' in thread_data:
+                professor_id = thread_data.get('professor_id')
+                try:
+                    professor = Professor.objects.get(id=professor_id)
+                    thread.professor = professor
+                except Professor.DoesNotExist:
+                    return {"success": False, "error": f"Professor with ID {professor_id} not found"}
+            thread.save()
+            print(f"Thread saved with ID {thread.id}, category: {thread.category}")
+            
             return {"success": True, "thread": thread}
         except Exception as e:
+            print(f"Error creating thread: {str(e)}")
             return {"success": False, "error": str(e)}
-
+        
     @staticmethod
     def update_thread(thread_id, thread_data):
         """

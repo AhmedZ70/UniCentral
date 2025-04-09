@@ -1,38 +1,86 @@
-/**
- * This file handles the logic for displaying a list of departments and their associated courses. 
- * It fetches department data from the server, renders them in a categorized manner (by first letter), 
- * and provides a mechanism to navigate into each department to fetch and display its courses. 
- * Users can also navigate back to the list of departments from the courses view.
- */
-
 document.addEventListener("DOMContentLoaded", () => {
-    // ------------------------------------------------------------------------
-    // [Section 1: Setup constants and initial UI state]
-    // ------------------------------------------------------------------------
+
     const departmentsApiUrl = "/api/departments/";
     const departmentsContainer = document.getElementById("departments");
     const coursesContainer = document.getElementById("courses");
     const breadcrumbContainer = document.getElementById("breadcrumb");
 
-    // Set initial visibility
+    const alphabetNavContainer = document.createElement("div");
+    alphabetNavContainer.id = "alphabet-nav";
+    alphabetNavContainer.className = "alphabet-navigation";
+    
+    departmentsContainer.parentNode.insertBefore(alphabetNavContainer, departmentsContainer);
+
     departmentsContainer.classList.add("visible");
     coursesContainer.classList.add("hidden");
 
-    // ------------------------------------------------------------------------
-    // [Section 2: Fetch and Display Departments]
-    // ------------------------------------------------------------------------
+    const searchContainer = document.createElement("div");
+    searchContainer.id = "course-search-container";
+    searchContainer.className = "course-search-container";
+    searchContainer.style.display = "none"; 
+
+    const searchInput = document.createElement("input");
+    searchInput.type = "text";
+    searchInput.id = "course-search-input";
+    searchInput.className = "course-search-input";
+    searchInput.placeholder = "Search courses...";
+
+    searchContainer.appendChild(searchInput);
+    coursesContainer.parentNode.insertBefore(searchContainer, coursesContainer);
+
+    const noResultsEl = document.createElement("div");
+    noResultsEl.id = "no-search-results";
+    noResultsEl.className = "no-search-results";
+    noResultsEl.style.display = "none";
+    noResultsEl.textContent = "No courses match your search.";
+    coursesContainer.parentNode.insertBefore(searchContainer, coursesContainer);
+
     fetch(departmentsApiUrl)
         .then((response) => response.json())
-        .then((data) => renderDepartments(data))
+        .then((data) => {
+            renderDepartments(data);
+            createAlphabetNav(data);
+        })
         .catch((error) => {
             console.error("Error fetching departments:", error);
             departmentsContainer.innerHTML =
                 "<p>Failed to load departments. Please try again later.</p>";
         });
 
-    // ------------------------------------------------------------------------
-    // [Function: Render Departments]
-    // ------------------------------------------------------------------------
+    function createAlphabetNav(departments) {
+        const firstLetters = new Set(
+            departments.map(dept => dept.name.charAt(0).toUpperCase())
+        );
+        
+        const sortedLetters = Array.from(firstLetters).sort();
+        
+        alphabetNavContainer.innerHTML = '';
+        
+        sortedLetters.forEach(letter => {
+            const letterLink = document.createElement('a');
+            letterLink.href = `#letter-${letter}`;
+            letterLink.className = 'alphabet-link';
+            letterLink.textContent = letter;
+            
+            letterLink.addEventListener('click', (e) => {
+                e.preventDefault();
+                const letterSection = document.getElementById(`letter-${letter}`);
+                if (letterSection) {
+                    const rect = letterSection.getBoundingClientRect();
+                    
+                    const scrollPosition = window.pageYOffset + rect.top - 70;
+                    
+                    window.scrollTo({
+                        top: scrollPosition,
+                        behavior: 'smooth'
+                    });
+                }
+            });
+            
+            alphabetNavContainer.appendChild(letterLink);
+        });
+    }
+
     function renderDepartments(departments) {
         if (!departments || departments.length === 0) {
             departmentsContainer.innerHTML = "<p>No departments available.</p>";
@@ -41,12 +89,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
         departmentsContainer.innerHTML = "";
 
-        // Sort by department name
         const sortedDepts = departments.sort((a, b) =>
             a.name.localeCompare(b.name)
         );
 
-        // Group departments by first letter
         const grouped = sortedDepts.reduce((acc, dept) => {
             const letter = dept.name.charAt(0).toUpperCase();
             acc[letter] = acc[letter] || [];
@@ -54,10 +100,11 @@ document.addEventListener("DOMContentLoaded", () => {
             return acc;
         }, {});
 
-        // Build the DOM elements (letter groups and department links)
         for (const [letter, depts] of Object.entries(grouped)) {
             const letterGroup = document.createElement("div");
             letterGroup.classList.add("letter-group");
+            
+            letterGroup.id = `letter-${letter}`;
 
             const letterHeader = document.createElement("h3");
             letterHeader.classList.add("letter-header");
@@ -89,60 +136,81 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
-    // Cache courses for the selected department
+    departmentsContainer.classList.add("visible");
+    coursesContainer.classList.add("hidden");
+
     let cachedCourses = {};
 
-    // ------------------------------------------------------------------------
-    // [Function: Show Courses for a Selected Department]
-    // ------------------------------------------------------------------------
     async function showCourses(departmentId, departmentName) {
-        // Check if courses are already cached
+        console.log("==== SHOW COURSES STARTED ====");
+        console.log(`Department: ${departmentName} (ID: ${departmentId})`);
+        
+        alphabetNavContainer.style.display = 'none';
+        
+        searchContainer.style.display = 'block';
+        
+        searchInput.value = '';
+        noResultsEl.style.display = 'none';
+        
+        departmentsContainer.style.display = 'none';
+        coursesContainer.style.display = 'block';
+        
         if (cachedCourses[departmentId]) {
-            renderCourses(cachedCourses[departmentId], departmentName);
+            currentDepartmentCourses = cachedCourses[departmentId];
+            renderCourses(currentDepartmentCourses, departmentName);
             return;
         }
-
+    
         try {
             const response = await fetch(`/api/departments/${departmentId}/courses/`);
             if (!response.ok) {
                 throw new Error(`Failed to fetch courses for department ${departmentId}`);
             }
-            const courses = await response.json(); // Backend returns [] for empty departments
-            cachedCourses[departmentId] = courses; // Cache the courses
-            renderCourses(courses, departmentName); // Always call renderCourses
+            const courses = await response.json();
+            cachedCourses[departmentId] = courses;
+            currentDepartmentCourses = courses;
+            renderCourses(courses, departmentName);
+            
+            console.log("==== AFTER RENDERING COURSES ====");
+            console.log("Alphabet bar visibility:", alphabetNavContainer.style.display);
+            console.log("Departments container visibility:", window.getComputedStyle(departmentsContainer).display);
+            console.log("Courses container visibility:", window.getComputedStyle(coursesContainer).display);
         } catch (error) {
             console.error("Error fetching courses:", error);
-            // Call renderCourses with an empty array on error
+            currentDepartmentCourses = [];
             renderCourses([], departmentName);
         }
     }
 
-    // ------------------------------------------------------------------------
-    // [Function: Render Courses in the UI]
-    // ------------------------------------------------------------------------
     function renderCourses(courses, departmentName) {
         window.scrollTo(0, 0);
         console.log("Rendering courses for department:", departmentName, courses);
-    
-        // Update breadcrumb
+        
+        if (!breadcrumbContainer) {
+            console.error("breadcrumbContainer is null!");
+            return;
+        }
+        
         breadcrumbContainer.innerHTML = `
             <a href="#" id="show-departments" class="breadcrumb-link">Departments</a> / ${departmentName}
         `;
-        coursesContainer.innerHTML = ""; // Clear existing content
-    
+        
+        if (!coursesContainer) {
+            console.error("coursesContainer is null!");
+            return;
+        }
+        
+        coursesContainer.innerHTML = "";
+        
         const sortedCourses = [...courses].sort((a, b) => {
-            // Safely extract numeric part of the course number
             const extractNumber = (course) => {
-                // If number is already a number, return it
                 if (typeof course.number === 'number') return course.number;
                 
-                // If it's a string, try to extract numeric part
                 if (typeof course.number === 'string') {
                     const numMatch = course.number.match(/\d+/);
                     return numMatch ? parseInt(numMatch[0], 10) : 0;
                 }
                 
-                // If no number found, return 0
                 return 0;
             };
     
@@ -151,13 +219,12 @@ document.addEventListener("DOMContentLoaded", () => {
             return numA - numB;
         });
     
-        // Check if the courses list is empty
         if (!sortedCourses || sortedCourses.length === 0) {
             coursesContainer.innerHTML = "<p>No courses available for this department.</p>";
         } else {
             sortedCourses.forEach((course) => {
                 const courseLink = document.createElement("a");
-                courseLink.href = `/courses/${course.id}/`; // Link to course detail page
+                courseLink.href = `/courses/${course.id}/`; 
                 courseLink.classList.add("course-link");
     
                 const courseDiv = document.createElement("div");
@@ -172,13 +239,11 @@ document.addEventListener("DOMContentLoaded", () => {
             });
         }
 
-        // Switch visibility: hide departments, show courses
-        departmentsContainer.classList.remove("visible");
-        departmentsContainer.classList.add("hidden");
-        coursesContainer.classList.remove("hidden");
-        coursesContainer.classList.add("visible");
+        departmentsContainer.classList.remove("visible"); 
+        departmentsContainer.classList.add("hidden");    
+        coursesContainer.classList.remove("hidden");       
+        coursesContainer.classList.add("visible");         
 
-        // Add event listener to the breadcrumb "Departments" link to go back
         const showDeptsLink = document.getElementById("show-departments");
         showDeptsLink.addEventListener("click", (e) => {
             e.preventDefault();
@@ -186,14 +251,51 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    // ------------------------------------------------------------------------
-    // [Function: Show Departments View]
-    // ------------------------------------------------------------------------
+    function searchCourses(query) {
+        if (!currentDepartmentCourses || currentDepartmentCourses.length === 0) {
+            return;
+        }
+        
+        query = query.toLowerCase().trim();
+        
+        if (!query) {
+            coursesContainer.childNodes.forEach(node => {
+                node.style.display = 'block';
+            });
+            noResultsEl.style.display = 'none';
+            return;
+        }
+        
+        let visibleCount = 0;
+        
+        coursesContainer.childNodes.forEach(courseNode => {
+            const courseText = courseNode.textContent.toLowerCase();
+            if (courseText.includes(query)) {
+                courseNode.style.display = 'block';
+                visibleCount++;
+            } else {
+                courseNode.style.display = 'none';
+            }
+        });
+        
+        if (visibleCount === 0) {
+            noResultsEl.style.display = 'block';
+        } else {
+            noResultsEl.style.display = 'none';
+        }
+    }
+
     function showDepartmentsView() {
         breadcrumbContainer.textContent = "Departments";
-        coursesContainer.classList.remove("visible");
-        coursesContainer.classList.add("hidden");
-        departmentsContainer.classList.remove("hidden");
-        departmentsContainer.classList.add("visible");
+        
+        coursesContainer.style.display = 'none';     
+        departmentsContainer.style.display = 'block'; 
+        
+        alphabetNavContainer.style.display = 'flex';
     }
+
+    searchInput.addEventListener('input', function() {
+        const query = this.value;
+        searchCourses(query);
+    });
 });

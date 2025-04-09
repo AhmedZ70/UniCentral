@@ -15,16 +15,45 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 
+
 document.addEventListener('DOMContentLoaded', function() {
+    initializeDiscussionBoard();
+    loadThreads();
+    setupEventListeners();
+});
+
+function initializeDiscussionBoard() {
     if (!document.querySelector('.discussion-threads')) {
         const mainContent = document.querySelector('.main-content');
-        const threadsContainer = document.createElement('section');
-        threadsContainer.className = 'discussion-threads';
-        mainContent.appendChild(threadsContainer);
+        if (mainContent) {
+            const threadsContainer = document.createElement('section');
+            threadsContainer.className = 'discussion-threads';
+            mainContent.appendChild(threadsContainer);
+        }
     }
     
-    loadThreads();
-    
+    if (!document.querySelector('.search-options') && document.querySelector('.search-container')) {
+        const searchContainer = document.querySelector('.search-container');
+        const optionsContainer = document.createElement('div');
+        optionsContainer.className = 'search-options';
+        
+        const includeCommentsLabel = document.createElement('label');
+        includeCommentsLabel.className = 'include-comments-label';
+        
+        const includeCommentsCheckbox = document.createElement('input');
+        includeCommentsCheckbox.type = 'checkbox';
+        includeCommentsCheckbox.id = 'include-comments';
+        includeCommentsCheckbox.checked = true;
+        
+        includeCommentsLabel.appendChild(includeCommentsCheckbox);
+        includeCommentsLabel.appendChild(document.createTextNode(' Search in comments'));
+        
+        optionsContainer.appendChild(includeCommentsLabel);
+        searchContainer.appendChild(optionsContainer);
+    }
+}
+
+function setupEventListeners() {
     const newThreadButton = document.querySelector('.new-thread-button');
     if (newThreadButton) {
         newThreadButton.addEventListener('click', showNewThreadModal);
@@ -55,7 +84,19 @@ document.addEventListener('DOMContentLoaded', function() {
     
     const searchInput = document.getElementById('search-discussions');
     if (searchInput) {
-        searchInput.addEventListener('input', debounce(loadThreads, 500));
+        const newSearchInput = searchInput.cloneNode(true);
+        searchInput.parentNode.replaceChild(newSearchInput, searchInput);
+        
+        newSearchInput.addEventListener('input', debounce(function() {
+            loadThreads();
+        }, 300));
+    }
+    
+    const includeCommentsCheckbox = document.getElementById('include-comments');
+    if (includeCommentsCheckbox) {
+        includeCommentsCheckbox.addEventListener('change', function() {
+            loadThreads();
+        });
     }
     
     const sortBySelect = document.getElementById('sort-by');
@@ -67,15 +108,13 @@ document.addEventListener('DOMContentLoaded', function() {
     if (filterBySelect) {
         filterBySelect.addEventListener('change', loadThreads);
     }
-});
+}
 
 function debounce(func, wait) {
     let timeout;
-    return function() {
-        const context = this;
-        const args = arguments;
+    return function(...args) {
         clearTimeout(timeout);
-        timeout = setTimeout(() => func.apply(context, args), wait);
+        timeout = setTimeout(() => func.apply(this, args), wait);
     };
 }
 
@@ -101,34 +140,33 @@ function formatRelativeTime(dateString) {
     }
 }
 
-function loadThreads() {
-    const searchTerm = document.getElementById('search-discussions')?.value || '';
-    const sortBy = document.getElementById('sort-by')?.value || 'recent';
-    const filterBy = document.getElementById('filter-by')?.value || 'all';
+async function loadThreads() {
+    console.log("loadThreads function called");
     
-    const threadsContainer = document.querySelector('.discussion-threads');
-    if (!threadsContainer) {
-        console.error('Threads container not found. Make sure .discussion-threads exists in your HTML');
-        return;
-    }
+    const searchInput = document.getElementById('search-discussions');
+    const searchTerm = searchInput ? searchInput.value.trim() : '';
     
-    threadsContainer.innerHTML = '<div class="loading">Loading discussions...</div>';
+    const sortBySelect = document.getElementById('sort-by');
+    const sortBy = sortBySelect ? sortBySelect.value : 'recent';
+    console.log("Sort selection:", sortBy);
     
-    const params = new URLSearchParams();
-    if (searchTerm) params.append('search', searchTerm);
-    if (sortBy) params.append('sort_by', sortBy);
-    if (filterBy && filterBy !== 'all') params.append('filter_by', filterBy);
+    const filterBySelect = document.getElementById('filter-by');
+    const filterBy = filterBySelect ? filterBySelect.value : 'all';
+    console.log("Filter selection:", filterBy);
+    
+    const includeCommentsCheckbox = document.getElementById('include-comments');
+    const includeComments = includeCommentsCheckbox ? includeCommentsCheckbox.checked : true;
     
     const contextType = document.body.dataset.contextType;
     const contextId = document.body.dataset.contextId;
     
-    console.log('Loading threads with params:', {
-        contextType, 
-        contextId, 
-        searchTerm, 
-        sortBy, 
-        filterBy
-    });
+    const threadsContainer = document.querySelector('.discussion-threads');
+    if (!threadsContainer) {
+        console.error('Threads container not found');
+        return;
+    }
+    
+    threadsContainer.innerHTML = '<div class="loading">Loading discussions...</div>';
     
     if (!contextType || !contextId) {
         threadsContainer.innerHTML = `
@@ -138,6 +176,12 @@ function loadThreads() {
         `;
         return;
     }
+    
+    const params = new URLSearchParams();
+    if (searchTerm) params.append('search', searchTerm);
+    params.append('sort_by', sortBy);
+    if (filterBy && filterBy !== 'all') params.append('filter_by', filterBy);
+    params.append('include_comments', includeComments);
     
     let endpoint;
     if (contextType === 'course') {
@@ -153,35 +197,61 @@ function loadThreads() {
         return;
     }
     
-    fetch(endpoint, { 
-        method: 'GET',
-        headers: {
-            'Content-Type': 'application/json'
-        }
-    })
-    .then(response => {
-        console.log('Response status:', response.status);
+    console.log('Loading threads with params:', { 
+        contextType, 
+        contextId, 
+        searchTerm, 
+        sortBy, 
+        filterBy,
+        includeComments 
+    });
+    console.log('Endpoint:', endpoint);
+    
+    try {
+        const response = await fetch(endpoint, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+        
         if (!response.ok) {
             throw new Error(`Server returned ${response.status}: ${response.statusText}`);
         }
-        return response.json();
-    })
-    .then(data => {
-        displayThreads(data);
-
-        let sortedData = [...data];
-    
+        
+        const data = await response.json();
+        console.log('Received data:', data);
+        
+        let filteredData = [...data];
+        if (filterBy && filterBy !== 'all') {
+            filteredData = filteredData.filter(thread => 
+                thread.category && thread.category.toLowerCase() === filterBy.toLowerCase()
+            );
+            console.log(`Filtered to ${filteredData.length} threads with category: ${filterBy}`);
+        }
+        
+        let sortedData = [...filteredData];
+        console.log(`Sorting ${sortedData.length} threads by: ${sortBy}`);
+        
         if (sortBy === 'recent') {
             sortedData = sortThreadsByDate(sortedData);
         } else if (sortBy === 'popular') {
             sortedData = sortThreadsByPopularity(sortedData);
-        } else if (sortBy === 'unanswered') { 
+        } else if (sortBy === 'unanswered') {
             sortedData = sortThreadsByUnanswered(sortedData);
         }
         
-        displayThreads(data);
-    })
-    .catch(error => {
+        displayThreads(sortedData);
+        
+        if (searchTerm && sortedData && sortedData.length > 0) {
+            highlightSearchMatches(searchTerm);
+        }
+        
+        const resultCounter = document.querySelector('.result-counter');
+        if (resultCounter) {
+            resultCounter.textContent = `${sortedData.length} discussion${sortedData.length !== 1 ? 's' : ''} found`;
+        }
+    } catch (error) {
         console.error('Error loading threads:', error);
         threadsContainer.innerHTML = `
             <div class="error-message">
@@ -193,6 +263,63 @@ function loadThreads() {
                 <p>Error: ${error.message}</p>
             </div>
         `;
+    }
+}
+
+function sortThreadsByPopularity(threads) {
+    console.log("Sorting by popularity");
+    
+    threads.forEach(thread => {
+        const commentCount = Array.isArray(thread.comments) ? thread.comments.length : 0;
+        console.log(`Thread ID ${thread.id}: ${commentCount} comments, title: ${thread.title}`);
+    });
+    
+    return [...threads].sort((a, b) => {
+        const aComments = Array.isArray(a.comments) ? a.comments.length : 0;
+        const bComments = Array.isArray(b.comments) ? b.comments.length : 0;
+        
+        if (bComments !== aComments) {
+            return bComments - aComments;
+        }
+        
+        return new Date(b.created_at) - new Date(a.created_at);
+    });
+}
+
+function sortThreadsByDate(threads) {
+    console.log("Sorting by date");
+    return [...threads].sort((a, b) => {
+        return new Date(b.created_at) - new Date(a.created_at);
+    });
+}
+
+function sortThreadsByUnanswered(threads) {
+    console.log("Sorting by unanswered");
+    return [...threads].sort((a, b) => {
+        const aHasComments = Array.isArray(a.comments) && a.comments.length > 0;
+        const bHasComments = Array.isArray(b.comments) && b.comments.length > 0;
+        
+        // Threads with no comments should come first
+        if (!aHasComments && bHasComments) {
+            return -1;
+        }
+        if (aHasComments && !bHasComments) {
+            return 1;
+        }
+    
+        return new Date(b.created_at) - new Date(a.created_at);
+    });
+}
+
+function debugThreadData(threads) {
+    console.log("=== Thread Data Debug ===");
+    threads.forEach(thread => {
+        console.log(`Thread ID: ${thread.id}`);
+        console.log(`  Title: ${thread.title}`);
+        console.log(`  Category: ${thread.category}`);
+        console.log(`  Created: ${thread.created_at}`);
+        console.log(`  Comments: ${Array.isArray(thread.comments) ? thread.comments.length : 'N/A'}`);
+        console.log("  ------------------");
     });
 }
 
@@ -200,7 +327,7 @@ function displayThreads(threads) {
     const threadsContainer = document.querySelector('.discussion-threads');
     
     threadsContainer.innerHTML = '';
-        
+    
     if (!threads || threads.length === 0) {
         threadsContainer.innerHTML = `
             <div class="no-results">
@@ -220,11 +347,19 @@ function displayThreads(threads) {
             const threadElement = createThreadElement(thread);
             threadsContainer.appendChild(threadElement);
             
-            loadThreadComments(thread.id);
+            if (thread.id) {
+                loadThreadComments(thread.id);
+            }
         } catch (error) {
             console.error('Error creating thread element:', error, thread);
         }
     });
+    
+    const resultCounter = document.querySelector('.result-counter');
+    if (resultCounter) {
+        resultCounter.textContent = `${threads.length} discussion${threads.length !== 1 ? 's' : ''} found`;
+    }
+    
     attachReplyListeners();
 }
 
@@ -233,6 +368,8 @@ function createThreadElement(thread) {
         console.error('Invalid thread object:', thread);
         throw new Error('Invalid thread object');
     }
+    
+    console.log("Creating thread element with data:", thread);
     
     const threadElement = document.createElement('div');
     threadElement.className = 'thread';
@@ -249,7 +386,13 @@ function createThreadElement(thread) {
     
     const topicTag = document.createElement('span');
     topicTag.className = 'topic-tag';
-    topicTag.textContent = thread.category || 'General';
+    
+    console.log("Thread category value:", thread.category);
+    
+    const categoryValue = thread.category || thread.topic || thread.type || 'general';
+    topicTag.textContent = categoryValue;
+    
+    topicTag.classList.add(`category-${categoryValue.toLowerCase()}`);
     
     const timestamp = document.createElement('span');
     timestamp.className = 'timestamp';
@@ -294,7 +437,7 @@ function createResponseElement(comment) {
         console.warn('Skipping invalid comment:', comment);
         return document.createElement('div');
     }
-
+    
     const responseElement = document.createElement('div');
     responseElement.className = 'response';
     responseElement.dataset.commentId = comment.id;
@@ -319,7 +462,7 @@ function createResponseElement(comment) {
     const timestampSpan = document.createElement('span');
     timestampSpan.className = 'timestamp';
     timestampSpan.textContent = formatRelativeTime(comment.created_at);
-
+    
     const upvoteButton = document.createElement('button');
     upvoteButton.className = 'upvote-button';
     upvoteButton.dataset.commentId = comment.id;
@@ -327,24 +470,22 @@ function createResponseElement(comment) {
     if (comment.user_has_upvoted) {
         upvoteButton.classList.add('active');
     }
-
+    
     const likeContainer = document.createElement('div');
     likeContainer.className = 'like-container';
-
+    
     const countSpan = document.createElement('span');
     countSpan.className = 'like-count';
-    countSpan.textContent = comment.upvotes || 0;
     
     const upvoteCount = comment.upvotes_count !== undefined ? comment.upvotes_count : 
                         (comment.upvotes !== undefined ? comment.upvotes : 0);
     
-    console.log(`Creating response element for comment ${comment.id} with upvote count: ${upvoteCount}`);
     countSpan.textContent = upvoteCount;
     
     const thumbsUpImg = document.createElement('img');
     thumbsUpImg.src = '/static/assets/thumbs_up.png';
     thumbsUpImg.alt = 'thumbs up';
-    thumbsUpImg.className = 'thumbs-up-img'
+    thumbsUpImg.className = 'thumbs-up-img';
     
     likeContainer.appendChild(thumbsUpImg);
     likeContainer.appendChild(countSpan);
@@ -356,7 +497,7 @@ function createResponseElement(comment) {
     
     responseElement.appendChild(contentParagraph);
     responseElement.appendChild(metaElement);
-
+    
     upvoteButton.addEventListener('click', function() {
         upvoteComment(comment.id, this);
     });
@@ -364,50 +505,41 @@ function createResponseElement(comment) {
     return responseElement;
 }
 
-function loadThreadComments(threadId) {
+async function loadThreadComments(threadId) {
+    const auth = getAuth();
     const user = auth.currentUser;
     const userEmail = user ? user.email : null;
     
     let endpoint = `/api/threads/${threadId}/comments/`;
     if (userEmail) {
         endpoint += `?email=${encodeURIComponent(userEmail)}`;
-        console.log(`Loading comments for thread ${threadId} with email ${userEmail}`);
-    } else {
-        console.log(`Loading comments for thread ${threadId} without email`);
     }
     
-    fetch(endpoint)
-        .then(response => {
-            if (!response.ok) {
-                throw new Error(`Failed to fetch comments. Status: ${response.status}`);
-            }
-            return response.json();
-        })
-        .then(comments => {
-            console.log(`Received ${comments.length} comments for thread ${threadId}`);
-            console.log('First comment:', comments.length > 0 ? comments[0] : 'No comments');
-            const threadElement = document.querySelector(`.thread[data-thread-id="${threadId}"]`);
-            if (threadElement) {
-                const responsesContainer = threadElement.querySelector('.responses');
-                responsesContainer.innerHTML = '';
-                
-                const replyCountElement = threadElement.querySelector('.reply-count');
-                replyCountElement.textContent = `${comments.length} replies`;
-                
-                comments.forEach(comment => {
-                    console.log(`Comment ${comment.id}: upvotes=${comment.upvotes_count}, user_has_upvoted=${comment.user_has_upvoted}`);    
-                    if (comment.user_has_upvoted) {
-                        console.log("User has upvoted comment:", comment.id);
-                    }
-                    
-                    const responseElement = createResponseElement(comment);
-                    responsesContainer.appendChild(responseElement);
-                });
-            }
-        })
-        .catch(error => {
-            console.error('Error loading comments:', error);
-        });
+    try {
+        const response = await fetch(endpoint);
+        
+        if (!response.ok) {
+            throw new Error(`Failed to fetch comments. Status: ${response.status}`);
+        }
+        
+        const comments = await response.json();
+        
+        const threadElement = document.querySelector(`.thread[data-thread-id="${threadId}"]`);
+        if (threadElement) {
+            const responsesContainer = threadElement.querySelector('.responses');
+            responsesContainer.innerHTML = '';
+            
+            const replyCountElement = threadElement.querySelector('.reply-count');
+            replyCountElement.textContent = `${comments.length} replies`;
+            
+            comments.forEach(comment => {
+                const responseElement = createResponseElement(comment);
+                responsesContainer.appendChild(responseElement);
+            });
+        }
+    } catch (error) {
+        console.error('Error loading comments:', error);
+    }
 }
 
 function attachReplyListeners() {
@@ -420,6 +552,7 @@ function attachReplyListeners() {
 }
 
 function showNewThreadModal() {
+    const auth = getAuth();
     if (!auth.currentUser) {
         window.location.href = '/login?redirect=' + encodeURIComponent(window.location.pathname);
         return;
@@ -434,12 +567,11 @@ function showNewThreadModal() {
                 titleTextarea.focus();
             }
         }, 50);
-    } else {
-        console.error("New thread modal not found");
     }
 }
 
 function showReplyModal(threadId) {
+    const auth = getAuth();
     if (!auth.currentUser) {
         window.location.href = '/login?redirect=' + encodeURIComponent(window.location.pathname);
         return;
@@ -452,8 +584,6 @@ function showReplyModal(threadId) {
         setTimeout(() => {
             modal.querySelector('textarea').focus();
         }, 50);
-    } else {
-        console.error("Reply modal not found");
     }
 }
 
@@ -464,10 +594,12 @@ function closeModals() {
     });
 }
 
-function createNewThread(form) {
+async function createNewThread(form) {
     try {
         const title = form.querySelector('textarea[name="title"]').value.trim();
         const category = form.querySelector('select[name="category"]').value;
+        
+        console.log("Creating new thread with category:", category);
         
         if (!title || !category) {
             alert('Please fill out all fields');
@@ -486,7 +618,8 @@ function createNewThread(form) {
             title,
             category
         };
-
+        
+        const auth = getAuth();
         const user = auth.currentUser;
         if (user) {
             threadData.email_address = user.email;
@@ -501,32 +634,30 @@ function createNewThread(form) {
             threadData.professor_id = contextId;
         }
         
-        fetch('/api/threads/create/', {
+        console.log("Sending thread data to server:", threadData);
+        
+        const response = await fetch('/api/threads/create/', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify(threadData)
-        })
-        .then(response => {
-            if (!response.ok) {
-                throw new Error(`Server returned ${response.status}: ${response.statusText}`);
-            }
-            return response.json();
-        })
-        .then(data => {
-            document.getElementById('new-thread-modal').style.display = 'none';
-            form.reset();
-            
-            loadThreads();
-        })
-        .catch(error => {
-            console.error('Error creating thread:', error);
-            alert('Failed to create thread. Please try again later.');
         });
+        
+        if (!response.ok) {
+            throw new Error(`Server returned ${response.status}: ${response.statusText}`);
+        }
+        
+        const data = await response.json();
+        console.log("Server response after thread creation:", data);
+        
+        document.getElementById('new-thread-modal').style.display = 'none';
+        form.reset();
+        
+        loadThreads();
     } catch (error) {
-        console.error('Unexpected error:', error);
-        alert('An unexpected error occurred. Please try again.');
+        console.error('Error creating thread:', error);
+        alert('Failed to create thread. Please try again later.');
     }
 }
 
@@ -540,6 +671,7 @@ async function submitReply(form) {
             return;
         }
         
+        const auth = getAuth();
         const user = auth.currentUser;
         if (!user) {
             alert('You must be logged in to post a reply');
@@ -559,13 +691,12 @@ async function submitReply(form) {
             },
             body: JSON.stringify(replyData)
         });
-                
+        
         if (!response.ok) {
             throw new Error(`Server returned ${response.status}: ${response.statusText}`);
         }
         
         const data = await response.json();
-        console.log('Reply posted successfully:', data);
         
         closeModals();
         form.reset();
@@ -579,13 +710,12 @@ async function submitReply(form) {
 
 async function upvoteComment(commentId, button) {
     try {
+        const auth = getAuth();
         const user = auth.currentUser;
         if (!user) {
             alert('You must be logged in to upvote a comment');
             return;
         }
-        
-        console.log(`Upvoting comment ${commentId} as ${user.email}`);
         
         const requestBody = {
             email: user.email
@@ -606,63 +736,19 @@ async function upvoteComment(commentId, button) {
         }
         
         const data = await response.json();
-        console.log('Upvote response:', data);
         
         const countSpan = button.querySelector('.like-count');
         if (countSpan) {
             countSpan.textContent = data.upvotes;
-            console.log(`Updated upvote count to ${data.upvotes}`);
         }
         
         if (data.user_upvoted) {
             button.classList.add('active');
-            console.log('Added active class to button');
         } else {
             button.classList.remove('active');
-            console.log('Removed active class from button');
         }
     } catch (error) {
         console.error('Error upvoting comment:', error);
         alert('Failed to upvote. Please try again later.');
     }
 }
-
-function sortThreadsByDate(threads) {
-    return [...threads].sort((a, b) => {
-        return new Date(b.created_at) - new Date(a.created_at);
-    });
-}
-
-function sortThreadsByPopularity(threads) {
-    return [...threads].sort((a, b) => {
-        const commentDiff = (b.total_comments || 0) - (a.total_comments || 0);
-        const upvoteDiff = (b.total_upvotes || 0) - (a.total_upvotes || 0);
-        
-        if (commentDiff === 0) {
-            if (upvoteDiff === 0) {
-                return new Date(b.created_at) - new Date(a.created_at);
-            }
-            return upvoteDiff;
-        }
-        
-        return commentDiff;
-    });
-}
-
-function sortThreadsByUnanswered(threads) {
-    return [...threads].sort((a, b) => {
-        const aHasComments = a.comments && a.comments.length > 0;
-        const bHasComments = b.comments && b.comments.length > 0;
-        
-        if (!aHasComments && bHasComments) {
-            return -1;
-        }
-        if (aHasComments && !bHasComments) {
-            return 1;
-        }
-        
-        return new Date(b.created_at) - new Date(a.created_at);
-    });
-}
-
-document.addEventListener('DOMContentLoaded', loadThreads);

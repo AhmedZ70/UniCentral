@@ -60,9 +60,8 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  // Display courses in the UI with clickable cards
   function displayCourses(courses) {
-    courseCardsContainer.innerHTML = ''; // Clear existing cards
+    courseCardsContainer.innerHTML = ''; 
 
     if (courses.length === 0) {
       if (searchInput.value.trim() === '') {

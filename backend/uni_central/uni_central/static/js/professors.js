@@ -1,60 +1,116 @@
-/**
- * This file handles the logic for displaying a list of departments and their associated professors. 
- * It fetches department data from the server, renders them in a categorized manner (by first letter), 
- * and provides a mechanism to navigate into each department to fetch and display its professors. 
- * Users can also navigate back to the list of departments from the professors view.
- */
-
 document.addEventListener("DOMContentLoaded", () => {
-    // ------------------------------------------------------------------------
-    // [Section 1: Setup constants and initial UI state]
-    // ------------------------------------------------------------------------
-    /**
-     * 1. We define the key HTML elements we'll manipulate:
-     *    - departmentsContainer: where departments will be listed
-     *    - professorsContainer: where professors will be listed
-     *    - breadcrumbContainer: a simple breadcrumb navigation element
-     *
-     * 2. We also set the initial visibility of these containers:
-     *    - Show the departmentsContainer
-     *    - Hide the professorsContainer
-     */
     const departmentsApiUrl = "/api/departments/";
     const departmentsContainer = document.getElementById("departments");
     const professorsContainer = document.getElementById("professors");
     const breadcrumbContainer = document.getElementById("breadcrumb");
 
-    // Set initial visibility
+    const departmentAlphabetNavContainer = document.createElement("div");
+    departmentAlphabetNavContainer.id = "alphabet-nav";
+    departmentAlphabetNavContainer.className = "alphabet-navigation";
+    
+    departmentsContainer.parentNode.insertBefore(departmentAlphabetNavContainer, departmentsContainer);
+
+    const professorsAlphabetNavContainer = document.createElement("div");
+    professorsAlphabetNavContainer.id = "professors-alphabet-nav";
+    professorsAlphabetNavContainer.className = "alphabet-navigation";
+    professorsAlphabetNavContainer.style.display = "none"; // Initially hidden
+    
+    professorsContainer.parentNode.insertBefore(professorsAlphabetNavContainer, professorsContainer);
+
     departmentsContainer.classList.add("visible");
     professorsContainer.classList.add("hidden");
 
-    // ------------------------------------------------------------------------
-    // [Section 2: Fetch and Display Departments]
-    // ------------------------------------------------------------------------
-    /**
-     * We fetch the list of departments from the server (departmentsApiUrl) and pass
-     * the response to the renderDepartments function if successful. If there's an
-     * error, we display a message to the user in the departmentsContainer.
-     */
     fetch(departmentsApiUrl)
         .then((response) => response.json())
-        .then((data) => renderDepartments(data))
+        .then((data) => {
+            renderDepartments(data);
+            createDepartmentAlphabetNav(data);
+        })
         .catch((error) => {
             console.error("Error fetching departments:", error);
             departmentsContainer.innerHTML =
                 "<p>Failed to load departments. Please try again later.</p>";
         });
 
-    // ------------------------------------------------------------------------
-    // [Function: Render Departments]
-    // ------------------------------------------------------------------------
-    /**
-     * Renders the list of departments in alphabetical groups based on the first
-     * letter of the department name. Clicking on any department triggers a call
-     * to 'showProfessorss' to display the department's professors.
-     *
-     * @param {Array} departments - Array of department objects from the server.
-     */
+
+    function createDepartmentAlphabetNav(departments) {
+        const firstLetters = new Set(
+            departments.map(dept => dept.name.charAt(0).toUpperCase())
+        );
+        
+        const sortedLetters = Array.from(firstLetters).sort();
+        
+        departmentAlphabetNavContainer.innerHTML = '';
+        
+        sortedLetters.forEach(letter => {
+            const letterLink = document.createElement('a');
+            letterLink.href = `#letter-${letter}`;
+            letterLink.className = 'alphabet-link';
+            letterLink.textContent = letter;
+            
+            letterLink.addEventListener('click', (e) => {
+                e.preventDefault();
+                const letterSection = document.getElementById(`letter-${letter}`);
+                if (letterSection) {
+                    const rect = letterSection.getBoundingClientRect();
+                    
+                    const scrollPosition = window.pageYOffset + rect.top - 70;
+                    
+                    window.scrollTo({
+                        top: scrollPosition,
+                        behavior: 'smooth'
+                    });
+                }
+            });
+            
+            departmentAlphabetNavContainer.appendChild(letterLink);
+        });
+    }
+
+function createProfessorsAlphabetNav(professors) {
+    const fullAlphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
+    
+    const populatedLetters = new Set();
+    professors.forEach(professor => {
+        if (professor.lname && professor.lname.length > 0) {
+            populatedLetters.add(professor.lname.charAt(0).toUpperCase());
+        }
+    });
+    
+    professorsAlphabetNavContainer.innerHTML = '';
+    
+    fullAlphabet.forEach(letter => {
+        const letterLink = document.createElement('a');
+        letterLink.href = `#prof-letter-${letter}`;
+        letterLink.className = 'alphabet-link';
+        
+        if (!populatedLetters.has(letter)) {
+            letterLink.classList.add('empty-letter');
+        }
+        
+        letterLink.textContent = letter;
+        
+        if (populatedLetters.has(letter)) {
+            letterLink.addEventListener('click', (e) => {
+                e.preventDefault();
+                const letterSection = document.getElementById(`prof-letter-${letter}`);
+                if (letterSection) {
+                    const rect = letterSection.getBoundingClientRect();
+                    const scrollPosition = window.pageYOffset + rect.top - 70;
+                    window.scrollTo({
+                        top: scrollPosition,
+                        behavior: 'smooth'
+                    });
+                }
+            });
+        }
+        
+        professorsAlphabetNavContainer.appendChild(letterLink);
+    });
+    
+    professorsAlphabetNavContainer.style.display = 'flex';
+}
+
     function renderDepartments(departments) {
         if (!departments || departments.length === 0) {
             departmentsContainer.innerHTML = "<p>No departments available.</p>";
@@ -63,12 +119,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
         departmentsContainer.innerHTML = "";
 
-        // Sort by department name
         const sortedDepts = departments.sort((a, b) =>
             a.name.localeCompare(b.name)
         );
 
-        // Group departments by first letter
         const grouped = sortedDepts.reduce((acc, dept) => {
             const letter = dept.name.charAt(0).toUpperCase();
             acc[letter] = acc[letter] || [];
@@ -76,10 +130,11 @@ document.addEventListener("DOMContentLoaded", () => {
             return acc;
         }, {});
 
-        // Build the DOM elements (letter groups and department links)
         for (const [letter, depts] of Object.entries(grouped)) {
             const letterGroup = document.createElement("div");
             letterGroup.classList.add("letter-group");
+
+            letterGroup.id = `letter-${letter}`;
 
             const letterHeader = document.createElement("h3");
             letterHeader.classList.add("letter-header");
@@ -111,20 +166,11 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
-    // Cache professors for the selected department
     let cachedProfessors = {};
-    // ------------------------------------------------------------------------
-    // [Function: Show Professors for a Selected Department]
-    // ------------------------------------------------------------------------
-    /**
-     * Fetches the professors for a specific department (by departmentId) and then
-     * calls 'renderProfessors' to display them. If there's an error, a message is shown.
-     *
-     * @param {number} departmentId - The ID of the department to fetch professors for.
-     * @param {string} departmentName - The name of the department for breadcrumb display.
-     */
+    
     async function showProfessors(departmentId, departmentName) {
-        // Check if professors are already cached
+        departmentAlphabetNavContainer.style.display = 'none';
+
         if (cachedProfessors[departmentId]) {
             renderProfessors(cachedProfessors[departmentId], departmentName);
             return;
@@ -140,66 +186,78 @@ document.addEventListener("DOMContentLoaded", () => {
             renderProfessors(professors, departmentName); // Always call renderProfessors
         } catch (error) {
             console.error("Error fetching professors:", error);
-            // Call renderProfessors with an empty array on error
             renderProfessors([], departmentName);
         }
     }
     
-
-
-    // ------------------------------------------------------------------------
-    // [Function: Render Professors in the UI]
-    // ------------------------------------------------------------------------
-    /**
-     * Takes an array of professors and the department's name, updates the breadcrumb,
-     * and displays each professors in a clickable link. Also hides the department list
-     * and shows the professors container.
-     *
-     * @param {Array} professors - Array of professor objects.
-     * @param {string} departmentName - The name of the department for the breadcrumb.
-     */
     function renderProfessors(professors, departmentName) {
         window.scrollTo(0, 0);
-        console.log("Rendering professors for department:", departmentName, professors);
-    
-        // Update breadcrumb
+        
         breadcrumbContainer.innerHTML = `
             <a href="#" id="show-departments" class="breadcrumb-link">Departments</a> / ${departmentName}
         `;
         professorsContainer.innerHTML = ""; // Clear existing content
     
-        // Sort professors by first name
+        // Sort professors by last name
         const sortedProfessors = [...professors].sort((a, b) => 
-            a.fname.localeCompare(b.fname)
+            a.lname.localeCompare(b.lname)
         );
     
-        // Check if the professors list is empty
         if (!sortedProfessors || sortedProfessors.length === 0) {
             professorsContainer.innerHTML = "<p>No professors available for this department.</p>";
+            professorsAlphabetNavContainer.style.display = 'none';
         } else {
-            sortedProfessors.forEach((professor) => {
-                console.log('Professor object:', professor); 
-                const professorLink = document.createElement("a");
-                professorLink.href = `/professors/${professor.id}/`; // Link to professor detail page
-                professorLink.classList.add("professor-link");
-    
-                const professorDiv = document.createElement("div");
-                professorDiv.classList.add("professor-item");
-                professorDiv.innerHTML = `
-                    <h4>${professor.fname} ${professor.lname}</h4>
-                `;
-                professorLink.appendChild(professorDiv);
-                professorsContainer.appendChild(professorLink);
-            });
+            const grouped = sortedProfessors.reduce((acc, professor) => {
+                const letter = professor.lname.charAt(0).toUpperCase();
+                acc[letter] = acc[letter] || [];
+                acc[letter].push(professor);
+                return acc;
+            }, {});
+            
+            createProfessorsAlphabetNav(sortedProfessors);
+            
+            for (const [letter, profs] of Object.entries(grouped)) {
+                const letterGroup = document.createElement("div");
+                letterGroup.classList.add("letter-group");
+                letterGroup.id = `prof-letter-${letter}`;
+                
+                const letterHeader = document.createElement("h3");
+                letterHeader.classList.add("letter-header");
+                letterHeader.textContent = letter;
+                letterGroup.appendChild(letterHeader);
+                
+                const sortedByLastName = [...profs].sort((a, b) => {
+                    const lastNameComparison = a.lname.localeCompare(b.lname);
+                    if (lastNameComparison !== 0) {
+                        return lastNameComparison;
+                    }
+                    return a.fname.localeCompare(b.fname);
+                });
+                
+                sortedByLastName.forEach((professor) => {
+                    const professorLink = document.createElement("a");
+                    professorLink.href = `/professors/${professor.id}/`; 
+                    professorLink.classList.add("professor-link");
+            
+                    const professorDiv = document.createElement("div");
+                    professorDiv.classList.add("professor-item");
+                    professorDiv.innerHTML = `
+                        <h4>${professor.lname}, ${professor.fname}</h4>
+                        ${professor.title ? `<p>${professor.title}</p>` : ''}
+                    `;
+                    professorLink.appendChild(professorDiv);
+                    letterGroup.appendChild(professorLink);
+                });
+                
+                professorsContainer.appendChild(letterGroup);
+            }
         }
     
-        // Switch visibility: hide departments, show professors
         departmentsContainer.classList.remove("visible");
         departmentsContainer.classList.add("hidden");
         professorsContainer.classList.remove("hidden");
         professorsContainer.classList.add("visible");
     
-        // Add event listener to the breadcrumb "Departments" link to go back
         const showDeptsLink = document.getElementById("show-departments");
         showDeptsLink.addEventListener("click", (e) => {
             e.preventDefault();
@@ -207,18 +265,18 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
     
-
-    // ------------------------------------------------------------------------
-    // [Function: Show Departments View]
-    // ------------------------------------------------------------------------
-    /**
-     * Resets the UI to display the department list and hides the professors container.
-     */
     function showDepartmentsView() {
         breadcrumbContainer.textContent = "Departments";
+
+        professorsAlphabetNavContainer.style.display = 'none';
+        professorSearchContainer.style.display = 'none';
+        noResultsEl.style.display = 'none';
+
         professorsContainer.classList.remove("visible");
         professorsContainer.classList.add("hidden");
         departmentsContainer.classList.remove("hidden");
         departmentsContainer.classList.add("visible");
+
+        departmentAlphabetNavContainer.style.display = 'flex';
     }
 });
