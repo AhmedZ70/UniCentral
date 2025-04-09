@@ -41,7 +41,7 @@ from .views import (
     UserReviewVoteView,
     SubmitReviewVoteView,
     CoursePlanGetAPIView,
-    ThreadCategoryStatsAPIView,
+    CategoryCountsView,
     home,
     courses,
     about_page,
@@ -156,8 +156,7 @@ urlpatterns = [
     path('api/threads/search/', ThreadSearchAPIView.as_view(), name='thread_search'),
     path("api/courses/<int:course_id>/threads/", CourseThreadsAPIView.as_view(), name="course-threads"),
     path("api/professors/<int:professor_id>/threads/", ProfessorThreadsAPIView.as_view(), name="professor-threads"),
-    path('api/threads/category_stats/', ThreadCategoryStatsAPIView.as_view(), name='thread-category-stats'),
-
+    path('api/courses/<int:course_id>/category-counts/', CategoryCountsView.as_view(), name='category-counts'),
 
     # Comment URLs
     path("api/threads/<int:thread_id>/comments/create/", CreateCommentAPIView.as_view(), name="api-create-comment"),

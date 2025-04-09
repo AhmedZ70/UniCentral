@@ -742,12 +742,13 @@ class ThreadService:
         return threads
     
     @staticmethod
-    def get_category_thread_count():
+    def get_category_counts(course_id):
         """
-        Returns the count of threads per category.
+        Fetch the count of threads by category for a specific course.
         """
-        category_counts = Thread.objects.values('category').annotate(thread_count=Count('category')).order_by('-thread_count')
-        return category_counts
+        categories = ['general', 'exams', 'homework', 'projects']
+        counts = {category: Thread.objects.filter(course_id=course_id, category=category).count() for category in categories}
+        return counts
 
 ############################
 # Comment-Related Services #
