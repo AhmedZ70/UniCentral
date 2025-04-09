@@ -73,7 +73,6 @@ class Course(models.Model):
 
     def update_averages(self):
         """Recalculate and update the average rating and difficulty."""
-        from .models import Review
         # Calculate averages from related reviews
         averages = Review.objects.filter(course=self).aggregate(
             avg_rating=Avg('rating'),
@@ -201,6 +200,7 @@ class Review(models.Model):
     hybrid = models.BooleanField(default=False)
     no_exams = models.BooleanField(default=False)
     presentations = models.BooleanField(default=False)
+    is_anonymous = models.BooleanField(default=False)
 
     class Meta:
         db_table = 'reviews'

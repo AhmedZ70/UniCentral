@@ -45,6 +45,40 @@ class ReviewSerializer(serializers.ModelSerializer):
     class Meta:
         model = Review
         fields = '__all__'
+
+    def get_user(self, obj):
+        """
+        Custom method to handle user information based on is_anonymous flag.
+        For anonymous reviews, returns null for the user.
+        For non-anonymous reviews, returns user details.
+        """
+        print(f"Review {obj.id} serializing - is_anonymous={obj.is_anonymous}, type={type(obj.is_anonymous)}")
+        
+        if obj.is_anonymous:
+            return None
+            
+        if hasattr(obj, 'user') and obj.user:
+            return {
+                'id': obj.user.id,
+                'fname': obj.user.first_name,
+                'lname': obj.user.last_name,
+                'email': obj.user.email
+            }
+        return None
+    
+    def to_representation(self, instance):
+        """
+        Override to_representation to ensure is_anonymous is always boolean.
+        """
+        data = super().to_representation(instance)
+        
+        if 'is_anonymous' in data:
+            data['is_anonymous'] = bool(data['is_anonymous'])
+            
+            # Debug log
+            print(f"Serialized Review {instance.id} - is_anonymous={data['is_anonymous']}, type={type(data['is_anonymous'])}")
+        
+        return data
         
 class ThreadSerializer(serializers.ModelSerializer):
     user = UserSerializer(read_only=True)
