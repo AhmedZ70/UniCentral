@@ -1074,15 +1074,14 @@ class ContentModerationService:
             
             response_data = response.json()
             
-            # Set thresholds for different attributes
-            # Higher thresholds = more permissive (allows more negative language while still blocking actual profanity)
+
             thresholds = {
-                'TOXICITY': 0.95,          # Very high: allows harsh negativity unless it's abusive
-                'SEVERE_TOXICITY': 0.7,    # Still strict for truly offensive language
-                'IDENTITY_ATTACK': 0.6,    # Strict to block slurs, discrimination
-                'INSULT': 0.95,            # Allows negative criticism like "this class sucks"
-                'PROFANITY': 0.9,          # Very low — blocks even mild profanity
-                'THREAT': 0.6              # Strict to block threatening language
+                'TOXICITY': 1.0,          
+                'SEVERE_TOXICITY': 1.0,
+                'IDENTITY_ATTACK': 1.0,
+                'INSULT': 1.0,
+                'PROFANITY': 0.5,
+                'THREAT': 1.0
             }
             
             # Check if any attribute exceeds its threshold
@@ -1094,10 +1093,8 @@ class ContentModerationService:
                         failed_attributes.append(attr.lower())
             
             if failed_attributes:
-                message = "Review contains inappropriate content"
-                if len(failed_attributes) <= 3:  # If only a few issues, be specific
-                    issues = ', '.join(failed_attributes).replace('_', ' ')
-                    message = f"Review contains {issues}. Please revise your content."
+                # Only show "profanity" in the error message
+                message = "Your submission contains profanity. Please revise and try again."
                 return False, message
             
             return True, None
