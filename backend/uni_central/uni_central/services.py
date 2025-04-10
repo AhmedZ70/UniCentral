@@ -1073,7 +1073,11 @@ class ContentModerationService:
             )
             
             response_data = response.json()
-            
+            print(f"Perspective API Response: {response_data}")
+            for attr, threshold in thresholds.items():
+                if attr in response_data.get('attributeScores', {}):
+                    score = response_data['attributeScores'][attr]['summaryScore']['value']
+                    print(f"Attribute {attr}: Score {score}, Threshold {threshold}")
 
             thresholds = {
                 'TOXICITY': 1.0,          
