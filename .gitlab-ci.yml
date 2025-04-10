@@ -114,8 +114,16 @@ deploy:
     - echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config
   script:
     - echo "Deploying to EC2 environment..."
-    # SSH into the server and pull the latest changes
-    - ssh ${EC2_USER}@${EC2_HOST} "cd ${APP_PATH} && git pull origin ${CI_COMMIT_REF_NAME} && source ${VENV_PATH}/bin/activate && pip install -r requirements.txt && cd ${DJANGO_PATH} && python manage.py migrate && python manage.py collectstatic --noinput && ${RESTART_COMMAND}"
+    # Debug and connectivity test
+    - echo "EC2_USER: ${EC2_USER}"
+    - echo "EC2_HOST: ${EC2_HOST}"
+    - echo "APP_PATH: ${APP_PATH}"
+    - echo "VENV_PATH: ${VENV_PATH}"
+    - echo "DJANGO_PATH: ${DJANGO_PATH}"
+    - echo "RESTART_COMMAND: ${RESTART_COMMAND}"
+    - nc -zv ${EC2_HOST} 22 || echo "Port 22 on ${EC2_HOST} is not reachable"
+    # SSH into the server with verbose output and pull the latest changes
+    - ssh -vvv ${EC2_USER}@${EC2_HOST} "cd ${APP_PATH} && git pull origin ${CI_COMMIT_REF_NAME} && source ${VENV_PATH}/bin/activate && pip install -r requirements.txt && cd ${DJANGO_PATH} && python manage.py migrate && python manage.py collectstatic --noinput && ${RESTART_COMMAND}"
   environment:
     name: production
     url: https://uni-central.com
