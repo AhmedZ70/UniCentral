@@ -258,15 +258,17 @@ class CreateReviewAPIView(APIView):
         user = UserService.get_user(email_address)
         review_data = request.data
 
-        try:
-            review = ReviewService.create_review_for_course(course_id, user, review_data)
+        result = ReviewService.create_review_for_course(course_id, user, review_data)
+        
+        if result["success"]:
+            review = result["review"]
             return Response(
                 {"message": "Review created successfully", "review_id": review.id},
                 status=status.HTTP_201_CREATED
             )
-        except Exception as e:
+        else:
             return Response(
-                {"error": str(e)},
+                {"error": result["error"]},
                 status=status.HTTP_400_BAD_REQUEST
             )
             
@@ -279,15 +281,17 @@ class CreateProfessorReviewAPIView(APIView):
         user = UserService.get_user(email_address)
         review_data = request.data
 
-        try:
-            review = ReviewService.create_review_for_professor(professor_id, user, review_data)
+        result = ReviewService.create_review_for_professor(professor_id, user, review_data)
+        
+        if result["success"]:
+            review = result["review"]
             return Response(
                 {"message": "Review created successfully", "review_id": review.id},
                 status=status.HTTP_201_CREATED
             )
-        except Exception as e:
+        else:
             return Response(
-                {"error": str(e)},
+                {"error": result["error"]},
                 status=status.HTTP_400_BAD_REQUEST
             )
             
@@ -301,12 +305,26 @@ class UpdateReviewAPIView(APIView):
         Handles PUT requests to update a review.
         """
         try:
-            review_id = request.get.data('review_id')
-            updated_review = ReviewService.update_review(review_id, request.data)
-            serializer = ReviewSerializer(updated_review)
-            return Response({"message": "Review updated successfully", "review": serializer.data}, status=status.HTTP_200_OK)
+            review_id = request.data.get('review_id')
+            result = ReviewService.update_review(review_id, request.data)
+            
+            if result["success"]:
+                review = result["review"]
+                serializer = ReviewSerializer(review)
+                return Response(
+                    {"message": "Review updated successfully", "review": serializer.data}, 
+                    status=status.HTTP_200_OK
+                )
+            else:
+                return Response(
+                    {"error": result["error"]},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
         except Exception as e:
-            return Response(str(e))
+            return Response(
+                {"error": str(e)},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
 
 class DeleteReviewAPIView(APIView):
     """
