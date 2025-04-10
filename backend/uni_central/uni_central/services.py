@@ -276,6 +276,9 @@ class ReviewService:
         Returns:
             dict: A dictionary with success/error information and the review object if successful.
         """
+        import logging
+        logging.warning(f"Updating review {review_id} with data: {review_data}")
+        
         review = ReviewService.get_review_by_id(review_id)
         if review == None:
             return {
@@ -287,8 +290,10 @@ class ReviewService:
         if "review" in review_data:
             review_text = review_data.get("review")
             if review_text:
+                logging.warning(f"Checking review text for profanity: {review_text}")
                 is_appropriate, message = ContentModerationService.moderate_text(review_text)
                 if not is_appropriate:
+                    logging.warning(f"Content moderation failed: {message}")
                     return {
                         "success": False,
                         "error": message
