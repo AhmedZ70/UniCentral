@@ -19,6 +19,8 @@ import re
 from fuzzywuzzy import fuzz
 from django.core.files.uploadedfile import InMemoryUploadedFile
 import logging
+from datetime import datetime
+import time
 import string
 import requests
 import json
@@ -1148,70 +1150,59 @@ class TranscriptService:
             # Group courses by semester
             courses_by_semester = {}
             for course in courses:
-                semester = course['semester']  # This comes from _process_image
+                semester = course['semester']
                 if semester not in courses_by_semester:
                     courses_by_semester[semester] = []
                 courses_by_semester[semester].append(course)
             
             # Update each semester in the course plan
             for semester_name, semester_courses in courses_by_semester.items():
-                # Parse semester information
-                try:
-                    term, year = semester_name.split(' ')
-                    year = int(year)
-                except (ValueError, TypeError) as e:
-                    print(f"Error parsing semester '{semester_name}': {e}")
-                    continue
-
-                # Find or create semester in course plan
                 semester_entry = None
                 for s in user.course_plan["semesters"]:
-                    if s.get("term") == term and s.get("year") == year:
+                    if s.get("term") == semester_name.split(' ')[0] and s.get("year") == int(semester_name.split(' ')[1]):
                         semester_entry = s
                         break
                 
                 if not semester_entry:
                     semester_entry = {
-                        "id": f"{term.lower()}-{year}",
-                        "term": term,
-                        "year": year,
+                        "id": f"{semester_name.lower().replace(' ', '-')}",
+                        "term": semester_name.split(' ')[0],
+                        "year": int(semester_name.split(' ')[1]),
                         "courses": []
                     }
                     user.course_plan["semesters"].append(semester_entry)
                 
-                # Add new courses to semester
                 for course in semester_courses:
-                    # Check if course already exists
+                    # Check if course already exists in this semester
                     course_exists = any(
-                        c.get("courseCode", "").lower() == course["code"].lower()
+                        c.get("courseCode", "").lower() == course["code"].lower() or
+                        c.get("code", "").lower() == course["code"].lower()
                         for c in semester_entry["courses"]
                     )
                     
                     if not course_exists:
+                        # Generate a unique ID for the course
+                        unique_id = str(course.get('course_id', f"transcript-{course['code'].replace(' ', '-')}-{int(time.time() * 1000)}"))
+                        
+                        # Create a new course entry with unified property names
+                        # These property names should match the ones used in manually added courses
                         new_course = {
-                            "id": f"{course['code'].replace(' ', '-')}-{len(semester_entry['courses'])}",
-                            "courseCode": course["code"],
-                            "courseName": course["name"],
-                            "credits": course["credits"]
+                            "id": unique_id,
+                            "courseCode": course["code"],  # Use consistent property name
+                            "courseName": course["name"],  # Use consistent property name
+                            "credits": course["credits"],
+                            "rating": course.get("rating", 0),
+                            "difficulty": course.get("difficulty", 0)
                         }
                         semester_entry["courses"].append(new_course)
                         print(f"Added course {course['code']} to {semester_name}")
 
-            # Sort semesters by year and term
-            term_order = {"spring": 0, "summer": 1, "fall": 2, "winter": 3}
-            user.course_plan["semesters"].sort(
-                key=lambda x: (x["year"], term_order.get(x["term"].lower(), 0))
-            )
-
-            # Save changes to database
-            print(f"Saving updated course plan: {user.course_plan}")
+            # Save the course plan
             user.save()
             return True
             
         except Exception as e:
             print(f"Error updating course plan: {e}")
-            import traceback
-            print(f"Traceback: {traceback.format_exc()}")
             return False
 
     @staticmethod
@@ -1272,7 +1263,6 @@ class TranscriptService:
 
             if not default_semester:
                 # If no semester found, use current year
-                from datetime import datetime
                 current_year = datetime.now().year
                 default_semester = f"Fall {current_year}"  # Default to Fall of current year
                 print(f"No semester found in transcript, using default: {default_semester}")
@@ -1350,9 +1340,11 @@ class TranscriptService:
                             'code': f"{db_course.subject} {db_course.number}",  # Use database values
                             'name': db_course.title,
                             'credits': db_course.credits,
+                            'rating': db_course.avg_rating,  # Use the average rating field
+                            'difficulty': db_course.avg_difficulty,  # Use the average difficulty field
                             'confidence': 1.0,
                             'db_match': True,
-                            'course_id': db_course.id,
+                            'course_id': db_course.id,  # This is the actual database ID
                             'semester': current_semester or default_semester  # Use current semester or default
                         })
                     else:
