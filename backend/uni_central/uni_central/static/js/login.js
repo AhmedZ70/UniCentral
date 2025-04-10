@@ -2,8 +2,6 @@ import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.8.0/firebas
 import { 
     getAuth, 
     signInWithEmailAndPassword,
-    signInWithPopup,
-    GoogleAuthProvider 
 } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js';
 
 // Firebase configuration
@@ -21,7 +19,6 @@ const firebaseConfig = {
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
-const provider = new GoogleAuthProvider();
 
 // Wait for DOM to be fully loaded
 document.addEventListener('DOMContentLoaded', () => {
@@ -35,7 +32,6 @@ document.addEventListener('DOMContentLoaded', () => {
     console.log('Login form found:', form); // Debug if form is found
     const passwordInput = document.getElementById('password');
     const togglePassword = document.getElementById('toggle-password');
-    const googleLoginBtn = document.getElementById('google-login');
 
     // Check if all elements exist
     if (!form || !passwordInput || !togglePassword) {
@@ -58,20 +54,6 @@ document.addEventListener('DOMContentLoaded', () => {
     // Add click listener for password toggle
     togglePassword.addEventListener('click', () => {
     togglePasswordVisibility(passwordInput, togglePassword);
-    });
-
-    // Handle Google Sign In
-    googleLoginBtn.addEventListener('click', async () => {
-    try {
-        const result = await signInWithPopup(auth, provider);
-        console.log('Google sign in successful:', result.user);
-        window.location.href = '/'; // Changed path
-    } catch (error) {
-        console.error('Google sign in error:', error);
-        const loginError = document.getElementById('login-error');
-        loginError.textContent = 'Google sign in failed. Please try again.';
-        loginError.style.display = 'block';
-    }
     });
 
     // Handle form submission
