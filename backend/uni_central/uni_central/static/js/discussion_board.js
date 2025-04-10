@@ -336,10 +336,6 @@ async function loadThreads() {
         
         displayThreads(sortedData);
         
-        if (searchTerm && sortedData && sortedData.length > 0) {
-            highlightSearchMatches(searchTerm);
-        }
-        
         const resultCounter = document.querySelector('.result-counter');
         if (resultCounter) {
             resultCounter.textContent = `${sortedData.length} discussion${sortedData.length !== 1 ? 's' : ''} found`;

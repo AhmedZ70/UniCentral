@@ -310,12 +310,11 @@ class UpdateReviewAPIView(APIView):
     API View to update an existing review by review_id.
     """
 
-    def put(self, request):
+    def put(self, request, review_id):
         """
         Handles PUT requests to update a review.
         """
         try:
-            review_id = request.data.get('review_id')
             result = ReviewService.update_review(review_id, request.data)
             
             if result["success"]:

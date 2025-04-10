@@ -24,6 +24,16 @@ onAuthStateChanged(auth, (user) => {
 document.addEventListener("DOMContentLoaded", () => {
     console.log("DOM loaded, initializing review form");
     initializeReviewForm();
+    
+    // Safety check - remove any loading indicator after 5 seconds
+    // to ensure it doesn't get stuck on the page
+    setTimeout(() => {
+        const stuckIndicator = document.getElementById('loading-indicator');
+        if (stuckIndicator) {
+            console.warn("Found a loading indicator that wasn't properly removed - cleaning up");
+            stuckIndicator.remove();
+        }
+    }, 5000);
 });
 
 // Main initialization function that runs either on DOM load or after authentication
@@ -192,6 +202,13 @@ async function loadReviewData() {
         if (loadingIndicator) {
             loadingIndicator.className = 'error-message';
             loadingIndicator.textContent = `Error: ${error.message}`;
+            
+            // Auto-remove error message after 5 seconds
+            setTimeout(() => {
+                if (loadingIndicator && loadingIndicator.parentNode) {
+                    loadingIndicator.remove();
+                }
+            }, 5000);
         } else {
             alert(`Failed to load review data: ${error.message}`);
         }
@@ -201,9 +218,24 @@ async function loadReviewData() {
 // Helper function to populate form with review data
 function populateFormWithReviewData(review) {
     // Set text fields
-    document.getElementById("reviewText").value = review.review || '';
-    document.getElementById("estimatedHours").value = review.estimated_hours || '';
-    document.getElementById("grade").value = review.grade || '';
+    const reviewTextElement = document.getElementById("reviewText");
+    if (reviewTextElement) reviewTextElement.value = review.review || '';
+    
+    const estimatedHoursElement = document.getElementById("estimatedHours");
+    if (estimatedHoursElement) estimatedHoursElement.value = review.estimated_hours || '';
+    
+    // Set grade dropdown value
+    const gradeElement = document.getElementById("grade");
+    if (gradeElement && review.grade) {
+        // Find and select the matching option
+        const options = gradeElement.options;
+        for (let i = 0; i < options.length; i++) {
+            if (options[i].value === review.grade) {
+                gradeElement.selectedIndex = i;
+                break;
+            }
+        }
+    }
     
     // Wait for the interactive selectors to be created
     setTimeout(() => {
@@ -220,7 +252,7 @@ function populateFormWithReviewData(review) {
             difficultyInput.value = review.difficulty || 0;
             updateDifficultyCircles(review.difficulty || 0);
         }
-    }, 100);
+    }, 300);
     
     // Set checkbox values (with fallbacks for null/undefined)
     setCheckboxSafely("wouldTakeAgain", review.would_take_again);
@@ -266,9 +298,17 @@ function setCheckboxSafely(id, value) {
 // Helper function to update rating stars UI
 function updateRatingStars(rating) {
     const starsContainer = document.querySelector('.interactive-stars');
-    if (!starsContainer) return;
+    if (!starsContainer) {
+        console.warn("Rating stars container not found, cannot update stars");
+        return;
+    }
     
     const stars = starsContainer.querySelectorAll('.star');
+    if (!stars || stars.length === 0) {
+        console.warn("No stars found in stars container");
+        return;
+    }
+    
     stars.forEach(star => {
         const starValue = parseInt(star.getAttribute('data-value'));
         if (starValue <= rating) {
@@ -278,14 +318,23 @@ function updateRatingStars(rating) {
         }
     });
     starsContainer.setAttribute('data-value', rating);
+    console.log(`Rating stars updated to ${rating}`);
 }
 
 // Helper function to update difficulty circles UI
 function updateDifficultyCircles(difficulty) {
     const circlesContainer = document.querySelector('.interactive-difficulty');
-    if (!circlesContainer) return;
+    if (!circlesContainer) {
+        console.warn("Difficulty circles container not found, cannot update circles");
+        return;
+    }
     
     const circles = circlesContainer.querySelectorAll('.difficulty-circle');
+    if (!circles || circles.length === 0) {
+        console.warn("No circles found in difficulty container");
+        return;
+    }
+    
     circles.forEach(circle => {
         const circleValue = parseInt(circle.getAttribute('data-value'));
         circle.classList.remove('filled', 'green', 'yellow', 'red');
@@ -302,6 +351,7 @@ function updateDifficultyCircles(difficulty) {
         }
     });
     circlesContainer.setAttribute('data-value', difficulty);
+    console.log(`Difficulty circles updated to ${difficulty}`);
 }
 
 // Set up the form submission
@@ -447,7 +497,7 @@ async function submitReview(formData, contextType, contextId) {
     let endpoint, method;
     
     if (isEditMode) {
-        endpoint = '/api/reviews/update/';
+        endpoint = `/api/reviews/${reviewId}/update/`;
         method = 'PUT';
     } else {
         endpoint = contextType === "course"

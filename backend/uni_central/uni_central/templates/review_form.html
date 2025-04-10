@@ -58,7 +58,22 @@
         <input type="number" id="estimatedHours" step="0.1" min="0">
 
         <label for="grade">Grade Received:</label>
-        <input type="text" id="grade" maxlength="2" placeholder="e.g., A, B+">
+        <select id="grade">
+            <option value="">-- Select a Grade --</option>
+            <option value="A">A</option>
+            <option value="A-">A-</option>
+            <option value="B+">B+</option>
+            <option value="B">B</option>
+            <option value="B-">B-</option>
+            <option value="C+">C+</option>
+            <option value="C">C</option>
+            <option value="C-">C-</option>
+            <option value="D+">D+</option>
+            <option value="D">D</option>
+            <option value="D-">D-</option>
+            <option value="E">E</option>
+        </select>
+        <span id="gradeError" class="error-message"></span>
         
         <!-- Boolean checkboxes (match IDs to what your JS uses) -->
         <div class="checkbox-group">
