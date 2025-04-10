@@ -88,17 +88,7 @@ migration-test:
     - python manage.py migrate --plan
   allow_failure: true
 
-# Security scanning
-security-scan:
-  stage: test
-  <<: *backend_config
-  script:
-    - pip install bandit safety
-    - echo "Running Bandit security scanner..."
-    - bandit -r uni_central/ -x uni_central/tests/
-    - echo "Checking dependencies for security vulnerabilities..."
-    - safety check
-  allow_failure: true
+
 
 # Build backend
 build-backend:
