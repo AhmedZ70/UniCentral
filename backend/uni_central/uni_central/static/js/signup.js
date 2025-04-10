@@ -21,7 +21,6 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 
-// Wait for DOM to be fully loaded
 document.addEventListener('DOMContentLoaded', () => {
     console.log('DOM Content Loaded'); // Debug log
 
@@ -34,7 +33,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const toggleConfirmPassword = document.getElementById('toggle-confirm-password');
     const passwordError = document.getElementById('password-error');    
 
-    // Check if all elements exist
     if (!form || !passwordInput || !confirmPasswordInput || !togglePassword || !toggleConfirmPassword) {
     console.error('One or more elements not found');
     return;
@@ -53,7 +51,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     }
 
-    // Add click listeners for password toggles
     togglePassword.addEventListener('click', () => {
     togglePasswordVisibility(passwordInput, togglePassword);
     });
@@ -64,7 +61,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Check if passwords match
     function checkPasswords() {
-        // Only check and show error if the first password field has content
         if (passwordInput.value.length > 0) {
             if (passwordInput.value !== confirmPasswordInput.value) {
                 passwordError.style.display = 'block';
@@ -73,22 +69,18 @@ document.addEventListener('DOMContentLoaded', () => {
             passwordError.style.display = 'none';
             return true;
         }
-        // If first password is empty, hide error and return true
         passwordError.style.display = 'none';
         return true;
     }
 
-    // Add input listeners for both password fields
     passwordInput.addEventListener('input', checkPasswords);
     confirmPasswordInput.addEventListener('input', checkPasswords);
 
-    // Add input listener for password confirmation
     confirmPasswordInput.addEventListener('input', checkPasswords);
 
-    // Handle form submission
     form.addEventListener('submit', async (e) => {
     e.preventDefault();
-    console.log('Form submitted'); // Debug log
+    console.log('Form submitted'); 
 
     if (!checkPasswords()) {
         return;
@@ -101,10 +93,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const fullName = fname + ' ' + lname;
     const signupError = document.getElementById('signup-error');
 
-    console.log('Attempting to create user with:', { email, fullName }); // Debug log
+    console.log('Attempting to create user with:', { email, fullName }); 
 
     try {
-        // Create user with email and password
         console.log('Calling createUserWithEmailAndPassword');
         const userCredential = await createUserWithEmailAndPassword(auth, email, password);
         console.log('User credential received:', userCredential);
@@ -112,27 +103,19 @@ document.addEventListener('DOMContentLoaded', () => {
         const user = userCredential.user;
         console.log('User created:', user.uid);
 
-        // Update user profile with name
         console.log('Updating user profile with name');
         await updateProfile(user, {
             displayName: fullName
         });
         console.log('Profile updated successfully');
 
-        // Store additional user data in Firebase
         console.log('User signed up successfully!');
         
-        // Verification Email (optional)
-        // await sendEmailVerification(user);
-        // console.log('Verification email sent');
-        
-        // Redirect to home page after successful signup
-        alert('Account created successfully! Please check your email for verification.');
+        alert('Account created successfully!');
         window.location.href = '/'; 
 
-        // User creation for sqlite3
         fetch('/api/create_user/', {
-            method: 'POST', // Use POST method
+            method: 'POST', 
             headers: {
             'Content-Type': 'application/json',
             },
@@ -157,8 +140,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
     } catch (error) {
-        console.error('Detailed error:', error); // More detailed error logging
-        // Handle specific error cases
+        console.error('Detailed error:', error); 
         switch (error.code) {
         case 'auth/email-already-in-use':
             signupError.textContent = 'This email is already registered. Use a different email or sign in.';

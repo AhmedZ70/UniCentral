@@ -3,7 +3,7 @@ html,
 ul,
 li,
 p,
-h1 {
+h1, h2 {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
@@ -13,6 +13,10 @@ body {
   font-family: 'Montserrat', sans-serif;
   line-height: 1.6;
   background-color: #fdfbf5;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  margin: 0;
 }
 
 .actions {
@@ -20,33 +24,24 @@ body {
   align-items: center;
 }
 
-body {
-  display: flex;
-  flex-direction: column;
-  /* Align items vertically */
-  min-height: 100vh;
-  /* Ensure body takes full viewport height */
-  margin: 0;
-}
-
 .hero {
   display: flex;
   flex-direction: column;
-  /* Align items vertically in the hero section */
   align-items: center;
   justify-content: center;
-  height: 85vh;
+  height: 90vh; 
+  padding: 20px;
 }
 
 .logo-container {
   display: flex;
   justify-content: center;
   align-items: center;
-  margin-bottom: 5px;
+  margin-bottom: 15px; 
 }
 
 .logo-container img {
-  width: 200px;
+  width: 250px;
   height: auto;
 }
 
@@ -55,34 +50,43 @@ body {
 }
 
 .login-box {
-  border: 1px solid black;
-  padding: 20px;
-  border-radius: 5px 5px 5px 5px;
-  height: 350px;
-  width: 300px;
+  border: 1px solid black; 
+  padding: 30px; 
+  border-radius: 8px; 
+  width: 375px; 
+  max-width: 90%;
   text-align: center;
   margin-bottom: 20px;
 }
 
+.login-box h2 {
+  margin-bottom: 30px; 
+  font-size: 28px;
+}
+
 .login-box-labels {
   text-align: left;
-  color: gray;
-  font-size: 12px;
+  color: #555; 
+  font-size: 14px; 
+  margin-bottom: 8px;
 }
 
 .login-entry div {
-  margin-bottom: 10px;
+  margin-bottom: 20px; 
 }
 
 .login-entry label {
   display: block;
+  font-weight: 500;
 }
 
 .login-entry input {
   width: 100%;
-  padding: 0.5rem;
+  padding: 12px; 
   box-sizing: border-box;
-  margin-top: -15px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 16px;
 }
 
 .password-container {
@@ -92,7 +96,9 @@ body {
 
 .password-toggle {
   position: absolute;
-  right: 2px;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
   background: none;
   border: none;
   cursor: pointer;
@@ -116,18 +122,41 @@ body {
   color: white;
   border: none;
   width: 100%;
-  padding: 0.5rem 1rem;
-  border-radius: 5px 5px 5px 5px;
+  padding: 12px;
+  border-radius: 4px;
   cursor: pointer;
   font-weight: bold;
   margin-top: 10px;
-  margin-bottom: 15px;
+  margin-bottom: 20px;
+  font-size: 16px;
+  transition: background-color 0.2s ease;
+}
+
+.login-btn:hover {
+  background-color: #004748;
+}
+
+.forgot-password {
+  color: #0066cc;
+  text-decoration: none;
+  font-size: 15px;
+}
+
+.forgot-password:hover {
+  text-decoration: underline;
 }
 
 .create-account {
-  margin-top: 20px;
-  margin-bottom: 20px;
+  margin-top: 10px;
+  text-align: center;
+  width: 440px;
+}
+
+.create-account span {
+  display: block;
+  margin-bottom: 10px;
   text-align: left;
+  font-size: 15px;
 }
 
 .create-account-btn {
@@ -135,15 +164,21 @@ body {
   border: 1px solid #005a5b;
   background-color: transparent;
   width: 100%;
-  padding: 0.5rem 1rem;
-  border-radius: 5px 5px 5px 5px;
-  margin-bottom: 10px;
+  padding: 12px;
+  border-radius: 4px;
   cursor: pointer;
+  font-weight: bold;
+  font-size: 16px;
+  transition: all 0.2s ease;
+}
+
+.create-account-btn:hover {
+  background-color: rgba(0, 90, 91, 0.1);
 }
 
 .error-message {
-  font-size: 12px;
-  color: red;
+  font-size: 14px;
+  color: #e53935;
   margin-top: 5px;
   margin-bottom: 5px;
 }
