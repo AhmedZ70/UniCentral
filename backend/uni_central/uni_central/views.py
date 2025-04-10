@@ -341,38 +341,46 @@ class UpdateReviewAPIView(APIView):
     """
     API View to update an existing review by review_id.
     """
-    def put(self, request):
+    def put(self, request, review_id=None):
         """
         Handles PUT requests to update a review.
+        Accepts review_id from the URL or from request.data.
         """
         try:
-            review_id = request.data.get('review_id')
+            print(f"Update request data: {request.data}")
+
+            # Prefer review_id from URL, fallback to request data
+            review_id = review_id or request.data.get('review_id')
+            print(f"Using review_id: {review_id}")
+
+            if not review_id:
+                return Response({"error": "Review ID is required"}, status=status.HTTP_400_BAD_REQUEST)
+
             result = ReviewService.update_review(review_id, request.data)
 
-            if result["success"]:
-                review = result["review"]
-                serializer = ReviewSerializer(review)
-                return Response(
-                    {"message": "Review updated successfully", "review": serializer.data},
-                    status=status.HTTP_200_OK
-                )
-            else:
-                error_msg = result["error"]
+            if isinstance(result, dict) and not result.get("success"):
+                error_msg = result.get("error", "Unknown error")
                 if any(word in error_msg.lower() for word in ["inappropriate", "toxicity", "profanity", "slurs"]):
                     error_msg = "Your review contains profanity. Please revise and try again."
+
                 return Response({"error": error_msg}, status=status.HTTP_400_BAD_REQUEST)
 
-        except Exception as e:
-            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            review = result["review"] if isinstance(result, dict) else result
+            serializer = ReviewSerializer(review)
+            return Response(
+                {"message": "Review updated successfully", "review": serializer.data},
+                status=status.HTTP_200_OK
+            )
 
+        except Exception as e:
             import traceback
             error_traceback = traceback.format_exc()
             print(f"Error updating review: {str(e)}")
             print(error_traceback)
-            # Return detailed error info during development
+
             return Response({
                 "error": str(e),
-                "traceback": error_traceback.split("\n")
+                "traceback": error_traceback.split("\n")  # Helpful during development
             }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         
 class UserCourseReviewsAPIView(APIView):

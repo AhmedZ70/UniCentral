@@ -29,94 +29,90 @@ document.addEventListener("DOMContentLoaded", () => {
     // Get context information
     const contextType = document.getElementById("contextType").value; // "course" or "professor"
     const contextId = document.getElementById("contextId").value;
-    
+
     // Check if this is an edit page by looking for review ID
     const reviewIdInput = document.getElementById("reviewId");
     const reviewId = reviewIdInput ? reviewIdInput.value : null;
     const isEdit = reviewId ? true : false;
-    
+
     const professorSelectContainer = document.getElementById("professorSelectContainer");
     const courseSelectContainer = document.getElementById("courseSelectContainer");
 
-    // For course reviews, we need to fetch the course ID from the review if this is an edit
     let courseId = document.getElementById("courseId") ? document.getElementById("courseId").value : null;
-    
+
     if (contextType === "course") {
         // If this is an edit form, use the course ID from the form
         if (isEdit && !courseId) {
             console.error("Course ID not found in edit form!");
         }
-        
+
         professorSelectContainer.style.display = "block";
-        
-        if (courseId) {
-            fetch(`/api/courses/${courseId}/professors/`)
-                .then((response) => {
-                    if (!response.ok) {
-                        throw new Error(`Failed to fetch professors (status ${response.status})`);
-                    }
-                    return response.json();
-                })
-                .then((professors) => {
-                    const professorSelect = document.getElementById("professorSelect");
-                    professors.forEach((prof) => {
-                        const option = document.createElement("option");
-                        option.value = prof.id;
-                        option.textContent = `${prof.fname} ${prof.lname}`;
-                        professorSelect.appendChild(option);
-                    });
-                    
-                    if (isEdit && document.getElementById("currentProfessorId")) {
-                        const currentProfId = document.getElementById("currentProfessorId").value;
-                        professorSelect.value = currentProfId;
-                    }
-                })
-                .catch((error) => console.error("Error fetching professors:", error));
-        } else {
-            console.error("Cannot fetch professors: Course ID is missing");
-        }
-    } else if (contextType === "professor") {
-        // Show course dropdown and fetch courses
-        courseSelectContainer.style.display = "block";
-        fetch(`/api/professors/${contextId}/courses/`)
+
+        fetch(`/api/courses/${contextId}/professors/`)
             .then((response) => {
                 if (!response.ok) {
-                    throw new Error(`Failed to fetch courses (status ${response.status})`);
+                    throw new Error(`Failed to fetch professors (status ${response.status})`);
                 }
                 return response.json();
             })
-            .then((courses) => {
-                const courseSelect = document.getElementById("courseSelect");
-                courses.forEach((course) => {
+            .then((professors) => {
+                const professorSelect = document.getElementById("professorSelect");
+
+                // Clear existing options
+                professorSelect.innerHTML = '';
+
+                // Add a default "Select Professor" option
+                const defaultOption = document.createElement("option");
+                defaultOption.value = "";
+                defaultOption.textContent = "Select a Professor";
+                defaultOption.selected = true;
+                defaultOption.disabled = true;
+                professorSelect.appendChild(defaultOption);
+
+                // Populate professors
+                professors.forEach((prof) => {
                     const option = document.createElement("option");
-                    option.value = course.id;
-                    option.textContent = `${course.title} (${course.subject} ${course.number})`;
-                    courseSelect.appendChild(option);
+                    option.value = prof.id;
+                    option.textContent = `${prof.fname} ${prof.lname}`;
+                    professorSelect.appendChild(option);
                 });
-                
-                // If this is an edit form, select the right course
-                if (isEdit && document.getElementById("currentCourseId")) {
-                    const currentCourseId = document.getElementById("currentCourseId").value;
-                    courseSelect.value = currentCourseId;
+
+                // If in edit mode and current professor exists, select that professor
+                if (isEdit && document.getElementById("currentProfessorId")) {
+                    const currentProfId = document.getElementById("currentProfessorId").value;
+                    professorSelect.value = currentProfId;
                 }
             })
-            .catch((error) => console.error("Error fetching courses:", error));
+            .catch((error) => {
+                console.error("Error fetching professors:", error);
+
+                // Disable professor dropdown and show error
+                const professorSelect = document.getElementById("professorSelect");
+                professorSelect.innerHTML = '';
+
+                const errorOption = document.createElement("option");
+                errorOption.textContent = "Unable to load professors";
+                errorOption.disabled = true;
+                errorOption.selected = true;
+                professorSelect.appendChild(errorOption);
+                professorSelect.disabled = true;
+            });
     }
-  
+
     // Replace numeric inputs with interactive selectors
     createInteractiveRatingSelector();
     createInteractiveDifficultySelector();
-    
+
     // Create the anonymous review option
     createAnonymousReviewOption();
-  
+
     // Handle form submission
     const submitBtn = document.getElementById("submitReviewBtn");
     submitBtn.addEventListener("click", (e) => {
         if (!submitBtn) {
             console.error("Submit button not found!");
             return;
-        }   
+        }
         e.preventDefault();
 
         let isAnonymous = false;
@@ -124,7 +120,7 @@ document.addEventListener("DOMContentLoaded", () => {
         console.log("Anonymous Checkbox Element:", anonymousCheckbox);
         console.log("Is Anonymous Checked:", anonymousCheckbox.checked);
         console.log("Anonymous Checkbox Value:", anonymousCheckbox.value);
-        
+
         if (anonymousCheckbox) {
             isAnonymous = anonymousCheckbox.checked;
             console.log("Anonymous Checkbox Found:", anonymousCheckbox);
@@ -132,7 +128,7 @@ document.addEventListener("DOMContentLoaded", () => {
         } else {
             console.error("Anonymous checkbox not found in the DOM!");
         }
-        
+
         // Get field values
         const reviewText = document.getElementById("reviewText").value.trim();
         const rating = document.getElementById("rating").value.trim();
@@ -181,7 +177,7 @@ document.addEventListener("DOMContentLoaded", () => {
         if (!isValid) {
             return;
         }
-        
+
         const bodyData = {
             review: reviewText,
             rating: parseFloat(rating),
@@ -203,22 +199,22 @@ document.addEventListener("DOMContentLoaded", () => {
 
             email_address: userEmail
         };
-  
+
         if (contextType === "course") {
             bodyData.professor = document.getElementById("professorSelect").value;
         } else if (contextType === "professor") {
             bodyData.course = document.getElementById("courseSelect").value;
         }
-        
+
         // If this is an edit, we need to include the review ID
         if (isEdit) {
             bodyData.review_id = reviewId;
         }
-  
+
         // Determine the endpoint based on whether this is a new review or an edit
         let endpoint;
         let method;
-        
+
         if (isEdit) {
             endpoint = `/api/reviews/${reviewId}/update/`;
             method = "PUT";
@@ -228,31 +224,42 @@ document.addEventListener("DOMContentLoaded", () => {
                 : `/api/professors/${contextId}/reviews/create/`;
             method = "POST";
         }
-  
+
         fetch(endpoint, {
             method: method,
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(bodyData),
         })
-            .then((response) => {
-                if (!response.ok) throw new Error(`Failed to ${isEdit ? 'update' : 'create'} review.`);
-                return response.json();
-            })
-            .then((data) => {
-                if (isEdit) {
-                    window.location.href = "/my_reviews/"; // Redirect to my reviews page after edit
-                } else {
-                    if (contextType === "course") {
-                        window.location.href = `/courses/${contextId}/`;
-                    } else if (contextType === "professor") {
-                        window.location.href = `/professors/${contextId}/`;
-                    }
+        .then((response) => {
+            // Log the full response for debugging
+            console.log('Response status:', response.status);
+            console.log('Response headers:', response.headers);
+            
+            // Try to parse the error response
+            return response.json().then(errorData => {
+                if (!response.ok) {
+                    console.error('Error response body:', errorData);
+                    throw new Error(`Failed to ${isEdit ? 'update' : 'create'} review. ${JSON.stringify(errorData)}`);
                 }
-            })
-            .catch((error) => {
-                console.error(`Error ${isEdit ? 'updating' : 'submitting'} review:`, error);
-                alert(`Failed to ${isEdit ? 'update' : 'create'} review.`);
+                return errorData;
             });
+        })
+        .then((data) => {
+            if (isEdit) {
+                window.location.href = "/my_reviews/";
+            } else {
+                if (contextType === "course") {
+                    window.location.href = `/courses/${contextId}/`;
+                } else if (contextType === "professor") {
+                    window.location.href = `/professors/${contextId}/`;
+                }
+            }
+        })
+        .catch((error) => {
+            console.error(`Error ${isEdit ? 'updating' : 'submitting'} review:`, error);
+            console.log('Body data sent:', bodyData);
+            alert(`Failed to ${isEdit ? 'update' : 'create'} review: ${error.message}`);
+        });
     });
 });
 
@@ -262,34 +269,34 @@ function createInteractiveRatingSelector() {
     const ratingContainer = document.createElement('div');
     ratingContainer.id = 'rating-stars-container';
     ratingContainer.className = 'interactive-stars-container';
-    
+
     // Create label and help text
     const starRatingTitle = document.createElement('div');
     starRatingTitle.className = 'selector-title';
     starRatingTitle.textContent = 'Rating:';
-    
+
     const helpText = document.createElement('div');
     helpText.className = 'selector-help-text';
     helpText.textContent = 'Click on a star to select your rating';
-    
+
     // Create stars container
     const starsContainer = document.createElement('div');
     starsContainer.className = 'interactive-stars';
     starsContainer.setAttribute('data-value', '0');
-    
+
     // Create 5 stars
     for (let i = 1; i <= 5; i++) {
         const star = document.createElement('span');
         star.className = 'star';
         star.setAttribute('data-value', i);
         star.innerHTML = '★';
-        
+
         // Add click event to each star
         star.addEventListener('click', () => {
             const selectedValue = parseInt(star.getAttribute('data-value'));
             starsContainer.setAttribute('data-value', selectedValue);
             ratingInput.value = selectedValue;
-            
+
             // Update star styles
             const stars = starsContainer.querySelectorAll('.star');
             stars.forEach(s => {
@@ -301,7 +308,7 @@ function createInteractiveRatingSelector() {
                 }
             });
         });
-        
+
         // Add hover effects
         star.addEventListener('mouseenter', () => {
             const hoverValue = parseInt(star.getAttribute('data-value'));
@@ -313,26 +320,26 @@ function createInteractiveRatingSelector() {
                 }
             });
         });
-        
+
         star.addEventListener('mouseleave', () => {
             const stars = starsContainer.querySelectorAll('.star');
             stars.forEach(s => {
                 s.classList.remove('hover');
             });
         });
-        
+
         starsContainer.appendChild(star);
     }
-    
+
     // Assemble the components
     ratingContainer.appendChild(starRatingTitle);
     ratingContainer.appendChild(starsContainer);
     ratingContainer.appendChild(helpText);
-    
+
     // Replace the original input with our interactive version
     const ratingParent = ratingInput.parentNode;
     ratingParent.insertBefore(ratingContainer, ratingInput);
-    
+
     // Hide the original input but keep it in the DOM for form submission
     ratingInput.style.display = 'none';
 }
@@ -343,39 +350,39 @@ function createInteractiveDifficultySelector() {
     const difficultyContainer = document.createElement('div');
     difficultyContainer.id = 'difficulty-circles-container';
     difficultyContainer.className = 'interactive-difficulty-container';
-    
+
     // Create label and help text
     const difficultyTitle = document.createElement('div');
     difficultyTitle.className = 'selector-title';
     difficultyTitle.textContent = 'Difficulty:';
-    
+
     const helpText = document.createElement('div');
     helpText.className = 'selector-help-text';
     helpText.textContent = 'Click on a circle to select difficulty level (1-6)';
-    
+
     // Create circles container
     const circlesContainer = document.createElement('div');
     circlesContainer.className = 'interactive-difficulty';
     circlesContainer.setAttribute('data-value', '0');
-    
+
     // Create 6 difficulty circles
     for (let i = 1; i <= 6; i++) {
         const circle = document.createElement('span');
         circle.className = 'difficulty-circle';
         circle.setAttribute('data-value', i);
-        
+
         // Add click event to each circle
         circle.addEventListener('click', () => {
             const selectedValue = parseInt(circle.getAttribute('data-value'));
             circlesContainer.setAttribute('data-value', selectedValue);
             difficultyInput.value = selectedValue;
-            
+
             // Update circle styles
             const circles = circlesContainer.querySelectorAll('.difficulty-circle');
             circles.forEach(c => {
                 const circleValue = parseInt(c.getAttribute('data-value'));
                 c.classList.remove('filled', 'green', 'yellow', 'red');
-                
+
                 if (circleValue <= selectedValue) {
                     c.classList.add('filled');
                     if (circleValue <= 2) {
@@ -388,7 +395,7 @@ function createInteractiveDifficultySelector() {
                 }
             });
         });
-        
+
         // Add hover effects
         circle.addEventListener('mouseenter', () => {
             const hoverValue = parseInt(circle.getAttribute('data-value'));
@@ -400,24 +407,24 @@ function createInteractiveDifficultySelector() {
                 }
             });
         });
-        
+
         circle.addEventListener('mouseleave', () => {
             const circles = circlesContainer.querySelectorAll('.difficulty-circle');
             circles.forEach(c => {
                 c.classList.remove('hover');
             });
         });
-        
+
         circlesContainer.appendChild(circle);
     }
-    
+
     difficultyContainer.appendChild(difficultyTitle);
     difficultyContainer.appendChild(circlesContainer);
     difficultyContainer.appendChild(helpText);
-    
+
     const difficultyParent = difficultyInput.parentNode;
     difficultyParent.insertBefore(difficultyContainer, difficultyInput);
-    
+
     difficultyInput.style.display = 'none';
 }
 
@@ -425,7 +432,7 @@ function createAnonymousReviewOption() {
     // Create container for the anonymous review option
     const anonymousContainer = document.createElement('div');
     anonymousContainer.className = 'form-check review-option-container mb-3';
-    
+
     // Create input checkbox
     const anonymousInput = document.createElement('input');
     anonymousInput.type = 'checkbox';
@@ -434,26 +441,26 @@ function createAnonymousReviewOption() {
     anonymousInput.name = 'anonymousReview';
     // Set default value to ensure it's initialized properly
     anonymousInput.value = "true";
-    
+
     // Create label
     const anonymousLabel = document.createElement('label');
     anonymousLabel.className = 'form-check-label ms-2';
     anonymousLabel.htmlFor = 'anonymousReview';
     anonymousLabel.textContent = 'Make this review anonymous';
-    
+
     // Create help text
     const helpText = document.createElement('small');
     helpText.className = 'form-text text-muted d-block mt-1';
     helpText.textContent = 'When checked, your name will not be displayed with this review';
-    
+
     // Assemble components
     anonymousContainer.appendChild(anonymousInput);
     anonymousContainer.appendChild(anonymousLabel);
     anonymousContainer.appendChild(document.createElement('br'));
     anonymousContainer.appendChild(helpText);
-    
+
     const submitBtn = document.getElementById('submitReviewBtn');
-    
+
     if (!submitBtn || !submitBtn.parentNode) {
         console.error("Cannot find submit button or its parent node");
         const form = document.querySelector('form');
@@ -464,15 +471,15 @@ function createAnonymousReviewOption() {
         }
         return;
     }
-    
+
     const submitBtnParent = submitBtn.parentNode;
-    
+
     const separator = document.createElement('hr');
     separator.className = 'mt-3 mb-3';
-    
+
     submitBtnParent.insertBefore(separator, submitBtn);
     submitBtnParent.insertBefore(anonymousContainer, submitBtn);
-    
+
     anonymousInput.addEventListener('change', () => {
         console.log("Anonymous checkbox changed:", anonymousInput.checked);
     });
