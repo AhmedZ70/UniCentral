@@ -315,7 +315,18 @@ class UpdateReviewAPIView(APIView):
         Handles PUT requests to update a review.
         """
         try:
-            result = ReviewService.update_review(review_id, request.data)
+            import logging
+            logging.warning(f"Received update request for review {review_id} with data: {request.data}")
+            
+            # Ensure review text is being sent in the request data
+            review = ReviewService.get_review_by_id(review_id)
+            if review and 'review' not in request.data and review.review:
+                # If review text is not in the request data, use the existing review text
+                modified_data = dict(request.data)
+                modified_data['review'] = review.review
+                result = ReviewService.update_review(review_id, modified_data)
+            else:
+                result = ReviewService.update_review(review_id, request.data)
             
             if result["success"]:
                 review = result["review"]
@@ -325,11 +336,8 @@ class UpdateReviewAPIView(APIView):
                     status=status.HTTP_200_OK
                 )
             else:
-                # Check if the error message is related to content moderation
+                # Get the error message - content moderation errors are already standardized in the service
                 error_msg = result["error"]
-                if "inappropriate" in error_msg.lower() or "toxicity" in error_msg.lower() or "profanity" in error_msg.lower() or "slurs" in error_msg.lower():
-                    error_msg = "Your review contains profanity. Please revise and try again."
-                
                 return Response(
                     {"error": error_msg},
                     status=status.HTTP_400_BAD_REQUEST
