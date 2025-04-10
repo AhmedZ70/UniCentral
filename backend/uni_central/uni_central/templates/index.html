@@ -14,21 +14,44 @@
     <section class="hero">
       <div class="text-content">
         <div class="text-container">
-          <h1><span class="overlap-arrow">Everything you need to know about your courses all in one place</span></h1>
+          <h1><span class="highlight-text">Everything you need to know about your courses all in one place</span></h1>
         </div>
         <img src="{% static 'assets/orange_arrow_transparent.png' %}" alt="Orange Arrow" class="orange-arrow">
         <p>Empowering students, one class at a time.</p>
-        <div class="search-bar">
-          <input type="text" placeholder="University of ..." class="search-input">
-          <button class="search-btn">SEARCH &#10140;</button>
+        
+        <div class="cta-container">
+          <a href="/courses/" class="cta-button primary">Explore Courses</a>
+          <a href="/professors/" class="cta-button secondary">Find Professors</a>
         </div>
-        <p class="subtext">Search for your university to find course information.<br>Aims to redefine the way that college students research and ultimately choose their courses each term.</p>
+        
+        <div class="feature-highlights">
+          <div class="feature">
+            <span class="feature-icon">✓</span>
+            <span class="feature-text">Course Reviews</span>
+          </div>
+          <div class="feature">
+            <span class="feature-icon">✓</span>
+            <span class="feature-text">Professor Ratings</span>
+          </div>
+          <div class="feature">
+            <span class="feature-icon">✓</span>
+            <span class="feature-text">Class Planning</span>
+          </div>
+        </div>
       </div>
       <div class="illustrations">
         <img src="{% static 'assets/student_studying_transparent.png' %}" alt="Student Illustration">
       </div>
     </section>
-    <div class="orange-bar"></div>
+    
+    <!-- Orange Bar as Footer -->
+    <div class="orange-bar">
+      <div class="footer-content">
+        <p>UniCentral - Making course selection easier for students</p>
+        <p class="copyright">© 2025 UniCentral. All rights reserved.</p>
+      </div>
+    </div>
+    
     <!-- React Root Element -->
     <div id="react-root"></div>
   </main>
