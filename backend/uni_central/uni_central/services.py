@@ -19,6 +19,8 @@ import re
 from fuzzywuzzy import fuzz
 from django.core.files.uploadedfile import InMemoryUploadedFile
 import logging
+from datetime import datetime
+import time
 
 ###############################
 # Department-Related Services #
@@ -964,7 +966,7 @@ class TranscriptService:
                 
                 if not semester_entry:
                     semester_entry = {
-                        "id": f"{semester_name.lower()}",
+                        "id": f"{semester_name.lower().replace(' ', '-')}",
                         "term": semester_name.split(' ')[0],
                         "year": int(semester_name.split(' ')[1]),
                         "courses": []
@@ -974,19 +976,24 @@ class TranscriptService:
                 for course in semester_courses:
                     # Check if course already exists in this semester
                     course_exists = any(
-                        c.get("courseCode", "").lower() == course["code"].lower()
+                        c.get("courseCode", "").lower() == course["code"].lower() or
+                        c.get("code", "").lower() == course["code"].lower()
                         for c in semester_entry["courses"]
                     )
                     
                     if not course_exists:
-                        # Create a new course entry with rating and difficulty
+                        # Generate a unique ID for the course
+                        unique_id = str(course.get('course_id', f"transcript-{course['code'].replace(' ', '-')}-{int(time.time() * 1000)}"))
+                        
+                        # Create a new course entry with unified property names
+                        # These property names should match the ones used in manually added courses
                         new_course = {
-                            "id": course['course_id'],  # Use the actual database ID
-                            "courseCode": course["code"],
-                            "courseName": course["name"],
+                            "id": unique_id,
+                            "courseCode": course["code"],  # Use consistent property name
+                            "courseName": course["name"],  # Use consistent property name
                             "credits": course["credits"],
-                            "rating": course["rating"],  # Add rating
-                            "difficulty": course["difficulty"]  # Add difficulty
+                            "rating": course.get("rating", 0),
+                            "difficulty": course.get("difficulty", 0)
                         }
                         semester_entry["courses"].append(new_course)
                         print(f"Added course {course['code']} to {semester_name}")
@@ -1057,7 +1064,6 @@ class TranscriptService:
 
             if not default_semester:
                 # If no semester found, use current year
-                from datetime import datetime
                 current_year = datetime.now().year
                 default_semester = f"Fall {current_year}"  # Default to Fall of current year
                 print(f"No semester found in transcript, using default: {default_semester}")
