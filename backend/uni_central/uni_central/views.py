@@ -310,14 +310,34 @@ class UpdateReviewAPIView(APIView):
     API View to update an existing review by review_id.
     """
 
-    def put(self, request):
+    def put(self, request, review_id=None):
         """
         Handles PUT requests to update a review.
+        
+        Args:
+            request: The HTTP request
+            review_id: Review ID from URL path (optional)
+            
+        Note: Review ID can be provided either in the URL path or request.data
         """
         try:
-            review_id = request.data.get('review_id')
+            # Get review_id from either URL path parameter or request data
+            review_id = review_id or request.data.get('review_id')
+            
+            if not review_id:
+                return Response(
+                    {"error": "Review ID is required"},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+                
+            # Convert to int if it's a string
+            if isinstance(review_id, str) and review_id.isdigit():
+                review_id = int(review_id)
+                
+            # Update the review using the service
             result = ReviewService.update_review(review_id, request.data)
             
+            # Check result
             if result["success"]:
                 review = result["review"]
                 serializer = ReviewSerializer(review)
@@ -336,8 +356,11 @@ class UpdateReviewAPIView(APIView):
                     status=status.HTTP_400_BAD_REQUEST
                 )
         except Exception as e:
+            import traceback
+            print(f"Error updating review: {str(e)}")
+            print(traceback.format_exc())
             return Response(
-                {"error": str(e)},
+                {"error": f"Failed to update review: {str(e)}"},
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
 
@@ -349,12 +372,44 @@ class DeleteReviewAPIView(APIView):
     def delete(self, request, review_id):
         """
         Calls the ReviewService to delete a review.
+        
+        Args:
+            request: The HTTP request
+            review_id: Review ID from URL path
         """
-        review_id = request.data.get('review_id')
-        review = ReviewService.get_review_by_id(review_id)
-        result = ReviewService.delete_review(review)
-
-        return Response(result)
+        try:
+            # URL path parameter takes precedence, but fallback to request data if needed
+            if not review_id:
+                review_id = request.data.get('review_id')
+                
+            if not review_id:
+                return Response(
+                    {"error": "Review ID is required"},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+                
+            # Convert to int if it's a string
+            if isinstance(review_id, str) and review_id.isdigit():
+                review_id = int(review_id)
+                
+            review = ReviewService.get_review_by_id(review_id)
+            if not review:
+                return Response(
+                    {"error": f"Review with ID {review_id} not found"},
+                    status=status.HTTP_404_NOT_FOUND
+                )
+                
+            result = ReviewService.delete_review(review)
+            return Response(result)
+            
+        except Exception as e:
+            import traceback
+            print(f"Error deleting review: {str(e)}")
+            print(traceback.format_exc())
+            return Response(
+                {"error": f"Failed to delete review: {str(e)}"},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
     
 ####################################
 # Review Vote-Related Views and APIs #

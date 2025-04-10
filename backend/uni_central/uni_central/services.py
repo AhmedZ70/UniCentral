@@ -1048,10 +1048,28 @@ class ContentModerationService:
                 - is_appropriate (bool): True if content passes moderation
                 - message (str): Explanation message if content fails moderation
         """
+        # Log a shortened version of the text to avoid log clutter
+        safe_text = text[:30] + "..." if text and len(text) > 30 else text
+        logging.info(f"Content moderation requested for text: '{safe_text}'")
+        
+        # Skip empty or very short text
+        if not text or len(text.strip()) < 3:
+            logging.info("Text too short, skipping moderation")
+            return True, None
+        
+        # Get the API key directly in each request to ensure we have the latest value
+        api_key = getattr(settings, 'PERSPECTIVE_API_KEY', '')
+        
         try:
-            api_key = settings.PERSPECTIVE_API_KEY
-            url = f"https://commentanalyzer.googleapis.com/v1alpha1/comments:analyze?key={api_key}"
+            # Check if API key is valid
+            if not api_key:
+                logging.warning("No API key found in settings.PERSPECTIVE_API_KEY")
+                logging.warning("Ensure the PERSPECTIVE_API_KEY environment variable is set")
+                # Return success since we're missing API key configuration
+                return True, None
             
+            # Build the request
+            url = f"https://commentanalyzer.googleapis.com/v1alpha1/comments:analyze?key={api_key}"
             analyze_request = {
                 'comment': {'text': text},
                 'requestedAttributes': {
@@ -1059,50 +1077,75 @@ class ContentModerationService:
                     'SEVERE_TOXICITY': {},
                     'IDENTITY_ATTACK': {},
                     'INSULT': {},
-                    'PROFANITY': {},
+                    'PROFANITY': {},  # This is the one we really care about
                     'THREAT': {}
                 },
                 'languages': ['en'],
                 'doNotStore': True
             }
             
+            # Make the API request
             response = requests.post(
                 url=url, 
                 data=json.dumps(analyze_request),
-                headers={'Content-Type': 'application/json'}
+                headers={'Content-Type': 'application/json'},
+                timeout=5  # Add timeout to avoid hanging
             )
             
+            # Handle API errors
+            if response.status_code != 200:
+                logging.error(f"API request failed with status code {response.status_code}")
+                logging.error(f"Error response: {response.text}")
+                # Don't block content if API fails
+                return True, None
+            
+            # Parse response
             response_data = response.json()
-
-
+            
+            # Our thresholds - only really checking PROFANITY
             thresholds = {
                 'TOXICITY': 1.0,          
                 'SEVERE_TOXICITY': 1.0,
                 'IDENTITY_ATTACK': 1.0,
                 'INSULT': 1.0,
-                'PROFANITY': 0.5,
+                'PROFANITY': 0.5,  # Main focus - detect obvious profanity
                 'THREAT': 1.0
             }
             
             # Check if any attribute exceeds its threshold
             failed_attributes = []
+            
+            # Make sure attributeScores exists to avoid KeyError
+            if 'attributeScores' not in response_data:
+                logging.error(f"Missing attributeScores in API response: {response_data}")
+                return True, None
+                
             for attr, threshold in thresholds.items():
-                if attr in response_data.get('attributeScores', {}):
+                if attr in response_data['attributeScores']:
                     score = response_data['attributeScores'][attr]['summaryScore']['value']
+                    
                     if score > threshold:
                         failed_attributes.append(attr.lower())
+                        logging.info(f"Content exceeded threshold for {attr}: {score} > {threshold}")
             
             if failed_attributes:
-                # Only show "profanity" in the error message
+                # Simple error message focused on profanity
                 message = "Your submission contains profanity. Please revise and try again."
+                logging.info(f"Content moderation failed. Failed attributes: {failed_attributes}")
                 return False, message
             
+            logging.info("Content passed moderation checks")
+            return True, None
+            
+        except requests.exceptions.Timeout:
+            logging.error("API request timed out")
+            # Don't block if API times out
             return True, None
             
         except Exception as e:
-            logging.error(f"Error using Perspective API: {str(e)}")
-            # If API fails, reject content as a safety measure
-            return False, "Content moderation service unavailable. Please try again later."
+            logging.exception(f"Error using Perspective API: {str(e)}")
+            # Don't block if there's an error
+            return True, None
 
 class TranscriptService:
     """

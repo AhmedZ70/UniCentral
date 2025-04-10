@@ -12,6 +12,17 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 
 from pathlib import Path
 import os
+import logging
+
+# Load environment variables from .env file if available
+try:
+    from dotenv import load_dotenv
+    env_file = os.path.join(Path(__file__).resolve().parent.parent, '.env')
+    if os.path.exists(env_file):
+        load_dotenv(env_file)
+        logging.info(f"Loaded environment variables from {env_file}")
+except ImportError:
+    logging.warning("python-dotenv not installed, skipping .env loading")
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -141,3 +152,9 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 # Content Moderation Settings
 # Google Perspective API Key for content moderation (get from https://developers.perspectiveapi.com)
 PERSPECTIVE_API_KEY = os.environ.get('PERSPECTIVE_API_KEY', '')
+
+# Log whether we have an API key for debugging
+if PERSPECTIVE_API_KEY:
+    logging.info("PERSPECTIVE_API_KEY is set and loaded from environment")
+else:
+    logging.warning("PERSPECTIVE_API_KEY is not set in environment - content moderation will be disabled")
