@@ -46,6 +46,8 @@ yarn-error.log
 venv/
 env/
 ENV/
+builds/
+cache/
 
 # Editor files
 .idea/
