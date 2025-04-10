@@ -22,34 +22,22 @@
         <div class="text-container">
           <h1>My Reviews</h1>
         </div>
-        <div class="review-type-filter">
-          <label for="review-type">Review Type:</label>
-          <select name="review-type" id="review-type">
-            <option value="all">All Reviews</option>
-            <option value="course">Course Reviews</option>
-            <option value="professor">Professor Reviews</option>
-          </select>
-        </div>
       </div>
     </section>
+    
+    <div class="search-bar">
+      <input type="text" id="review-search" class="search-input" placeholder="Search reviews, courses, or professors...">
+      <button id="search-btn" class="search-btn">Search</button>
+    </div>
     
     <div class="my-reviews-container">
       <div class="reviews-toolbar">
         <div class="reviews-count">
           <span id="reviews-count">0</span> reviews found
         </div>
-        <div class="reviews-sort">
-          <label for="sort-reviews">Sort by:</label>
-          <select id="sort-reviews">
-            <option value="newest">Newest First</option>
-            <option value="oldest">Oldest First</option>
-            <option value="rating-high">Highest Rating</option>
-            <option value="rating-low">Lowest Rating</option>
-          </select>
-        </div>
       </div>
       
-      <div id="reviews-list" class="reviews-list">
+      <div id="reviews-list" class="review-cards">
         <!-- Reviews will be dynamically inserted here -->
       </div>
       

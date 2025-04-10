@@ -10,8 +10,8 @@ const auth = getAuth();
 
 document.addEventListener("DOMContentLoaded", () => {
     // DOM elements
-    const reviewTypeFilter = document.getElementById("review-type");
-    const sortReviewsSelect = document.getElementById("sort-reviews");
+    const reviewSearchInput = document.getElementById("review-search");
+    const searchBtn = document.getElementById("search-btn");
     const reviewsList = document.getElementById("reviews-list");
     const noReviewsMessage = document.getElementById("no-reviews-message");
     const loadingIndicator = document.getElementById("loading-indicator");
@@ -47,9 +47,16 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
     
-    // Event listeners for filters and sorting
-    reviewTypeFilter.addEventListener("change", filterAndSortReviews);
-    sortReviewsSelect.addEventListener("change", filterAndSortReviews);
+    // Add event listener for search input
+    reviewSearchInput.addEventListener("input", searchReviews);
+    searchBtn.addEventListener("click", searchReviews);
+    
+    // Also trigger search on Enter key
+    reviewSearchInput.addEventListener("keyup", (event) => {
+        if (event.key === "Enter") {
+            searchReviews();
+        }
+    });
     
     // Modal close handlers
     closeModalButtons.forEach(button => {
@@ -119,7 +126,7 @@ document.addEventListener("DOMContentLoaded", () => {
             if (allReviews.length === 0) {
                 noReviewsMessage.style.display = "block";
             } else {
-                filterAndSortReviews();
+                displayReviews(allReviews);
             }
         } catch (error) {
             console.error('Error fetching reviews:', error);
@@ -129,44 +136,53 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
     
-    // Filter and sort reviews based on current selections
-    function filterAndSortReviews() {
-        const filterType = reviewTypeFilter.value;
-        const sortBy = sortReviewsSelect.value;
+    // Function to search reviews
+    function searchReviews() {
+        const searchTerm = reviewSearchInput.value.toLowerCase().trim();
         
-        // Apply filters
-        let filteredReviews = [...allReviews];
-        
-        if (filterType === 'course') {
-            filteredReviews = filteredReviews.filter(review => review.course);
-        } else if (filterType === 'professor') {
-            filteredReviews = filteredReviews.filter(review => review.professor);
+        if (!searchTerm) {
+            // If search is empty, show all reviews
+            reviewsCountEl.textContent = allReviews.length;
+            displayReviews(allReviews);
+            return;
         }
         
-        // Apply sorting
-        switch (sortBy) {
-            case 'newest':
-                // Sort by ID (assuming higher ID = newer)
-                filteredReviews.sort((a, b) => b.id - a.id);
-                break;
-            case 'oldest':
-                filteredReviews.sort((a, b) => a.id - b.id);
-                break;
-            case 'rating-high':
-                filteredReviews.sort((a, b) => (b.rating || 0) - (a.rating || 0));
-                break;
-            case 'rating-low':
-                filteredReviews.sort((a, b) => (a.rating || 0) - (b.rating || 0));
-                break;
-            default:
-                // Default to newest first
-                filteredReviews.sort((a, b) => b.id - a.id);
-        }
+        const filteredReviews = allReviews.filter(review => {
+            // Search in review text
+            if (review.review && review.review.toLowerCase().includes(searchTerm)) {
+                return true;
+            }
+            
+            // Search in course title, subject, and number
+            if (review.course) {
+                const courseTitle = review.course.title ? review.course.title.toLowerCase() : '';
+                const courseSubject = review.course.subject ? review.course.subject.toLowerCase() : '';
+                const courseNumber = review.course.number ? String(review.course.number) : '';
+                
+                if (courseTitle.includes(searchTerm) || 
+                    courseSubject.includes(searchTerm) || 
+                    courseNumber.includes(searchTerm)) {
+                    return true;
+                }
+            }
+            
+            // Search in professor name
+            if (review.professor) {
+                const profFirstName = review.professor.fname ? review.professor.fname.toLowerCase() : '';
+                const profLastName = review.professor.lname ? review.professor.lname.toLowerCase() : '';
+                
+                if (profFirstName.includes(searchTerm) || profLastName.includes(searchTerm)) {
+                    return true;
+                }
+            }
+            
+            return false;
+        });
         
-        // Update review count
+        // Update reviews count
         reviewsCountEl.textContent = filteredReviews.length;
         
-        // Display filtered and sorted reviews
+        // Display filtered reviews
         displayReviews(filteredReviews);
     }
     
@@ -180,6 +196,9 @@ document.addEventListener("DOMContentLoaded", () => {
         }
         
         noReviewsMessage.style.display = "none";
+        
+        // Sort by newest first by default
+        reviews.sort((a, b) => b.id - a.id);
         
         reviews.forEach(review => {
             const reviewCard = document.createElement('div');
@@ -206,34 +225,48 @@ document.addEventListener("DOMContentLoaded", () => {
             
             reviewCard.innerHTML = `
                 <div class="review-header">
-                    <div>
+                    <div class="review-header-left">
                         <h3 class="review-title">${reviewTitle}</h3>
                         <p class="review-subtitle">${reviewSubtitle}</p>
                     </div>
+                    <div class="review-header-right">
+                        <div class="review-actions">
+                            <button class="edit-btn" data-review-id="${review.id}">Edit</button>
+                            <button class="delete-btn" data-review-id="${review.id}">Delete</button>
+                        </div>
+                    </div>
                 </div>
                 <div class="review-content">
-                    <p class="review-text">${review.review || 'No review text provided.'}</p>
-                    
-                    <div class="review-details">
-                        <p class="detail-item">
-                            <span class="detail-label">Rating:</span>
-                            <span class="rating-container"></span>
-                        </p>
-                        <p class="detail-item">
-                            <span class="detail-label">Difficulty:</span>
-                            <span class="difficulty-container"></span>
-                        </p>
-                        <p class="detail-item">
-                            <span class="detail-label">Grade:</span> ${review.grade || 'N/A'}
-                        </p>
-                        <p class="detail-item">
-                            <span class="detail-label">Estimated Hours:</span> ${review.estimated_hours || 'N/A'}
-                        </p>
+                    <div class="review-text-section">
+                        <p class="review-text">${review.review || 'No review text provided.'}</p>
+                        
+                        <div class="review-tags">
+                            ${review.for_credit ? '<span class="tag">For Credit</span>' : ''}
+                            ${review.would_take_again ? '<span class="tag">Would Take Again</span>' : ''}
+                            ${review.mandatory_attendance ? '<span class="tag">Attendance Required</span>' : ''}
+                            ${review.is_anonymous ? '<span class="tag">Anonymous</span>' : ''}
+                        </div>
                     </div>
                     
-                    <div class="review-actions">
-                        <button class="edit-btn" data-review-id="${review.id}">Edit</button>
-                        <button class="delete-btn" data-review-id="${review.id}">Delete</button>
+                    <div class="review-side-section">
+                        <div class="review-details">
+                            <p class="detail-item">
+                                <span class="detail-label">Rating</span>
+                                <span class="rating-container"></span>
+                            </p>
+                            <p class="detail-item">
+                                <span class="detail-label">Difficulty</span>
+                                <span class="difficulty-container"></span>
+                            </p>
+                            <p class="detail-item">
+                                <span class="detail-label">Grade</span> 
+                                <strong>${review.grade || 'N/A'}</strong>
+                            </p>
+                            <p class="detail-item">
+                                <span class="detail-label">Weekly Hours</span>
+                                <strong>${review.estimated_hours || 'N/A'}</strong>
+                            </p>
+                        </div>
                     </div>
                 </div>
             `;
@@ -252,15 +285,21 @@ document.addEventListener("DOMContentLoaded", () => {
             const editBtn = reviewCard.querySelector('.edit-btn');
             const deleteBtn = reviewCard.querySelector('.delete-btn');
             
-            editBtn.addEventListener('click', () => {
-                currentlySelectedReview = review;
-                editConfirmModal.style.display = "flex";
-            });
+            if (editBtn) {
+                editBtn.addEventListener('click', (e) => {
+                    e.stopPropagation(); // Prevent card click
+                    currentlySelectedReview = review;
+                    editConfirmModal.style.display = "flex";
+                });
+            }
             
-            deleteBtn.addEventListener('click', () => {
-                currentlySelectedReview = review;
-                deleteConfirmModal.style.display = "flex";
-            });
+            if (deleteBtn) {
+                deleteBtn.addEventListener('click', (e) => {
+                    e.stopPropagation(); // Prevent card click
+                    currentlySelectedReview = review;
+                    deleteConfirmModal.style.display = "flex";
+                });
+            }
         });
     }
     
@@ -302,7 +341,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 allReviews = allReviews.filter(review => review.id !== reviewId);
                 
                 // Update the UI
-                filterAndSortReviews();
+                displayReviews(allReviews);
                 
                 // Show success message
                 alert('Review deleted successfully');

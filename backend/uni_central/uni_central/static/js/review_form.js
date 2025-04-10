@@ -47,17 +47,6 @@ function initializeReviewForm() {
     if (isEditMode) {
         document.querySelector('.page-title').textContent = 'Edit Review';
         document.getElementById('submitReviewBtn').textContent = 'Update Review';
-        
-        // Add loading indicator
-        const loadingIndicator = document.createElement('div');
-        loadingIndicator.id = 'loading-indicator';
-        loadingIndicator.className = 'loading-message';
-        loadingIndicator.innerHTML = 'Loading review data...';
-        
-        const submitBtn = document.getElementById('submitReviewBtn');
-        if (submitBtn && submitBtn.parentNode) {
-            submitBtn.parentNode.insertBefore(loadingIndicator, submitBtn);
-        }
     }
   
     // Load professors dropdown if we're in course context
@@ -71,9 +60,14 @@ function initializeReviewForm() {
         loadCoursesDropdown(contextId);
     }
   
-    // Replace numeric inputs with interactive selectors
-    createInteractiveRatingSelector();
-    createInteractiveDifficultySelector();
+    // Replace numeric inputs with interactive selectors - only if they don't already exist
+    if (!document.querySelector('.interactive-stars')) {
+        createInteractiveRatingSelector();
+    }
+    
+    if (!document.querySelector('.interactive-difficulty')) {
+        createInteractiveDifficultySelector();
+    }
     
     // Create the anonymous review option only if it doesn't already exist
     if (!document.getElementById('anonymousReview')) {
@@ -106,10 +100,8 @@ function loadProfessorsDropdown(courseId) {
                 professorSelect.appendChild(option);
             });
             
-            // If we're in edit mode, load the review after populating options
-            if (isEditMode && userEmail && reviewId) {
-                loadReviewData();
-            }
+            // If we're in edit mode, the main function will load the review data
+            // No need to call loadReviewData here
         })
         .catch(error => console.error("Error fetching professors:", error));
 }
@@ -130,10 +122,8 @@ function loadCoursesDropdown(professorId) {
                 courseSelect.appendChild(option);
             });
             
-            // If we're in edit mode, load the review after populating options
-            if (isEditMode && userEmail && reviewId) {
-                loadReviewData();
-            }
+            // If we're in edit mode, the main function will load the review data
+            // No need to call loadReviewData here
         })
         .catch(error => console.error("Error fetching courses:", error));
 }
@@ -143,6 +133,20 @@ async function loadReviewData() {
     if (!reviewId || !userEmail) {
         console.log("Missing review ID or user email, cannot load review data");
         return;
+    }
+    
+    // Show loading indicator if it doesn't exist
+    let loadingIndicator = document.getElementById('loading-indicator');
+    if (!loadingIndicator) {
+        loadingIndicator = document.createElement('div');
+        loadingIndicator.id = 'loading-indicator';
+        loadingIndicator.className = 'loading-message';
+        loadingIndicator.innerHTML = 'Loading review data...';
+        
+        const submitBtn = document.getElementById('submitReviewBtn');
+        if (submitBtn && submitBtn.parentNode) {
+            submitBtn.parentNode.insertBefore(loadingIndicator, submitBtn);
+        }
     }
     
     try {
@@ -169,16 +173,22 @@ async function loadReviewData() {
         // Now populate the form fields
         populateFormWithReviewData(review);
         
-        // Remove loading indicator if present
-        const loadingIndicator = document.getElementById('loading-indicator');
-        if (loadingIndicator) {
-            loadingIndicator.remove();
-        }
+        // Ensure the loading indicator is removed after a short delay
+        // to make sure all UI updates have completed
+        setTimeout(() => {
+            // Remove loading indicator if present
+            loadingIndicator = document.getElementById('loading-indicator');
+            if (loadingIndicator) {
+                loadingIndicator.remove();
+                console.log("Loading indicator removed");
+            }
+        }, 500);
+        
     } catch (error) {
         console.error("Error loading review data:", error);
         
         // Show error in the loading indicator instead of removing it
-        const loadingIndicator = document.getElementById('loading-indicator');
+        loadingIndicator = document.getElementById('loading-indicator');
         if (loadingIndicator) {
             loadingIndicator.className = 'error-message';
             loadingIndicator.textContent = `Error: ${error.message}`;
@@ -195,19 +205,22 @@ function populateFormWithReviewData(review) {
     document.getElementById("estimatedHours").value = review.estimated_hours || '';
     document.getElementById("grade").value = review.grade || '';
     
-    // Set the rating value and update stars UI
-    const ratingInput = document.getElementById("rating");
-    if (ratingInput) {
-        ratingInput.value = review.rating || 0;
-        updateRatingStars(review.rating || 0);
-    }
-    
-    // Set the difficulty value and update circles UI
-    const difficultyInput = document.getElementById("difficulty");
-    if (difficultyInput) {
-        difficultyInput.value = review.difficulty || 0;
-        updateDifficultyCircles(review.difficulty || 0);
-    }
+    // Wait for the interactive selectors to be created
+    setTimeout(() => {
+        // Set the rating value and update stars UI
+        const ratingInput = document.getElementById("rating");
+        if (ratingInput) {
+            ratingInput.value = review.rating || 0;
+            updateRatingStars(review.rating || 0);
+        }
+        
+        // Set the difficulty value and update circles UI
+        const difficultyInput = document.getElementById("difficulty");
+        if (difficultyInput) {
+            difficultyInput.value = review.difficulty || 0;
+            updateDifficultyCircles(review.difficulty || 0);
+        }
+    }, 100);
     
     // Set checkbox values (with fallbacks for null/undefined)
     setCheckboxSafely("wouldTakeAgain", review.would_take_again);
