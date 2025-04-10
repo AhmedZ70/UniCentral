@@ -160,11 +160,14 @@ document.addEventListener("DOMContentLoaded", () => {
             // Professor grade distribution chart logic
             let professorChart = null;
 
-            const professorGradeData = { A: 0, B: 0, C: 0, D: 0, F: 0 };
+            const professorGradeData = { A: 0, B: 0, C: 0, D: 0, E: 0 };
 
             reviews.forEach((review) => {
                 if (review.grade) {
-                    professorGradeData[review.grade] = (professorGradeData[review.grade] || 0) + 1;
+                    const gradeLetter = review.grade.trim().charAt(0).toUpperCase();
+                    if (professorGradeData.hasOwnProperty(gradeLetter)) {
+                        professorGradeData[gradeLetter]++;
+                    }
                 }
             });
 
@@ -200,8 +203,8 @@ document.addEventListener("DOMContentLoaded", () => {
                                     label: 'Professor Grade Distribution',
                                     data: Object.values(professorGradeData),
                                     backgroundColor: [
-                                        '#4CAF50', '#8BC34A', '#9C27B0',
-                                        '#FFEB3B', '#FF9800', '#F44336'
+                                        '#4CAF50', '#8BC34A','#FFEB3B',
+                                        '#FF9800', '#F44336', '#9C27B0'
                                     ]
                                 }]
                             },
