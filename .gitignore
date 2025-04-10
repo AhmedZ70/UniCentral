@@ -43,7 +43,7 @@ yarn-error.log
 .env.production.local
 
 # Virtual Environment
-/venv
+venv/
 env/
 ENV/
 

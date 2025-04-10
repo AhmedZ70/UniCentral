@@ -28,16 +28,16 @@
                 <a id="discussion-board-btn" href="{% url 'professor_discussion_board' context_id=professor_id %}" class="go-to-discussion-board-button">Discussion Board</a>
             </div>
 
-            <!-- Link to toggle chart visibility -->
             <a href="#" id="showProfessorChartLink" class="view-grade-distribution-link">View Professor Grade Distribution</a>
 
-            <!-- Canvas where the chart will be rendered -->
-            <canvas id="gradeAverageChart" style="display:none;"></canvas>
+            <div id="professor-chart-container" style="display: none;">
+                <canvas id="gradeAverageChart"></canvas>
+            </div>
 
-            <!-- Message when no grade data is available -->
             <p id="no-grade-message" style="display: none; font-weight: bold; text-align: center;">
                 No grade distribution available.
             </p>
+            
         </section>
 
         <!-- Reviews Section -->

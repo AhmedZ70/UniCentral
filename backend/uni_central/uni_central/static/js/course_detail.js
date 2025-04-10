@@ -136,7 +136,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
             const gradeData = { A: 0, B: 0, C: 0, D: 0, F: 0 };
             
-            // Calculate grade distribution based on reviews
             reviews.forEach((review) => {
                 if (review.grade) {
                     gradeData[review.grade] = (gradeData[review.grade] || 0) + 1;
@@ -156,19 +155,17 @@ document.addEventListener("DOMContentLoaded", () => {
                     chartContainer.style.display = "none";
                     showChartLink.textContent = "View Grade Distribution";
                 } else {
-                    // Toggle chart visibility and link text
+
                     if (chartContainer.style.display === "none" || chartContainer.style.display === "") {
                         chartContainer.style.display = "block";
                         noGradeMessage.style.display = "none";
             
                         showChartLink.textContent = "Close Chart";
             
-                        // Destroy the previous chart if it exists
                         if (gradeChart) {
                             gradeChart.destroy();
                         }
             
-                        // Create the chart (Pie Chart for grade distribution)
                         const ctx = chartCanvas.getContext('2d');
             
                         gradeChart = new Chart(ctx, {
@@ -179,12 +176,12 @@ document.addEventListener("DOMContentLoaded", () => {
                                     label: 'Grade Distribution',
                                     data: Object.values(gradeData),
                                     backgroundColor: [
-                                        '#4CAF50', // Dark Green for A
-                                        '#8BC34A', // Lighter Green for A
-                                        '#9C27B0', // Slightly Lighter Green/Purple for B
-                                        '#FFEB3B', // Yellow-green for C
-                                        '#FF9800', // Orange for D
-                                        '#F44336', // Red for F (or E)
+                                        '#4CAF50',
+                                        '#8BC34A',
+                                        '#9C27B0',
+                                        '#FFEB3B',
+                                        '#FF9800',
+                                        '#F44336',
                                     ]
                                 }]
                             },

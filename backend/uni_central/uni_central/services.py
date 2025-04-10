@@ -19,6 +19,12 @@ import re
 from fuzzywuzzy import fuzz
 from django.core.files.uploadedfile import InMemoryUploadedFile
 import logging
+from datetime import datetime
+import time
+import string
+import requests
+import json
+from django.conf import settings
 
 ###############################
 # Department-Related Services #
@@ -121,8 +127,18 @@ class ReviewService:
             user (User): The user creating the review.
             review_data (dict): A dictionary containing the review details.
         Returns:
-            Review: The created review object.
+            dict: A dictionary with success/error information and the review object if successful.
         """
+        # Check review text for inappropriate content if present
+        review_text = review_data.get('review')
+        if review_text:
+            is_appropriate, message = ContentModerationService.moderate_text(review_text)
+            if not is_appropriate:
+                return {
+                    "success": False,
+                    "error": message
+                }
+        
         course = CourseService.get_course(course_id)
         professor_id = review_data.get('professor')
         professor = get_object_or_404(Professor, id=professor_id) if professor_id else None
@@ -132,45 +148,69 @@ class ReviewService:
             is_anonymous = is_anonymous.lower() == 'true'
         else:
             is_anonymous = bool(is_anonymous)
-        review = Review.objects.create(
-            user=user,
-            course=course,
-            professor=professor,
+            
+        try:
+            review = Review.objects.create(
+                user=user,
+                course=course,
+                professor=professor,
 
-            # Text / string fields
-            review=review_data.get('review'),
-            grade=review_data.get('grade'),
+                # Text / string fields
+                review=review_text,
+                grade=review_data.get('grade'),
 
-            # Numeric fields
-            rating=float(review_data.get('rating')) if review_data.get('rating') else None,
-            difficulty=int(review_data.get('difficulty')) if review_data.get('difficulty') else None,
-            estimated_hours=float(review_data.get('estimated_hours')) if review_data.get('estimated_hours') else None,
+                # Numeric fields
+                rating=float(review_data.get('rating')) if review_data.get('rating') else None,
+                difficulty=int(review_data.get('difficulty')) if review_data.get('difficulty') else None,
+                estimated_hours=float(review_data.get('estimated_hours')) if review_data.get('estimated_hours') else None,
 
-            # Boolean fields
-            would_take_again=(review_data.get('would_take_again') == 'true'),
-            for_credit=(review_data.get('for_credit') == 'true'),
-            mandatory_attendance=(review_data.get('mandatory_attendance') == 'true'),
-            required_course=(review_data.get('required_course') == 'true'),
-            is_gened=(review_data.get('is_gened') == 'true'),
-            in_person=(review_data.get('in_person') == 'true'),
-            online=(review_data.get('online') == 'true'),
-            hybrid=(review_data.get('hybrid') == 'true'),
-            no_exams=(review_data.get('no_exams') == 'true'),
-            presentations=(review_data.get('presentations') == 'true'),
-            is_anonymous=is_anonymous,
-        )
+                # Boolean fields
+                would_take_again=(review_data.get('would_take_again') == 'true'),
+                for_credit=(review_data.get('for_credit') == 'true'),
+                mandatory_attendance=(review_data.get('mandatory_attendance') == 'true'),
+                required_course=(review_data.get('required_course') == 'true'),
+                is_gened=(review_data.get('is_gened') == 'true'),
+                in_person=(review_data.get('in_person') == 'true'),
+                online=(review_data.get('online') == 'true'),
+                hybrid=(review_data.get('hybrid') == 'true'),
+                no_exams=(review_data.get('no_exams') == 'true'),
+                presentations=(review_data.get('presentations') == 'true'),
+                is_anonymous=is_anonymous,
+            )
 
-        course.update_averages()
-        if professor:
-            professor.update_averages()
+            course.update_averages()
+            if professor:
+                professor.update_averages()
 
-        return review
+            return {
+                "success": True,
+                "review": review
+            }
+        except Exception as e:
+            logging.error(f"Error creating review: {str(e)}")
+            return {
+                "success": False,
+                "error": "Failed to create review. Please try again."
+            }
     
     @staticmethod
     def create_review_for_professor(professor_id, user, review_data):
         """
         Creates a review for a professor and associates it with the selected course.
+        
+        Returns:
+            dict: A dictionary with success/error information and the review object if successful.
         """
+        # Check review text for inappropriate content if present
+        review_text = review_data.get('review')
+        if review_text:
+            is_appropriate, message = ContentModerationService.moderate_text(review_text)
+            if not is_appropriate:
+                return {
+                    "success": False,
+                    "error": message
+                }
+        
         professor = ProfessorService.get_professor(professor_id)
 
         course_id = review_data.get("course")
@@ -182,37 +222,47 @@ class ReviewService:
         else:
             is_anonymous = bool(is_anonymous)
 
-        review = Review.objects.create(
-            user=user,
-            professor=professor,
-            course=course,  
+        try:
+            review = Review.objects.create(
+                user=user,
+                professor=professor,
+                course=course,  
 
-            # Text / string fields
-            review=review_data.get("review"),
-            grade=review_data.get("grade"),
+                # Text / string fields
+                review=review_text,
+                grade=review_data.get("grade"),
 
-            # Numeric fields
-            rating=float(review_data.get("rating")) if review_data.get("rating") else None,
-            difficulty=int(review_data.get("difficulty")) if review_data.get("difficulty") else None,
-            estimated_hours=float(review_data.get("estimated_hours")) if review_data.get("estimated_hours") else None,
+                # Numeric fields
+                rating=float(review_data.get("rating")) if review_data.get("rating") else None,
+                difficulty=int(review_data.get("difficulty")) if review_data.get("difficulty") else None,
+                estimated_hours=float(review_data.get("estimated_hours")) if review_data.get("estimated_hours") else None,
 
-            # Boolean fields
-            would_take_again=review_data.get("would_take_again") == "true",
-            for_credit=review_data.get("for_credit") == "true",
-            mandatory_attendance=review_data.get("mandatory_attendance") == "true",
-            in_person=review_data.get("in_person") == "true",
-            online=review_data.get("online") == "true",
-            hybrid=review_data.get("hybrid") == "true",
-            no_exams=review_data.get("no_exams") == "true",
-            presentations=review_data.get("presentations") == "true",
-            is_anonymous=is_anonymous,        
-            )
+                # Boolean fields
+                would_take_again=review_data.get("would_take_again") == "true",
+                for_credit=review_data.get("for_credit") == "true",
+                mandatory_attendance=review_data.get("mandatory_attendance") == "true",
+                in_person=review_data.get("in_person") == "true",
+                online=review_data.get("online") == "true",
+                hybrid=review_data.get("hybrid") == "true",
+                no_exams=review_data.get("no_exams") == "true",
+                presentations=review_data.get("presentations") == "true",
+                is_anonymous=is_anonymous,        
+                )
 
-        professor.update_averages()
-        if course:
-            course.update_averages()
+            professor.update_averages()
+            if course:
+                course.update_averages()
 
-        return review
+            return {
+                "success": True,
+                "review": review
+            }
+        except Exception as e:
+            logging.error(f"Error creating review: {str(e)}")
+            return {
+                "success": False,
+                "error": "Failed to create review. Please try again."
+            }
     
     @staticmethod
     def get_user_reviews(user):
@@ -231,51 +281,74 @@ class ReviewService:
             review_data (dict): A dictionary containing the updated review details.
 
         Returns:
-            Review: The updated review object.
+            dict: A dictionary with success/error information and the review object if successful.
         """
         review = ReviewService.get_review_by_id(review_id)
         if review == None:
-            return None
+            return {
+                "success": False,
+                "error": "Review not found"
+            }
 
+        # Check review text for inappropriate content if present
         if "review" in review_data:
-            review.review = review_data["review"]
-        if "rating" in review_data:
-            review.rating = float(review_data["rating"])
-        if "difficulty" in review_data:
-            review.difficulty = int(review_data["difficulty"])
-        if "estimated_hours" in review_data:
-            review.estimated_hours = float(review_data["estimated_hours"])
-        if "grade" in review_data:
-            review.grade = review_data["grade"]
-        if "would_take_again" in review_data:
-            review.would_take_again = review_data["would_take_again"]
-        if "for_credit" in review_data:
-            review.for_credit = review_data["for_credit"]
-        if "mandatory_attendance" in review_data:
-            review.mandatory_attendance = review_data["mandatory_attendance"]
-        if "is_gened" in review_data:
-            review.is_gened = review_data["is_gened"]
-        if "in_person" in review_data:
-            review.in_person = review_data["in_person"]
-        if "online" in review_data:
-            review.online = review_data["online"]
-        if "hybrid" in review_data:
-            review.hybrid = review_data["hybrid"] 
-        if "no_exams" in review_data:
-            review.no_exams = review_data["no_exams"]   
-        if "presentations" in review_data:
-            review.presentations = review_data["presentations"]
-        if "is_anonymous" in review_data:
-            review.is_anonymous = review_data["is_anonymous"] 
+            review_text = review_data.get("review")
+            if review_text:
+                is_appropriate, message = ContentModerationService.moderate_text(review_text)
+                if not is_appropriate:
+                    return {
+                        "success": False,
+                        "error": message
+                    }
+                review.review = review_text
 
-        review.save()
+        try:
+            if "rating" in review_data:
+                review.rating = float(review_data["rating"])
+            if "difficulty" in review_data:
+                review.difficulty = int(review_data["difficulty"])
+            if "estimated_hours" in review_data:
+                review.estimated_hours = float(review_data["estimated_hours"])
+            if "grade" in review_data:
+                review.grade = review_data["grade"]
+            if "would_take_again" in review_data:
+                review.would_take_again = review_data["would_take_again"]
+            if "for_credit" in review_data:
+                review.for_credit = review_data["for_credit"]
+            if "mandatory_attendance" in review_data:
+                review.mandatory_attendance = review_data["mandatory_attendance"]
+            if "is_gened" in review_data:
+                review.is_gened = review_data["is_gened"]
+            if "in_person" in review_data:
+                review.in_person = review_data["in_person"]
+            if "online" in review_data:
+                review.online = review_data["online"]
+            if "hybrid" in review_data:
+                review.hybrid = review_data["hybrid"] 
+            if "no_exams" in review_data:
+                review.no_exams = review_data["no_exams"]   
+            if "presentations" in review_data:
+                review.presentations = review_data["presentations"]
+            if "is_anonymous" in review_data:
+                review.is_anonymous = review_data["is_anonymous"] 
 
-        if review.course:
-            review.course.update_averages()
-        if review.professor:
-            review.professor.update_averages()
+            review.save()
 
-        return review
+            if review.course:
+                review.course.update_averages()
+            if review.professor:
+                review.professor.update_averages()
+
+            return {
+                "success": True,
+                "review": review
+            }
+        except Exception as e:
+            logging.error(f"Error updating review: {str(e)}")
+            return {
+                "success": False,
+                "error": "Failed to update review. Please try again."
+            }
     
     @staticmethod
     def delete_review(review):
@@ -683,6 +756,11 @@ class ThreadService:
             if not title:
                 return {"success": False, "error": "Title is required"}
             
+            # Check title for inappropriate content
+            is_appropriate, message = ContentModerationService.moderate_text(title)
+            if not is_appropriate:
+                return {"success": False, "error": message}
+            
             thread = Thread(
                 title=title,
                 category=category, 
@@ -723,10 +801,20 @@ class ThreadService:
             return {"success": False, "error": "Thread not found"}
 
         if "title" in thread_data:
-            thread.title = thread_data["title"]
+            new_title = thread_data["title"]
+            if new_title:
+                # Check updated title for inappropriate language
+                is_appropriate, message = ContentModerationService.moderate_text(new_title)
+                if not is_appropriate:
+                    return {"success": False, "error": message}
+                thread.title = new_title
 
-        thread.save()
-        return {"success": True, "thread": thread}
+        try:
+            thread.save()
+            return {"success": True, "thread": thread}
+        except Exception as e:
+            logging.error(f"Error updating thread: {str(e)}")
+            return {"success": False, "error": "Failed to update thread. Please try again."}
 
     @staticmethod
     def get_thread_by_id(thread_id):
@@ -810,6 +898,15 @@ class CommentService:
         if not thread:
             return {"success": False, "error": "Thread not found"}
 
+        content = comment_data.get("content")
+        if not content:
+            return {"success": False, "error": "Comment content is required"}
+            
+        # Check comment content for inappropriate language
+        is_appropriate, message = ContentModerationService.moderate_text(content)
+        if not is_appropriate:
+            return {"success": False, "error": message}
+
         email_address = comment_data.get("email_address")
         
         try:
@@ -824,7 +921,7 @@ class CommentService:
             comment = Comment.objects.create(
                 thread=thread,
                 user=user,
-                content=comment_data.get("content")
+                content=content
             )
             return {"success": True, "comment": comment}
         except Exception as e:
@@ -841,10 +938,20 @@ class CommentService:
             return {"success": False, "error": "Comment not found"}
 
         if "content" in comment_data:
-            comment.content = comment_data["content"]
+            new_content = comment_data["content"]
+            if new_content:
+                # Check updated content for inappropriate language
+                is_appropriate, message = ContentModerationService.moderate_text(new_content)
+                if not is_appropriate:
+                    return {"success": False, "error": message}
+                comment.content = new_content
 
-        comment.save()
-        return {"success": True, "comment": comment}
+        try:
+            comment.save()
+            return {"success": True, "comment": comment}
+        except Exception as e:
+            logging.error(f"Error updating comment: {str(e)}")
+            return {"success": False, "error": "Failed to update comment. Please try again."}
 
     @staticmethod
     def get_comment_by_id(comment_id):
@@ -942,6 +1049,84 @@ class CommentUpvoteService:
 # Transcript-Related Services #
 ############################
 
+################################
+# Content Moderation Service #
+################################
+class ContentModerationService:
+    """
+    Service class for moderating content using Google's Perspective API
+    to detect profanity, slurs, and other inappropriate content.
+    """
+    
+    @staticmethod
+    def moderate_text(text):
+        """
+        Moderates text content using Perspective API.
+        
+        Args:
+            text (str): The text content to moderate
+            
+        Returns:
+            tuple: (is_appropriate, message)
+                - is_appropriate (bool): True if content passes moderation
+                - message (str): Explanation message if content fails moderation
+        """
+        try:
+            api_key = settings.PERSPECTIVE_API_KEY
+            url = f"https://commentanalyzer.googleapis.com/v1alpha1/comments:analyze?key={api_key}"
+            
+            analyze_request = {
+                'comment': {'text': text},
+                'requestedAttributes': {
+                    'TOXICITY': {},
+                    'SEVERE_TOXICITY': {},
+                    'IDENTITY_ATTACK': {},
+                    'INSULT': {},
+                    'PROFANITY': {},
+                    'THREAT': {}
+                },
+                'languages': ['en'],
+                'doNotStore': True
+            }
+            
+            response = requests.post(
+                url=url, 
+                data=json.dumps(analyze_request),
+                headers={'Content-Type': 'application/json'}
+            )
+            
+            response_data = response.json()
+            
+
+            thresholds = {
+                'TOXICITY': 1.0,          
+                'SEVERE_TOXICITY': 1.0,
+                'IDENTITY_ATTACK': 1.0,
+                'INSULT': 1.0,
+                'PROFANITY': 0.5,
+                'THREAT': 1.0
+            }
+            
+            # Check if any attribute exceeds its threshold
+            failed_attributes = []
+            for attr, threshold in thresholds.items():
+                if attr in response_data.get('attributeScores', {}):
+                    score = response_data['attributeScores'][attr]['summaryScore']['value']
+                    if score > threshold:
+                        failed_attributes.append(attr.lower())
+            
+            if failed_attributes:
+                # Only show "profanity" in the error message
+                message = "Your submission contains profanity. Please revise and try again."
+                return False, message
+            
+            return True, None
+            
+        except Exception as e:
+            logging.error(f"Error using Perspective API: {str(e)}")
+            # If API fails, reject content as a safety measure
+            return False, "Content moderation service unavailable. Please try again later."
+
 class TranscriptService:
     """
     Service class for handling transcript processing and course extraction.
@@ -985,70 +1170,59 @@ class TranscriptService:
             # Group courses by semester
             courses_by_semester = {}
             for course in courses:
-                semester = course['semester']  # This comes from _process_image
+                semester = course['semester']
                 if semester not in courses_by_semester:
                     courses_by_semester[semester] = []
                 courses_by_semester[semester].append(course)
             
             # Update each semester in the course plan
             for semester_name, semester_courses in courses_by_semester.items():
-                # Parse semester information
-                try:
-                    term, year = semester_name.split(' ')
-                    year = int(year)
-                except (ValueError, TypeError) as e:
-                    print(f"Error parsing semester '{semester_name}': {e}")
-                    continue
-
-                # Find or create semester in course plan
                 semester_entry = None
                 for s in user.course_plan["semesters"]:
-                    if s.get("term") == term and s.get("year") == year:
+                    if s.get("term") == semester_name.split(' ')[0] and s.get("year") == int(semester_name.split(' ')[1]):
                         semester_entry = s
                         break
                 
                 if not semester_entry:
                     semester_entry = {
-                        "id": f"{term.lower()}-{year}",
-                        "term": term,
-                        "year": year,
+                        "id": f"{semester_name.lower().replace(' ', '-')}",
+                        "term": semester_name.split(' ')[0],
+                        "year": int(semester_name.split(' ')[1]),
                         "courses": []
                     }
                     user.course_plan["semesters"].append(semester_entry)
                 
-                # Add new courses to semester
                 for course in semester_courses:
-                    # Check if course already exists
+                    # Check if course already exists in this semester
                     course_exists = any(
-                        c.get("courseCode", "").lower() == course["code"].lower()
+                        c.get("courseCode", "").lower() == course["code"].lower() or
+                        c.get("code", "").lower() == course["code"].lower()
                         for c in semester_entry["courses"]
                     )
                     
                     if not course_exists:
+                        # Generate a unique ID for the course
+                        unique_id = str(course.get('course_id', f"transcript-{course['code'].replace(' ', '-')}-{int(time.time() * 1000)}"))
+                        
+                        # Create a new course entry with unified property names
+                        # These property names should match the ones used in manually added courses
                         new_course = {
-                            "id": f"{course['code'].replace(' ', '-')}-{len(semester_entry['courses'])}",
-                            "courseCode": course["code"],
-                            "courseName": course["name"],
-                            "credits": course["credits"]
+                            "id": unique_id,
+                            "courseCode": course["code"],  # Use consistent property name
+                            "courseName": course["name"],  # Use consistent property name
+                            "credits": course["credits"],
+                            "rating": course.get("rating", 0),
+                            "difficulty": course.get("difficulty", 0)
                         }
                         semester_entry["courses"].append(new_course)
                         print(f"Added course {course['code']} to {semester_name}")
 
-            # Sort semesters by year and term
-            term_order = {"spring": 0, "summer": 1, "fall": 2, "winter": 3}
-            user.course_plan["semesters"].sort(
-                key=lambda x: (x["year"], term_order.get(x["term"].lower(), 0))
-            )
-
-            # Save changes to database
-            print(f"Saving updated course plan: {user.course_plan}")
+            # Save the course plan
             user.save()
             return True
             
         except Exception as e:
             print(f"Error updating course plan: {e}")
-            import traceback
-            print(f"Traceback: {traceback.format_exc()}")
             return False
 
     @staticmethod
@@ -1109,7 +1283,6 @@ class TranscriptService:
 
             if not default_semester:
                 # If no semester found, use current year
-                from datetime import datetime
                 current_year = datetime.now().year
                 default_semester = f"Fall {current_year}"  # Default to Fall of current year
                 print(f"No semester found in transcript, using default: {default_semester}")
@@ -1187,9 +1360,11 @@ class TranscriptService:
                             'code': f"{db_course.subject} {db_course.number}",  # Use database values
                             'name': db_course.title,
                             'credits': db_course.credits,
+                            'rating': db_course.avg_rating,  # Use the average rating field
+                            'difficulty': db_course.avg_difficulty,  # Use the average difficulty field
                             'confidence': 1.0,
                             'db_match': True,
-                            'course_id': db_course.id,
+                            'course_id': db_course.id,  # This is the actual database ID
                             'semester': current_semester or default_semester  # Use current semester or default
                         })
                     else:

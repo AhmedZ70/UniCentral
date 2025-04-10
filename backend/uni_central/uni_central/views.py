@@ -341,24 +341,30 @@ class UpdateReviewAPIView(APIView):
     """
     API View to update an existing review by review_id.
     """
-
-    def put(self, request, review_id):
+    def put(self, request):
+        """
+        Handles PUT requests to update a review.
+        """
         try:
-            print(f"Update request data: {request.data}")
-            
-            # Get review_id from URL or request data
-            if review_id is None:
-                review_id = request.data.get('review_id')
-            
-            print(f"Using review_id: {review_id}")
-                
-            if not review_id:
-                return Response({"error": "Review ID is required"}, status=status.HTTP_400_BAD_REQUEST)
-                
-            updated_review = ReviewService.update_review(review_id, request.data)
-            serializer = ReviewSerializer(updated_review)
-            return Response({"message": "Review updated successfully", "review": serializer.data}, status=status.HTTP_200_OK)
+            review_id = request.data.get('review_id')
+            result = ReviewService.update_review(review_id, request.data)
+
+            if result["success"]:
+                review = result["review"]
+                serializer = ReviewSerializer(review)
+                return Response(
+                    {"message": "Review updated successfully", "review": serializer.data},
+                    status=status.HTTP_200_OK
+                )
+            else:
+                error_msg = result["error"]
+                if any(word in error_msg.lower() for word in ["inappropriate", "toxicity", "profanity", "slurs"]):
+                    error_msg = "Your review contains profanity. Please revise and try again."
+                return Response({"error": error_msg}, status=status.HTTP_400_BAD_REQUEST)
+
         except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
             import traceback
             error_traceback = traceback.format_exc()
             print(f"Error updating review: {str(e)}")

@@ -7,7 +7,7 @@
         <div class="text-content">
             <div class="text-container">
                 <h1>Course Planner</h1>
-                <h2>Plan your courses by adding semesters, courses, and credits to create a roadmap to your degree.</h2>
+                <h2>Plan your academic journey semester by semester</h2>
             </div>
         </div>
     </section>
@@ -32,17 +32,28 @@
                 </div>
             </div>
             
-            <div id="upload-progress" class="upload-progress">
+            <div id="upload-progress" class="upload-progress hidden">
                 <div class="progress-bar">
                     <div class="progress-fill"></div>
                 </div>
                 <div class="progress-text">Processing transcript...</div>
             </div>
             
-            <div id="results-preview" class="results-preview">
+            <div id="results-preview" class="results-preview hidden">
                 <!-- Results will be dynamically inserted here -->
             </div>
         </div>
+    </div>
+
+    <!-- Instructions Section -->
+    <div class="planner-instructions">
+        <h3>How to Use the Course Planner</h3>
+        <ul>
+            <li><strong>Add Semester</strong> - Click the "Add Semester+" button to create a new semester</li>
+            <li><strong>Add Course</strong> - Within each semester, click "Add Course" to search and add courses</li>
+            <li><strong>Remove</strong> - Use the remove buttons to delete courses or entire semesters</li>
+            <li><strong>Quick Add</strong> - Upload your transcript above to automatically import courses</li>
+        </ul>
     </div>
 
     <div id="course-planner">
@@ -56,35 +67,112 @@
     <div class="semester-popup-overlay" id="semester-popup">
         <div class="semester-popup-content">
             <button class="close-popup" onclick="closeSemesterPopup()">&times;</button>
-            <h2 class="semester-popup-title">Enter your desired semester</h2>
+            <h2 class="semester-popup-title">Add New Semester</h2>
             <div class="semester-popup-body">
                 <select id="term-select">
                     <option value="Fall">Fall</option>
                     <option value="Spring">Spring</option>
                     <option value="Summer">Summer</option>
+                    <option value="Winter">Winter</option>
                 </select>
-                <input type="number" id="year-input" placeholder="Year">
+                <input type="number" id="year-input" placeholder="Year" min="2000" max="2100">
             </div>
             <div class="popup-buttons">
-                <button class="semester-popup-button submit" onclick="submitSemester()">Add +</button>
+                <button class="semester-popup-button cancel" onclick="closeSemesterPopup()">Cancel</button>
+                <button class="semester-popup-button submit" onclick="submitSemester()">Add Semester</button>
             </div>
         </div>
     </div>
 
-    <!-- Course Popup -->
-    <div class="semester-popup-overlay" id="course-popup">
-        <div class="semester-popup-content">
+    <!-- Course Selection Popup -->
+    <div class="course-popup-overlay" id="course-popup">
+        <div class="course-popup-content">
             <button class="close-popup" onclick="closeCoursePopup()">&times;</button>
-            <h2 class="semester-popup-title">Add Course</h2>
-            <div class="semester-popup-body">
-                <input type="text" id="course-code" placeholder="Course Code (e.g., CS 1410)">
-                <input type="text" id="course-name" placeholder="Course Name">
-                <input type="number" id="course-credits" placeholder="Credits" min="1" max="6">
+            <h2 class="course-popup-title">Add Courses</h2>
+            
+            <!-- Course Filter Form -->
+            <div class="filter-form-container">
+                <h3>Search for Courses</h3>
+                <div class="filter-grid">
+                    <div class="filter-row">
+                        <input type="text" id="department-filter" placeholder="Department (e.g., CS)">
+                        <input type="text" id="course-title-filter" placeholder="Course Title">
+                    </div>
+                    <div class="filter-row">
+                        <input type="number" id="min-course-number" placeholder="Min Course Number">
+                        <input type="number" id="max-course-number" placeholder="Max Course Number">
+                    </div>
+                    <div class="filter-row">
+                        <input type="text" id="professor-filter" placeholder="Professor Name">
+                        <input type="number" id="credits-filter" placeholder="Credits" min="1" max="12">
+                    </div>
+                    <div class="filter-row">
+                        <div class="rating-selector">
+                            <label>Min Rating:</label>
+                            <div class="star-rating" id="min-rating">
+                                <span class="star" data-value="1">★</span>
+                                <span class="star" data-value="2">★</span>
+                                <span class="star" data-value="3">★</span>
+                                <span class="star" data-value="4">★</span>
+                                <span class="star" data-value="5">★</span>
+                            </div>
+                        </div>
+                        <div class="difficulty-selector">
+                            <label>Max Difficulty:</label>
+                            <div class="difficulty-rating" id="max-difficulty">
+                                <span class="difficulty-dot" data-value="1"></span>
+                                <span class="difficulty-dot" data-value="2"></span>
+                                <span class="difficulty-dot" data-value="3"></span>
+                                <span class="difficulty-dot" data-value="4"></span>
+                                <span class="difficulty-dot" data-value="5"></span>
+                                <span class="difficulty-dot" data-value="6"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="filter-row center">
+                        <button id="apply-filters" class="filter-button">Search Courses</button>
+                    </div>
+                </div>
             </div>
+            
+            <!-- Course Results -->
+            <div class="course-results-container">
+                <div class="course-results-header">
+                    <h3>Search Results</h3>
+                    <p id="result-count">0 courses found</p>
+                </div>
+                <div class="course-results" id="course-results">
+                    <!-- Course results will be populated dynamically -->
+                    <div class="empty-results">
+                        <p>Use the filters above to search for courses</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Selected Courses -->
+            <div class="selected-courses-container">
+                <div class="selected-header">
+                    <h3>Selected Courses</h3>
+                    <p id="selected-count">0 courses selected</p>
+                </div>
+                <div class="selected-courses" id="selected-courses">
+                    <!-- Selected courses will be shown here -->
+                    <div class="empty-selection">
+                        <p>No courses selected yet</p>
+                    </div>
+                </div>
+            </div>
+            
             <div class="popup-buttons">
-                <button class="semester-popup-button submit" onclick="submitCourse()">Add Course</button>
+                <button class="course-popup-button cancel" onclick="closeCoursePopup()">Cancel</button>
+                <button class="course-popup-button submit" onclick="addSelectedCourses()">Add Selected Courses</button>
             </div>
         </div>
+    </div>
+
+    <!-- Empty State Message -->
+    <div id="empty-planner-message" class="empty-state-message" style="display: none;">
+        <p>Your course plan is empty. Click "Add Semester+" to start planning your academic journey.</p>
     </div>
 </main>
 
