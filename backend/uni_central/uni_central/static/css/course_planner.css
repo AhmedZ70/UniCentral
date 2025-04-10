@@ -591,13 +591,20 @@ body {
     font-family: 'Montserrat', sans-serif;
 }
 
+.upload-tips {
+    margin-top: 0.5rem;
+    color: #005a5b;
+    font-style: italic;
+}
+
 .upload-progress {
     margin: 2rem 0;
     display: none;
 }
 
-.upload-progress.visible {
-    display: block;
+.upload-progress.visible,
+.upload-progress:not(.hidden) {
+    display: block !important;
 }
 
 .progress-bar {
@@ -622,6 +629,16 @@ body {
     font-size: 16px;
     font-family: 'Montserrat', sans-serif;
     text-align: center;
+    font-weight: bold;
+}
+
+.progress-subtext {
+    color: #666;
+    font-size: 14px;
+    font-family: 'Montserrat', sans-serif;
+    text-align: center;
+    margin-top: 0.5rem;
+    font-style: italic;
 }
 
 .results-preview {
@@ -634,8 +651,9 @@ body {
     padding: 1.5rem;
 }
 
-.results-preview.visible {
-    display: block;
+.results-preview.visible,
+.results-preview:not(.hidden) {
+    display: block !important;
 }
 
 .results-preview h3 {
@@ -659,6 +677,7 @@ body {
     align-items: center;
     padding: 1rem;
     border-bottom: 1px solid #e0e0e0;
+    border-left: 4px solid #005a5b;
     transition: background-color 0.3s ease;
 }
 
@@ -1371,4 +1390,23 @@ body {
 
 .course-card.error .course-name {
     color: #ff4444;
+}
+
+.course-stats-summary {
+    background-color: #f5f5f5;
+    border-left: 5px solid #005a5b;
+    padding: 10px 15px;
+    margin: 10px 0 20px;
+    border-radius: 4px;
+    font-family: 'Montserrat', sans-serif;
+}
+
+.course-stats-summary p {
+    margin: 5px 0;
+    font-size: 14px;
+}
+
+.course-stats-summary p:first-child {
+    font-weight: bold;
+    color: #005a5b;
 }
