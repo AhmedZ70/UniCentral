@@ -244,6 +244,8 @@ function createSemesterElement(semester) {
 
 // Function to create a course element
 function createCourseElement(semesterId, course) {
+    console.log('Course Rating:', course.rating);
+    console.log('Course Difficulty:', course.difficulty);
     const courseLink = document.createElement('a');
     courseLink.href = `/courses/${course.id}/`;
     courseLink.className = 'course-card';
