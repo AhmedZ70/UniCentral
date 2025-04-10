@@ -126,6 +126,31 @@ document.addEventListener("DOMContentLoaded", () => {
             isValid = false;
         }
 
+        // Validate Grade (must be selected from dropdown)
+        const allowedGrades = ["A", "A-", "B+", "B", "B-", "C+", "C", "C-", "D+", "D", "D-", "E"];
+        const gradeInput = document.getElementById("grade");
+        const gradeValue = gradeInput.value.trim();
+        let gradeError = document.getElementById("gradeError");
+
+        // Create error element if it doesn't exist
+        if (!gradeError) {
+            gradeError = document.createElement("span");
+            gradeError.id = "gradeError";
+            gradeError.className = "error-message";
+            gradeInput.parentNode.insertBefore(gradeError, gradeInput.nextSibling);
+        }
+
+        if (!allowedGrades.includes(gradeValue)) {
+            gradeError.textContent = "Please select a valid grade.";
+            gradeError.style.display = "block";
+            gradeInput.classList.add("error");
+            isValid = false;
+        } else {
+            gradeError.textContent = "";
+            gradeError.style.display = "none";
+            gradeInput.classList.remove("error");
+        }
+
         // Stop submission if validation fails
         if (!isValid) {
             return;
