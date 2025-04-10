@@ -61,6 +61,13 @@ from .views import (
     professor_detail,
     discussion_board,
     TranscriptUploadView,
+    CreateStudyBuddyRequestView,
+    GetStudyBuddyRequestsView,
+    UpdateStudyBuddyRequestView,
+    StudyBuddyMessagesView,
+    SendStudyBuddyMessageView,
+    MarkMessagesAsReadView,
+    MessageUpdatesSSEView,
 )
 
 urlpatterns = [
@@ -174,4 +181,15 @@ urlpatterns = [
     # Course Plan URLs
     path('api/get-course-plan/<str:email_address>/', CoursePlanGetAPIView.as_view(), name='get_course_plan'),
     path('api/update-course-plan/<str:email_address>/', CoursePlanUpdateAPIView.as_view(), name='update_course_plan'),
+    
+    # Study Buddy URLs
+    path('api/study-buddy/request/', CreateStudyBuddyRequestView.as_view(), name='create_study_buddy_request'),
+    path('api/study-buddy/requests/<str:email_address>/', GetStudyBuddyRequestsView.as_view(), name='get_study_buddy_requests'),
+    path('api/study-buddy/requests/<int:request_id>/update/', UpdateStudyBuddyRequestView.as_view(), name='update_study_buddy_request'),
+    
+    # Study Buddy Messaging URLs
+    path('api/study-buddy/requests/<int:request_id>/messages/', StudyBuddyMessagesView.as_view(), name='get_study_buddy_messages'),
+    path('api/study-buddy/requests/<int:request_id>/messages/send/', SendStudyBuddyMessageView.as_view(), name='send_study_buddy_message'),
+    path('api/study-buddy/requests/<int:request_id>/messages/read/', MarkMessagesAsReadView.as_view(), name='mark_messages_as_read'),
+    path('api/message-updates/<str:email_address>/', MessageUpdatesSSEView.as_view(), name='message_updates_sse'),
 ]

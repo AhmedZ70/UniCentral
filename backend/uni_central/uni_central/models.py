@@ -339,3 +339,69 @@ class CoursePlan(models.Model):
     def __str__(self):
         return f"Course Plan for {self.user.email}"
     
+###########################
+# STUDY BUDDY REQUEST MODEL #
+###########################
+class StudyBuddyRequest(models.Model):
+    """
+    A model for tracking study buddy requests between users.
+    
+    Attributes:
+        sender (ForeignKey): The user who sent the request.
+        receiver (ForeignKey): The user who received the request.
+        course_name (CharField): The name of the course to study together.
+        message (TextField): A message from the sender to the receiver.
+        status (CharField): The status of the request (pending, accepted, declined).
+        created_at (DateTimeField): When the request was created.
+        updated_at (DateTimeField): When the request was last updated.
+    """
+    sender = models.ForeignKey('User', on_delete=models.CASCADE, related_name='sent_study_requests')
+    receiver = models.ForeignKey('User', on_delete=models.CASCADE, related_name='received_study_requests')
+    course_name = models.CharField(max_length=255)
+    message = models.TextField()
+    status = models.CharField(max_length=10, choices=[
+        ('pending', 'Pending'),
+        ('accepted', 'Accepted'),
+        ('declined', 'Declined')
+    ], default='pending')
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        db_table = 'study_buddy_requests'
+        unique_together = ('sender', 'receiver', 'course_name')
+        verbose_name = 'Study Buddy Request'
+        verbose_name_plural = 'Study Buddy Requests'
+        
+    def __str__(self):
+        return f"Study buddy request from {self.sender.fname} to {self.receiver.fname} for {self.course_name}"
+    
+##########################
+# STUDY BUDDY MESSAGE MODEL #
+##########################
+class StudyBuddyMessage(models.Model):
+    """
+    A model for storing messages between study buddies.
+    
+    Attributes:
+        sender (ForeignKey): The user who sent the message.
+        receiver (ForeignKey): The user who received the message.
+        study_buddy_request (ForeignKey): The related study buddy request.
+        content (TextField): The content of the message.
+        is_read (BooleanField): Whether the message has been read.
+        created_at (DateTimeField): When the message was created.
+    """
+    sender = models.ForeignKey('User', on_delete=models.CASCADE, related_name='sent_messages')
+    receiver = models.ForeignKey('User', on_delete=models.CASCADE, related_name='received_messages')
+    study_buddy_request = models.ForeignKey('StudyBuddyRequest', on_delete=models.CASCADE, related_name='messages')
+    content = models.TextField()
+    is_read = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        db_table = 'study_buddy_messages'
+        ordering = ['created_at']
+        
+    def __str__(self):
+        return f"Message from {self.sender.fname} to {self.receiver.fname} at {self.created_at}"
+    

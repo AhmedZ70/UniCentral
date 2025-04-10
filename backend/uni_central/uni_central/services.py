@@ -7,6 +7,8 @@ from .models import (
     Thread,
     Comment,
     CommentUpvote,
+    StudyBuddyRequest,
+    StudyBuddyMessage,
     )
 from django.shortcuts import get_object_or_404
 from django.db.models import Q, Count, F, ExpressionWrapper, IntegerField
@@ -1394,3 +1396,501 @@ class TranscriptService:
         except Exception as e:
             print(f"Error processing image: {str(e)}")
             raise
+
+##############################
+# Study Buddy-Related Services #
+##############################
+class StudyBuddyService:
+    """
+    Provides utility methods for managing study buddy requests.
+    """
+    
+    @staticmethod
+    def create_request(sender_email, receiver_id, course_name, message):
+        """
+        Create a new study buddy request.
+        
+        Args:
+            sender_email (str): Email of the user sending the request
+            receiver_id (int): ID of the user receiving the request
+            course_name (str): Name of the course to study together
+            message (str): Message from sender to receiver
+            
+        Returns:
+            dict: Result with success status and data or error message
+        """
+        try:
+            from .models import User
+            
+            # Get sender and receiver
+            sender = User.objects.get(email_address=sender_email)
+            receiver = User.objects.get(id=receiver_id)
+            
+            # Check if request already exists
+            existing_request = StudyBuddyRequest.objects.filter(
+                sender=sender,
+                receiver=receiver,
+                course_name=course_name
+            ).first()
+            
+            if existing_request:
+                return {
+                    "success": False,
+                    "error": "You already sent a study buddy request to this user for this course."
+                }
+            
+            # Create new request
+            request = StudyBuddyRequest.objects.create(
+                sender=sender,
+                receiver=receiver,
+                course_name=course_name,
+                message=message,
+                status='pending'
+            )
+            
+            return {
+                "success": True,
+                "request": {
+                    "id": request.id,
+                    "sender": f"{request.sender.fname} {request.sender.lname}",
+                    "receiver": f"{request.receiver.fname} {request.receiver.lname}",
+                    "course_name": request.course_name,
+                    "status": request.status,
+                    "created_at": request.created_at.isoformat()
+                }
+            }
+            
+        except User.DoesNotExist:
+            return {
+                "success": False,
+                "error": "User not found."
+            }
+        except Exception as e:
+            print(f"Error creating study buddy request: {str(e)}")
+            return {
+                "success": False,
+                "error": "Failed to create study buddy request."
+            }
+    
+    @staticmethod
+    def get_requests_by_user(email):
+        """
+        Get all study buddy requests for a user (both sent and received).
+        
+        Args:
+            email (str): Email of the user
+            
+        Returns:
+            dict: Result with success status and request data or error message
+        """
+        try:
+            from .models import User
+            
+            user = User.objects.get(email_address=email)
+            
+            # Get sent requests
+            sent_requests = StudyBuddyRequest.objects.filter(sender=user)
+            
+            # Get received requests
+            received_requests = StudyBuddyRequest.objects.filter(receiver=user)
+            
+            # Convert to dicts for JSON serialization
+            sent_data = [{
+                "id": req.id,
+                "receiver_id": req.receiver.id,
+                "receiver_name": f"{req.receiver.fname} {req.receiver.lname}",
+                "course": req.course_name,
+                "message": req.message,
+                "status": req.status,
+                "created_at": req.created_at.isoformat(),
+                "type": "sent"
+            } for req in sent_requests]
+            
+            received_data = [{
+                "id": req.id,
+                "sender_id": req.sender.id,
+                "sender_name": f"{req.sender.fname} {req.sender.lname}",
+                "course": req.course_name,
+                "message": req.message,
+                "status": req.status,
+                "created_at": req.created_at.isoformat(),
+                "type": "received"
+            } for req in received_requests]
+            
+            return {
+                "success": True,
+                "sent_requests": sent_data,
+                "received_requests": received_data
+            }
+            
+        except User.DoesNotExist:
+            return {
+                "success": False,
+                "error": "User not found."
+            }
+        except Exception as e:
+            print(f"Error fetching study buddy requests: {str(e)}")
+            return {
+                "success": False,
+                "error": "Failed to fetch study buddy requests."
+            }
+    
+    @staticmethod
+    def update_request_status(request_id, new_status):
+        """
+        Update the status of a study buddy request.
+        
+        Args:
+            request_id (int): ID of the request to update
+            new_status (str): New status ('accepted' or 'declined')
+            
+        Returns:
+            dict: Result with success status and updated request or error message
+        """
+        try:
+            from .models import StudyBuddyRequest
+            
+            request = StudyBuddyRequest.objects.get(id=request_id)
+            
+            if new_status not in ['accepted', 'declined']:
+                return {
+                    "success": False,
+                    "error": "Invalid status. Must be 'accepted' or 'declined'."
+                }
+            
+            request.status = new_status
+            request.save()
+            
+            return {
+                "success": True,
+                "request": {
+                    "id": request.id,
+                    "sender": f"{request.sender.fname} {request.sender.lname}",
+                    "receiver": f"{request.receiver.fname} {request.receiver.lname}",
+                    "course_name": request.course_name,
+                    "status": request.status,
+                    "updated_at": request.updated_at.isoformat()
+                }
+            }
+            
+        except StudyBuddyRequest.DoesNotExist:
+            return {
+                "success": False,
+                "error": "Study buddy request not found."
+            }
+        except Exception as e:
+            print(f"Error updating study buddy request: {str(e)}")
+            return {
+                "success": False,
+                "error": "Failed to update study buddy request."
+            }
+
+    @staticmethod
+    def get_messages(request_id):
+        """
+        Get all messages for a specific study buddy request.
+        
+        Args:
+            request_id (int): ID of the study buddy request
+            
+        Returns:
+            dict: Result with success status and messages data or error message
+        """
+        try:
+            from .models import StudyBuddyRequest, StudyBuddyMessage
+            
+            request = StudyBuddyRequest.objects.get(id=request_id)
+            
+            # Verify that the request has been accepted
+            if request.status != 'accepted':
+                return {
+                    "success": False,
+                    "error": "Messages are only available for accepted study buddy requests"
+                }
+            
+            messages = StudyBuddyMessage.objects.filter(study_buddy_request=request).order_by('created_at')
+            
+            # Convert to dicts for JSON serialization
+            messages_data = [{
+                "id": msg.id,
+                "sender_id": msg.sender.id,
+                "sender_name": f"{msg.sender.fname} {msg.sender.lname}",
+                "receiver_id": msg.receiver.id,
+                "content": msg.content,
+                "is_read": msg.is_read,
+                "created_at": msg.created_at.isoformat()
+            } for msg in messages]
+            
+            return {
+                "success": True,
+                "messages": messages_data
+            }
+            
+        except StudyBuddyRequest.DoesNotExist:
+            return {
+                "success": False,
+                "error": "Study buddy request not found"
+            }
+        except Exception as e:
+            print(f"Error getting messages: {str(e)}")
+            return {
+                "success": False,
+                "error": "Failed to get messages"
+            }
+
+    @staticmethod
+    def send_message(sender_email, receiver_id, request_id, content):
+        """
+        Send a message between study buddies.
+        
+        Args:
+            sender_email (str): Email of the user sending the message
+            receiver_id (int): ID of the user receiving the message
+            request_id (int): ID of the study buddy request
+            content (str): Message content
+            
+        Returns:
+            dict: Result with success status and message data or error message
+        """
+        try:
+            from .models import StudyBuddyRequest, StudyBuddyMessage, User
+            
+            # Verify users and request exist
+            sender = User.objects.get(email_address=sender_email)
+            receiver = User.objects.get(id=receiver_id)
+            request = StudyBuddyRequest.objects.get(id=request_id)
+            
+            # Verify that the request has been accepted
+            if request.status != 'accepted':
+                return {
+                    "success": False,
+                    "error": "Messages can only be sent for accepted study buddy requests"
+                }
+            
+            # Verify that the sender and receiver are the users in the request
+            if not ((sender == request.sender and receiver == request.receiver) or 
+                    (sender == request.receiver and receiver == request.sender)):
+                return {
+                    "success": False,
+                    "error": "You can only message your study buddy"
+                }
+            
+            # Check for inappropriate content
+            is_appropriate, message = ContentModerationService.moderate_text(content)
+            if not is_appropriate:
+                return {
+                    "success": False,
+                    "error": message
+                }
+            
+            # Create the message
+            message = StudyBuddyMessage.objects.create(
+                sender=sender,
+                receiver=receiver,
+                study_buddy_request=request,
+                content=content,
+                is_read=False
+            )
+            
+            return {
+                "success": True,
+                "message": {
+                    "id": message.id,
+                    "sender_name": f"{sender.fname} {sender.lname}",
+                    "content": message.content,
+                    "created_at": message.created_at.isoformat()
+                }
+            }
+            
+        except User.DoesNotExist:
+            return {
+                "success": False,
+                "error": "User not found"
+            }
+        except StudyBuddyRequest.DoesNotExist:
+            return {
+                "success": False,
+                "error": "Study buddy request not found"
+            }
+        except Exception as e:
+            print(f"Error sending message: {str(e)}")
+            return {
+                "success": False,
+                "error": "Failed to send message"
+            }
+
+    @staticmethod
+    def mark_messages_as_read(user_email, request_id):
+        """
+        Mark all messages for a user in a study buddy request as read.
+        
+        Args:
+            user_email (str): Email of the user
+            request_id (int): ID of the study buddy request
+            
+        Returns:
+            dict: Result with success status or error message
+        """
+        try:
+            from .models import StudyBuddyRequest, StudyBuddyMessage, User
+            
+            user = User.objects.get(email_address=user_email)
+            request = StudyBuddyRequest.objects.get(id=request_id)
+            
+            # Mark messages as read
+            updated_count = StudyBuddyMessage.objects.filter(
+                receiver=user,
+                study_buddy_request=request,
+                is_read=False
+            ).update(is_read=True)
+            
+            return {
+                "success": True,
+                "count": updated_count
+            }
+            
+        except User.DoesNotExist:
+            return {
+                "success": False,
+                "error": "User not found"
+            }
+        except StudyBuddyRequest.DoesNotExist:
+            return {
+                "success": False,
+                "error": "Study buddy request not found"
+            }
+        except Exception as e:
+            print(f"Error marking messages as read: {str(e)}")
+            return {
+                "success": False,
+                "error": "Failed to mark messages as read"
+            }
+
+    @staticmethod
+    def get_unread_message_count(user_email):
+        """
+        Get the count of unread messages for a user.
+        
+        Args:
+            user_email (str): Email of the user
+            
+        Returns:
+            dict: Result with success status and unread counts by request ID
+        """
+        try:
+            from .models import User, StudyBuddyMessage
+            
+            user = User.objects.get(email_address=user_email)
+            
+            # Get count of unread messages by request
+            unread_counts = {}
+            
+            # Find all messages where the user is the receiver and messages are unread
+            unread_messages = StudyBuddyMessage.objects.filter(
+                receiver=user,
+                is_read=False
+            )
+            
+            # Group by request ID and count
+            for message in unread_messages:
+                request_id = message.study_buddy_request.id
+                if request_id in unread_counts:
+                    unread_counts[request_id] += 1
+                else:
+                    unread_counts[request_id] = 1
+                
+            # Also include sender info
+            sender_info = {}
+            for request_id in unread_counts.keys():
+                # Get the latest unread message for this request
+                latest_message = StudyBuddyMessage.objects.filter(
+                    study_buddy_request_id=request_id,
+                    receiver=user,
+                    is_read=False
+                ).order_by('-created_at').first()
+                
+                if latest_message:
+                    sender_info[request_id] = {
+                        'id': latest_message.sender.id,
+                        'name': f"{latest_message.sender.fname} {latest_message.sender.lname}",
+                        'preview': latest_message.content[:30] + ('...' if len(latest_message.content) > 30 else '')
+                    }
+            
+            return {
+                "success": True,
+                "unread_counts": unread_counts,
+                "sender_info": sender_info
+            }
+            
+        except User.DoesNotExist:
+            return {
+                "success": False,
+                "error": "User not found"
+            }
+        except Exception as e:
+            print(f"Error getting unread message count: {str(e)}")
+            return {
+                "success": False,
+                "error": "Failed to get unread message count"
+            }
+            
+    @staticmethod
+    def get_buddy_status_updates(user_email):
+        """
+        Get study buddies with their status information.
+        
+        Args:
+            user_email (str): Email of the user
+            
+        Returns:
+            dict: Result with success status and list of buddies with their status
+        """
+        try:
+            from .models import User, StudyBuddyRequest
+            
+            user = User.objects.get(email_address=user_email)
+            
+            # Get all accepted study buddy requests
+            sent_requests = StudyBuddyRequest.objects.filter(
+                sender=user,
+                status='accepted'
+            )
+            
+            received_requests = StudyBuddyRequest.objects.filter(
+                receiver=user,
+                status='accepted'
+            )
+            
+            # Extract buddy information
+            buddies = []
+            
+            for request in sent_requests:
+                buddies.append({
+                    'id': request.receiver.id,
+                    'name': f"{request.receiver.fname} {request.receiver.lname}",
+                    'request_id': request.id
+                })
+                
+            for request in received_requests:
+                buddies.append({
+                    'id': request.sender.id,
+                    'name': f"{request.sender.fname} {request.sender.lname}",
+                    'request_id': request.id
+                })
+            
+            return {
+                "success": True,
+                "buddies": buddies
+            }
+            
+        except User.DoesNotExist:
+            return {
+                "success": False,
+                "error": "User not found"
+            }
+        except Exception as e:
+            print(f"Error getting buddy status updates: {str(e)}")
+            return {
+                "success": False,
+                "error": "Failed to get buddy status updates"
+            }

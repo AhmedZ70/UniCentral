@@ -15,6 +15,7 @@ from .services import (
     CommentService,
     CommentUpvoteService,
     TranscriptService,
+    StudyBuddyService,
     )
 from .serializers import (
     DepartmentSerializer,
@@ -26,6 +27,9 @@ from .serializers import (
     CommentSerializer,
 )
 from django.http import JsonResponse
+import time
+import json
+from django.http import StreamingHttpResponse
 
 ######################
 # General Page Views #
@@ -1398,3 +1402,311 @@ class GetReviewAPIView(APIView):
                 {"error": str(e)},
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
+
+# Study Buddy Views and APIs
+class CreateStudyBuddyRequestView(APIView):
+    """
+    API View to create a new study buddy request.
+    """
+    def post(self, request):
+        try:
+            sender_email = request.data.get('sender_email')
+            receiver_id = request.data.get('receiver_id')
+            course = request.data.get('course')
+            message = request.data.get('message')
+            
+            if not all([sender_email, receiver_id, course, message]):
+                return Response(
+                    {"error": "Missing required fields"},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+            
+            result = StudyBuddyService.create_request(
+                sender_email=sender_email,
+                receiver_id=receiver_id,
+                course_name=course,
+                message=message
+            )
+            
+            if result["success"]:
+                return Response(
+                    {"message": "Study buddy request sent successfully", "data": result["request"]},
+                    status=status.HTTP_201_CREATED
+                )
+            else:
+                return Response(
+                    {"error": result["error"]},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+                
+        except Exception as e:
+            print(f"Error creating study buddy request: {str(e)}")
+            return Response(
+                {"error": str(e)},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+
+class GetStudyBuddyRequestsView(APIView):
+    """
+    API View to get all study buddy requests for a user.
+    """
+    def get(self, request, email_address):
+        try:
+            result = StudyBuddyService.get_requests_by_user(email_address)
+            
+            if result["success"]:
+                return Response(
+                    {
+                        "sent_requests": result["sent_requests"],
+                        "received_requests": result["received_requests"]
+                    },
+                    status=status.HTTP_200_OK
+                )
+            else:
+                return Response(
+                    {"error": result["error"]},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+                
+        except Exception as e:
+            print(f"Error fetching study buddy requests: {str(e)}")
+            return Response(
+                {"error": str(e)},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+
+class UpdateStudyBuddyRequestView(APIView):
+    """
+    API View to update the status of a study buddy request.
+    """
+    def put(self, request, request_id):
+        try:
+            new_status = request.data.get('status')
+            
+            if not new_status:
+                return Response(
+                    {"error": "Missing status field"},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+            
+            result = StudyBuddyService.update_request_status(
+                request_id=request_id,
+                new_status=new_status
+            )
+            
+            if result["success"]:
+                return Response(
+                    {"message": f"Study buddy request {new_status}", "data": result["request"]},
+                    status=status.HTTP_200_OK
+                )
+            else:
+                return Response(
+                    {"error": result["error"]},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+                
+        except Exception as e:
+            print(f"Error updating study buddy request: {str(e)}")
+            return Response(
+                {"error": str(e)},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+
+class StudyBuddyMessagesView(APIView):
+    """
+    API View to get messages for a study buddy request.
+    """
+    def get(self, request, request_id):
+        try:
+            result = StudyBuddyService.get_messages(request_id)
+            
+            if result["success"]:
+                return Response(
+                    {"messages": result["messages"]},
+                    status=status.HTTP_200_OK
+                )
+            else:
+                return Response(
+                    {"error": result["error"]},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+                
+        except Exception as e:
+            print(f"Error fetching study buddy messages: {str(e)}")
+            return Response(
+                {"error": str(e)},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+            
+class SendStudyBuddyMessageView(APIView):
+    """
+    API View to send a message to a study buddy.
+    """
+    def post(self, request, request_id):
+        try:
+            sender_email = request.data.get('sender_email')
+            receiver_id = request.data.get('receiver_id')
+            content = request.data.get('content')
+            
+            if not all([sender_email, receiver_id, content]):
+                return Response(
+                    {"error": "Missing required fields"},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+            
+            result = StudyBuddyService.send_message(
+                sender_email=sender_email,
+                receiver_id=receiver_id,
+                request_id=request_id,
+                content=content
+            )
+            
+            if result["success"]:
+                return Response(
+                    {"message": "Message sent successfully", "data": result["message"]},
+                    status=status.HTTP_201_CREATED
+                )
+            else:
+                return Response(
+                    {"error": result["error"]},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+                
+        except Exception as e:
+            print(f"Error sending study buddy message: {str(e)}")
+            return Response(
+                {"error": str(e)},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+            
+class MarkMessagesAsReadView(APIView):
+    """
+    API View to mark messages as read.
+    """
+    def post(self, request, request_id):
+        try:
+            user_email = request.data.get('user_email')
+            
+            if not user_email:
+                return Response(
+                    {"error": "Missing user_email field"},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+            
+            result = StudyBuddyService.mark_messages_as_read(
+                user_email=user_email,
+                request_id=request_id
+            )
+            
+            if result["success"]:
+                return Response(
+                    {"message": f"Marked {result['count']} messages as read"},
+                    status=status.HTTP_200_OK
+                )
+            else:
+                return Response(
+                    {"error": result["error"]},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+                
+        except Exception as e:
+            print(f"Error marking messages as read: {str(e)}")
+            return Response(
+                {"error": str(e)},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+
+class MessageUpdatesSSEView(APIView):
+    """
+    Server-Sent Events (SSE) API for real-time message updates.
+    """
+    def get(self, request, email_address):
+        # Set response headers for SSE
+        response = StreamingHttpResponse(
+            streaming_content=self.event_stream(email_address),
+            content_type='text/event-stream'
+        )
+        response['Cache-Control'] = 'no-cache'
+        response['X-Accel-Buffering'] = 'no'  # For Nginx
+        return response
+    
+    def event_stream(self, email_address):
+        """Generate SSE events for message updates."""
+        last_check = {}
+        user_status = {}
+        last_status_update = 0
+        
+        try:
+            # Mark this user as online when they connect
+            user = UserService.get_user(email_address)
+            if user:
+                user_id = user.id
+                # In a production app, we'd store user online status in Redis/DB
+                # For now, we'll just send the notification
+                
+                # Add timestamp for ping events
+                last_ping = time.time()
+                
+                while True:
+                    current_time = time.time()
+                    
+                    # Check for new unread messages
+                    result = StudyBuddyService.get_unread_message_count(email_address)
+                    
+                    if result["success"]:
+                        # Only send update if there's a change
+                        current_state = json.dumps(result["unread_counts"])
+                        if current_state != last_check.get('unread_counts'):
+                            last_check['unread_counts'] = current_state
+                            
+                            # Format the data for SSE
+                            data = {
+                                'event': 'message_update',
+                                'unread_counts': result["unread_counts"],
+                                'sender_info': result["sender_info"],
+                                'timestamp': int(current_time)
+                            }
+                            
+                            # Yield the SSE formatted event
+                            yield f"event: message_update\ndata: {json.dumps(data)}\n\n"
+                    
+                    # Send periodic ping events to keep connection alive
+                    if current_time - last_ping > 15:  # Every 15 seconds
+                        ping_data = {
+                            'timestamp': int(current_time)
+                        }
+                        yield f"event: ping\ndata: {json.dumps(ping_data)}\n\n"
+                        last_ping = current_time
+                    
+                    # Update user statuses every 30 seconds
+                    if current_time - last_status_update > 30:
+                        # In a production app, we'd get buddy statuses from Redis/DB
+                        # For now just send random statuses
+                        # Get study buddies
+                        buddy_requests = StudyBuddyService.get_buddy_status_updates(email_address)
+                        if buddy_requests["success"]:
+                            statuses = {}
+                            for buddy in buddy_requests.get("buddies", []):
+                                # Normally we'd get real status, for demo just random
+                                import random
+                                status = "online" if random.random() > 0.3 else "offline"
+                                statuses[buddy["id"]] = {
+                                    "status": status,
+                                    "last_active": int(current_time - random.randint(0, 3600))
+                                }
+                            
+                            status_data = {
+                                "buddies": statuses
+                            }
+                            
+                            yield f"event: status_update\ndata: {json.dumps(status_data)}\n\n"
+                            last_status_update = current_time
+                    
+                    # Sleep to avoid excessive server load
+                    time.sleep(3)
+                
+        except Exception as e:
+            print(f"SSE connection closed: {str(e)}")
+            
+            # Send an error event
+            yield f"event: error\ndata: Connection closed\n\n"
