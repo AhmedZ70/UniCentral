@@ -51,6 +51,7 @@ class Course(models.Model):
         avg_rating (FloatField): The average rating for the course. Default is 0.
         credits (PositiveIntegerField): The number of credits the course is worth. Must be greater than 0.
         semester (CharField): The semester when the course is offered (e.g., 'Fall 2024'). Optional.
+        professors
     """
 
     id = models.AutoField(primary_key=True)

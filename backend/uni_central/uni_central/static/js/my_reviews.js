@@ -164,13 +164,14 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // Professor (for course reviews)
     if (isCourseReview && review.course) {
-        const profP = document.createElement('p');
-        const profLabel = document.createElement('span');
-        profLabel.className = 'label';
-        profLabel.textContent = 'Professor: ';
-        profP.appendChild(profLabel);
-        profP.appendChild(document.createTextNode(review.course.professor_name || 'N/A'));
-        infoDiv.appendChild(profP);
+      const profName = review.professor ? `${review.professor.fname} ${review.professor.lname}` : 'N/A';
+      const profP = document.createElement('p');
+      const profLabel = document.createElement('span');
+      profLabel.className = 'label';
+      profLabel.textContent = 'Professor: ';
+      profP.appendChild(profLabel);
+      profP.appendChild(document.createTextNode(profName));
+      infoDiv.appendChild(profP);
     } 
     // Course (for professor reviews)
     else if (!isCourseReview && review.professor) {
