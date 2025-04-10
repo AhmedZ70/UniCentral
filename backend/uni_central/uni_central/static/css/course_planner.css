@@ -275,8 +275,8 @@ body {
 
 .course-stats {
     display: flex;
-    justify-content: space-between;
-    align-items: center;
+    flex-direction: column;
+    gap: 8px;
     margin-top: 15px;
     padding-top: 15px;
     border-top: 1px solid #eee;
@@ -291,6 +291,7 @@ body {
 .stat-label {
     color: #666;
     font-size: 0.9em;
+    min-width: 70px;
 }
 
 .course-info {
@@ -314,19 +315,36 @@ body {
     margin: 10px 0;
 }
 
-.rating-stars,
-.difficulty-rating {
-    margin-top: 5px;
+.rating-stars {
+    display: inline-flex;
+    align-items: center;
+    gap: 2px;
+    line-height: 1;
+    height: 20px;
 }
 
-.star {
+.rating-stars .star {
+    font-size: 18px;
     color: #ddd;
-    font-size: 20px;
-    margin-right: 2px;
+    display: inline-block;
+    position: relative;
+    width: 18px;
+    height: 18px;
+    text-align: center;
+    line-height: 18px;
+    overflow: visible;
 }
 
-.star.filled {
+.rating-stars .star.filled {
     color: #ffd700;
+}
+
+.difficulty-rating {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    line-height: 1;
+    height: 20px;
 }
 
 .difficulty-circle {
@@ -335,7 +353,8 @@ body {
     height: 12px;
     border-radius: 50%;
     border: 1px solid #ccc;
-    margin-right: 4px;
+    position: relative;
+    flex-shrink: 0;
 }
 
 .difficulty-circle.filled {
