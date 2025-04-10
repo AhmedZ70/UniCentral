@@ -380,7 +380,7 @@ class UserCourseReviewsAPIView(APIView):
         
         try:
             user = UserService.get_user(email)
-            reviews = ReviewService.get_user_course_reviews(user)
+            reviews = ReviewService.get_user_reviews(user)
             serializer = ReviewSerializer(reviews, many=True)
             return Response(serializer.data)
         except Exception as e:
@@ -406,16 +406,22 @@ class UserProfessorReviewsAPIView(APIView):
         
 class CourseReviewFormView(APIView):
     def get(self, request, context_id=None, review_id=None):
-        # This is an edit request if review_id is provided
         if review_id:
-            # Get the existing review
             review = ReviewService.get_review_by_id(review_id)
             course = review.course
+            rating = review.rating
+            difficulty = review.difficulty
+            grade = review.grade
+            estimated_hours = review.estimated_hours
             
-            # Pre-fill form with existing data
+            # Pre-fill with existing data
             context = {
                 'course': course,
                 'review': review,
+                'grade': grade,
+                'rating': rating,
+                'difficulty': difficulty,
+                'estimates_hours': estimated_hours,
                 'is_edit': True,
                 'form_action': f'/api/reviews/{review_id}/update/'
             }
@@ -431,16 +437,22 @@ class CourseReviewFormView(APIView):
     
 class ProfessorReviewFormView(APIView):
     def get(self, request, context_id=None, review_id=None):
-        # This is an edit request if review_id is provided
         if review_id:
-            # Get the existing review
             review = ReviewService.get_review_by_id(review_id)
             professor = review.professor
+            rating = review.rating
+            difficulty = review.difficulty
+            grade = review.grade
+            estimated_hours = review.estimated_hours
             
             # Pre-fill form with existing data
             context = {
                 'professor': professor,
                 'review': review,
+                'grade': grade,
+                'rating': rating,
+                'difficulty': difficulty,
+                'estimates_hours': estimated_hours,
                 'is_edit': True,
                 'form_action': f'/api/reviews/{review_id}/update/'
             }

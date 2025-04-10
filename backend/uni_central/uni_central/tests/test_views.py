@@ -210,7 +210,6 @@ class ViewTestCase(TestCase):
         )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-
     def test_get_user_classmates(self):
         response = self.client.get(reverse('api-my_classmates', args=[self.user.email_address]))
         self.assertEqual(response.status_code, status.HTTP_200_OK)

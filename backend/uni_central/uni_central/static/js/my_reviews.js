@@ -1,15 +1,11 @@
 import { getAuth, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js';
 
 document.addEventListener('DOMContentLoaded', () => {
-  const reviewTypeSelect = document.getElementById('review-type');
   const reviewsContainer = document.querySelector('.my-reviews');
-  const reviewsSort = document.querySelector('.reviews-sort');
   
   let userEmail = '';
   
   let allReviews = [];
-  let courseReviews = [];
-  let professorReviews = [];
 
   const auth = getAuth();
   
@@ -28,16 +24,12 @@ document.addEventListener('DOMContentLoaded', () => {
   }
   
   function setupEventListeners() {
-    reviewTypeSelect.addEventListener('change', filterReviews);
-    reviewsSort.addEventListener('change', sortReviews);    
     reviewsContainer.addEventListener('click', handleReviewAction);
   }
   
   async function loadUserReviews() {
     try {
-      const searchElement = reviewsContainer.querySelector('.search-reviews');
       reviewsContainer.innerHTML = '';
-      reviewsContainer.appendChild(searchElement);
       
       const loadingMsg = document.createElement('div');
       loadingMsg.className = 'loading-message';
@@ -45,23 +37,27 @@ document.addEventListener('DOMContentLoaded', () => {
       reviewsContainer.appendChild(loadingMsg);
       
       const courseReviewsResponse = await fetch(`/api/user/reviews/courses?email=${encodeURIComponent(userEmail)}`);
+      let courseReviews = [];
       if (courseReviewsResponse.ok) {
         courseReviews = await courseReviewsResponse.json();
+        
+        // Filter to ensure only course reviews are loaded
+        courseReviews = courseReviews.filter(review => review.course !== null && review.course !== undefined);
+        
+        console.log('Course Reviews:', courseReviews.length);
+        
+        allReviews = courseReviews;
       } else {
         console.error('Failed to fetch course reviews:', await courseReviewsResponse.text());
-        courseReviews = [];
       }
       
-      const professorReviewsResponse = await fetch(`/api/user/reviews/professors?email=${encodeURIComponent(userEmail)}`);
-      if (professorReviewsResponse.ok) {
-        professorReviews = await professorReviewsResponse.json();
-      } else {
-        console.error('Failed to fetch professor reviews:', await professorReviewsResponse.text());
-        professorReviews = [];
-      }
+      // Sort by newest first
+      allReviews.sort((a, b) => {
+        const dateA = new Date(a.created_at || 0);
+        const dateB = new Date(b.created_at || 0);
+        return dateB - dateA; 
+      });
       
-      allReviews = [...courseReviews, ...professorReviews];
-      sortReviewsByDate(allReviews, 'desc');
       displayReviews(allReviews);
     } catch (error) {
       console.error('Error loading reviews:', error);
@@ -70,9 +66,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
   
   function displayReviews(reviews) {
-    const searchElement = reviewsContainer.querySelector('.search-reviews');
     reviewsContainer.innerHTML = '';
-    reviewsContainer.appendChild(searchElement);
     
     if (reviews.length === 0) {
       const noReviewsMsg = document.createElement('div');
@@ -95,7 +89,6 @@ document.addEventListener('DOMContentLoaded', () => {
     cardDiv.className = isCourseReview ? 'course-review-card' : 'professor-review-card';
     cardDiv.dataset.reviewId = review.id;
     
-    // Create card HTML content
     const infoDiv = document.createElement('div');
     infoDiv.className = 'review-info';
     
@@ -104,12 +97,9 @@ document.addEventListener('DOMContentLoaded', () => {
     
     const titleHeading = document.createElement('h3');
     
-    // Handle title based on review type
     if (isCourseReview && review.course) {
-        // For course reviews, format is "CS 4400 Computer Systems"
         titleHeading.textContent = `${review.course.code || ''} ${review.course.title || ''}`.trim();
     } else if (!isCourseReview && review.professor) {
-        // For professor reviews, format is "Daniel Kopta"
         titleHeading.textContent = `${review.professor.fname || ''} ${review.professor.lname || ''}`.trim();
     } else {
         titleHeading.textContent = "Unknown Review";
@@ -162,7 +152,6 @@ document.addEventListener('DOMContentLoaded', () => {
     hoursP.appendChild(document.createTextNode(`${review.estimated_hours || 'N/A'} ${review.estimated_hours ? 'hours' : ''}`));
     infoDiv.appendChild(hoursP);
     
-    // Professor (for course reviews)
     if (isCourseReview && review.course) {
       const profName = review.professor ? `${review.professor.fname} ${review.professor.lname}` : 'N/A';
       const profP = document.createElement('p');
@@ -173,16 +162,6 @@ document.addEventListener('DOMContentLoaded', () => {
       profP.appendChild(document.createTextNode(profName));
       infoDiv.appendChild(profP);
     } 
-    // Course (for professor reviews)
-    else if (!isCourseReview && review.professor) {
-        const courseP = document.createElement('p');
-        const courseLabel = document.createElement('span');
-        courseLabel.className = 'label';
-        courseLabel.textContent = 'Course Taught: ';
-        courseP.appendChild(courseLabel);
-        courseP.appendChild(document.createTextNode(review.professor.course_name || 'N/A'));
-        infoDiv.appendChild(courseP);
-    }
     
     // Boolean fields with Yes/No answers
     const boolFields = [
@@ -226,7 +205,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const gradeP = document.createElement('p');
     const gradeLabel = document.createElement('span');
     gradeLabel.className = 'label';
-    gradeLabel.textContent = 'Average Grade: ';
+    gradeLabel.textContent = 'Grade Received: ';
     gradeP.appendChild(gradeLabel);
     gradeP.appendChild(document.createTextNode(review.grade || 'N/A'));
     infoDiv.appendChild(gradeP);
@@ -249,109 +228,51 @@ document.addEventListener('DOMContentLoaded', () => {
     cardDiv.appendChild(deleteBtn);
     
     return cardDiv;
-}
-
-// Functions for creating stars and circles
-function createRatingStars(rating) {
-    const maxStars = 5;
-    const filledStars = Math.round(rating); 
-    const starsContainer = document.createElement('div');
-    starsContainer.className = 'rating-stars';
-
-    for (let i = 1; i <= maxStars; i++) {
-        const star = document.createElement('span');
-        star.className = i <= filledStars ? 'star filled' : 'star';
-        star.innerHTML = '★'; 
-        starsContainer.appendChild(star);
-    }
-
-    return starsContainer;
-}
-
-function createDifficultyCircles(difficulty) {
-    const maxCircles = 6;
-    const filledCircles = Math.round(difficulty);
-    const circlesContainer = document.createElement('div');
-    circlesContainer.className = 'difficulty-rating';
-
-    for (let i = 1; i <= maxCircles; i++) {
-        const circle = document.createElement('div');
-        circle.className = 'difficulty-circle';
-
-        if (i <= filledCircles) {
-            circle.classList.add('filled');
-
-            if (i <= 2) {
-                circle.classList.add('green');
-            } else if (i <= 4) {
-                circle.classList.add('yellow');
-            } else {
-                circle.classList.add('red');
-            }
-        }
-
-        circlesContainer.appendChild(circle);
-    }
-
-    return circlesContainer;
-}
-
-  function filterReviews() {
-    const filterValue = reviewTypeSelect.value;
-    let filteredReviews;
-    
-    switch (filterValue) {
-      case 'course':
-        filteredReviews = courseReviews;
-        break;
-      case 'professor':
-        filteredReviews = professorReviews;
-        break;
-      case 'all':
-      default:
-        filteredReviews = allReviews;
-        break;
-    }
-    
-    const sortOrder = reviewsSort.value === 'newest-oldest' ? 'desc' : 'asc';
-    sortReviewsByDate(filteredReviews, sortOrder);
-    
-    displayReviews(filteredReviews);
   }
-  
-  function sortReviews() {
-    const sortValue = reviewsSort.value;
-    const sortOrder = sortValue === 'newest-oldest' ? 'desc' : 'asc';
-    
-    let reviewsToSort;
-    switch (reviewTypeSelect.value) {
-      case 'course':
-        reviewsToSort = courseReviews;
-        break;
-      case 'professor':
-        reviewsToSort = professorReviews;
-        break;
-      case 'all':
-      default:
-        reviewsToSort = allReviews;
-        break;
-    }
-    
-    sortReviewsByDate(reviewsToSort, sortOrder);
-    displayReviews(reviewsToSort);
+
+  // Functions for creating stars and circles remain the same
+  function createRatingStars(rating) {
+      const maxStars = 5;
+      const filledStars = Math.round(rating); 
+      const starsContainer = document.createElement('div');
+      starsContainer.className = 'rating-stars';
+
+      for (let i = 1; i <= maxStars; i++) {
+          const star = document.createElement('span');
+          star.className = i <= filledStars ? 'star filled' : 'star';
+          star.innerHTML = '★'; 
+          starsContainer.appendChild(star);
+      }
+
+      return starsContainer;
   }
-  
-  function sortReviewsByDate(reviews, order) {
-    reviews.sort((a, b) => {
-      const dateA = new Date(a.created_at || 0);
-      const dateB = new Date(b.created_at || 0);
-      
-      return order === 'asc' 
-        ? dateA - dateB 
-        : dateB - dateA;
-    });
-    
-    return reviews;
+
+  function createDifficultyCircles(difficulty) {
+      const maxCircles = 6;
+      const filledCircles = Math.round(difficulty);
+      const circlesContainer = document.createElement('div');
+      circlesContainer.className = 'difficulty-rating';
+
+      for (let i = 1; i <= maxCircles; i++) {
+          const circle = document.createElement('div');
+          circle.className = 'difficulty-circle';
+
+          if (i <= filledCircles) {
+              circle.classList.add('filled');
+
+              if (i <= 2) {
+                  circle.classList.add('green');
+              } else if (i <= 4) {
+                  circle.classList.add('yellow');
+              } else {
+                  circle.classList.add('red');
+              }
+          }
+
+          circlesContainer.appendChild(circle);
+      }
+
+      return circlesContainer;
   }
   
   function handleReviewAction(event) {
@@ -379,7 +300,7 @@ function createDifficultyCircles(difficulty) {
     } else {
         window.location.assign(`/edit-professor-review/${reviewId}/`);
     }
-}
+  }
   
   async function confirmAndDeleteReview(reviewId, reviewCard) {
     const confirmDelete = confirm('Are you sure you want to delete this review? This action cannot be undone.');
@@ -399,8 +320,6 @@ function createDifficultyCircles(difficulty) {
         
         if (response.ok) {
           allReviews = allReviews.filter(review => review.id.toString() !== reviewId.toString());
-          courseReviews = courseReviews.filter(review => review.id.toString() !== reviewId.toString());
-          professorReviews = professorReviews.filter(review => review.id.toString() !== reviewId.toString());
           reviewCard.remove();
           showNotification('Review successfully deleted!', 'success');
           

@@ -47,10 +47,8 @@ document.addEventListener("DOMContentLoaded", () => {
             console.error("Course ID not found in edit form!");
         }
         
-        // Show professor dropdown and fetch professors
         professorSelectContainer.style.display = "block";
         
-        // Only fetch professors if we have a courseId
         if (courseId) {
             fetch(`/api/courses/${courseId}/professors/`)
                 .then((response) => {
@@ -68,7 +66,6 @@ document.addEventListener("DOMContentLoaded", () => {
                         professorSelect.appendChild(option);
                     });
                     
-                    // If this is an edit form, select the right professor
                     if (isEdit && document.getElementById("currentProfessorId")) {
                         const currentProfId = document.getElementById("currentProfessorId").value;
                         professorSelect.value = currentProfId;
@@ -116,14 +113,12 @@ document.addEventListener("DOMContentLoaded", () => {
     // Handle form submission
     const submitBtn = document.getElementById("submitReviewBtn");
     submitBtn.addEventListener("click", (e) => {
-        // Your existing form submission code...
         if (!submitBtn) {
             console.error("Submit button not found!");
             return;
         }   
         e.preventDefault();
 
-        // Your existing validation code...
         let isAnonymous = false;
         const anonymousCheckbox = document.getElementById("anonymousReview");
         console.log("Anonymous Checkbox Element:", anonymousCheckbox);
@@ -143,7 +138,6 @@ document.addEventListener("DOMContentLoaded", () => {
         const rating = document.getElementById("rating").value.trim();
         const difficulty = document.getElementById("difficulty").value.trim();
 
-        // Your existing validation code...
         // Get error elements
         const reviewTextError = document.getElementById("reviewTextError");
         const ratingError = document.getElementById("ratingError");
@@ -245,11 +239,9 @@ document.addEventListener("DOMContentLoaded", () => {
                 return response.json();
             })
             .then((data) => {
-                // Redirect based on where the edit came from
                 if (isEdit) {
                     window.location.href = "/my_reviews/"; // Redirect to my reviews page after edit
                 } else {
-                    // For new reviews, redirect to the course or professor detail page
                     if (contextType === "course") {
                         window.location.href = `/courses/${contextId}/`;
                     } else if (contextType === "professor") {

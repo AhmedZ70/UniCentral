@@ -215,18 +215,11 @@ class ReviewService:
         return review
     
     @staticmethod
-    def get_user_course_reviews(user):
+    def get_user_reviews(user):
         """
         Get all course reviews by a specific user.
         """
         return Review.objects.filter(user=user, course__isnull=False)
-
-    @staticmethod
-    def get_user_professor_reviews(user):
-        """
-        Get all professor reviews by a specific user.
-        """
-        return Review.objects.filter(user=user, professor__isnull=False)
 
     @staticmethod
     def update_review(review_id, review_data):
@@ -252,14 +245,28 @@ class ReviewService:
             review.difficulty = int(review_data["difficulty"])
         if "estimated_hours" in review_data:
             review.estimated_hours = float(review_data["estimated_hours"])
+        if "grade" in review_data:
+            review.grade = review_data["grade"]
         if "would_take_again" in review_data:
-            review.would_take_again = review_data["would_take_again"] == "true"
+            review.would_take_again = review_data["would_take_again"]
         if "for_credit" in review_data:
-            review.for_credit = review_data["for_credit"] == "true"
+            review.for_credit = review_data["for_credit"]
         if "mandatory_attendance" in review_data:
-            review.mandatory_attendance = review_data["mandatory_attendance"] == "true"
+            review.mandatory_attendance = review_data["mandatory_attendance"]
+        if "is_gened" in review_data:
+            review.is_gened = review_data["is_gened"]
+        if "in_person" in review_data:
+            review.in_person = review_data["in_person"]
+        if "online" in review_data:
+            review.online = review_data["online"]
+        if "hybrid" in review_data:
+            review.hybrid = review_data["hybrid"] 
+        if "no_exams" in review_data:
+            review.no_exams = review_data["no_exams"]   
+        if "presentations" in review_data:
+            review.presentations = review_data["presentations"]
         if "is_anonymous" in review_data:
-            review.is_anonymous = review_data["is_anonymous"] == "true"
+            review.is_anonymous = review_data["is_anonymous"] 
 
         review.save()
 

@@ -1,158 +1,167 @@
 /* ============================================= */
 /* General                                       */
 /* ============================================= */
-body, html, ul, li, p, h1, h2, select {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-  }
-  
-  body {
-    font-family: 'Montserrat', sans-serif;
-    line-height: 1.6;
-    background-color: #FAF8F0;
-  }
-  
-  @font-face {
-    font-family: 'Agrandir';
-    src: url('../assets/fonts/Agrandir-Regular.otf') format('truetype');
-    font-weight: normal;
-    font-style: normal;
-  }
-  
-  /* ============================================= */
-  /* Navbar Styles                                 */
-  /* ============================================= */
-  .navbar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 1rem 2rem;
-    font-weight: 100;
-    font-size: 20px;
-  }
-  
-  .logo {
-    display: flex;
-    align-items: center;
-    font-size: 1.2rem;
-    font-weight: bold;
-    color: #333333;
-  }
-  
-  .logo img {
-    width: 200px;
-    margin-right: 8px;
-  }
-  
-  .logo-home-btn {
-    border: none;
-    background-color: #FAF8F0;
-  }
-  
-  .nav-links {
-    display: flex;
-    list-style: none;
-  }
-  
-  .nav-links li {
-    margin-left: 2rem;
-  }
-  
-  .nav-links a {
-    text-decoration: none;
-    color: #333333;
-    font-weight: bold;
-  }
-  
-  .nav-links a:hover {
-    color: #005a5b;
-  }
-  
-  .actions {
-    display: flex;
-    align-items: center;
-  }
-  
-  .register-btn {
-    background-color: #005a5b;
-    color: #FAF8F0;
-    border: none;
-    font-family: 'Agrandir', sans-serif;
-    font-size: 20px;
-    padding: 0.5rem 1rem;
-    border-radius: 20px;
-    font-weight: bold;
-    cursor: pointer;
-  }
-  
-  .register-btn:hover {
-    background-color: #007d7d;
-  }
-  
-  .welcome-message {
-    color: #005a5b;
-    font-weight: bold;
-    margin-right: 1rem;
-    display: inline-block;
-    font-family: 'Montserrat', sans-serif;
-  }
-  
-  /* ============================================= */
-  /* Hero Section                                   */
-  /* ============================================= */
-  .hero {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 2rem 2rem 0.5rem 2rem; /* Reduced bottom padding */
-  }
-  
-  .text-container {
-    position: relative;
-    z-index: 1;
-  }
-  
-  .text-content {
-    max-width: 100%;
-    font-family: 'Agrandir', sans-serif;
-  }
-  
-  .text-content h1 {
-    font-family: 'Agrandir', sans-serif;
-    font-weight: 100;
-    font-size: 65px;
-    color: #ff743e;
-    margin-left: 50px;
-    margin-top: -50px;
-  }
-  
-  .review-type {
-    font-size: 25px;
-    margin-left: 38px;
-  }
-
-  .review-type select {
-    font-family: 'Agrandir', sans-serif;
-  }
-
-  #review-type {
-    width: 200px;  
-    height: 40px;  
-    padding: 8px 12px;  
-    font-size: 16px; 
-    box-sizing: border-box;  
-    border-radius: 5px;  
-    border: 1px solid black;  
-    appearance: auto;  
+body,
+html,
+ul,
+li,
+p,
+h1,
+h2,
+select {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
+
+body {
+  font-family: 'Montserrat', sans-serif;
+  line-height: 1.6;
+  background-color: #FAF8F0;
+}
+
+@font-face {
+  font-family: 'Agrandir';
+  src: url('../assets/fonts/Agrandir-Regular.otf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+/* ============================================= */
+/* Navbar Styles                                 */
+/* ============================================= */
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 2rem;
+  font-weight: 100;
+  font-size: 20px;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: #333333;
+}
+
+.logo img {
+  width: 200px;
+  margin-right: 8px;
+}
+
+.logo-home-btn {
+  border: none;
+  background-color: #FAF8F0;
+}
+
+.nav-links {
+  display: flex;
+  list-style: none;
+}
+
+.nav-links li {
+  margin-left: 2rem;
+}
+
+.nav-links a {
+  text-decoration: none;
+  color: #333333;
+  font-weight: bold;
+}
+
+.nav-links a:hover {
+  color: #005a5b;
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+}
+
+.register-btn {
+  background-color: #005a5b;
+  color: #FAF8F0;
+  border: none;
+  font-family: 'Agrandir', sans-serif;
+  font-size: 20px;
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.register-btn:hover {
+  background-color: #007d7d;
+}
+
+.welcome-message {
+  color: #005a5b;
+  font-weight: bold;
+  margin-right: 1rem;
+  display: inline-block;
+  font-family: 'Montserrat', sans-serif;
+}
+
+/* ============================================= */
+/* Hero Section                                   */
+/* ============================================= */
+.hero {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 2rem 2rem 0.5rem 2rem;
+  /* Reduced bottom padding */
+}
+
+.text-container {
+  position: relative;
+  z-index: 1;
+}
+
+.text-content {
+  max-width: 100%;
+  font-family: 'Agrandir', sans-serif;
+}
+
+.text-content h1 {
+  font-family: 'Agrandir', sans-serif;
+  font-weight: 100;
+  font-size: 65px;
+  color: #ff743e;
+  margin-left: 50px;
+  margin-top: -50px;
+}
+
+.review-type {
+  font-size: 25px;
+  margin-left: 38px;
+}
+
+.review-type select {
+  font-family: 'Agrandir', sans-serif;
+}
+
+#review-type {
+  width: 200px;
+  height: 40px;
+  padding: 8px 12px;
+  font-size: 16px;
+  box-sizing: border-box;
+  border-radius: 5px;
+  border: 1px solid black;
+  appearance: auto;
+}
+
 .my-reviews {
   max-width: 1000px;
   margin: 2rem auto;
   padding: 0 20px;
 }
 
-.course-review-card, .professor-review-card {
+.course-review-card {
   background: #fff;
   padding: 30px;
   border-radius: 15px;
@@ -163,7 +172,7 @@ body, html, ul, li, p, h1, h2, select {
   border: 2px solid black;
 }
 
-.course-review-card:hover, .professor-review-card:hover {
+.course-review-card:hover {
   transform: translateY(-5px);
   box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
 }
@@ -251,7 +260,8 @@ body, html, ul, li, p, h1, h2, select {
   cursor: pointer;
 } */
 
-.edit-review, .delete-btn {
+.edit-review,
+.delete-btn {
   position: absolute;
   padding: 10px 20px;
   border-radius: 30px;
@@ -279,7 +289,8 @@ body, html, ul, li, p, h1, h2, select {
   border: none;
 }
 
-.course-review-card.deleting, .professor-review-card.deleting {
+.course-review-card.deleting,
+.professor-review-card.deleting {
   opacity: 0.5;
   transform: scale(0.95);
   transition: opacity 0.3s, transform 0.3s;
@@ -300,7 +311,7 @@ body, html, ul, li, p, h1, h2, select {
 }
 
 .notification.success {
-  background-color: #4CAF50;
+  background-color: #2d6a6b;
 }
 
 .notification.error {
@@ -319,28 +330,4 @@ body, html, ul, li, p, h1, h2, select {
   background-color: #f9f9f9;
   border-radius: 8px;
   margin: 2rem 0;
-}
-
-.search-reviews {
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 2rem;
-}
-
-.filter-container, .sort-container {
-  display: flex;
-  align-items: center;
-}
-
-.filter-container label, .sort-container label {
-  margin-right: 10px;
-  font-weight: 600;
-  color: #005a5b;
-}
-
-.review-type, .reviews-sort {
-  padding: 8px 15px;
-  border-radius: 5px;
-  font-family: 'Montserrat', sans-serif;
-  color: #333;
 }
