@@ -41,17 +41,10 @@ document.addEventListener("DOMContentLoaded", () => {
         <div class="classmate-info">
           <div class="name-container">
             <h3>${classmate.fname} ${classmate.lname}</h3>
-            <button class="chat-button" data-id="${classmate.id}">
-              <img src="/static/assets/chat_bubble.png" alt="chat" class="chat-bubble">
-            </button>
           </div>
           <p>Classes in common: ${classmate.common_classes ? classmate.common_classes.join(', ') : "N/A"}</p>
         </div>
       `;
-      card.querySelector('.chat-button').addEventListener('click', () => {
-        console.log(`Initiate chat with ${classmate.fname} ${classmate.lname}`);
-        // Implement your chat logic or redirection here.
-      });
       classmateGrid.appendChild(card);
     });
   }
