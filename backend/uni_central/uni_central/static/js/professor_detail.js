@@ -157,7 +157,9 @@ document.addEventListener("DOMContentLoaded", () => {
                     setupThumbsButtons(review.id, li);
                 });
             }
-            // Prof grade dist.
+            // Professor grade distribution chart logic
+            let professorChart = null;
+
             const professorGradeData = { A: 0, B: 0, C: 0, D: 0, F: 0 };
 
             reviews.forEach((review) => {
@@ -165,34 +167,32 @@ document.addEventListener("DOMContentLoaded", () => {
                     professorGradeData[review.grade] = (professorGradeData[review.grade] || 0) + 1;
                 }
             });
+
             const showProfessorChartLink = document.getElementById("showProfessorChartLink");
             const professorChartCanvas = document.getElementById("gradeAverageChart");
+            const professorChartContainer = document.getElementById("professor-chart-container");
             const noProfessorGradeMessage = document.getElementById("no-grade-message");
 
             showProfessorChartLink.addEventListener("click", function (event) {
-                event.preventDefault(); // Prevent the link from navigating
+                event.preventDefault();
 
-                console.log("View Distribution clicked!");
-                // Check if there is no professor grade data
                 if (Object.values(professorGradeData).every(value => value === 0)) {
-                    // Show the message that no grade data is available
                     noProfessorGradeMessage.style.display = "block";
-                    professorChartCanvas.style.display = "none"; // Hide the chart
-                    showProfessorChartLink.textContent = "View Professor Grade Distribution"; // Reset the link text
+                    professorChartContainer.style.display = "none";
+                    showProfessorChartLink.textContent = "View Professor Grade Distribution";
                 } else {
-                    // Toggle chart visibility and link text
-                    if (professorChartCanvas.style.display === "none" || professorChartCanvas.style.display === "") {
-                        // Show the chart
-                        professorChartCanvas.style.display = "block";
-                        noProfessorGradeMessage.style.display = "none"; // Hide the "No grade data" message
-
-                        // Change the link text to "Close Chart"
+                    if (professorChartContainer.style.display === "none" || professorChartContainer.style.display === "") {
+                        professorChartContainer.style.display = "block";
+                        noProfessorGradeMessage.style.display = "none";
                         showProfessorChartLink.textContent = "Close Chart";
 
-                        // Create the chart (Pie Chart for grade distribution)
+                        if (professorChart) {
+                            professorChart.destroy();
+                        }
+
                         const ctx = professorChartCanvas.getContext('2d');
 
-                        new Chart(ctx, {
+                        professorChart = new Chart(ctx, {
                             type: 'pie',
                             data: {
                                 labels: Object.keys(professorGradeData),
@@ -200,17 +200,14 @@ document.addEventListener("DOMContentLoaded", () => {
                                     label: 'Professor Grade Distribution',
                                     data: Object.values(professorGradeData),
                                     backgroundColor: [
-                                        '#4CAF50', // Dark Green for A
-                                        '#8BC34A', // Lighter Green for A
-                                        '#9C27B0', // Slightly Lighter Green/Purple for B
-                                        '#FFEB3B', // Yellow-green for C
-                                        '#FF9800', // Orange for D
-                                        '#F44336', // Red for F
+                                        '#4CAF50', '#8BC34A', '#9C27B0',
+                                        '#FFEB3B', '#FF9800', '#F44336'
                                     ]
                                 }]
                             },
                             options: {
                                 responsive: true,
+                                maintainAspectRatio: false,
                                 plugins: {
                                     legend: {
                                         position: 'top',
@@ -219,11 +216,8 @@ document.addEventListener("DOMContentLoaded", () => {
                             }
                         });
                     } else {
-                        // Hide the chart
-                        professorChartCanvas.style.display = "none";
-                        noProfessorGradeMessage.style.display = "none"; // Hide message when chart is closed
-
-                        // Change the link text back to "View Professor Grade Distribution"
+                        professorChartContainer.style.display = "none";
+                        noProfessorGradeMessage.style.display = "none";
                         showProfessorChartLink.textContent = "View Professor Grade Distribution";
                     }
                 }
