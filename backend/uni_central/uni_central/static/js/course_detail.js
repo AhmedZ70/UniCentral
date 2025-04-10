@@ -138,7 +138,10 @@ document.addEventListener("DOMContentLoaded", () => {
             
             reviews.forEach((review) => {
                 if (review.grade) {
-                    gradeData[review.grade] = (gradeData[review.grade] || 0) + 1;
+                    const gradeLetter = review.grade.trim().charAt(0).toUpperCase();
+                    if (gradeData.hasOwnProperty(gradeLetter)) {
+                        gradeData[gradeLetter]++;
+                    }
                 }
             });
             
