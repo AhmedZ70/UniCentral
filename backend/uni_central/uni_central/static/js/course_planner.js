@@ -254,10 +254,19 @@ function renderSemesters() {
         emptyMessage.style.display = 'none';
     }
 
-    coursePlan.semesters.forEach(semester => {
+    // Sort semesters by year and term first
+    const sortedSemesters = [...coursePlan.semesters].sort((a, b) => {
+        if (a.year !== b.year) return a.year - b.year;
+        const termOrder = { spring: 0, summer: 1, fall: 2, winter: 3 };
+        return termOrder[a.term.toLowerCase()] - termOrder[b.term.toLowerCase()];
+    });
+
+    sortedSemesters.forEach(semester => {
         const semesterElement = createSemesterElement(semester);
         container.appendChild(semesterElement);
     });
+
+    console.log(`Rendered ${sortedSemesters.length} semesters with ${sortedSemesters.reduce((total, sem) => total + sem.courses.length, 0)} total courses`);
 }
 
 // Function to create a semester element
@@ -266,8 +275,13 @@ function createSemesterElement(semester) {
     semesterDiv.className = 'semester-container';
     semesterDiv.id = `semester-${semester.id}`;
 
+    console.log(`Creating semester element: ${semester.term} ${semester.year} with ${semester.courses.length} courses`);
+
     // Calculate total credits
-    const totalCredits = semester.courses.reduce((sum, course) => sum + parseInt(course.credits), 0);
+    const totalCredits = semester.courses.reduce((sum, course) => {
+        const credits = parseInt(course.credits) || 0;
+        return sum + credits;
+    }, 0);
 
     const header = document.createElement('div');
     header.className = 'semester-header';
@@ -277,18 +291,46 @@ function createSemesterElement(semester) {
             <span class="credit-counter">Total Credits: ${totalCredits}</span>
         </div>
         <div class="semester-controls">
-            <button onclick="removeSemester('${semester.id}')">Remove Semester</button>
-            <button onclick="showCoursePopup('${semester.id}')">Add Course</button>
+            <button class="remove-semester-btn" onclick="removeSemester('${semester.id}')">Remove Semester</button>
+            <button class="add-course-btn" onclick="showCoursePopup('${semester.id}')">Add Course</button>
         </div>
     `;
 
     const coursesDiv = document.createElement('div');
     coursesDiv.className = 'courses-container';
 
-    semester.courses.forEach(course => {
-        const courseElement = createCourseElement(semester.id, course);
-        coursesDiv.appendChild(courseElement);
-    });
+    if (semester.courses.length === 0) {
+        const emptyCourses = document.createElement('div');
+        emptyCourses.className = 'empty-courses-message';
+        emptyCourses.textContent = 'No courses added to this semester yet. Click "Add Course" to get started.';
+        coursesDiv.appendChild(emptyCourses);
+    } else {
+        // Sort courses by course code
+        const sortedCourses = [...semester.courses].sort((a, b) => {
+            const codeA = a.courseCode || a.code || '';
+            const codeB = b.courseCode || b.code || '';
+            return codeA.localeCompare(codeB);
+        });
+
+        sortedCourses.forEach(course => {
+            try {
+                const courseElement = createCourseElement(semester.id, course);
+                coursesDiv.appendChild(courseElement);
+            } catch (error) {
+                console.error(`Error creating course element for course:`, course, error);
+                // Create a fallback course element with error message
+                const errorElement = document.createElement('div');
+                errorElement.className = 'course-card error';
+                errorElement.innerHTML = `
+                    <div class="course-info">
+                        <h3 class="course-name">Error displaying course</h3>
+                        <p>There was an error displaying this course. Please refresh the page.</p>
+                    </div>
+                `;
+                coursesDiv.appendChild(errorElement);
+            }
+        });
+    }
 
     semesterDiv.appendChild(header);
     semesterDiv.appendChild(coursesDiv);
@@ -527,6 +569,8 @@ function showCoursePopup(semesterId) {
     currentSemesterId = semesterId;
     selectedCourses = [];
     
+    console.log(`Opening course popup for semester ID: ${semesterId}`);
+    
     // Clear any previous search results and selections
     document.getElementById('course-results').innerHTML = `
         <div class="empty-results">
@@ -556,11 +600,18 @@ function showCoursePopup(semesterId) {
     // Show the popup
     document.getElementById('course-popup').classList.add('active');
     
-    // Add event listener to the search button
+    // Remove existing event listeners to prevent duplicates
     const applyFiltersButton = document.getElementById('apply-filters');
-    applyFiltersButton.addEventListener('click', searchCourses);
+    const newButton = applyFiltersButton.cloneNode(true);
+    applyFiltersButton.parentNode.replaceChild(newButton, applyFiltersButton);
     
-    // Add event listeners to stars and difficulty dots
+    // Add event listener to the new button
+    document.getElementById('apply-filters').addEventListener('click', function() {
+        console.log('Search button clicked');
+        searchCourses(semesterId);
+    });
+    
+    // Add event listeners to stars and difficulty dots (with recreated elements to avoid duplicate listeners)
     setupStarRating();
     setupDifficultyRating();
 }
@@ -1290,21 +1341,33 @@ function showNotification(message) {
 
 // Function to set up star rating functionality
 function setupStarRating() {
-    const stars = document.querySelectorAll('.star-rating .star');
+    const starRating = document.getElementById('min-rating');
+    const stars = starRating.querySelectorAll('.star');
+    
+    // Remove existing event listeners by cloning and replacing each star
     stars.forEach(star => {
+        const newStar = star.cloneNode(true);
+        star.parentNode.replaceChild(newStar, star);
+    });
+    
+    // Get the fresh stars and add new event listeners
+    const freshStars = starRating.querySelectorAll('.star');
+    freshStars.forEach(star => {
         star.addEventListener('click', function() {
             const value = parseInt(this.getAttribute('data-value'));
+            console.log(`Star clicked: ${value}`);
             
             // Toggle selection
             if (this.classList.contains('active') && 
                 !this.nextElementSibling?.classList.contains('active')) {
                 // If clicking on the last active star, deselect all
-                document.querySelectorAll('.star-rating .star').forEach(s => {
+                starRating.querySelectorAll('.star').forEach(s => {
                     s.classList.remove('active');
                 });
+                console.log('All stars deselected');
             } else {
                 // Select up to this star
-                document.querySelectorAll('.star-rating .star').forEach(s => {
+                starRating.querySelectorAll('.star').forEach(s => {
                     const starValue = parseInt(s.getAttribute('data-value'));
                     if (starValue <= value) {
                         s.classList.add('active');
@@ -1312,6 +1375,7 @@ function setupStarRating() {
                         s.classList.remove('active');
                     }
                 });
+                console.log(`Stars set to: ${value}`);
             }
         });
     });
@@ -1319,21 +1383,33 @@ function setupStarRating() {
 
 // Function to set up difficulty rating functionality
 function setupDifficultyRating() {
-    const difficultyDots = document.querySelectorAll('.difficulty-rating .difficulty-dot');
-    difficultyDots.forEach(dot => {
+    const difficultyRating = document.getElementById('max-difficulty');
+    const dots = difficultyRating.querySelectorAll('.difficulty-dot');
+    
+    // Remove existing event listeners by cloning and replacing each dot
+    dots.forEach(dot => {
+        const newDot = dot.cloneNode(true);
+        dot.parentNode.replaceChild(newDot, dot);
+    });
+    
+    // Get the fresh dots and add new event listeners
+    const freshDots = difficultyRating.querySelectorAll('.difficulty-dot');
+    freshDots.forEach(dot => {
         dot.addEventListener('click', function() {
             const value = parseInt(this.getAttribute('data-value'));
+            console.log(`Difficulty dot clicked: ${value}`);
             
             // Toggle selection
             if (this.classList.contains('active') && 
                 !this.previousElementSibling?.classList.contains('active')) {
                 // If clicking on the first active dot, deselect all
-                document.querySelectorAll('.difficulty-rating .difficulty-dot').forEach(d => {
+                difficultyRating.querySelectorAll('.difficulty-dot').forEach(d => {
                     d.classList.remove('active');
                 });
+                console.log('All difficulty dots deselected');
             } else {
                 // Select up to this dot
-                document.querySelectorAll('.difficulty-rating .difficulty-dot').forEach(d => {
+                difficultyRating.querySelectorAll('.difficulty-dot').forEach(d => {
                     const dotValue = parseInt(d.getAttribute('data-value'));
                     if (dotValue <= value) {
                         d.classList.add('active');
@@ -1341,13 +1417,21 @@ function setupDifficultyRating() {
                         d.classList.remove('active');
                     }
                 });
+                console.log(`Difficulty set to: ${value}`);
             }
         });
     });
 }
 
 // Function to search for courses
-async function searchCourses() {
+async function searchCourses(semesterId) {
+    // Make sure we have the current semester ID
+    if (!semesterId && currentSemesterId) {
+        semesterId = currentSemesterId;
+    }
+    
+    console.log(`Searching courses for semester ID: ${semesterId}`);
+    
     const department = document.getElementById('department-filter').value.trim();
     const title = document.getElementById('course-title-filter').value.trim();
     const minNumber = document.getElementById('min-course-number').value.trim();
@@ -1358,10 +1442,12 @@ async function searchCourses() {
     // Get rating value (count active stars)
     const activeStars = document.querySelectorAll('.star-rating .star.active');
     const minRating = activeStars.length > 0 ? activeStars.length : '';
+    console.log(`Min rating filter: ${minRating}`);
     
     // Get difficulty value (count active dots)
     const activeDots = document.querySelectorAll('.difficulty-rating .difficulty-dot.active');
     const maxDifficulty = activeDots.length > 0 ? activeDots.length : '';
+    console.log(`Max difficulty filter: ${maxDifficulty}`);
     
     // Build filter parameters
     const filters = {};
@@ -1373,6 +1459,8 @@ async function searchCourses() {
     if (credits) filters.credits = credits;
     if (minRating) filters.min_rating = minRating;
     if (maxDifficulty) filters.max_difficulty = maxDifficulty;
+    
+    console.log('Search filters:', filters);
     
     // Show loading state
     document.getElementById('course-results').innerHTML = `
@@ -1397,7 +1485,120 @@ async function searchCourses() {
         }
         
         const courses = await response.json();
-        displaySearchResults(courses);
+        console.log(`API returned ${courses.length} courses`);
+        
+        // Apply client-side filtering for transcript-added courses in current semester
+        let filteredCourses = [...courses]; // Create a copy to avoid modifying the original
+        
+        // If min rating is set, ensure we also consider it for semester courses
+        if (semesterId) {
+            // Get the semester and its courses
+            const allSemesters = coursePlan.semesters;
+            console.log(`Total semesters in plan: ${allSemesters.length}`);
+            
+            // Find current semester
+            const semester = allSemesters.find(s => s.id === semesterId);
+            
+            if (semester) {
+                console.log(`Found semester: ${semester.term} ${semester.year} with ${semester.courses.length} courses`);
+                
+                if (semester.courses.length > 0) {
+                    // Log all semester courses to check their format
+                    console.log('Semester courses:', JSON.stringify(semester.courses.slice(0, 3)));
+                    
+                    // Check which courses should be included based on filters
+                    let includedSemesterCourses = [...semester.courses];
+                    
+                    // Apply min rating filter if set
+                    if (minRating) {
+                        const minRatingValue = parseFloat(minRating);
+                        console.log(`Filtering semester courses by min rating: ${minRatingValue}`);
+                        
+                        includedSemesterCourses = includedSemesterCourses.filter(course => {
+                            // Handle different property names for rating
+                            const courseRating = parseFloat(course.rating || course.avg_rating || 0);
+                            const included = courseRating >= minRatingValue;
+                            
+                            if (!included) {
+                                console.log(`Excluding semester course: ${course.courseCode || course.code} (rating: ${courseRating})`);
+                            }
+                            
+                            return included;
+                        });
+                    }
+                    
+                    // Apply max difficulty filter if set
+                    if (maxDifficulty) {
+                        const maxDifficultyValue = parseFloat(maxDifficulty);
+                        console.log(`Filtering semester courses by max difficulty: ${maxDifficultyValue}`);
+                        
+                        includedSemesterCourses = includedSemesterCourses.filter(course => {
+                            // Handle different property names for difficulty
+                            const courseDifficulty = parseFloat(course.difficulty || course.avg_difficulty || 0);
+                            return courseDifficulty <= maxDifficultyValue;
+                        });
+                    }
+                    
+                    // Add semester courses to results if they meet criteria
+                    console.log(`${includedSemesterCourses.length} semester courses match the filter criteria`);
+                    
+                    includedSemesterCourses.forEach(semesterCourse => {
+                        // Skip if this course is already in our results
+                        const alreadyInResults = filteredCourses.some(c => {
+                            // Try different ways to match courses
+                            const idMatch = c.id === semesterCourse.id;
+                            const codeMatch = (c.subject && semesterCourse.courseCode) ? 
+                                `${c.subject} ${c.number}` === semesterCourse.courseCode : false;
+                            
+                            return idMatch || codeMatch;
+                        });
+                        
+                        if (!alreadyInResults) {
+                            console.log(`Adding semester course to results: ${semesterCourse.courseCode || semesterCourse.code || 'Unknown'}`);
+                            
+                            // Format semester course to match API course format
+                            const courseCode = semesterCourse.courseCode || semesterCourse.code || '';
+                            const [subject, number] = courseCode.split(' ');
+                            
+                            filteredCourses.push({
+                                id: semesterCourse.id,
+                                title: semesterCourse.courseName || semesterCourse.name,
+                                subject: subject || '',
+                                number: number || '',
+                                credits: semesterCourse.credits || 3,
+                                avg_rating: semesterCourse.rating || 0,
+                                avg_difficulty: semesterCourse.difficulty || 0,
+                                is_semester_course: true  // Mark as semester course
+                            });
+                        }
+                    });
+                }
+            } else {
+                console.log(`Semester with ID ${semesterId} not found in course plan`);
+                console.log('Available semesters:', allSemesters.map(s => ({ id: s.id, term: s.term, year: s.year })));
+            }
+        }
+        
+        // Apply any additional client-side filters
+        if (department) {
+            const deptLower = department.toLowerCase();
+            filteredCourses = filteredCourses.filter(course => {
+                const courseSubject = course.subject || 
+                    (course.courseCode ? course.courseCode.split(' ')[0] : "");
+                return courseSubject.toLowerCase().includes(deptLower);
+            });
+        }
+        
+        if (title) {
+            const titleLower = title.toLowerCase();
+            filteredCourses = filteredCourses.filter(course => {
+                const courseTitle = course.title || course.courseName || "";
+                return courseTitle.toLowerCase().includes(titleLower);
+            });
+        }
+        
+        console.log(`Final filtered result count: ${filteredCourses.length}`);
+        displaySearchResults(filteredCourses);
     } catch (error) {
         console.error('Error searching courses:', error);
         document.getElementById('course-results').innerHTML = `
@@ -1432,8 +1633,23 @@ function displaySearchResults(courses) {
         // Check if course is already selected
         const isSelected = selectedCourses.some(selected => selected.id === course.id);
         
+        // Determine course code and title based on available properties
+        const courseCode = course.is_semester_course ? 
+            course.courseCode || `${course.subject} ${course.number}` : 
+            `${course.subject} ${course.number}`;
+            
+        const courseTitle = course.is_semester_course ? 
+            course.courseName || course.title : 
+            course.title;
+            
+        const credits = course.credits || 3;
+        
+        // Get rating and difficulty values
+        const rating = parseFloat(course.avg_rating || course.rating || 0);
+        const difficulty = parseFloat(course.avg_difficulty || course.difficulty || 0);
+        
         // Determine difficulty level for display
-        const difficultyLevel = Math.floor(course.avg_difficulty) || 0;
+        const difficultyLevel = Math.floor(difficulty) || 0;
         let difficultyClass = '';
         if (difficultyLevel <= 2) {
             difficultyClass = 'difficulty-level-' + difficultyLevel;
@@ -1444,30 +1660,30 @@ function displaySearchResults(courses) {
         }
         
         resultsHTML += `
-            <div class="course-result-item" data-id="${course.id}">
+            <div class="course-result-item" data-id="${course.id}" data-source="${course.is_semester_course ? 'semester' : 'api'}">
                 <input type="checkbox" class="course-checkbox" 
                     data-id="${course.id}" 
-                    data-code="${course.subject} ${course.number}" 
-                    data-name="${course.title}" 
-                    data-credits="${course.credits}" 
-                    data-rating="${course.avg_rating || 0}" 
-                    data-difficulty="${course.avg_difficulty || 0}"
+                    data-code="${courseCode}" 
+                    data-name="${courseTitle}" 
+                    data-credits="${credits}" 
+                    data-rating="${rating}" 
+                    data-difficulty="${difficulty}"
                     ${isSelected ? 'checked' : ''}>
                 <div class="course-info-preview">
-                    <div class="course-code-preview">${course.subject} ${course.number}</div>
-                    <div class="course-title-preview">${course.title}</div>
+                    <div class="course-code-preview">${courseCode}</div>
+                    <div class="course-title-preview">${courseTitle}</div>
                     <div class="course-meta-preview">
                         <div class="course-credits-preview">
-                            <i class="fas fa-book"></i> ${course.credits} Credits
+                            <i class="fas fa-book"></i> ${credits} Credits
                         </div>
                         <div class="course-rating-preview">
-                            <i class="fas fa-star"></i> ${course.avg_rating ? course.avg_rating.toFixed(1) : 'N/A'}
+                            <i class="fas fa-star"></i> ${rating ? rating.toFixed(1) : 'N/A'}
                         </div>
                         <div class="course-difficulty-preview">
                             <i class="fas fa-chart-bar"></i> 
                             Difficulty: 
                             <span class="difficulty-indicator ${difficultyClass}"></span>
-                            ${course.avg_difficulty ? course.avg_difficulty.toFixed(1) : 'N/A'}
+                            ${difficulty ? difficulty.toFixed(1) : 'N/A'}
                         </div>
                     </div>
                 </div>

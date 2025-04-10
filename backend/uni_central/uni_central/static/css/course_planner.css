@@ -1326,3 +1326,49 @@ body {
 .course-popup-button.submit:hover {
     background-color: #007d7d;
 }
+
+.semester-controls button {
+    background-color: #005a5b;
+    color: white;
+    padding: 8px 16px;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    font-family: 'Montserrat', sans-serif;
+    margin-left: 10px;
+}
+
+.semester-controls .remove-semester-btn {
+    background-color: #ff4444;
+}
+
+.semester-controls .remove-semester-btn:hover {
+    background-color: #ff6666;
+}
+
+.semester-controls .add-course-btn:hover {
+    background-color: #007d7d;
+}
+
+.empty-courses-message {
+    padding: 20px;
+    text-align: center;
+    color: #888;
+    font-style: italic;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    margin: 10px 0;
+    border: 1px dashed #ccc;
+}
+
+.course-card.error {
+    background-color: #ffebeb;
+    border-left: 4px solid #ff4444;
+}
+
+.course-card.error .course-name {
+    color: #ff4444;
+}
