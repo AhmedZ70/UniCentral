@@ -355,82 +355,159 @@ function createCourseElement(semesterId, course) {
     const courseCode = course.courseCode || course.code || "Unknown Code";
     const courseName = course.courseName || course.name || "Unknown Course";
     const credits = course.credits || 0;
-    const rating = course.rating || 0;
-    const difficulty = course.difficulty || 0;
+    const rating = course.rating || course.avg_rating || 0;
+    const difficulty = course.difficulty || course.avg_difficulty || 0;
 
-    courseLink.innerHTML = `
-        <div class="course-info">
-            <div class="course-header">
-                <span class="course-code">${courseCode}</span>
-                <span class="course-credits">${credits} Credits</span>
-            </div>
-            <h3 class="course-name">${courseName}</h3>
-            <div class="course-stats">
-                <div class="stat-group">
-                    <span class="stat-label">Rating:</span>
-                    <div class="rating-stars">${createRatingStars(rating)}</div>
-                </div>
-                <div class="stat-group">
-                    <span class="stat-label">Difficulty:</span>
-                    <div class="difficulty-rating">${createDifficultyCircles(difficulty)}</div>
-                </div>
-            </div>
-        </div>
-        <div class="course-actions">
-            <button class="remove-course-btn" 
-                onclick="event.preventDefault(); removeCourse('${semesterId}', '${course.id || course.course_id || ""}')">
-                Remove Course
-            </button>
-        </div>
-    `;
+    // Create the course info div
+    const courseInfo = document.createElement('div');
+    courseInfo.className = 'course-info';
+
+    // Add course header
+    const courseHeader = document.createElement('div');
+    courseHeader.className = 'course-header';
+    
+    const codeSpan = document.createElement('span');
+    codeSpan.className = 'course-code';
+    codeSpan.textContent = courseCode;
+    
+    const creditsSpan = document.createElement('span');
+    creditsSpan.className = 'course-credits';
+    creditsSpan.textContent = `${credits} Credits`;
+    
+    courseHeader.appendChild(codeSpan);
+    courseHeader.appendChild(creditsSpan);
+    courseInfo.appendChild(courseHeader);
+
+    // Add course name
+    const courseNameHeading = document.createElement('h3');
+    courseNameHeading.className = 'course-name';
+    courseNameHeading.textContent = courseName;
+    courseInfo.appendChild(courseNameHeading);
+
+    // Create stats container
+    const statsDiv = document.createElement('div');
+    statsDiv.className = 'course-stats';
+
+    // Add rating group
+    const ratingGroup = document.createElement('div');
+    ratingGroup.className = 'stat-group';
+    
+    const ratingLabel = document.createElement('span');
+    ratingLabel.className = 'stat-label';
+    ratingLabel.textContent = 'Rating:';
+    
+    ratingGroup.appendChild(ratingLabel);
+    ratingGroup.appendChild(createRatingStars(rating));
+    statsDiv.appendChild(ratingGroup);
+
+    // Add difficulty group
+    const difficultyGroup = document.createElement('div');
+    difficultyGroup.className = 'stat-group';
+    
+    const difficultyLabel = document.createElement('span');
+    difficultyLabel.className = 'stat-label';
+    difficultyLabel.textContent = 'Difficulty:';
+    
+    difficultyGroup.appendChild(difficultyLabel);
+    difficultyGroup.appendChild(createDifficultyCircles(difficulty));
+    statsDiv.appendChild(difficultyGroup);
+
+    // Add stats to course info
+    courseInfo.appendChild(statsDiv);
+
+    // Create course actions div
+    const actionsDiv = document.createElement('div');
+    actionsDiv.className = 'course-actions';
+    
+    const removeButton = document.createElement('button');
+    removeButton.className = 'remove-course-btn';
+    removeButton.textContent = 'Remove Course';
+    removeButton.onclick = function(event) {
+        event.preventDefault();
+        removeCourse(semesterId, course.id || course.course_id || "");
+    };
+    
+    actionsDiv.appendChild(removeButton);
+
+    // Assemble the course card
+    courseLink.appendChild(courseInfo);
+    courseLink.appendChild(actionsDiv);
 
     return courseLink;
 }
 
 function createRatingStars(rating) {
     const maxStars = 5;
-    let starsHTML = '';
+    const filledStars = Math.round(rating); 
+    const starsContainer = document.createElement('div');
+    starsContainer.className = 'rating-stars';
+
+    // Ensure rating is a valid number
+    const validRating = !isNaN(parseFloat(rating)) ? Math.min(Math.max(parseFloat(rating), 0), 5) : 0;
+    const roundedRating = Math.round(validRating);
 
     for (let i = 1; i <= maxStars; i++) {
-        if (i <= rating) {
-            starsHTML += '<span class="star filled">★</span>';
-        } else if (i - 1 < rating && rating < i) {
-            const percentage = (rating - (i - 1)) * 100;
-            starsHTML += `
-                <span class="star partial" style="position: relative;">
-                    <span class="star filled" style="position: absolute; width: ${percentage}%; overflow: hidden;">★</span>
-                    <span class="star">★</span>
-                </span>
-            `;
-        } else {
-            starsHTML += '<span class="star">★</span>';
-        }
+        const star = document.createElement('span');
+        star.className = i <= roundedRating ? 'star filled' : 'star';
+        star.innerHTML = '★';
+        star.setAttribute('aria-hidden', 'true');
+        starsContainer.appendChild(star);
     }
-    return starsHTML;
+
+    // Add screen reader text for accessibility
+    const srText = document.createElement('span');
+    srText.className = 'sr-only';
+    srText.textContent = `${validRating} out of 5 stars`;
+    srText.style.position = 'absolute';
+    srText.style.width = '1px';
+    srText.style.height = '1px';
+    srText.style.overflow = 'hidden';
+    srText.style.clip = 'rect(0, 0, 0, 0)';
+    starsContainer.appendChild(srText);
+
+    return starsContainer;
 }
 
 function createDifficultyCircles(difficulty) {
-    const flooredDifficulty = Math.floor(parseFloat(difficulty) || 0);
     const maxCircles = 6;
-    let circlesHTML = '';
+    // Ensure difficulty is a valid number
+    const validDifficulty = !isNaN(parseFloat(difficulty)) ? Math.min(Math.max(parseFloat(difficulty), 0), 6) : 0;
+    const roundedDifficulty = Math.round(validDifficulty);
+    
+    const circlesContainer = document.createElement('div');
+    circlesContainer.className = 'difficulty-rating';
 
     for (let i = 1; i <= maxCircles; i++) {
-        if (i <= flooredDifficulty) {
-            let colorClass = '';
+        const circle = document.createElement('div');
+        circle.className = 'difficulty-circle';
+        
+        if (i <= roundedDifficulty) {
+            circle.classList.add('filled');
+            
             if (i <= 2) {
-                colorClass = 'green';
+                circle.classList.add('green');
             } else if (i <= 4) {
-                colorClass = 'yellow';
+                circle.classList.add('yellow');
             } else {
-                colorClass = 'red';
+                circle.classList.add('red');
             }
-            circlesHTML += `<span class="difficulty-circle filled ${colorClass}"></span>`;
-        } else {
-            circlesHTML += `<span class="difficulty-circle"></span>`;
         }
+        
+        circlesContainer.appendChild(circle);
     }
 
-    return circlesHTML;
+    // Add screen reader text for accessibility
+    const srText = document.createElement('span');
+    srText.className = 'sr-only';
+    srText.textContent = `Difficulty level ${validDifficulty} out of 6`;
+    srText.style.position = 'absolute';
+    srText.style.width = '1px';
+    srText.style.height = '1px';
+    srText.style.overflow = 'hidden';
+    srText.style.clip = 'rect(0, 0, 0, 0)';
+    circlesContainer.appendChild(srText);
+    
+    return circlesContainer;
 }
 
 // Update your course planner JS with these functions:
@@ -1791,8 +1868,10 @@ function displaySearchResults(courses) {
     // Update result count
     document.getElementById('result-count').textContent = `${courses.length} courses found`;
     
+    // Clear existing results
+    resultsContainer.innerHTML = '';
+    
     // Generate HTML for each course result
-    let resultsHTML = '';
     courses.forEach(course => {
         // Check if course is already selected
         const isSelected = selectedCourses.some(selected => selected.id === course.id);
@@ -1812,54 +1891,27 @@ function displaySearchResults(courses) {
         const rating = parseFloat(course.avg_rating || course.rating || 0);
         const difficulty = parseFloat(course.avg_difficulty || course.difficulty || 0);
         
-        // Determine difficulty level for display
-        const difficultyLevel = Math.floor(difficulty) || 0;
-        let difficultyClass = '';
-        if (difficultyLevel <= 2) {
-            difficultyClass = 'difficulty-level-' + difficultyLevel;
-        } else if (difficultyLevel <= 4) {
-            difficultyClass = 'difficulty-level-' + difficultyLevel;
-        } else {
-            difficultyClass = 'difficulty-level-' + difficultyLevel;
+        // Create the result item element
+        const resultItem = document.createElement('div');
+        resultItem.className = 'course-result-item';
+        resultItem.setAttribute('data-id', course.id);
+        resultItem.setAttribute('data-source', course.is_semester_course ? 'semester' : 'api');
+        
+        // Create and configure the checkbox
+        const checkbox = document.createElement('input');
+        checkbox.type = 'checkbox';
+        checkbox.className = 'course-checkbox';
+        checkbox.setAttribute('data-id', course.id);
+        checkbox.setAttribute('data-code', courseCode);
+        checkbox.setAttribute('data-name', courseTitle);
+        checkbox.setAttribute('data-credits', credits);
+        checkbox.setAttribute('data-rating', rating);
+        checkbox.setAttribute('data-difficulty', difficulty);
+        if (isSelected) {
+            checkbox.checked = true;
         }
         
-        resultsHTML += `
-            <div class="course-result-item" data-id="${course.id}" data-source="${course.is_semester_course ? 'semester' : 'api'}">
-                <input type="checkbox" class="course-checkbox" 
-                    data-id="${course.id}" 
-                    data-code="${courseCode}" 
-                    data-name="${courseTitle}" 
-                    data-credits="${credits}" 
-                    data-rating="${rating}" 
-                    data-difficulty="${difficulty}"
-                    ${isSelected ? 'checked' : ''}>
-                <div class="course-info-preview">
-                    <div class="course-code-preview">${courseCode}</div>
-                    <div class="course-title-preview">${courseTitle}</div>
-                    <div class="course-meta-preview">
-                        <div class="course-credits-preview">
-                            <i class="fas fa-book"></i> ${credits} Credits
-                        </div>
-                        <div class="course-rating-preview">
-                            <i class="fas fa-star"></i> ${rating ? rating.toFixed(1) : 'N/A'}
-                        </div>
-                        <div class="course-difficulty-preview">
-                            <i class="fas fa-chart-bar"></i> 
-                            Difficulty: 
-                            <span class="difficulty-indicator ${difficultyClass}"></span>
-                            ${difficulty ? difficulty.toFixed(1) : 'N/A'}
-                        </div>
-                    </div>
-                </div>
-            </div>
-        `;
-    });
-    
-    resultsContainer.innerHTML = resultsHTML;
-    
-    // Add event listeners to checkboxes
-    const checkboxes = document.querySelectorAll('.course-checkbox');
-    checkboxes.forEach(checkbox => {
+        // Add checkbox change event listener
         checkbox.addEventListener('change', function() {
             const courseId = this.getAttribute('data-id');
             const courseCode = this.getAttribute('data-code');
@@ -1885,6 +1937,84 @@ function displaySearchResults(courses) {
             
             updateSelectedCoursesList();
         });
+        
+        // Create the course info container
+        const courseInfo = document.createElement('div');
+        courseInfo.className = 'course-info-preview';
+        
+        // Add course code
+        const codeEl = document.createElement('div');
+        codeEl.className = 'course-code-preview';
+        codeEl.textContent = courseCode;
+        courseInfo.appendChild(codeEl);
+        
+        // Add course title
+        const titleEl = document.createElement('div');
+        titleEl.className = 'course-title-preview';
+        titleEl.textContent = courseTitle;
+        courseInfo.appendChild(titleEl);
+        
+        // Create metadata container
+        const metaEl = document.createElement('div');
+        metaEl.className = 'course-meta-preview';
+        
+        // Add credits info
+        const creditsEl = document.createElement('div');
+        creditsEl.className = 'course-credits-preview';
+        
+        const creditIcon = document.createElement('i');
+        creditIcon.className = 'fas fa-book';
+        creditsEl.appendChild(creditIcon);
+        
+        creditsEl.appendChild(document.createTextNode(` ${credits} Credits`));
+        metaEl.appendChild(creditsEl);
+        
+        // Add rating info
+        const ratingEl = document.createElement('div');
+        ratingEl.className = 'course-rating-preview';
+        
+        const ratingIcon = document.createElement('i');
+        ratingIcon.className = 'fas fa-star';
+        ratingEl.appendChild(ratingIcon);
+        
+        ratingEl.appendChild(document.createTextNode(` ${rating ? rating.toFixed(1) : 'N/A'}`));
+        metaEl.appendChild(ratingEl);
+        
+        // Add difficulty info
+        const difficultyEl = document.createElement('div');
+        difficultyEl.className = 'course-difficulty-preview';
+        
+        const difficultyIcon = document.createElement('i');
+        difficultyIcon.className = 'fas fa-chart-bar';
+        difficultyEl.appendChild(difficultyIcon);
+        
+        difficultyEl.appendChild(document.createTextNode(' Difficulty: '));
+        
+        // Add difficulty indicator
+        const indicatorEl = document.createElement('span');
+        indicatorEl.className = 'difficulty-indicator';
+        
+        // Determine difficulty level for display
+        const difficultyLevel = Math.floor(difficulty) || 0;
+        if (difficultyLevel <= 2) {
+            indicatorEl.classList.add('difficulty-level-1');
+        } else if (difficultyLevel <= 4) {
+            indicatorEl.classList.add('difficulty-level-3');
+        } else {
+            indicatorEl.classList.add('difficulty-level-5');
+        }
+        
+        difficultyEl.appendChild(indicatorEl);
+        difficultyEl.appendChild(document.createTextNode(` ${difficulty ? difficulty.toFixed(1) : 'N/A'}`));
+        
+        metaEl.appendChild(difficultyEl);
+        courseInfo.appendChild(metaEl);
+        
+        // Assemble the result item
+        resultItem.appendChild(checkbox);
+        resultItem.appendChild(courseInfo);
+        
+        resultsContainer.appendChild(resultItem);
     });
 }
 
