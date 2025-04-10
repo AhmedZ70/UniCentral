@@ -62,7 +62,15 @@
 
   <!-- Footer -->
   <footer>
-    <p>&copy; 2025 UniCentral. All Rights Reserved.</p>
+    <div class="footer-links">
+      <a href="{% url 'home' %}">Home</a>
+      <a href="{% url 'courses' %}">Courses</a>
+      <a href="{% url 'professors' %}">Professors</a>
+      <a href="{% url 'help_feedback' %}">Help & Feedback</a>
+      <a href="{% url 'privacy_policy' %}">Privacy Policy</a>
+      <a href="mailto:unicentralutah@gmail.com">Contact</a>
+    </div>
+    <p>&copy; {% now "Y" %} UniCentral. All Rights Reserved.</p>
   </footer>
 
 </body>

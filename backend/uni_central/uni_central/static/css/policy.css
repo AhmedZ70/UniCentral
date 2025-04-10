@@ -1,0 +1,292 @@
+/* ============================================= */
+/* Policy Pages - Privacy Policy & Help/Feedback  */
+/* ============================================= */
+
+/* Hero Section */
+.policy-hero {
+  background-color: #005a5b;
+  padding: 3rem 0;
+  margin-bottom: 2rem;
+  text-align: center;
+  color: white;
+}
+
+.policy-header h1 {
+  font-family: 'Agrandir', sans-serif;
+  font-size: 2.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.policy-header p {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 1.2rem;
+  opacity: 0.9;
+}
+
+/* Container */
+.policy-container {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 0 2rem 4rem;
+}
+
+.policy-content {
+  background-color: white;
+  padding: 2rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+}
+
+/* Content Sections */
+.policy-section {
+  margin-bottom: 2.5rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid #eee;
+}
+
+.policy-section:last-child {
+  margin-bottom: 0;
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.policy-section h2 {
+  font-family: 'Agrandir', sans-serif;
+  color: #ff743e;
+  font-size: 1.8rem;
+  margin-bottom: 1.2rem;
+}
+
+.policy-section h3 {
+  font-family: 'Montserrat', sans-serif;
+  color: #005a5b;
+  font-size: 1.3rem;
+  margin: 1.5rem 0 0.8rem;
+}
+
+.policy-section p, 
+.policy-section li {
+  font-family: 'Montserrat', sans-serif;
+  color: #333;
+  line-height: 1.6;
+  margin-bottom: 1rem;
+  font-size: 1rem;
+}
+
+.policy-section ul, 
+.policy-section ol {
+  padding-left: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.policy-section li {
+  margin-bottom: 0.5rem;
+}
+
+/* Links */
+.policy-section a {
+  color: #005a5b;
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.2s ease;
+}
+
+.policy-section a:hover {
+  color: #ff743e;
+  text-decoration: underline;
+}
+
+/* Contact Email */
+.contact-email {
+  font-weight: bold;
+  margin-top: 0.5rem;
+  display: inline-block;
+  padding: 0.5rem 1rem;
+  background-color: #f8f9fa;
+  border-radius: 6px;
+}
+
+/* FAQ Section */
+.faq-item {
+  margin-bottom: 1.5rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px dashed #eee;
+}
+
+.faq-item:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.faq-item h3 {
+  color: #005a5b;
+  font-size: 1.2rem;
+  margin-bottom: 0.8rem;
+  position: relative;
+  padding-left: 1.5rem;
+}
+
+.faq-item h3:before {
+  content: "→";
+  position: absolute;
+  left: 0;
+  color: #ff743e;
+}
+
+/* Feedback Form */
+.feedback-form {
+  margin-top: 1.5rem;
+  background-color: #f8f9fa;
+  padding: 1.5rem;
+  border-radius: 8px;
+  border-left: 4px solid #005a5b;
+}
+
+.form-group {
+  margin-bottom: 1.2rem;
+}
+
+.form-group label {
+  display: block;
+  font-size: 0.9rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  color: #444;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+  width: 100%;
+  padding: 0.8rem;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 1rem;
+  transition: border-color 0.2s ease;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+  outline: none;
+  border-color: #005a5b;
+}
+
+.submit-button {
+  background-color: #005a5b;
+  color: white;
+  border: none;
+  padding: 0.8rem 2rem;
+  font-size: 1rem;
+  font-weight: 600;
+  border-radius: 30px;
+  cursor: pointer;
+  transition: background-color 0.2s ease, transform 0.2s ease;
+  font-family: 'Montserrat', sans-serif;
+}
+
+.submit-button:hover {
+  background-color: #007d7d;
+  transform: translateY(-2px);
+}
+
+/* Contact Section */
+.contact-info {
+  display: flex;
+  gap: 2rem;
+  flex-wrap: wrap;
+  margin-top: 1.5rem;
+}
+
+.contact-method {
+  flex: 1 1 300px;
+  padding: 1.5rem;
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  text-align: center;
+  transition: transform 0.2s ease;
+}
+
+.contact-method:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
+}
+
+.contact-method i {
+  font-size: 2rem;
+  color: #ff743e;
+  margin-bottom: 1rem;
+}
+
+.contact-method h3 {
+  font-size: 1.2rem;
+  color: #005a5b;
+  margin-bottom: 0.5rem;
+}
+
+/* Responsive Styles */
+@media (max-width: 768px) {
+  .policy-hero {
+    padding: 2rem 0;
+  }
+  
+  .policy-header h1 {
+    font-size: 2rem;
+  }
+  
+  .policy-header p {
+    font-size: 1rem;
+  }
+  
+  .policy-container {
+    padding: 0 1rem 3rem;
+  }
+  
+  .policy-content {
+    padding: 1.5rem;
+  }
+  
+  .policy-section h2 {
+    font-size: 1.5rem;
+  }
+  
+  .policy-section h3 {
+    font-size: 1.1rem;
+  }
+  
+  .contact-info {
+    flex-direction: column;
+    gap: 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .policy-hero {
+    padding: 1.5rem 0;
+  }
+  
+  .policy-header h1 {
+    font-size: 1.8rem;
+  }
+  
+  .policy-content {
+    padding: 1rem;
+  }
+  
+  .policy-section {
+    margin-bottom: 1.5rem;
+  }
+  
+  .policy-section h2 {
+    font-size: 1.3rem;
+  }
+  
+  .faq-item h3 {
+    font-size: 1.1rem;
+  }
+  
+  .submit-button {
+    width: 100%;
+  }
+} 

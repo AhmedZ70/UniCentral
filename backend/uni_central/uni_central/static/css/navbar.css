@@ -115,3 +115,38 @@ body, html, ul, li, p, h1, h2, select {
     background-color: #005a5b;
     margin-top: 5px;
   }
+
+@media (max-width: 768px) {
+  .navbar {
+    flex-direction: column;
+    padding: 1rem;
+  }
+  
+  .logo {
+    margin-bottom: 1rem;
+  }
+  
+  .nav-links {
+    flex-direction: column;
+    width: 100%;
+    text-align: center;
+  }
+  
+  .nav-links li {
+    margin: 0.5rem 0;
+  }
+  
+  /* More visible links on small screens */
+  .nav-links li a {
+    padding: 0.5rem;
+    display: block;
+    background-color: #f8f8f8;
+    border-radius: 4px;
+  }
+  
+  .nav-links li a:hover,
+  .nav-links li a.active {
+    background-color: #005a5b;
+    color: white;
+  }
+}

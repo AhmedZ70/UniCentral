@@ -108,3 +108,38 @@
     color: #3c3c3c;
   }
   
+  /* Add styles for the additional links in the dropdown */
+  .dropdown-menu-content li {
+    list-style: none;
+    padding: 12px 15px;
+    text-align: center;
+    margin: 8px 0;
+    transition: background-color 0.3s ease;
+  }
+  
+  .dropdown-menu-content li a {
+    color: #333;
+    text-decoration: none;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 16px;
+    display: block;
+    transition: color 0.3s ease;
+    font-weight: bold;
+    padding: 5px;
+  }
+  
+  .dropdown-menu-content li:hover {
+    background-color: #f0f0f0;
+    border-radius: 6px;
+  }
+  
+  .dropdown-menu-content li a:hover {
+    color: #005a5b;
+  }
+  
+  /* Menu Icon Filter */
+  .menu-icon {
+    filter: hue-rotate(190deg);
+    opacity: 0.8;
+  }
+  

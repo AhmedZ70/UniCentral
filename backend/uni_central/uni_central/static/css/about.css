@@ -200,3 +200,24 @@ footer {
   background-color: #fafafa;
   color: #333333;
 }
+
+/* Add styles for footer links */
+.footer-links {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+  margin: 1rem 0;
+}
+
+.footer-links a {
+  color: #333;
+  text-decoration: none;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.footer-links a:hover {
+  color: #005a5b;
+  text-decoration: underline;
+}

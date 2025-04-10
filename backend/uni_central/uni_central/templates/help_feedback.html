@@ -1,0 +1,137 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}UniCentral - Help & Feedback{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/policy.css' %}">
+{% endblock %}
+
+{% block content %}
+<main class="main-content">
+  <section class="policy-hero">
+    <div class="policy-header">
+      <h1>Help & Feedback</h1>
+      <p>We're here to help you get the most out of UniCentral</p>
+    </div>
+  </section>
+
+  <div class="policy-container">
+    <div class="policy-content">
+      <section class="policy-section">
+        <h2>Frequently Asked Questions</h2>
+        
+        <div class="faq-item">
+          <h3>What is UniCentral?</h3>
+          <p>UniCentral is a platform designed to help students make informed decisions about their courses and professors. We provide course reviews, professor ratings, and a course planning tool to help you plan your academic journey.</p>
+        </div>
+        
+        <div class="faq-item">
+          <h3>How do I create an account?</h3>
+          <p>Click on the "Register" button in the top right corner of the page. You'll need to provide your email address and create a password. We recommend using your university email for verification purposes.</p>
+        </div>
+        
+        <div class="faq-item">
+          <h3>Can I submit a review anonymously?</h3>
+          <p>Yes, your reviews will be displayed anonymously to other users. However, you need to be logged in to submit a review to prevent spam and ensure quality content.</p>
+        </div>
+        
+        <div class="faq-item">
+          <h3>How can I use the Course Planner?</h3>
+          <p>Our Course Planner allows you to organize courses by semester. Simply navigate to the Course Planner page, add a semester, and then add courses to that semester. You can also upload your transcript to automatically import your courses.</p>
+        </div>
+        
+        <div class="faq-item">
+          <h3>Are the professors notified when I leave a review?</h3>
+          <p>No, professors are not notified when reviews are posted. All reviews are anonymous to encourage honest feedback while maintaining professionalism.</p>
+        </div>
+      </section>
+
+      <section class="policy-section">
+        <h2>Give Us Feedback</h2>
+        <p>We're constantly working to improve UniCentral. If you have suggestions, found a bug, or want to share your experience, please fill out the form below or email us directly at <a href="mailto:unicentralutah@gmail.com">unicentralutah@gmail.com</a>.</p>
+        
+        <form id="feedback-form" class="feedback-form">
+          <div class="form-group">
+            <label for="feedback-name">Name (optional)</label>
+            <input type="text" id="feedback-name" placeholder="Your name">
+          </div>
+          
+          <div class="form-group">
+            <label for="feedback-email">Email Address</label>
+            <input type="email" id="feedback-email" placeholder="your.email@example.com" required>
+          </div>
+          
+          <div class="form-group">
+            <label for="feedback-type">Feedback Type</label>
+            <select id="feedback-type" required>
+              <option value="">Select a feedback type</option>
+              <option value="bug">Bug Report</option>
+              <option value="feature">Feature Request</option>
+              <option value="content">Content Issue</option>
+              <option value="general">General Feedback</option>
+            </select>
+          </div>
+          
+          <div class="form-group">
+            <label for="feedback-message">Your Feedback</label>
+            <textarea id="feedback-message" rows="6" placeholder="Please describe your feedback in detail..." required></textarea>
+          </div>
+          
+          <button type="submit" class="submit-button">Submit Feedback</button>
+        </form>
+      </section>
+
+      <section class="policy-section">
+        <h2>Contact Support</h2>
+        <p>Need further assistance? Our support team is here to help you with any questions or issues you may have.</p>
+        
+        <div class="contact-info">
+          <div class="contact-method">
+            <i class="fas fa-envelope"></i>
+            <h3>Email</h3>
+            <p><a href="mailto:unicentralutah@gmail.com">unicentralutah@gmail.com</a></p>
+          </div>
+          
+          <div class="contact-method">
+            <i class="fas fa-clock"></i>
+            <h3>Response Time</h3>
+            <p>We typically respond within 24-48 hours, Monday through Friday.</p>
+          </div>
+        </div>
+      </section>
+    </div>
+  </div>
+</main>
+
+{% block extra_js %}
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const feedbackForm = document.getElementById('feedback-form');
+    
+    feedbackForm.addEventListener('submit', function(e) {
+      e.preventDefault();
+      
+      // Get form values
+      const name = document.getElementById('feedback-name').value;
+      const email = document.getElementById('feedback-email').value;
+      const type = document.getElementById('feedback-type').value;
+      const message = document.getElementById('feedback-message').value;
+      
+      // Simple validation
+      if (!email || !type || !message) {
+        alert('Please fill in all required fields');
+        return;
+      }
+      
+      // Here you would typically send the data to your backend
+      // For now, we'll just show a success message
+      
+      alert('Thank you for your feedback! We appreciate your input and will review it shortly.');
+      feedbackForm.reset();
+    });
+  });
+</script>
+{% endblock %}
+
+{% endblock %} 

@@ -34,8 +34,14 @@
           <button class="logout-btn">Log Out</button>
           <hr>
         </div>
-        <li><a href="#">Privacy Policy</a></li>
-        <li><a href="#">Help & Feedback</a></li>
+        <div class="icons">
+          <img src="{% static 'assets/my_account_icon.png' %}" alt="Help Icon" class="menu-icon">
+          <a href="{% url 'help_feedback' %}">Help & Feedback</a>
+        </div>
+        <div class="icons">
+          <img src="{% static 'assets/my_account_icon.png' %}" alt="Privacy Icon" class="menu-icon">
+          <a href="{% url 'privacy_policy' %}">Privacy Policy</a>
+        </div>
       </div>
     </div>
 </div>
