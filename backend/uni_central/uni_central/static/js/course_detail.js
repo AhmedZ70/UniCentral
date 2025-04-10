@@ -134,7 +134,7 @@ document.addEventListener("DOMContentLoaded", () => {
             // 6. Handle Grade Distribution Chart
             let gradeChart = null;
 
-            const gradeData = { A: 0, B: 0, C: 0, D: 0, F: 0 };
+            const gradeData = { A: 0, B: 0, C: 0, D: 0, E: 0 };
             
             reviews.forEach((review) => {
                 if (review.grade) {
@@ -178,10 +178,10 @@ document.addEventListener("DOMContentLoaded", () => {
                                     backgroundColor: [
                                         '#4CAF50',
                                         '#8BC34A',
-                                        '#9C27B0',
                                         '#FFEB3B',
                                         '#FF9800',
                                         '#F44336',
+                                        '#9C27B0',
                                     ]
                                 }]
                             },
