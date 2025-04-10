@@ -115,3 +115,4 @@ The pipeline configuration is defined in `.gitlab-ci.yml`.
 ---
 # Triggering pipeline
 # Triggering pipeline
+# Triggering pipeline
