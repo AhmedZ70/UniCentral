@@ -1,8 +1,6 @@
-// Import the auth object and onAuthStateChanged from auth.js
 import { auth, onAuthStateChanged } from './auth.js';
 
 document.addEventListener("DOMContentLoaded", () => {
-    // 1. Grab the course_id from a hidden <input> in the template
     const courseIdInput = document.getElementById("courseId");
     if (!courseIdInput) {
         console.error("No #courseId element found in the DOM!");
@@ -10,55 +8,66 @@ document.addEventListener("DOMContentLoaded", () => {
     }
     const courseId = courseIdInput.value;
 
-    // 2. Get references to DOM elements we want to populate
     const courseTitleEl = document.getElementById("course-title");
     const courseDetailsEl = document.getElementById("course-details");
     const reviewsListEl = document.getElementById("reviews-list");
     const noReviewsMsgEl = document.getElementById("no-reviews-message");
     const enrollBtn = document.getElementById("enroll-btn");
 
-    // 3. Fetch course + reviews data from your Django REST API
     fetch(`/api/courses/${courseId}/reviews/`)
         .then((response) => {
             if (!response.ok) {
                 throw new Error(`Failed to load course data (status ${response.status})`);
             }
-            return response.json(); // data = { course: {...}, reviews: [...] }
+            return response.json(); 
         })
         .then((data) => {
-            // 4. Populate course info
             const course = data.course || {};
             courseTitleEl.textContent = course.title || "Untitled Course";
 
-            // Populate rating stars
             const ratingContainer = document.getElementById("course-rating");
             ratingContainer.appendChild(createRatingStars(course.avg_rating));
 
-            // Populate difficulty circles
             const difficultyContainer = document.getElementById("course-difficulty");
             difficultyContainer.appendChild(createDifficultyCircles(course.avg_difficulty));
 
-            // Populate other course details
             document.getElementById("course-subject").textContent = course.subject || "N/A";
             document.getElementById("course-credits").textContent = course.credits || "N/A";
             document.getElementById("course-semester").textContent = course.semester || "Not specified";
             document.getElementById("course-grade").textContent = course.grade || "N/A";
 
-            // 5. Populate reviews list
             const reviews = data.reviews || [];
             if (reviews.length === 0) {
                 noReviewsMsgEl.style.display = "block";
             } else {
                 noReviewsMsgEl.style.display = "none";
-                reviewsListEl.innerHTML = ""; // clear any existing content
+                reviewsListEl.innerHTML = ""; 
 
                 reviews.forEach((review) => {
                     const li = document.createElement("li");
                     li.classList.add("review-item");
 
+                    let reviewAuthor;
+                    if (review.is_anonymous === true || review.is_anonymous === 'true') {
+                        reviewAuthor = "Anonymous";
+                        console.log('Attribution Reason: Review marked as anonymous');
+                    } else {
+                        const firstName = review.user?.fname || '';
+                        const lastName = review.user?.lname || '';
+                        reviewAuthor = (firstName + ' ' + lastName).trim() || "Anonymous";
+                        
+                        console.log('Attribution Details:', {
+                            firstName: firstName,
+                            lastName: lastName,
+                            constructedName: reviewAuthor
+                        });
+                    }
+
+                    console.log('Final Determined Review Author:', reviewAuthor);
+
                     li.innerHTML = `
                         <div class="review-header">
-                            <strong>Review by: anonymous</strong>
+                            <strong>Review by: ${reviewAuthor}</strong>
                             <span>Grade: ${review.grade || "Not provided"}</span>
                         </div>
                         <div class="review-content">
@@ -123,44 +132,46 @@ document.addEventListener("DOMContentLoaded", () => {
                 });
             }
             // 6. Handle Grade Distribution Chart
-            const gradeData = { A: 0, B: 0, C: 0, D: 0, F: 0 };
+            let gradeChart = null;
 
+            const gradeData = { A: 0, B: 0, C: 0, D: 0, F: 0 };
+            
             // Calculate grade distribution based on reviews
             reviews.forEach((review) => {
                 if (review.grade) {
                     gradeData[review.grade] = (gradeData[review.grade] || 0) + 1;
                 }
             });
-
-            // Add event listener to show/hide the chart and toggle link text
+            
             const showChartLink = document.getElementById("showChartLink");
             const chartCanvas = document.getElementById("gradeAverageChart");
-            const noGradeMessage = document.getElementById("no-grade-message");  // Add the message element
-
+            const chartContainer = document.getElementById("chart-container");
+            const noGradeMessage = document.getElementById("no-grade-message");
+            
             showChartLink.addEventListener("click", function (event) {
-                event.preventDefault(); // Prevent the link from navigating
-
-                // Check if there is no grade data
+                event.preventDefault();
+            
                 if (Object.values(gradeData).every(value => value === 0)) {
-                    // Show the message that no grade data is available
-                    noGradeMessage.style.display = "block";  // Show message
-                    chartCanvas.style.display = "none";     // Hide the chart
-                    showChartLink.textContent = "View Grade Distribution"; // Reset the link text
+                    noGradeMessage.style.display = "block";
+                    chartContainer.style.display = "none";
+                    showChartLink.textContent = "View Grade Distribution";
                 } else {
                     // Toggle chart visibility and link text
-                    if (chartCanvas.style.display === "none" || chartCanvas.style.display === "") {
-                        // Show the chart
-                        chartCanvas.style.display = "block"; // Make the chart visible
-                        noGradeMessage.style.display = "none"; // Hide the "No grade data" message
-
-                        // Change the link text to "Close Chart"
+                    if (chartContainer.style.display === "none" || chartContainer.style.display === "") {
+                        chartContainer.style.display = "block";
+                        noGradeMessage.style.display = "none";
+            
                         showChartLink.textContent = "Close Chart";
-
+            
+                        // Destroy the previous chart if it exists
+                        if (gradeChart) {
+                            gradeChart.destroy();
+                        }
+            
                         // Create the chart (Pie Chart for grade distribution)
                         const ctx = chartCanvas.getContext('2d');
-
-                        // Create the chart (Pie Chart for grade distribution)
-                        new Chart(ctx, {
+            
+                        gradeChart = new Chart(ctx, {
                             type: 'pie',
                             data: {
                                 labels: Object.keys(gradeData),
@@ -174,12 +185,12 @@ document.addEventListener("DOMContentLoaded", () => {
                                         '#FFEB3B', // Yellow-green for C
                                         '#FF9800', // Orange for D
                                         '#F44336', // Red for F (or E)
-                                        '#9E9E9E', // Gray for F/E
                                     ]
                                 }]
                             },
                             options: {
                                 responsive: true,
+                                maintainAspectRatio: false,
                                 plugins: {
                                     legend: {
                                         position: 'top',
@@ -188,22 +199,19 @@ document.addEventListener("DOMContentLoaded", () => {
                             }
                         });
                     } else {
-                        // Hide the chart
-                        chartCanvas.style.display = "none";
-                        noGradeMessage.style.display = "none"; // Hide message when chart is closed
-
-                        // Change the link text back to "View Grade Distribution"
+                        chartContainer.style.display = "none";
+                        noGradeMessage.style.display = "none";
+            
                         showChartLink.textContent = "View Grade Distribution";
                     }
                 }
-            });
+            });            
         })
         .catch((error) => {
             console.error("Error fetching course data:", error);
             courseTitleEl.textContent = "Error Loading Course";
         });
 
-    // 7. Handle Enroll/Unenroll Button
     if (enrollBtn) {
         // Use onAuthStateChanged to track the user's authentication state
         onAuthStateChanged(auth, (user) => {
@@ -242,7 +250,6 @@ document.addEventListener("DOMContentLoaded", () => {
                         .then((data) => {
                             if (data.message) {
                                 alert(data.message);
-                                // Toggle button text
                                 enrollBtn.textContent = isEnrolled ? "Enroll" : "Unenroll";
                             } else if (data.error) {
                                 alert(data.error);

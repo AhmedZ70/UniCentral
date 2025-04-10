@@ -422,3 +422,33 @@ input[type="checkbox"] {
     margin-top: 5px;
   }
 }
+
+/* Chart code */
+#chart-container {
+  width: 50%;
+  height: 250px;
+  margin: 0 auto;
+  min-width: 0;
+}
+
+#showChartButton {
+  background-color: #005a5b;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  font-size: 16px;
+  border-radius: 20px;
+  cursor: pointer;
+  font-family: 'Montserrat', sans-serif;
+  transition: background-color 0.3s;
+  display: inline-block;
+  margin-bottom: 10px;
+}
+
+#showChartButton:hover {
+  background-color: #007d7d;
+}
+
+#showChartButton:focus {
+  outline: none;
+}

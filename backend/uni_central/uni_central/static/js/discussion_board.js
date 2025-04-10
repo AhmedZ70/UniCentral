@@ -20,7 +20,100 @@ document.addEventListener('DOMContentLoaded', function() {
     initializeDiscussionBoard();
     loadThreads();
     setupEventListeners();
+    setupShowChartButton();
 });
+
+function setupShowChartButton() {
+    const showChartButton = document.getElementById('showChartButton');
+    const chartContainer = document.getElementById('chart-container');
+    const chartCanvas = document.getElementById('categoryChart');
+    const ctx = chartCanvas.getContext('2d');
+
+    // Create or select a message element for empty chart
+    let noDataMessage = document.getElementById('no-topic-message');
+    if (!noDataMessage) {
+        noDataMessage = document.createElement('p');
+        noDataMessage.id = 'no-topic-message';
+        noDataMessage.style.display = 'none';
+        noDataMessage.style.fontWeight = 'bold';
+        noDataMessage.style.textAlign = 'center';
+        noDataMessage.style.color = '#666';
+        chartContainer.appendChild(noDataMessage);
+    }
+
+    // Track existing chart instance to destroy before rendering again
+    let currentChart = null;
+
+    showChartButton.addEventListener('click', function () {
+        if (chartContainer.style.display === "none") {
+            chartContainer.style.display = "block";
+            showChartButton.textContent = "Hide Topic Chart";
+
+            const contextId = document.body.dataset.contextId;
+
+            fetch(`/api/courses/${contextId}/category-counts/`)
+                .then(response => response.json())
+                .then(categoryCounts => {
+                    const hasData = Object.values(categoryCounts).some(count => count > 0);
+
+                    if (!hasData) {
+                        chartCanvas.style.display = "none";
+                        noDataMessage.textContent = "No topic information available.";
+                        noDataMessage.style.display = "block";
+                        return;
+                    }
+
+                    noDataMessage.style.display = "none";
+                    chartCanvas.style.display = "block";
+
+                    if (currentChart) {
+                        currentChart.destroy();
+                    }
+
+                    currentChart = new Chart(ctx, {
+                        type: 'bar',
+                        data: {
+                            labels: Object.keys(categoryCounts),
+                            datasets: [{
+                                label: 'Threads by Category',
+                                data: Object.values(categoryCounts),
+                                backgroundColor: ['#FF743E', '#FFEB3B', '#4CAF50', '#FF9800'],
+                                borderColor: '#fff',
+                                borderWidth: 1
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: {
+                                    position: 'top',
+                                },
+                                tooltip: {
+                                    callbacks: {
+                                        label: function (tooltipItem) {
+                                            return tooltipItem.raw + ' threads';
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    });
+                })
+                .catch(error => {
+                    console.error("Error fetching category data:", error);
+                    chartCanvas.style.display = "none";
+                    noDataMessage.textContent = "Failed to load topic information.";
+                    noDataMessage.style.display = "block";
+                });
+
+        } else {
+            chartContainer.style.display = "none";
+            showChartButton.textContent = "Show Topic Chart";
+        }
+    });
+}
+
 
 function initializeDiscussionBoard() {
     if (!document.querySelector('.discussion-threads')) {

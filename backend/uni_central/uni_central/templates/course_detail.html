@@ -40,11 +40,12 @@
                 <button id="enroll-btn" class="leave-review-button">Enroll</button>
                 <a id="discussion-board-btn" href="{% url 'course_discussion_board' context_id=course_id %}" class="go-to-discussion-board-button">Discussion Board</a>
             </div>
-            <!-- Add the link to display the chart -->
+            
             <a href="#" id="showChartLink" class="view-grade-distribution-link">View Grade Distribution</a>
 
-            <!-- Canvas where the chart will be rendered -->
-            <canvas id="gradeAverageChart" style="display:none;"></canvas>
+            <div id="chart-container" style="display:none;">
+                <canvas id="gradeAverageChart"></canvas>
+            </div>
 
             <p id="no-grade-message" style="display: none; font-weight: bold; text-align: center;">
                 No grade distribution available.

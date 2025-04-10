@@ -1,17 +1,14 @@
 import { auth, onAuthStateChanged } from './auth.js';
 
 document.addEventListener("DOMContentLoaded", () => {
-    // Get professor ID from the hidden input
     const professorId = document.getElementById("professorId").value;
 
-    // DOM elements to populate
     const professorNameEl = document.getElementById("professor-name");
     const professorDetailsEl = document.getElementById("professor-details");
     const reviewsListEl = document.getElementById("reviews-list");
     const noReviewsMsgEl = document.getElementById("no-reviews-message");
     const addProfessorBtn = document.getElementById("add-professor-btn");
 
-    // Fetch professor details, reviews, and courses taught
     fetch(`/api/professors/${professorId}/reviews/`)
         .then((response) => {
             if (!response.ok) {
@@ -20,44 +17,36 @@ document.addEventListener("DOMContentLoaded", () => {
             return response.json();
         })
         .then((data) => {
-            // Populate professor info
             const professor = data.professor || {};
             professorNameEl.className = 'professor-title';
             professorNameEl.textContent = `${professor.fname} ${professor.lname}`;
 
-            // Create a container for professor details
             const detailsContainer = document.createElement('div');
             detailsContainer.innerHTML = `
                 <p><span class="detail-label">Department:</strong> ${professor.department?.name || "N/A"}</p>
             `;
 
-            // Add rating stars
             const ratingContainer = document.createElement('p');
             ratingContainer.innerHTML = `<span class="detail-label">Average Rating:</span> `;
             ratingContainer.appendChild(createRatingStars(professor.avg_rating));
             detailsContainer.appendChild(ratingContainer);
 
-            // Add difficulty circles
             const difficultyContainer = document.createElement('p');
             difficultyContainer.innerHTML = `<span class="detail-label">Average Difficulty:</span> `;
             difficultyContainer.appendChild(createDifficultyCircles(professor.avg_difficulty));
             detailsContainer.appendChild(difficultyContainer);
 
-            // Append the details container to the professor details section
             professorDetailsEl.appendChild(detailsContainer);
 
-            // Add bold "Courses taught" heading
             const coursesHeading = document.createElement("p");
             coursesHeading.innerHTML = `<span class="detail-label">Courses taught:</span>`;
             professorDetailsEl.appendChild(coursesHeading);
 
-            // Populate courses taught
             const courses = data.courses_taught || [];
             const coursesTaughtList = document.createElement("ul");
             coursesTaughtList.classList.add("courses-taught-list");
 
             if (courses.length > 0) {
-                // Instead of creating a ul/li list, create individual p elements
                 courses.forEach((course) => {
                     const courseItem = document.createElement("p");
                     courseItem.style.marginTop = "5px";
@@ -82,9 +71,40 @@ document.addEventListener("DOMContentLoaded", () => {
                     const li = document.createElement("li");
                     li.classList.add("review-item");
 
+                    // Extensive debug logging for review author attribution
+                    console.log('Raw Review Object:', JSON.parse(JSON.stringify(review)));
+                    console.log('Is Anonymous Flag:', review.is_anonymous);
+                    console.log('User Object Details:', 
+                        review.user ? {
+                            fname: review.user.fname,
+                            lname: review.user.lname,
+                            email: review.user.email
+                        } : 'No user object found'
+                    );
+
+                    // Determine review attribution with detailed debugging
+                    let reviewAuthor;
+                    if (review.is_anonymous === true || review.is_anonymous === 'true') {
+                        reviewAuthor = "Anonymous";
+                        console.log('Attribution Reason: Review marked as anonymous');
+                    } else {
+                        // Attempt to construct name
+                        const firstName = review.user?.fname || '';
+                        const lastName = review.user?.lname || '';
+                        reviewAuthor = (firstName + ' ' + lastName).trim() || "Anonymous";
+                        
+                        console.log('Attribution Details:', {
+                            firstName: firstName,
+                            lastName: lastName,
+                            constructedName: reviewAuthor
+                        });
+                    }
+
+                    console.log('Final Determined Review Author:', reviewAuthor);
+
                     li.innerHTML = `
                         <div class="review-header">
-                            <strong>Review by: anonymous</strong>
+                            <strong>Review by: ${reviewAuthor}</strong>
                             <span>Grade: ${review.grade || "N/A"}</span>
                         </div>
                         <div class="review-content">
@@ -294,7 +314,6 @@ function createDifficultyCircles(difficulty) {
         if (i <= filledCircles) {
             circle.classList.add('filled');
 
-            // Add color based on difficulty level
             if (i <= 2) {
                 circle.classList.add('green');
             } else if (i <= 4) {
