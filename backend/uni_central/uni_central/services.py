@@ -276,19 +276,32 @@ class ReviewService:
         Returns:
             dict: A dictionary with success/error information and the review object if successful.
         """
+        import logging
+        logging.warning(f"Updating review {review_id} with data: {review_data}")
+        
         review = ReviewService.get_review_by_id(review_id)
         if review == None:
             return {
                 "success": False,
                 "error": "Review not found"
             }
+        
+        # Verify that email_address matches the review's user
+        email_address = review_data.get('email_address')
+        if email_address and email_address != review.user.email_address:
+            return {
+                "success": False,
+                "error": "You don't have permission to edit this review"
+            }
 
         # Check review text for inappropriate content if present
         if "review" in review_data:
             review_text = review_data.get("review")
             if review_text:
+                logging.warning(f"Checking review text for profanity: {review_text}")
                 is_appropriate, message = ContentModerationService.moderate_text(review_text)
                 if not is_appropriate:
+                    logging.warning(f"Content moderation failed: {message}")
                     return {
                         "success": False,
                         "error": message
@@ -296,21 +309,46 @@ class ReviewService:
                 review.review = review_text
 
         try:
+            # Update numeric fields
             if "rating" in review_data:
                 review.rating = float(review_data["rating"])
             if "difficulty" in review_data:
                 review.difficulty = int(review_data["difficulty"])
             if "estimated_hours" in review_data:
-                review.estimated_hours = float(review_data["estimated_hours"])
+                review.estimated_hours = float(review_data["estimated_hours"]) if review_data["estimated_hours"] else None
+                
+            # Update string fields
+            if "grade" in review_data:
+                review.grade = review_data["grade"]
+                
+            # Update boolean fields
             if "would_take_again" in review_data:
-                review.would_take_again = review_data["would_take_again"] == "true"
+                review.would_take_again = review_data["would_take_again"] == True or review_data["would_take_again"] == "true"
             if "for_credit" in review_data:
-                review.for_credit = review_data["for_credit"] == "true"
+                review.for_credit = review_data["for_credit"] == True or review_data["for_credit"] == "true"
             if "mandatory_attendance" in review_data:
-                review.mandatory_attendance = review_data["mandatory_attendance"] == "true"
+                review.mandatory_attendance = review_data["mandatory_attendance"] == True or review_data["mandatory_attendance"] == "true"
+            if "required_course" in review_data:
+                review.required_course = review_data["required_course"] == True or review_data["required_course"] == "true"
+            if "is_gened" in review_data:
+                review.is_gened = review_data["is_gened"] == True or review_data["is_gened"] == "true"
+            if "in_person" in review_data:
+                review.in_person = review_data["in_person"] == True or review_data["in_person"] == "true"
+            if "online" in review_data:
+                review.online = review_data["online"] == True or review_data["online"] == "true"
+            if "hybrid" in review_data:
+                review.hybrid = review_data["hybrid"] == True or review_data["hybrid"] == "true"
+            if "no_exams" in review_data:
+                review.no_exams = review_data["no_exams"] == True or review_data["no_exams"] == "true"
+            if "presentations" in review_data:
+                review.presentations = review_data["presentations"] == True or review_data["presentations"] == "true"
+            if "is_anonymous" in review_data:
+                review.is_anonymous = review_data["is_anonymous"] == True or review_data["is_anonymous"] == "true"
 
+            # Save the updated review
             review.save()
 
+            # Update averages
             if review.course:
                 review.course.update_averages()
             if review.professor:
@@ -324,7 +362,7 @@ class ReviewService:
             logging.error(f"Error updating review: {str(e)}")
             return {
                 "success": False,
-                "error": "Failed to update review. Please try again."
+                "error": f"Failed to update review: {str(e)}"
             }
     
     @staticmethod

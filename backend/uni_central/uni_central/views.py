@@ -310,13 +310,23 @@ class UpdateReviewAPIView(APIView):
     API View to update an existing review by review_id.
     """
 
-    def put(self, request):
+    def put(self, request, review_id):
         """
         Handles PUT requests to update a review.
         """
         try:
-            review_id = request.data.get('review_id')
-            result = ReviewService.update_review(review_id, request.data)
+            import logging
+            logging.warning(f"Received update request for review {review_id} with data: {request.data}")
+            
+            # Ensure review text is being sent in the request data
+            review = ReviewService.get_review_by_id(review_id)
+            if review and 'review' not in request.data and review.review:
+                # If review text is not in the request data, use the existing review text
+                modified_data = dict(request.data)
+                modified_data['review'] = review.review
+                result = ReviewService.update_review(review_id, modified_data)
+            else:
+                result = ReviewService.update_review(review_id, request.data)
             
             if result["success"]:
                 review = result["review"]
@@ -326,11 +336,8 @@ class UpdateReviewAPIView(APIView):
                     status=status.HTTP_200_OK
                 )
             else:
-                # Check if the error message is related to content moderation
+                # Get the error message - content moderation errors are already standardized in the service
                 error_msg = result["error"]
-                if "inappropriate" in error_msg.lower() or "toxicity" in error_msg.lower() or "profanity" in error_msg.lower() or "slurs" in error_msg.lower():
-                    error_msg = "Your review contains profanity. Please revise and try again."
-                
                 return Response(
                     {"error": error_msg},
                     status=status.HTTP_400_BAD_REQUEST
@@ -350,10 +357,25 @@ class DeleteReviewAPIView(APIView):
         """
         Calls the ReviewService to delete a review.
         """
-        review_id = request.data.get('review_id')
+        # Get the review_id from the URL parameter instead of request body
         review = ReviewService.get_review_by_id(review_id)
+        
+        # Check if the review exists
+        if not review:
+            return Response(
+                {"success": False, "error": "Review not found"},
+                status=status.HTTP_404_NOT_FOUND
+            )
+        
+        # Check if the user has permission to delete this review
+        email_address = request.data.get('email_address')
+        if email_address and email_address != review.user.email_address:
+            return Response(
+                {"success": False, "error": "You don't have permission to delete this review"},
+                status=status.HTTP_403_FORBIDDEN
+            )
+        
         result = ReviewService.delete_review(review)
-
         return Response(result)
     
 ####################################
@@ -1329,4 +1351,50 @@ class TranscriptUploadView(APIView):
             return JsonResponse(
                 {'error': str(e)}, 
                 status=500
+            )
+
+class GetReviewAPIView(APIView):
+    """
+    API View to get a single review by ID.
+    """
+    def get(self, request, review_id):
+        """
+        Handles GET requests to fetch a specific review.
+        """
+        try:
+            review = ReviewService.get_review_by_id(review_id)
+            
+            if not review:
+                return Response(
+                    {"error": "Review not found"},
+                    status=status.HTTP_404_NOT_FOUND
+                )
+            
+            # Check if the requesting user is the author of the review
+            # Get email from URL param for GET requests
+            email = request.GET.get('email')
+            
+            # Debug info
+            print(f"GetReviewAPIView - Email from request: {email}")
+            print(f"GetReviewAPIView - Review author: {review.user.email_address}")
+            
+            # Only enforce permission check if email is provided (to allow public viewing)
+            if email and email != "null" and email != review.user.email_address:
+                return Response(
+                    {"error": "You don't have permission to access this review"},
+                    status=status.HTTP_403_FORBIDDEN
+                )
+                
+            serializer = ReviewSerializer(review)
+            return Response(
+                serializer.data, 
+                status=status.HTTP_200_OK
+            )
+        except Exception as e:
+            print(f"Error in GetReviewAPIView: {str(e)}")
+            import traceback
+            print(f"Traceback: {traceback.format_exc()}")
+            return Response(
+                {"error": str(e)},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
