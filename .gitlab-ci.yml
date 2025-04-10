@@ -123,9 +123,13 @@ deploy:
     - main
     - content-moderation
   variables:
+    SSH_PRIVATE_KEY: "${SSH_PRIVATE_KEY}"
     EC2_HOST: "${EC2_HOST}"
     EC2_USER: "${EC2_USER}"
     APP_PATH: "${APP_PATH}"
     VENV_PATH: "${VENV_PATH}"
     DJANGO_PATH: "${DJANGO_PATH}"
     RESTART_COMMAND: "${RESTART_COMMAND}"
+    PERSPECTIVE_API_KEY: "${PERSPECTIVE_API_KEY}"
+    
+    
