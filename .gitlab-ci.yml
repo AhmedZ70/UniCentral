@@ -123,6 +123,7 @@ deploy:
     - main
     - content-moderation
   variables:
+    SSH_PRIVATE_KEY: "${SSH_PRIVATE_KEY}"
     EC2_HOST: "${EC2_HOST}"
     EC2_USER: "${EC2_USER}"
     APP_PATH: "${APP_PATH}"
