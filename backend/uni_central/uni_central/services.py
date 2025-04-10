@@ -982,15 +982,18 @@ class TranscriptService:
                 
                 # Add new courses to semester
                 for course in semester_courses:
-                    # Check if course already exists
+                    # Check if course already exists in this semester
                     course_exists = any(
                         c.get("courseCode", "").lower() == course["code"].lower()
                         for c in semester_entry["courses"]
                     )
                     
                     if not course_exists:
+                        # Use the database ID if available, otherwise generate a new one
+                        course_id = course.get('course_id') or f"{course['code'].replace(' ', '-')}-{len(semester_entry['courses'])}"
+                        
                         new_course = {
-                            "id": f"{course['code'].replace(' ', '-')}-{len(semester_entry['courses'])}",
+                            "id": course_id,  # Use the actual database ID
                             "courseCode": course["code"],
                             "courseName": course["name"],
                             "credits": course["credits"]
@@ -1153,7 +1156,7 @@ class TranscriptService:
                             'credits': db_course.credits,
                             'confidence': 1.0,
                             'db_match': True,
-                            'course_id': db_course.id,
+                            'course_id': db_course.id,  # This is the actual database ID
                             'semester': current_semester or default_semester  # Use current semester or default
                         })
                     else:

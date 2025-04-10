@@ -179,33 +179,6 @@ function addSemester(term, year) {
     return semester;
 }
 
-// Function to add a course to a semester
-function addCourse(semesterId, courseCode, courseName, credits) {
-    const semester = coursePlan.semesters.find(s => s.id === semesterId);
-    if (!semester) {
-        console.error(`Semester with ID ${semesterId} not found`);
-        return null;
-    }
-    
-    // Check if course already exists in the semester
-    const existingCourse = semester.courses.find(c => c.courseCode === courseCode);
-    if (existingCourse) {
-        console.log(`Course ${courseCode} already exists in semester ${semesterId}`);
-        return existingCourse;
-    }
-    
-    const course = {
-        courseCode: courseCode,
-        courseName: courseName,
-        credits: parseInt(credits),
-        id: Math.random().toString(36).slice(2, 11) // Generate a unique ID for the course
-    };
-    
-    semester.courses.push(course);
-    console.log(`Added course ${courseCode} to semester ${semesterId}`);
-    return course;
-}
-
 // Function to remove a course
 function removeCourse(semesterId, courseId) {
     const semester = coursePlan.semesters.find(sem => sem.id === semesterId);
@@ -271,15 +244,82 @@ function createSemesterElement(semester) {
 
 // Function to create a course element
 function createCourseElement(semesterId, course) {
-    const courseDiv = document.createElement('div');
-    courseDiv.className = 'course-card';
-    courseDiv.innerHTML = `
-        <h4>${course.courseCode}</h4>
-        <p>${course.courseName}</p>
-        <p>Credits: ${course.credits}</p>
-        <button onclick="removeCourse('${semesterId}', '${course.id}')">Remove</button>
+    const courseLink = document.createElement('a');
+    courseLink.href = `/courses/${course.id}/`;
+    courseLink.className = 'course-card';
+    courseLink.style.textDecoration = 'none';
+    courseLink.style.color = 'inherit';
+
+    courseLink.innerHTML = `
+        <div class="course-info">
+            <div class="course-header">
+                <span class="course-code">${course.courseCode}</span>
+                <span class="course-credits">${course.credits} Credits</span>
+            </div>
+            <h3 class="course-name">${course.courseName}</h3>
+            <div class="course-stats">
+                <div class="stat-group">
+                    <span class="stat-label">Rating:</span>
+                    <div class="rating-stars">${createRatingStars(course.rating || 0)}</div>
+                </div>
+                <div class="stat-group">
+                    <span class="stat-label">Difficulty:</span>
+                    <div class="difficulty-rating">${createDifficultyCircles(course.difficulty || 0)}</div>
+                </div>
+            </div>
+        </div>
+        <div class="course-actions">
+            <button class="remove-course-btn" onclick="event.preventDefault(); removeCourse('${semesterId}', '${course.id}')">Remove Course</button>
+        </div>
     `;
-    return courseDiv;
+
+    return courseLink;
+}
+
+function createRatingStars(rating) {
+    const maxStars = 5;
+    let starsHTML = '';
+
+    for (let i = 1; i <= maxStars; i++) {
+        if (i <= rating) {
+            starsHTML += '<span class="star filled">★</span>';
+        } else if (i - 1 < rating && rating < i) {
+            const percentage = (rating - (i - 1)) * 100;
+            starsHTML += `
+                <span class="star partial" style="position: relative;">
+                    <span class="star filled" style="position: absolute; width: ${percentage}%; overflow: hidden;">★</span>
+                    <span class="star">★</span>
+                </span>
+            `;
+        } else {
+            starsHTML += '<span class="star">★</span>';
+        }
+    }
+    return starsHTML;
+}
+
+function createDifficultyCircles(difficulty) {
+    const flooredDifficulty = Math.floor(parseFloat(difficulty) || 0);
+    const maxCircles = 6;
+    let circlesHTML = '';
+
+    for (let i = 1; i <= maxCircles; i++) {
+        if (i <= flooredDifficulty) {
+            let colorClass = '';
+            if (i <= 2) {
+                colorClass = 'green';
+            } else if (i <= 4) {
+                colorClass = 'yellow';
+            } else {
+                colorClass = 'red';
+            }
+            circlesHTML += `<span class="difficulty-circle filled ${colorClass}"></span>`;
+        } else {
+            circlesHTML += `<span class="difficulty-circle"></span>`;
+        }
+    }
+
+    return circlesHTML;
 }
 
 // Update your course planner JS with these functions:
@@ -302,15 +342,65 @@ function closeSemesterPopup() {
     document.getElementById('semester-popup').classList.remove('active');
 }
 
-function submitCourse() {
+async function submitCourse() {
     const courseCode = document.getElementById('course-code').value;
     const courseName = document.getElementById('course-name').value;
     const credits = document.getElementById('course-credits').value;
     
     if (courseCode && courseName && credits) {
-        const currentSemesterId = document.getElementById('course-popup').dataset.semesterId;
-        addCourse(currentSemesterId, courseCode, courseName, parseInt(credits));
-        closeCoursePopup();
+        try {
+            // Fetch course details from the database
+            const response = await fetch(`/api/filter-courses/?search=${encodeURIComponent(courseCode)}`);
+            if (!response.ok) {
+                throw new Error('Failed to fetch course data');
+            }
+            const data = await response.json();
+            
+            // Try to find a matching course
+            const matchingCourse = data.find(c => {
+                const fullCode = `${c.subject}-${c.number}`;
+                return fullCode === courseCode.trim() || c.title.toLowerCase() === courseName.toLowerCase();
+            });
+
+            if (!matchingCourse) {
+                alert('Course not found in the database. Please check the course code and try again.');
+                return;
+            }
+
+            const currentSemesterId = document.getElementById('course-popup').dataset.semesterId;
+            
+            // Add course with the actual database ID
+            const course = {
+                id: matchingCourse.id,  // Use the actual database ID
+                courseCode: courseCode,
+                courseName: courseName,
+                credits: parseInt(credits),
+                rating: matchingCourse.avg_rating || 0,
+                difficulty: matchingCourse.avg_difficulty || 0
+            };
+
+            // Find the semester and add the course
+            const semester = coursePlan.semesters.find(s => s.id === currentSemesterId);
+            if (!semester) {
+                throw new Error('Semester not found');
+            }
+
+            // Check for duplicate course
+            const existingCourse = semester.courses.find(c => c.id === course.id);
+            if (existingCourse) {
+                alert('This course is already in this semester.');
+                return;
+            }
+
+            semester.courses.push(course);
+            await saveCoursePlan();
+            renderSemesters();
+            closeCoursePopup();
+
+        } catch (error) {
+            console.error('Error adding course:', error);
+            alert('Failed to add course. Please try again.');
+        }
     }
 }
 
