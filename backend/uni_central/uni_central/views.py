@@ -1327,14 +1327,15 @@ class TranscriptUploadView(APIView):
             file = request.FILES['file']
             print(f"Processing file: {file.name}, type: {file.content_type}, size: {file.size}")
             
-            if not file.content_type.startswith(('image/', 'application/pdf', 'text/csv')):
+            if not file.content_type.startswith(('image/', 'application/pdf')):
                 return JsonResponse(
                     {'error': f'Unsupported file type: {file.content_type}'}, 
                     status=400
                 )
             
-            # Pass user to process_transcript
-            courses = TranscriptService.process_transcript(file, file.content_type, user)
+            # Don't update user's course plan, just detect courses
+            # Explicitly pass update_plan=False
+            courses = TranscriptService.process_transcript(file, file.content_type, user=None, update_plan=False)
             print(f"Found {len(courses)} courses in transcript")
             
             if not courses:
@@ -1343,9 +1344,10 @@ class TranscriptUploadView(APIView):
                     status=200  # Return empty array instead of 404
                 )
                 
+            # Send the courses back to the client
             return JsonResponse({
                 'courses': courses,
-                'message': 'Courses have been added to your course plan'
+                'message': 'Courses detected in your transcript. Please select the ones you want to add to your plan.'
             }, status=200)
             
         except Exception as e:

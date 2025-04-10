@@ -66,6 +66,7 @@ document.addEventListener('DOMContentLoaded', () => {
             
             // Initialize the transcript parser
             transcriptParser = new TranscriptParser();
+            console.debug("Transcript parser initialized");
             
             // Add event listener for add semester button
             const addSemesterBtn = document.querySelector('.add-semester');
@@ -642,6 +643,7 @@ function sortCourses(semesterId, sortBy) {
 
 class TranscriptParser {
     constructor() {
+        console.debug("TranscriptParser constructor called");
         this.fileInput = document.getElementById('transcript-file');
         this.uploadBox = document.getElementById('upload-box');
         this.progressContainer = document.getElementById('upload-progress');
@@ -651,10 +653,18 @@ class TranscriptParser {
         
         if (!this.fileInput || !this.uploadBox || !this.progressContainer || 
             !this.progressBar || !this.progressText || !this.resultsContainer) {
-            console.error('Required elements not found');
+            console.error('Required elements not found', {
+                fileInput: !!this.fileInput,
+                uploadBox: !!this.uploadBox,
+                progressContainer: !!this.progressContainer,
+                progressBar: !!this.progressBar,
+                progressText: !!this.progressText,
+                resultsContainer: !!this.resultsContainer
+            });
             return;
         }
         
+        console.debug("All required elements found, setting up event listeners");
         this.setupEventListeners();
     }
 
@@ -678,12 +688,14 @@ class TranscriptParser {
             
             const files = e.dataTransfer.files;
             if (files.length > 0) {
+                console.debug("File dropped:", files[0].name);
                 this.handleFile(files[0]);
             }
         });
 
         this.fileInput.addEventListener('change', (e) => {
             if (e.target.files.length > 0) {
+                console.debug("File selected:", e.target.files[0].name);
                 this.handleFile(e.target.files[0]);
             }
         });
@@ -692,12 +704,36 @@ class TranscriptParser {
         const uploadButton = this.uploadBox.querySelector('.upload-button');
         if (uploadButton) {
             uploadButton.addEventListener('click', () => {
+                console.debug("Upload button clicked");
+                // Reset file input before opening it to ensure change event fires
+                this.fileInput.value = '';
                 this.fileInput.click();
             });
+        }
+        
+        // Add cancel button event listener to reset file input and hide containers
+        document.getElementById('cancel-courses-btn')?.addEventListener('click', () => {
+            this.resetUploader();
+        });
+        
+        console.debug("Event listeners set up");
+    }
+
+    // New method to reset the uploader after cancel
+    resetUploader() {
+        console.debug("Resetting uploader");
+        this.resultsContainer.classList.add('hidden');
+        this.resultsContainer.style.display = 'none';
+        this.progressContainer.classList.add('hidden');
+        
+        // Reset file input to allow reselecting the same file
+        if (this.fileInput) {
+            this.fileInput.value = '';
         }
     }
 
     handleFile(file) {
+        console.debug("handleFile called with file:", file.name, file.type, file.size);
         const allowedTypes = ['application/pdf', 'image/jpeg', 'image/png'];
         const maxSize = 10 * 1024 * 1024; // 10MB
 
@@ -719,120 +755,224 @@ class TranscriptParser {
             return;
         }
 
-        const formData = new FormData();
-        formData.append('file', file);
-        formData.append('email_address', user.email);
-
+        // Show progress immediately
         this.showProgress();
-        this.updateProgress(0, 'Uploading file...');
+        
+        // Show initial loading message
+        this.updateProgress(5, 'Preparing to upload...');
+        
+        // Short delay to ensure UI updates
+        setTimeout(() => {
+            const formData = new FormData();
+            formData.append('file', file);
+            formData.append('email_address', user.email);
 
-        fetch('/api/transcript/upload/', {
-            method: 'POST',
-            body: formData,
-            headers: {
-                'X-CSRFToken': getCookie('csrftoken')
-            }
-        })
-        .then(response => {
-            if (response.status === 403) {
-                console.log('User not authenticated, redirecting to login');
-                window.location.href = '/login/';
-                throw new Error('Not authenticated');
-            }
-            if (!response.ok) {
-                throw new Error('Network response was not ok');
-            }
-            return response.json();
-        })
-        .then(data => {
-            if (data.error) {
-                throw new Error(data.error);
-            }
-            this.updateProgress(100, 'Processing complete!');
+            console.debug('Creating FormData and starting fetch');
             
-            // Show success message if courses were added to plan
-            if (data.message) {
-                alert(data.message);
-            }
-            
-            setTimeout(() => {
-                this.hideProgress();
-                this.showResults(data.courses);
+            // Show appropriate message based on file type
+            const fileTypeMessage = file.type === 'application/pdf' 
+                ? 'Processing PDF file... This may take a moment.'
+                : 'Processing image file...';
                 
-                // Refresh the course plan display
-                loadCoursePlan(user.email);
-            }, 500);
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            if (error.message !== 'Not authenticated') {
-                this.updateProgress(0, 'Error processing file');
+            this.updateProgress(10, fileTypeMessage);
+
+            fetch('/api/transcript/upload/', {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-CSRFToken': getCookie('csrftoken')
+                }
+            })
+            .then(response => {
+                console.debug('Received response:', response.status, response.statusText);
+                if (response.status === 403) {
+                    console.log('User not authenticated, redirecting to login');
+                    window.location.href = '/login/';
+                    throw new Error('Not authenticated');
+                }
+                
+                this.updateProgress(50, 'Parsing transcript...');
+                
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.debug('Received data:', data);
+                if (data.error) {
+                    throw new Error(data.error);
+                }
+                this.updateProgress(80, 'Analyzing course data...');
+                
+                // Process the response data with a delay to show loading progress
                 setTimeout(() => {
-                    this.hideProgress();
-                    alert('Error processing file. Please try again.');
-                }, 1000);
-            }
-        });
+                    this.updateProgress(95, 'Preparing results...');
+                    
+                    setTimeout(() => {
+                        console.debug('Processing complete, preparing to show results');
+                        // Keep progress visible but update text
+                        this.updateProgress(100, 'Processing complete!');
+                        
+                        setTimeout(() => {
+                            // Only hide progress after showing the results
+                            if (data.courses && data.courses.length > 0) {
+                                console.debug(`Found ${data.courses.length} courses to display`);
+                                this.showResults(data.courses);
+                            } else {
+                                // Show message if no courses were found
+                                console.debug('No courses found');
+                                this.hideProgress();
+                                this.resultsContainer.innerHTML = '<p>No courses could be detected in the transcript. Please try a clearer image or manually add your courses.</p>';
+                                this.resultsContainer.classList.remove('hidden');
+                                this.resultsContainer.style.display = 'block';
+                                console.debug('Empty results message displayed');
+                            }
+                        }, 500);
+                    }, 300);
+                }, 300);
+            })
+            .catch(error => {
+                console.error('Error processing transcript:', error);
+                if (error.message !== 'Not authenticated') {
+                    this.updateProgress(0, 'Error processing file');
+                    setTimeout(() => {
+                        this.hideProgress();
+                        alert('Error processing file: ' + error.message);
+                        // Reset file input
+                        this.fileInput.value = '';
+                    }, 1000);
+                }
+            });
+        }, 100); // Short delay to ensure UI updates before fetch begins
     }
 
     showProgress() {
+        console.debug("Showing progress container");
         this.progressContainer.classList.remove('hidden');
+        // Explicitly set display to block to ensure visibility
+        this.progressContainer.style.display = 'block';
         this.resultsContainer.classList.add('hidden');
+        this.resultsContainer.style.display = 'none';
     }
 
     hideProgress() {
+        console.debug("Hiding progress container");
         this.progressContainer.classList.add('hidden');
+        this.progressContainer.style.display = 'none';
     }
 
     updateProgress(percent, message) {
+        console.debug(`Updating progress: ${percent}%, "${message}"`);
         this.progressBar.style.width = `${percent}%`;
         this.progressText.textContent = message;
     }
 
     showResults(courses) {
+        console.debug("showResults called with", courses.length, "courses");
+        
         if (!courses || courses.length === 0) {
+            console.debug("No courses to show");
             this.resultsContainer.innerHTML = '<p>No courses found in the transcript.</p>';
             this.resultsContainer.classList.remove('hidden');
+            this.resultsContainer.style.display = 'block';
             return;
         }
 
-        const coursesGroupedBySemester = this.groupCoursesBySemester(courses);
-        let html = '<h3>Found Courses:</h3>';
+        // Filter to only include database-matched courses
+        const dbCourses = courses.filter(course => course.db_match === true);
+        
+        if (dbCourses.length === 0) {
+            console.debug("No database-matched courses found");
+            this.resultsContainer.innerHTML = '<p>No matching courses were found in our database. Try uploading a clearer image or add courses manually.</p>';
+            this.resultsContainer.classList.remove('hidden');
+            this.resultsContainer.style.display = 'block';
+            return;
+        }
+        
+        console.debug(`Showing ${dbCourses.length} database-matched courses`);
+        
+        const coursesGroupedBySemester = this.groupCoursesBySemester(dbCourses);
+        console.debug("Courses grouped by semester:", Object.keys(coursesGroupedBySemester));
+        
+        let html = `
+            <h3>Review and Select Courses to Add:</h3>
+            <div class="course-stats-summary">
+                <p>${dbCourses.length} courses found in your transcript</p>
+                <p>Select the courses you want to add to your course plan</p>
+            </div>
+        `;
         
         Object.entries(coursesGroupedBySemester)
             .sort(([semA], [semB]) => this.compareSemesters(semA, semB))
             .forEach(([semester, semesterCourses]) => {
+                console.debug(`Processing semester ${semester} with ${semesterCourses.length} courses`);
+                
                 html += `
                     <div class="semester-section">
                         <div class="semester-header">${semester}</div>
-                        ${semesterCourses.map(course => `
-                            <div class="course-item">
-                                <input type="checkbox" id="course-${course.code}" 
-                                       value="${JSON.stringify(course)}" 
-                                       data-name="${course.name}"
-                                       data-credits="${course.credits || 3}"
-                                       data-semester="${semester}">
-                                <label for="course-${course.code}">
-                                    <div class="course-code">${course.code}</div>
-                                    <div class="course-name">${course.name}</div>
-                                    <div class="course-credits">${course.credits || 3} Credits</div>
-                                </label>
-                            </div>
-                        `).join('')}
+                        ${semesterCourses.map(course => {
+                            console.debug(`Adding course ${course.code} to HTML`);
+                            return `
+                                <div class="course-item">
+                                    <input type="checkbox" class="course-checkbox" 
+                                           id="course-${course.code.replace(/\s+/g, '-')}"
+                                           value='${JSON.stringify(course).replace(/'/g, "&#39;")}'
+                                           data-name="${course.name}"
+                                           data-credits="${course.credits || 3}"
+                                           data-semester="${semester}"
+                                           checked>
+                                    <label for="course-${course.code.replace(/\s+/g, '-')}">
+                                        <div class="course-code">${course.code}</div>
+                                        <div class="course-name">${course.name}</div>
+                                        <div class="course-credits">${course.credits || 3} Credits</div>
+                                    </label>
+                                </div>
+                            `;
+                        }).join('')}
                     </div>
                 `;
             });
 
         html += `
             <div class="action-buttons">
-                <button onclick="transcriptParser.confirmSelectedCourses()" class="confirm-btn">
+                <button id="confirm-courses-btn" class="confirm-btn">
                     Add Selected Courses
+                </button>
+                <button id="cancel-courses-btn" class="cancel-btn">
+                    Cancel
                 </button>
             </div>
         `;
 
+        console.debug("Setting HTML on results container");
         this.resultsContainer.innerHTML = html;
+        
+        // Leave progress display visible during transition
+        // Will be hidden after results are confirmed or canceled
+        
+        // Add event listeners to buttons after they're added to the DOM
+        document.getElementById('confirm-courses-btn').addEventListener('click', () => {
+            console.debug("Confirm button clicked");
+            this.confirmSelectedCourses();
+        });
+        
+        document.getElementById('cancel-courses-btn').addEventListener('click', () => {
+            console.debug("Cancel button clicked");
+            this.resetUploader();
+        });
+        
+        console.debug("Removing 'hidden' class from results container");
         this.resultsContainer.classList.remove('hidden');
+        
+        // Force element to be visible
+        this.resultsContainer.style.display = 'block';
+        console.debug("Display style set to block");
+        
+        // Now hide progress after results are shown
+        setTimeout(() => {
+            this.hideProgress();
+        }, 300);
     }
 
     groupCoursesBySemester(courses) {
@@ -881,13 +1021,17 @@ class TranscriptParser {
         // Group selected courses by semester
         const coursesBySemester = {};
         checkboxes.forEach(checkbox => {
-            const courseData = JSON.parse(checkbox.value);
-            const semesterName = courseData.semester;
-            
-            if (!coursesBySemester[semesterName]) {
-                coursesBySemester[semesterName] = [];
+            try {
+                const courseData = JSON.parse(checkbox.value);
+                const semesterName = courseData.semester;
+                
+                if (!coursesBySemester[semesterName]) {
+                    coursesBySemester[semesterName] = [];
+                }
+                coursesBySemester[semesterName].push(courseData);
+            } catch (error) {
+                console.error('Error parsing course data:', error);
             }
-            coursesBySemester[semesterName].push(courseData);
         });
         
         // Process each semester's courses
@@ -961,6 +1105,9 @@ class TranscriptParser {
             });
         });
         
+        // Show loading message
+        this.updateProgressDisplay("Saving your course selections...");
+        
         // Sort semesters by year and term
         const termOrder = { 'spring': 0, 'summer': 1, 'fall': 2, 'winter': 3 };
         coursePlan.semesters.sort((a, b) => {
@@ -971,17 +1118,34 @@ class TranscriptParser {
         // Save the updated course plan
         saveCoursePlan()
             .then(() => {
-                // Hide the results container
-                document.getElementById('results-preview').classList.add('hidden');
+                // Reset uploader
+                this.resetUploader();
+                
                 // Show success message
                 alert('Selected courses have been added to your course plan.');
+                
                 // Refresh the course plan display
                 renderSemesters();
             })
             .catch(error => {
+                // Hide the progress display
+                this.hideProgressDisplay();
+                
                 console.error('Error saving course plan:', error);
                 alert('Failed to save course plan. Please try again.');
             });
+    }
+    
+    updateProgressDisplay(message) {
+        // Show progress container
+        this.progressContainer.classList.remove('hidden');
+        this.progressBar.style.width = '50%';
+        this.progressText.textContent = message;
+    }
+    
+    hideProgressDisplay() {
+        // Hide progress container
+        this.progressContainer.classList.add('hidden');
     }
 }
 

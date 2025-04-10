@@ -1146,29 +1146,273 @@ class ContentModerationService:
 
 class TranscriptService:
     """
-    Service class for handling transcript processing and course extraction.
+    Service class for handling transcript processing and course extraction with improved course matching 
+    and support for PDF files.
     """
     
     @staticmethod
-    def process_transcript(file_obj, file_type, user=None):
+    def process_transcript(file_obj, file_type, user=None, update_plan=False):
         """
         Process uploaded transcript file and extract course information.
         Args:
             file_obj: The uploaded file object
             file_type: The MIME type of the file
             user: Optional User instance to update course plan
+            update_plan: Boolean flag to indicate if user's plan should be updated
         """
         if file_type.startswith('image/'):
             courses = TranscriptService._process_image(file_obj)
-            
-            # If user is provided, update their course plan
-            if user and courses:
-                TranscriptService._update_user_course_plan(user, courses)
-                
-            return courses
+        elif file_type == 'application/pdf':
+            courses = TranscriptService._process_pdf(file_obj)
         else:
-            raise ValueError('Currently only supporting image files')
+            raise ValueError('Currently only supporting image and PDF files')
+        
+        # Only update user's course plan if user is provided AND explicitly requested
+        # This step is now skipped for the initial transcript analysis
+        if user and update_plan:
+            TranscriptService._update_user_course_plan(user, courses)
+            
+        return courses
 
+    @staticmethod
+    def _process_image(file_obj):
+        """
+        Process image transcript and extract course information.
+        """
+        print("Processing image file...")
+        try:
+            image = Image.open(file_obj)
+            print(f"Image opened successfully: size={image.size}, mode={image.mode}")
+            
+            # Convert image to text using Tesseract OCR
+            text = pytesseract.image_to_string(image)
+            print(f"OCR Text extracted: {len(text)} characters")
+            
+            # Extract courses from the text
+            return TranscriptService._extract_courses_from_text(text)
+            
+        except Exception as e:
+            print(f"Error processing image: {str(e)}")
+            raise
+
+    @staticmethod
+    def _process_pdf(file_obj):
+        """
+        Process PDF transcript and extract course information.
+        """
+        print("Processing PDF file...")
+        try:
+            # Try to extract text directly from PDF
+            import pdfplumber
+            import tempfile
+            
+            # Save the InMemoryUploadedFile to a temporary file
+            with tempfile.NamedTemporaryFile(delete=False, suffix='.pdf') as temp_file:
+                for chunk in file_obj.chunks():
+                    temp_file.write(chunk)
+                temp_path = temp_file.name
+            
+            all_text = ""
+            try:
+                # Try to extract text directly from PDF
+                with pdfplumber.open(temp_path) as pdf:
+                    for page in pdf.pages:
+                        page_text = page.extract_text()
+                        if page_text:
+                            all_text += page_text + "\n\n"
+                
+                print(f"Extracted {len(all_text)} characters from PDF text layer")
+                
+                # If we got enough text, process it
+                if len(all_text.strip()) > 100:  # Minimum threshold to consider it valid text
+                    return TranscriptService._extract_courses_from_text(all_text)
+            except Exception as pdf_text_error:
+                print(f"Error extracting PDF text layer: {str(pdf_text_error)}")
+                all_text = ""  # Reset text if extraction failed
+            
+            # If text extraction failed or returned too little text, try OCR
+            if len(all_text.strip()) <= 100:
+                print("PDF text extraction failed or insufficient text, falling back to OCR")
+                
+                # Convert PDF to images and OCR
+                from pdf2image import convert_from_path
+                
+                images = convert_from_path(temp_path)
+                all_text = ""
+                
+                for i, image in enumerate(images):
+                    print(f"OCR processing page {i+1}/{len(images)}")
+                    page_text = pytesseract.image_to_string(image)
+                    all_text += page_text + "\n\n"
+                
+                print(f"Extracted {len(all_text)} characters using OCR on PDF")
+            
+            # Clean up the temporary file
+            import os
+            os.unlink(temp_path)
+            
+            return TranscriptService._extract_courses_from_text(all_text)
+            
+        except Exception as e:
+            print(f"Error processing PDF: {str(e)}")
+            raise
+
+    @staticmethod
+    def _extract_courses_from_text(text):
+        """
+        Extracts course information from text extracted from a transcript.
+        Only includes courses that match to the database.
+        """
+        print("Extracting courses from text...")
+        # First, split text into lines for better context analysis
+        lines = text.split('\n')
+        courses = []
+        current_semester = None
+        default_semester = None  # Will be set to the most recent semester found
+        
+        # Keywords that indicate a line is not a course
+        non_course_keywords = {
+            'term gpa', 'dean\'s list', 'semester', 'quarter', 'year', 'total', 'grade', 'units',
+            'intensive', 'exploration', 'requirement', 'continued', 'advisor', 'student id'
+        }
+        
+        # Common OCR misreadings and their corrections
+        dept_corrections = {
+            'WRIG': 'WRTG',
+            'CS)': 'CS',
+            '€S': 'CS',
+            'cS': 'CS',
+            'cs': 'CS',
+            'CS.': 'CS',
+            '€S_' : 'CS',
+            'ETHNC': 'ETHNC',
+            'ECON9': 'ECON'
+        }
+        
+        # Pattern to match semester lines (e.g., "Fall 2023", "Spring 2024")
+        semester_pattern = r'(Spring|Summer|Fall|Winter)\s+(\d{4})'
+        
+        # Pattern to match course lines, more permissive to handle OCR artifacts
+        course_pattern = r'^([A-Za-z€)]\S{1,4})\s*[~\'"_\s]*\s*(\d{3,4}[A-Za-z]?)[\\.\s]*\s+([^0-9\n](?:[^\n]*[^0-9\n])?)'
+        
+        # First pass: find the most recent semester
+        for line in lines:
+            semester_match = re.search(semester_pattern, line, re.IGNORECASE)
+            if semester_match:
+                term = semester_match.group(1).capitalize()
+                year = semester_match.group(2)
+                semester = f"{term} {year}"
+                if not default_semester or int(year) > int(default_semester.split()[-1]):
+                    default_semester = semester
+
+        if not default_semester:
+            # If no semester found, use current year
+            current_year = datetime.now().year
+            default_semester = f"Fall {current_year}"  # Default to Fall of current year
+            print(f"No semester found in transcript, using default: {default_semester}")
+
+        matched_courses = []
+
+        # Second pass: process courses
+        for line in lines:
+            line = line.strip()
+            if not line:
+                continue
+            
+            # Check for semester header
+            semester_match = re.search(semester_pattern, line, re.IGNORECASE)
+            if semester_match:
+                term = semester_match.group(1).capitalize()
+                year = semester_match.group(2)
+                current_semester = f"{term} {year}"
+                print(f"Found semester: {current_semester}")
+                continue
+                
+            # Skip lines that are clearly not courses
+            lower_line = line.lower()
+            if any(keyword in lower_line for keyword in non_course_keywords):
+                continue
+            
+            # Look for course pattern
+            match = re.match(course_pattern, line)
+            if not match:
+                continue
+                
+            dept = match.group(1).strip().upper()  # Convert to uppercase for consistency
+            num = match.group(2).strip()
+            name = match.group(3).strip()
+            
+            # Clean up department code
+            dept = dept_corrections.get(dept, dept)
+            
+            # Clean up the course number (remove any non-numeric prefix)
+            num = re.sub(r'^[^0-9]+', '', num)
+            # Handle special case for ECON 91740 -> 1740
+            if len(num) > 4:
+                num = num[-4:]
+            
+            # Additional validation: must have both department code and course number
+            if not dept or not num:
+                continue
+                
+            # Clean up the course name
+            name = re.sub(r'\s+[A-F][+-]?\s*$', '', name)  # Remove grade
+            name = re.sub(r'\s+\d+\.\d+\s*$', '', name)    # Remove credits
+            name = re.sub(r'\s+\([^)]*\)', '', name)       # Remove parenthetical notes
+            name = re.sub(r'[\\©*=]+', '', name)           # Remove special characters
+            name = re.sub(r'\s+', ' ', name)
+            
+            # Additional validation: course name should be reasonable length
+            if len(name) < 3 or len(name) > 100:
+                continue
+            
+            code = f"{dept} {num}"
+            print(f"Attempting to match course: {code} - {name}")
+            
+            # Try to find the course in the database
+            try:
+                # Extract just the numeric part for the database query
+                num_only = re.match(r'\d+', num).group(0)
+                
+                # Try exact match first
+                db_course = Course.objects.filter(
+                    subject__iexact=dept,
+                    number=int(num_only)
+                ).first()
+                
+                if db_course:
+                    print(f"Found matching course in database: {db_course}")
+                    matched_courses.append({
+                        'code': f"{db_course.subject} {db_course.number}",  # Use database values
+                        'name': db_course.title,
+                        'credits': db_course.credits,
+                        'rating': db_course.avg_rating,  # Use the average rating field
+                        'difficulty': db_course.avg_difficulty,  # Use the average difficulty field
+                        'confidence': 1.0,
+                        'db_match': True,
+                        'course_id': db_course.id,  # This is the actual database ID
+                        'semester': current_semester or default_semester  # Use current semester or default
+                    })
+                else:
+                    # Skip custom courses - don't include them
+                    print(f"No database match found for: {code}, skipping")
+            except Exception as e:
+                print(f"Error matching course {code} in database: {str(e)}")
+                continue
+        
+        # Convert courses to JSON-serializable dictionaries to avoid any serialization issues
+        serializable_courses = []
+        for course in matched_courses:
+            course_dict = dict(course)
+            # Ensure numeric values are serializable
+            course_dict['rating'] = float(course_dict['rating']) if course_dict['rating'] is not None else 0
+            course_dict['difficulty'] = float(course_dict['difficulty']) if course_dict['difficulty'] is not None else 0
+            course_dict['credits'] = int(course_dict['credits']) if course_dict['credits'] is not None else 3
+            serializable_courses.append(course_dict)
+        
+        print(f"Total database-matched courses found: {len(serializable_courses)}")
+        return serializable_courses
+        
     @staticmethod
     def _update_user_course_plan(user, courses):
         """
@@ -1194,21 +1438,38 @@ class TranscriptService:
             
             # Update each semester in the course plan
             for semester_name, semester_courses in courses_by_semester.items():
+                # Parse semester term and year
+                parts = semester_name.split(' ')
+                if len(parts) != 2:
+                    print(f"Invalid semester format: {semester_name}, skipping")
+                    continue
+                    
+                term, year_str = parts
+                try:
+                    year = int(year_str)
+                except ValueError:
+                    print(f"Invalid year in semester: {semester_name}, skipping")
+                    continue
+                
+                # Look for existing semester in user's course plan
                 semester_entry = None
                 for s in user.course_plan["semesters"]:
-                    if s.get("term") == semester_name.split(' ')[0] and s.get("year") == int(semester_name.split(' ')[1]):
+                    if s.get("term") == term and s.get("year") == year:
                         semester_entry = s
                         break
                 
+                # Create new semester if needed
                 if not semester_entry:
                     semester_entry = {
-                        "id": f"{semester_name.lower().replace(' ', '-')}",
-                        "term": semester_name.split(' ')[0],
-                        "year": int(semester_name.split(' ')[1]),
+                        "id": f"{term.lower()}-{year}",
+                        "term": term,
+                        "year": year,
                         "courses": []
                     }
                     user.course_plan["semesters"].append(semester_entry)
+                    print(f"Created new semester: {term} {year}")
                 
+                # Add courses to the semester
                 for course in semester_courses:
                     # Check if course already exists in this semester
                     course_exists = any(
