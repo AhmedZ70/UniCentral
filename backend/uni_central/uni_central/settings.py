@@ -140,4 +140,4 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 # Content Moderation Settings
 # Google Perspective API Key for content moderation (get from https://developers.perspectiveapi.com)
-PERSPECTIVE_API_KEY = os.environ.get('PERSPECTIVE_API_KEY', '')
+PERSPECTIVE_API_KEY = "AIzaSyDO6oaEOdKHWWigxilUc7TjojC1MP1iKMM"  # Replace with your actual API key
