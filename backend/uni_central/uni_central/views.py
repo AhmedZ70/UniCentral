@@ -269,8 +269,8 @@ class CreateReviewAPIView(APIView):
         else:
             # Check if the error message is related to content moderation
             error_msg = result["error"]
-            if "inappropriate" in error_msg.lower() or "toxicity" in error_msg.lower() or "profanity" in error_msg.lower():
-                error_msg = "Please remove profanity, slurs, or other inappropriate language from your review and try again. Critical feedback is welcome, but please express it respectfully."
+            if "inappropriate" in error_msg.lower() or "toxicity" in error_msg.lower() or "profanity" in error_msg.lower() or "slurs" in error_msg.lower():
+                error_msg = "Your review contains profanity. Please revise and try again."
             
             return Response(
                 {"error": error_msg},
@@ -297,8 +297,8 @@ class CreateProfessorReviewAPIView(APIView):
         else:
             # Check if the error message is related to content moderation
             error_msg = result["error"]
-            if "inappropriate" in error_msg.lower() or "toxicity" in error_msg.lower() or "profanity" in error_msg.lower():
-                error_msg = "Please remove profanity, slurs, or other inappropriate language from your review and try again. Critical feedback is welcome, but please express it respectfully."
+            if "inappropriate" in error_msg.lower() or "toxicity" in error_msg.lower() or "profanity" in error_msg.lower() or "slurs" in error_msg.lower():
+                error_msg = "Your review contains profanity. Please revise and try again."
             
             return Response(
                 {"error": error_msg},
@@ -328,8 +328,8 @@ class UpdateReviewAPIView(APIView):
             else:
                 # Check if the error message is related to content moderation
                 error_msg = result["error"]
-                if "inappropriate" in error_msg.lower() or "toxicity" in error_msg.lower() or "profanity" in error_msg.lower():
-                    error_msg = "Please remove profanity, slurs, or other inappropriate language from your review and try again. Critical feedback is welcome, but please express it respectfully."
+                if "inappropriate" in error_msg.lower() or "toxicity" in error_msg.lower() or "profanity" in error_msg.lower() or "slurs" in error_msg.lower():
+                    error_msg = "Your review contains profanity. Please revise and try again."
                 
                 return Response(
                     {"error": error_msg},
@@ -987,8 +987,8 @@ class CreateThreadAPIView(APIView):
         
         # Check if the error message is related to content moderation
         error_msg = result["error"]
-        if "inappropriate" in error_msg.lower() or "toxicity" in error_msg.lower() or "profanity" in error_msg.lower():
-            error_msg = "Please remove profanity, slurs, or other inappropriate language from your thread title and try again. Critical questions are welcome, but please express them respectfully."
+        if "inappropriate" in error_msg.lower() or "toxicity" in error_msg.lower() or "profanity" in error_msg.lower() or "slurs" in error_msg.lower():
+            error_msg = "Your thread title contains profanity. Please revise and try again."
         
         print(f"Thread creation failed: {error_msg}")
         return Response({"error": error_msg}, status=status.HTTP_400_BAD_REQUEST)
@@ -1007,8 +1007,8 @@ class UpdateThreadAPIView(APIView):
         
         # Check if the error message is related to content moderation
         error_msg = result["error"]
-        if "inappropriate" in error_msg.lower() or "toxicity" in error_msg.lower() or "profanity" in error_msg.lower():
-            error_msg = "Please remove profanity, slurs, or other inappropriate language from your thread title and try again. Critical questions are welcome, but please express them respectfully."
+        if "inappropriate" in error_msg.lower() or "toxicity" in error_msg.lower() or "profanity" in error_msg.lower() or "slurs" in error_msg.lower():
+            error_msg = "Your thread title contains profanity. Please revise and try again."
         
         return Response({"error": error_msg}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -1158,8 +1158,8 @@ class CreateCommentAPIView(APIView):
         
         # Check if the error message is related to content moderation
         error_msg = result["error"]
-        if "inappropriate" in error_msg.lower() or "toxicity" in error_msg.lower() or "profanity" in error_msg.lower():
-            error_msg = "Please remove profanity, slurs, or other inappropriate language from your comment and try again. Critical opinions are welcome, but please express them respectfully."
+        if "inappropriate" in error_msg.lower() or "toxicity" in error_msg.lower() or "profanity" in error_msg.lower() or "slurs" in error_msg.lower():
+            error_msg = "Your comment contains profanity. Please revise and try again."
         
         return Response({"error": error_msg}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -1177,8 +1177,8 @@ class UpdateCommentAPIView(APIView):
         
         # Check if the error message is related to content moderation
         error_msg = result["error"]
-        if "inappropriate" in error_msg.lower() or "toxicity" in error_msg.lower() or "profanity" in error_msg.lower():
-            error_msg = "Please remove profanity, slurs, or other inappropriate language from your comment and try again. Critical opinions are welcome, but please express them respectfully."
+        if "inappropriate" in error_msg.lower() or "toxicity" in error_msg.lower() or "profanity" in error_msg.lower() or "slurs" in error_msg.lower():
+            error_msg = "Your comment contains profanity. Please revise and try again."
         
         return Response({"error": error_msg}, status=status.HTTP_400_BAD_REQUEST)
 
