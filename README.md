@@ -113,3 +113,4 @@ Our CI/CD pipeline automatically runs:
 The pipeline configuration is defined in `.gitlab-ci.yml`.
 
 ---
+# Triggering pipeline
