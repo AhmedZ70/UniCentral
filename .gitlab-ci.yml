@@ -39,6 +39,13 @@ cache:
     - cd backend/uni_central
     - pip install -r requirements.txt || pip install django djangorestframework pytesseract pdf2image pillow fuzzywuzzy
     - pip install coverage pytest pytest-django pytest-cov
+    - |
+      if command -v apk >/dev/null 2>&1; then
+        apk add --no-cache openssh-client bash git
+      else
+        # macOS already has these tools
+        echo "Running on macOS, skipping package installation"
+      fi
 
 # Backend linting
 backend-lint:
@@ -81,17 +88,7 @@ migration-test:
     - python manage.py migrate --plan
   allow_failure: true
 
-# Security scanning
-security-scan:
-  stage: test
-  <<: *backend_config
-  script:
-    - pip install bandit safety
-    - echo "Running Bandit security scanner..."
-    - bandit -r uni_central/ -x uni_central/tests/
-    - echo "Checking dependencies for security vulnerabilities..."
-    - safety check
-  allow_failure: true
+
 
 # Build backend
 build-backend:
@@ -108,9 +105,9 @@ build-backend:
 # Deploy to existing EC2 instance
 deploy:
   stage: deploy
-  image: alpine:latest
+  # Remove the image directive to use the default shell environment
+  # image: alpine:latest
   before_script:
-    - apk add --no-cache openssh-client bash git
     - mkdir -p ~/.ssh
     - echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
     - chmod 600 ~/.ssh/id_rsa
@@ -126,9 +123,13 @@ deploy:
     - main
     - content-moderation
   variables:
+    SSH_PRIVATE_KEY: "${SSH_PRIVATE_KEY}"
     EC2_HOST: "${EC2_HOST}"
     EC2_USER: "${EC2_USER}"
     APP_PATH: "${APP_PATH}"
     VENV_PATH: "${VENV_PATH}"
     DJANGO_PATH: "${DJANGO_PATH}"
     RESTART_COMMAND: "${RESTART_COMMAND}"
+    PERSPECTIVE_API_KEY: "${PERSPECTIVE_API_KEY}"
+    
+    

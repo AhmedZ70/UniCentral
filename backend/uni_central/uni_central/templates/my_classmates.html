@@ -48,6 +48,30 @@
     </div>
   </main>
   
+  <!-- Study Buddy Request Modal -->
+  <div class="study-buddy-modal">
+    <div class="study-buddy-modal-content">
+      <button class="close-modal">&times;</button>
+      <form class="study-buddy-form">
+        <h3>Send Study Buddy Request</h3>
+        <input type="hidden" id="classmate-id" name="classmate-id">
+        <input type="hidden" id="classmate-name" name="classmate-name">
+        <div class="form-group">
+          <label for="course-select">Select a course:</label>
+          <select id="course-select" name="course-select" required>
+            <option value="">Select a course...</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="message">Message:</label>
+          <textarea id="message" name="message" placeholder="Hi! Would you like to study together for this course?" required></textarea>
+        </div>
+        <button type="submit" class="submit-request">Send Request</button>
+        <div class="success-message">Study buddy request sent successfully!</div>
+      </form>
+    </div>
+  </div>
+  
   <!-- 
     IMPORTANT: The JS file fetches classmates from the endpoint
     /api/my_classmates/<user_email>/.

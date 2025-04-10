@@ -7,6 +7,8 @@ from .models import (
     Thread,
     Comment,
     CommentUpvote,
+    StudyBuddyRequest,
+    StudyBuddyMessage,
     )
 from django.shortcuts import get_object_or_404
 from django.db.models import Q, Count, F, ExpressionWrapper, IntegerField
@@ -276,19 +278,32 @@ class ReviewService:
         Returns:
             dict: A dictionary with success/error information and the review object if successful.
         """
+        import logging
+        logging.warning(f"Updating review {review_id} with data: {review_data}")
+        
         review = ReviewService.get_review_by_id(review_id)
         if review == None:
             return {
                 "success": False,
                 "error": "Review not found"
             }
+        
+        # Verify that email_address matches the review's user
+        email_address = review_data.get('email_address')
+        if email_address and email_address != review.user.email_address:
+            return {
+                "success": False,
+                "error": "You don't have permission to edit this review"
+            }
 
         # Check review text for inappropriate content if present
         if "review" in review_data:
             review_text = review_data.get("review")
             if review_text:
+                logging.warning(f"Checking review text for profanity: {review_text}")
                 is_appropriate, message = ContentModerationService.moderate_text(review_text)
                 if not is_appropriate:
+                    logging.warning(f"Content moderation failed: {message}")
                     return {
                         "success": False,
                         "error": message
@@ -296,21 +311,46 @@ class ReviewService:
                 review.review = review_text
 
         try:
+            # Update numeric fields
             if "rating" in review_data:
                 review.rating = float(review_data["rating"])
             if "difficulty" in review_data:
                 review.difficulty = int(review_data["difficulty"])
             if "estimated_hours" in review_data:
-                review.estimated_hours = float(review_data["estimated_hours"])
+                review.estimated_hours = float(review_data["estimated_hours"]) if review_data["estimated_hours"] else None
+                
+            # Update string fields
+            if "grade" in review_data:
+                review.grade = review_data["grade"]
+                
+            # Update boolean fields
             if "would_take_again" in review_data:
-                review.would_take_again = review_data["would_take_again"] == "true"
+                review.would_take_again = review_data["would_take_again"] == True or review_data["would_take_again"] == "true"
             if "for_credit" in review_data:
-                review.for_credit = review_data["for_credit"] == "true"
+                review.for_credit = review_data["for_credit"] == True or review_data["for_credit"] == "true"
             if "mandatory_attendance" in review_data:
-                review.mandatory_attendance = review_data["mandatory_attendance"] == "true"
+                review.mandatory_attendance = review_data["mandatory_attendance"] == True or review_data["mandatory_attendance"] == "true"
+            if "required_course" in review_data:
+                review.required_course = review_data["required_course"] == True or review_data["required_course"] == "true"
+            if "is_gened" in review_data:
+                review.is_gened = review_data["is_gened"] == True or review_data["is_gened"] == "true"
+            if "in_person" in review_data:
+                review.in_person = review_data["in_person"] == True or review_data["in_person"] == "true"
+            if "online" in review_data:
+                review.online = review_data["online"] == True or review_data["online"] == "true"
+            if "hybrid" in review_data:
+                review.hybrid = review_data["hybrid"] == True or review_data["hybrid"] == "true"
+            if "no_exams" in review_data:
+                review.no_exams = review_data["no_exams"] == True or review_data["no_exams"] == "true"
+            if "presentations" in review_data:
+                review.presentations = review_data["presentations"] == True or review_data["presentations"] == "true"
+            if "is_anonymous" in review_data:
+                review.is_anonymous = review_data["is_anonymous"] == True or review_data["is_anonymous"] == "true"
 
+            # Save the updated review
             review.save()
 
+            # Update averages
             if review.course:
                 review.course.update_averages()
             if review.professor:
@@ -324,7 +364,7 @@ class ReviewService:
             logging.error(f"Error updating review: {str(e)}")
             return {
                 "success": False,
-                "error": "Failed to update review. Please try again."
+                "error": f"Failed to update review: {str(e)}"
             }
     
     @staticmethod
@@ -1073,7 +1113,7 @@ class ContentModerationService:
             )
             
             response_data = response.json()
-            
+
 
             thresholds = {
                 'TOXICITY': 1.0,          
@@ -1462,3 +1502,656 @@ class TranscriptService:
         except Exception as e:
             print(f"Error updating course plan: {e}")
             return False
+
+    @staticmethod
+    def _process_image(file_obj):
+        """
+        Process image transcript and extract course information.
+        """
+        print("Processing image file...")
+        try:
+            image = Image.open(file_obj)
+            print(f"Image opened successfully: size={image.size}, mode={image.mode}")
+            
+            # Convert image to text using Tesseract OCR
+            text = pytesseract.image_to_string(image)
+            print(f"OCR Text extracted: {len(text)} characters")
+            print(f"Extracted text:\n{text}")
+            
+            # First, split text into lines for better context analysis
+            lines = text.split('\n')
+            courses = []
+            current_semester = None
+            default_semester = None  # Will be set to the most recent semester found
+            
+            # Keywords that indicate a line is not a course
+            non_course_keywords = {
+                'term gpa', 'dean\'s list', 'semester', 'quarter', 'year', 'total', 'grade', 'units',
+                'intensive', 'exploration', 'requirement', 'continued'
+            }
+            
+            # Common OCR misreadings and their corrections
+            dept_corrections = {
+                'WRIG': 'WRTG',
+                'CS)': 'CS',
+                '€S': 'CS',
+                'cS': 'CS',
+                'cs': 'CS',
+                'CS.': 'CS',
+                '€S_' : 'CS',
+                'ETHNC': 'ETHNC',
+                'ECON9': 'ECON'
+            }
+            
+            # Pattern to match semester lines (e.g., "Fall 2023", "Spring 2024")
+            semester_pattern = r'(Spring|Summer|Fall|Winter)\s+(\d{4})'
+            
+            # Pattern to match course lines, more permissive to handle OCR artifacts
+            course_pattern = r'^([A-Za-z€)]\S{1,4})\s*[~\'"_\s]*\s*(\d{3,4}[A-Za-z]?)[\\.\s]*\s+([^0-9\n](?:[^\n]*[^0-9\n])?)'
+            
+            # First pass: find the most recent semester
+            for line in lines:
+                semester_match = re.search(semester_pattern, line, re.IGNORECASE)
+                if semester_match:
+                    term = semester_match.group(1).capitalize()
+                    year = semester_match.group(2)
+                    semester = f"{term} {year}"
+                    if not default_semester or int(year) > int(default_semester.split()[-1]):
+                        default_semester = semester
+
+            if not default_semester:
+                # If no semester found, use current year
+                current_year = datetime.now().year
+                default_semester = f"Fall {current_year}"  # Default to Fall of current year
+                print(f"No semester found in transcript, using default: {default_semester}")
+
+            # Second pass: process courses
+            for line in lines:
+                line = line.strip()
+                if not line:
+                    continue
+                
+                # Check for semester header
+                semester_match = re.search(semester_pattern, line, re.IGNORECASE)
+                if semester_match:
+                    term = semester_match.group(1).capitalize()
+                    year = semester_match.group(2)
+                    current_semester = f"{term} {year}"
+                    print(f"Found semester: {current_semester}")
+                    continue
+                    
+                # Skip lines that are clearly not courses
+                lower_line = line.lower()
+                if any(keyword in lower_line for keyword in non_course_keywords):
+                    continue
+                
+                # Look for course pattern
+                match = re.match(course_pattern, line)
+                if not match:
+                    continue
+                    
+                dept = match.group(1).strip().upper()  # Convert to uppercase for consistency
+                num = match.group(2).strip()
+                name = match.group(3).strip()
+                
+                # Clean up department code
+                dept = dept_corrections.get(dept, dept)
+                
+                # Clean up the course number (remove any non-numeric prefix)
+                num = re.sub(r'^[^0-9]+', '', num)
+                # Handle special case for ECON 91740 -> 1740
+                if len(num) > 4:
+                    num = num[-4:]
+                
+                # Additional validation: must have both department code and course number
+                if not dept or not num:
+                    continue
+                    
+                # Clean up the course name
+                name = re.sub(r'\s+[A-F][+-]?\s*$', '', name)  # Remove grade
+                name = re.sub(r'\s+\d+\.\d+\s*$', '', name)    # Remove credits
+                name = re.sub(r'\s+\([^)]*\)', '', name)       # Remove parenthetical notes
+                name = re.sub(r'[\\©*=]+', '', name)           # Remove special characters
+                name = re.sub(r'\s+', ' ', name)
+                
+                # Additional validation: course name should be reasonable length
+                if len(name) < 3 or len(name) > 100:
+                    continue
+                
+                code = f"{dept} {num}"
+                print(f"Attempting to match course: {code} - {name}")
+                
+                # Try to find the course in the database
+                try:
+                    # Extract just the numeric part for the database query
+                    num_only = re.match(r'\d+', num).group(0)
+                    
+                    # Try exact match first
+                    db_course = Course.objects.filter(
+                        subject__iexact=dept,
+                        number=int(num_only)
+                    ).first()
+                    
+                    if db_course:
+                        print(f"Found matching course in database: {db_course}")
+                        courses.append({
+                            'code': f"{db_course.subject} {db_course.number}",  # Use database values
+                            'name': db_course.title,
+                            'credits': db_course.credits,
+                            'rating': db_course.avg_rating,  # Use the average rating field
+                            'difficulty': db_course.avg_difficulty,  # Use the average difficulty field
+                            'confidence': 1.0,
+                            'db_match': True,
+                            'course_id': db_course.id,  # This is the actual database ID
+                            'semester': current_semester or default_semester  # Use current semester or default
+                        })
+                    else:
+                        print(f"No database match found for: {code}")
+                except Exception as e:
+                    print(f"Error matching course {code} in database: {str(e)}")
+                    continue
+            
+            print(f"Total database-matched courses found: {len(courses)}")
+            return courses
+            
+        except Exception as e:
+            print(f"Error processing image: {str(e)}")
+            raise
+
+##############################
+# Study Buddy-Related Services #
+##############################
+class StudyBuddyService:
+    """
+    Provides utility methods for managing study buddy requests.
+    """
+    
+    @staticmethod
+    def create_request(sender_email, receiver_id, course_name, message):
+        """
+        Create a new study buddy request.
+        
+        Args:
+            sender_email (str): Email of the user sending the request
+            receiver_id (int): ID of the user receiving the request
+            course_name (str): Name of the course to study together
+            message (str): Message from sender to receiver
+            
+        Returns:
+            dict: Result with success status and data or error message
+        """
+        try:
+            from .models import User
+            
+            # Get sender and receiver
+            sender = User.objects.get(email_address=sender_email)
+            receiver = User.objects.get(id=receiver_id)
+            
+            # Check if request already exists
+            existing_request = StudyBuddyRequest.objects.filter(
+                sender=sender,
+                receiver=receiver,
+                course_name=course_name
+            ).first()
+            
+            if existing_request:
+                return {
+                    "success": False,
+                    "error": "You already sent a study buddy request to this user for this course."
+                }
+            
+            # Create new request
+            request = StudyBuddyRequest.objects.create(
+                sender=sender,
+                receiver=receiver,
+                course_name=course_name,
+                message=message,
+                status='pending'
+            )
+            
+            return {
+                "success": True,
+                "request": {
+                    "id": request.id,
+                    "sender": f"{request.sender.fname} {request.sender.lname}",
+                    "receiver": f"{request.receiver.fname} {request.receiver.lname}",
+                    "course_name": request.course_name,
+                    "status": request.status,
+                    "created_at": request.created_at.isoformat()
+                }
+            }
+            
+        except User.DoesNotExist:
+            return {
+                "success": False,
+                "error": "User not found."
+            }
+        except Exception as e:
+            print(f"Error creating study buddy request: {str(e)}")
+            return {
+                "success": False,
+                "error": "Failed to create study buddy request."
+            }
+    
+    @staticmethod
+    def get_requests_by_user(email):
+        """
+        Get all study buddy requests for a user (both sent and received).
+        
+        Args:
+            email (str): Email of the user
+            
+        Returns:
+            dict: Result with success status and request data or error message
+        """
+        try:
+            from .models import User
+            
+            user = User.objects.get(email_address=email)
+            
+            # Get sent requests
+            sent_requests = StudyBuddyRequest.objects.filter(sender=user)
+            
+            # Get received requests
+            received_requests = StudyBuddyRequest.objects.filter(receiver=user)
+            
+            # Convert to dicts for JSON serialization
+            sent_data = [{
+                "id": req.id,
+                "receiver_id": req.receiver.id,
+                "receiver_name": f"{req.receiver.fname} {req.receiver.lname}",
+                "course": req.course_name,
+                "message": req.message,
+                "status": req.status,
+                "created_at": req.created_at.isoformat(),
+                "type": "sent"
+            } for req in sent_requests]
+            
+            received_data = [{
+                "id": req.id,
+                "sender_id": req.sender.id,
+                "sender_name": f"{req.sender.fname} {req.sender.lname}",
+                "course": req.course_name,
+                "message": req.message,
+                "status": req.status,
+                "created_at": req.created_at.isoformat(),
+                "type": "received"
+            } for req in received_requests]
+            
+            return {
+                "success": True,
+                "sent_requests": sent_data,
+                "received_requests": received_data
+            }
+            
+        except User.DoesNotExist:
+            return {
+                "success": False,
+                "error": "User not found."
+            }
+        except Exception as e:
+            print(f"Error fetching study buddy requests: {str(e)}")
+            return {
+                "success": False,
+                "error": "Failed to fetch study buddy requests."
+            }
+    
+    @staticmethod
+    def update_request_status(request_id, new_status):
+        """
+        Update the status of a study buddy request.
+        
+        Args:
+            request_id (int): ID of the request to update
+            new_status (str): New status ('accepted' or 'declined')
+            
+        Returns:
+            dict: Result with success status and updated request or error message
+        """
+        try:
+            from .models import StudyBuddyRequest
+            
+            request = StudyBuddyRequest.objects.get(id=request_id)
+            
+            if new_status not in ['accepted', 'declined']:
+                return {
+                    "success": False,
+                    "error": "Invalid status. Must be 'accepted' or 'declined'."
+                }
+            
+            request.status = new_status
+            request.save()
+            
+            return {
+                "success": True,
+                "request": {
+                    "id": request.id,
+                    "sender": f"{request.sender.fname} {request.sender.lname}",
+                    "receiver": f"{request.receiver.fname} {request.receiver.lname}",
+                    "course_name": request.course_name,
+                    "status": request.status,
+                    "updated_at": request.updated_at.isoformat()
+                }
+            }
+            
+        except StudyBuddyRequest.DoesNotExist:
+            return {
+                "success": False,
+                "error": "Study buddy request not found."
+            }
+        except Exception as e:
+            print(f"Error updating study buddy request: {str(e)}")
+            return {
+                "success": False,
+                "error": "Failed to update study buddy request."
+            }
+
+    @staticmethod
+    def get_messages(request_id):
+        """
+        Get all messages for a specific study buddy request.
+        
+        Args:
+            request_id (int): ID of the study buddy request
+            
+        Returns:
+            dict: Result with success status and messages data or error message
+        """
+        try:
+            from .models import StudyBuddyRequest, StudyBuddyMessage
+            
+            request = StudyBuddyRequest.objects.get(id=request_id)
+            
+            # Verify that the request has been accepted
+            if request.status != 'accepted':
+                return {
+                    "success": False,
+                    "error": "Messages are only available for accepted study buddy requests"
+                }
+            
+            messages = StudyBuddyMessage.objects.filter(study_buddy_request=request).order_by('created_at')
+            
+            # Convert to dicts for JSON serialization
+            messages_data = [{
+                "id": msg.id,
+                "sender_id": msg.sender.id,
+                "sender_name": f"{msg.sender.fname} {msg.sender.lname}",
+                "receiver_id": msg.receiver.id,
+                "content": msg.content,
+                "is_read": msg.is_read,
+                "created_at": msg.created_at.isoformat()
+            } for msg in messages]
+            
+            return {
+                "success": True,
+                "messages": messages_data
+            }
+            
+        except StudyBuddyRequest.DoesNotExist:
+            return {
+                "success": False,
+                "error": "Study buddy request not found"
+            }
+        except Exception as e:
+            print(f"Error getting messages: {str(e)}")
+            return {
+                "success": False,
+                "error": "Failed to get messages"
+            }
+
+    @staticmethod
+    def send_message(sender_email, receiver_id, request_id, content):
+        """
+        Send a message between study buddies.
+        
+        Args:
+            sender_email (str): Email of the user sending the message
+            receiver_id (int): ID of the user receiving the message
+            request_id (int): ID of the study buddy request
+            content (str): Message content
+            
+        Returns:
+            dict: Result with success status and message data or error message
+        """
+        try:
+            from .models import StudyBuddyRequest, StudyBuddyMessage, User
+            
+            # Verify users and request exist
+            sender = User.objects.get(email_address=sender_email)
+            receiver = User.objects.get(id=receiver_id)
+            request = StudyBuddyRequest.objects.get(id=request_id)
+            
+            # Verify that the request has been accepted
+            if request.status != 'accepted':
+                return {
+                    "success": False,
+                    "error": "Messages can only be sent for accepted study buddy requests"
+                }
+            
+            # Verify that the sender and receiver are the users in the request
+            if not ((sender == request.sender and receiver == request.receiver) or 
+                    (sender == request.receiver and receiver == request.sender)):
+                return {
+                    "success": False,
+                    "error": "You can only message your study buddy"
+                }
+            
+            # Check for inappropriate content
+            is_appropriate, message = ContentModerationService.moderate_text(content)
+            if not is_appropriate:
+                return {
+                    "success": False,
+                    "error": message
+                }
+            
+            # Create the message
+            message = StudyBuddyMessage.objects.create(
+                sender=sender,
+                receiver=receiver,
+                study_buddy_request=request,
+                content=content,
+                is_read=False
+            )
+            
+            return {
+                "success": True,
+                "message": {
+                    "id": message.id,
+                    "sender_name": f"{sender.fname} {sender.lname}",
+                    "content": message.content,
+                    "created_at": message.created_at.isoformat()
+                }
+            }
+            
+        except User.DoesNotExist:
+            return {
+                "success": False,
+                "error": "User not found"
+            }
+        except StudyBuddyRequest.DoesNotExist:
+            return {
+                "success": False,
+                "error": "Study buddy request not found"
+            }
+        except Exception as e:
+            print(f"Error sending message: {str(e)}")
+            return {
+                "success": False,
+                "error": "Failed to send message"
+            }
+
+    @staticmethod
+    def mark_messages_as_read(user_email, request_id):
+        """
+        Mark all messages for a user in a study buddy request as read.
+        
+        Args:
+            user_email (str): Email of the user
+            request_id (int): ID of the study buddy request
+            
+        Returns:
+            dict: Result with success status or error message
+        """
+        try:
+            from .models import StudyBuddyRequest, StudyBuddyMessage, User
+            
+            user = User.objects.get(email_address=user_email)
+            request = StudyBuddyRequest.objects.get(id=request_id)
+            
+            # Mark messages as read
+            updated_count = StudyBuddyMessage.objects.filter(
+                receiver=user,
+                study_buddy_request=request,
+                is_read=False
+            ).update(is_read=True)
+            
+            return {
+                "success": True,
+                "count": updated_count
+            }
+            
+        except User.DoesNotExist:
+            return {
+                "success": False,
+                "error": "User not found"
+            }
+        except StudyBuddyRequest.DoesNotExist:
+            return {
+                "success": False,
+                "error": "Study buddy request not found"
+            }
+        except Exception as e:
+            print(f"Error marking messages as read: {str(e)}")
+            return {
+                "success": False,
+                "error": "Failed to mark messages as read"
+            }
+
+    @staticmethod
+    def get_unread_message_count(user_email):
+        """
+        Get the count of unread messages for a user.
+        
+        Args:
+            user_email (str): Email of the user
+            
+        Returns:
+            dict: Result with success status and unread counts by request ID
+        """
+        try:
+            from .models import User, StudyBuddyMessage
+            
+            user = User.objects.get(email_address=user_email)
+            
+            # Get count of unread messages by request
+            unread_counts = {}
+            
+            # Find all messages where the user is the receiver and messages are unread
+            unread_messages = StudyBuddyMessage.objects.filter(
+                receiver=user,
+                is_read=False
+            )
+            
+            # Group by request ID and count
+            for message in unread_messages:
+                request_id = message.study_buddy_request.id
+                if request_id in unread_counts:
+                    unread_counts[request_id] += 1
+                else:
+                    unread_counts[request_id] = 1
+                
+            # Also include sender info
+            sender_info = {}
+            for request_id in unread_counts.keys():
+                # Get the latest unread message for this request
+                latest_message = StudyBuddyMessage.objects.filter(
+                    study_buddy_request_id=request_id,
+                    receiver=user,
+                    is_read=False
+                ).order_by('-created_at').first()
+                
+                if latest_message:
+                    sender_info[request_id] = {
+                        'id': latest_message.sender.id,
+                        'name': f"{latest_message.sender.fname} {latest_message.sender.lname}",
+                        'preview': latest_message.content[:30] + ('...' if len(latest_message.content) > 30 else '')
+                    }
+            
+            return {
+                "success": True,
+                "unread_counts": unread_counts,
+                "sender_info": sender_info
+            }
+            
+        except User.DoesNotExist:
+            return {
+                "success": False,
+                "error": "User not found"
+            }
+        except Exception as e:
+            print(f"Error getting unread message count: {str(e)}")
+            return {
+                "success": False,
+                "error": "Failed to get unread message count"
+            }
+            
+    @staticmethod
+    def get_buddy_status_updates(user_email):
+        """
+        Get study buddies with their status information.
+        
+        Args:
+            user_email (str): Email of the user
+            
+        Returns:
+            dict: Result with success status and list of buddies with their status
+        """
+        try:
+            from .models import User, StudyBuddyRequest
+            
+            user = User.objects.get(email_address=user_email)
+            
+            # Get all accepted study buddy requests
+            sent_requests = StudyBuddyRequest.objects.filter(
+                sender=user,
+                status='accepted'
+            )
+            
+            received_requests = StudyBuddyRequest.objects.filter(
+                receiver=user,
+                status='accepted'
+            )
+            
+            # Extract buddy information
+            buddies = []
+            
+            for request in sent_requests:
+                buddies.append({
+                    'id': request.receiver.id,
+                    'name': f"{request.receiver.fname} {request.receiver.lname}",
+                    'request_id': request.id
+                })
+                
+            for request in received_requests:
+                buddies.append({
+                    'id': request.sender.id,
+                    'name': f"{request.sender.fname} {request.sender.lname}",
+                    'request_id': request.id
+                })
+            
+            return {
+                "success": True,
+                "buddies": buddies
+            }
+            
+        except User.DoesNotExist:
+            return {
+                "success": False,
+                "error": "User not found"
+            }
+        except Exception as e:
+            print(f"Error getting buddy status updates: {str(e)}")
+            return {
+                "success": False,
+                "error": "Failed to get buddy status updates"
+            }
