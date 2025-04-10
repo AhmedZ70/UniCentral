@@ -33,7 +33,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
             document.getElementById("course-subject").textContent = course.subject || "N/A";
             document.getElementById("course-credits").textContent = course.credits || "N/A";
-            document.getElementById("course-semester").textContent = course.semester || "Not specified";
             document.getElementById("course-grade").textContent = course.grade || "N/A";
 
             const reviews = data.reviews || [];
