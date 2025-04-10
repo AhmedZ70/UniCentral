@@ -23,6 +23,7 @@ from .views import (
     EditAccountView,
     UpdateReviewAPIView,
     DeleteReviewAPIView,
+    GetReviewAPIView,
     CreateThreadAPIView,
     UpdateThreadAPIView,
     DeleteThreadAPIView,
@@ -114,7 +115,7 @@ urlpatterns = [
     
     # Review URLs
     path('api/courses/<int:course_id>/reviews/', CourseReviewListView.as_view(), name='course-reviews'),
-
+    path('api/reviews/<int:review_id>/', GetReviewAPIView.as_view(), name='get-review'),
     path('api/courses/<int:course_id>/reviews/enroll/', EnrollView.as_view(), name='api-course-enroll'),
     path('api/courses/<int:course_id>/reviews/un_enroll/', UnEnrollView.as_view(), name='api-course-un-enroll'),
 
