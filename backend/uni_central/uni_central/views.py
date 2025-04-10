@@ -267,8 +267,13 @@ class CreateReviewAPIView(APIView):
                 status=status.HTTP_201_CREATED
             )
         else:
+            # Check if the error message is related to content moderation
+            error_msg = result["error"]
+            if "inappropriate" in error_msg.lower() or "toxicity" in error_msg.lower() or "profanity" in error_msg.lower():
+                error_msg = "Please remove profanity, slurs, or other inappropriate language from your review and try again. Critical feedback is welcome, but please express it respectfully."
+            
             return Response(
-                {"error": result["error"]},
+                {"error": error_msg},
                 status=status.HTTP_400_BAD_REQUEST
             )
             
@@ -290,8 +295,13 @@ class CreateProfessorReviewAPIView(APIView):
                 status=status.HTTP_201_CREATED
             )
         else:
+            # Check if the error message is related to content moderation
+            error_msg = result["error"]
+            if "inappropriate" in error_msg.lower() or "toxicity" in error_msg.lower() or "profanity" in error_msg.lower():
+                error_msg = "Please remove profanity, slurs, or other inappropriate language from your review and try again. Critical feedback is welcome, but please express it respectfully."
+            
             return Response(
-                {"error": result["error"]},
+                {"error": error_msg},
                 status=status.HTTP_400_BAD_REQUEST
             )
             
@@ -316,8 +326,13 @@ class UpdateReviewAPIView(APIView):
                     status=status.HTTP_200_OK
                 )
             else:
+                # Check if the error message is related to content moderation
+                error_msg = result["error"]
+                if "inappropriate" in error_msg.lower() or "toxicity" in error_msg.lower() or "profanity" in error_msg.lower():
+                    error_msg = "Please remove profanity, slurs, or other inappropriate language from your review and try again. Critical feedback is welcome, but please express it respectfully."
+                
                 return Response(
-                    {"error": result["error"]},
+                    {"error": error_msg},
                     status=status.HTTP_400_BAD_REQUEST
                 )
         except Exception as e:
@@ -970,8 +985,13 @@ class CreateThreadAPIView(APIView):
             print(f"Thread created successfully with data: {serializer.data}")
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         
-        print(f"Thread creation failed: {result['error']}")
-        return Response({"error": result["error"]}, status=status.HTTP_400_BAD_REQUEST)
+        # Check if the error message is related to content moderation
+        error_msg = result["error"]
+        if "inappropriate" in error_msg.lower() or "toxicity" in error_msg.lower() or "profanity" in error_msg.lower():
+            error_msg = "Please remove profanity, slurs, or other inappropriate language from your thread title and try again. Critical questions are welcome, but please express them respectfully."
+        
+        print(f"Thread creation failed: {error_msg}")
+        return Response({"error": error_msg}, status=status.HTTP_400_BAD_REQUEST)
 
 class UpdateThreadAPIView(APIView):
     """
@@ -985,7 +1005,12 @@ class UpdateThreadAPIView(APIView):
             serializer = ThreadSerializer(result["thread"])
             return Response(serializer.data, status=status.HTTP_200_OK)
         
-        return Response({"error": result["error"]}, status=status.HTTP_400_BAD_REQUEST)
+        # Check if the error message is related to content moderation
+        error_msg = result["error"]
+        if "inappropriate" in error_msg.lower() or "toxicity" in error_msg.lower() or "profanity" in error_msg.lower():
+            error_msg = "Please remove profanity, slurs, or other inappropriate language from your thread title and try again. Critical questions are welcome, but please express them respectfully."
+        
+        return Response({"error": error_msg}, status=status.HTTP_400_BAD_REQUEST)
 
 class DeleteThreadAPIView(APIView):
     """
@@ -1131,7 +1156,12 @@ class CreateCommentAPIView(APIView):
             serializer = CommentSerializer(result["comment"])
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         
-        return Response({"error": result["error"]}, status=status.HTTP_400_BAD_REQUEST)
+        # Check if the error message is related to content moderation
+        error_msg = result["error"]
+        if "inappropriate" in error_msg.lower() or "toxicity" in error_msg.lower() or "profanity" in error_msg.lower():
+            error_msg = "Please remove profanity, slurs, or other inappropriate language from your comment and try again. Critical opinions are welcome, but please express them respectfully."
+        
+        return Response({"error": error_msg}, status=status.HTTP_400_BAD_REQUEST)
 
 class UpdateCommentAPIView(APIView):
     """
@@ -1145,7 +1175,12 @@ class UpdateCommentAPIView(APIView):
             serializer = CommentSerializer(result["comment"])
             return Response(serializer.data, status=status.HTTP_200_OK)
         
-        return Response({"error": result["error"]}, status=status.HTTP_400_BAD_REQUEST)
+        # Check if the error message is related to content moderation
+        error_msg = result["error"]
+        if "inappropriate" in error_msg.lower() or "toxicity" in error_msg.lower() or "profanity" in error_msg.lower():
+            error_msg = "Please remove profanity, slurs, or other inappropriate language from your comment and try again. Critical opinions are welcome, but please express them respectfully."
+        
+        return Response({"error": error_msg}, status=status.HTTP_400_BAD_REQUEST)
 
 
 class DeleteCommentAPIView(APIView):

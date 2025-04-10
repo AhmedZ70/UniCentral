@@ -1073,13 +1073,14 @@ class ContentModerationService:
             response_data = response.json()
             
             # Set thresholds for different attributes
+            # Higher thresholds = more permissive (allows more negative language while still blocking actual profanity)
             thresholds = {
-                'TOXICITY': 0.75,
-                'SEVERE_TOXICITY': 0.7,
-                'IDENTITY_ATTACK': 0.7,
-                'INSULT': 0.7,
-                'PROFANITY': 0.8,
-                'THREAT': 0.7
+                'TOXICITY': 0.95,          # Very high: allows harsh negativity unless it's abusive
+                'SEVERE_TOXICITY': 0.7,    # Still strict for truly offensive language
+                'IDENTITY_ATTACK': 0.6,    # Strict to block slurs, discrimination
+                'INSULT': 0.95,            # Allows negative criticism like "this class sucks"
+                'PROFANITY': 0.9,          # Very low — blocks even mild profanity
+                'THREAT': 0.6              # Strict to block threatening language
             }
             
             # Check if any attribute exceeds its threshold
