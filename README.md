@@ -6,6 +6,57 @@ UniCentral is a comprehensive course planning platform that helps students make 
 
 ---
 
+## Getting Started
+
+### Download and Install
+
+```bash
+# Clone the repository
+git clone https://capstone.cs.utah.edu/unicentral/unicentral.git
+cd unicentral
+
+# Install backend dependencies
+cd backend/uni_central
+python -m venv venv
+source venv/bin/activate  # On Windows: venv\Scripts\activate
+pip install -r ../../requirements.txt
+
+# Set up the database
+python manage.py migrate
+
+# Load initial data (optional)
+python manage.py course_scraper
+
+# Install frontend dependencies
+cd ../../
+npm install
+```
+
+### Run the Application
+
+```bash
+# Start the backend server (from backend/uni_central directory)
+python manage.py runserver
+
+# In a separate terminal, build and run the frontend
+npm run build  # Creates production build
+# OR for development with hot reloading
+npm run dev
+```
+
+Access the application at http://127.0.0.1:8000/
+
+### How to Use UniCentral
+
+1. **Create an Account**: Sign up using the registration form or Google authentication.
+2. **Browse Courses**: Explore the course catalog with advanced filtering options.
+3. **Read and Write Reviews**: View ratings and feedback for courses and professors, and contribute your own reviews.
+4. **Plan Your Schedule**: Use the course planner to organize your academic journey by semester.
+5. **Connect with Classmates**: Engage in discussion boards and find study buddies for your courses.
+6. **Manage Your Profile**: Track your courses, reviews, and messages in your personal dashboard.
+
+---
+
 ## Abstract
 
 UniCentral is a comprehensive course planning tool designed to empower students to make informed academic decisions. Serving as a one-stop solution, it consolidates course reviews, professor ratings, semester offerings, workload estimations, and peer feedback into a user-friendly platform. This tool enables students to filter and select courses that align with their schedules, time commitments, and academic goals, addressing the challenge of fragmented and unreliable information sources in academic planning.
