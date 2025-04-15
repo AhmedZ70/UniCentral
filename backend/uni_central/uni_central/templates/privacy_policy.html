@@ -1,0 +1,83 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}UniCentral - Privacy Policy{% endblock %}
+
+{% block extra_css %}
+  <link rel="stylesheet" href="{% static 'css/privacy_policy.css' %}">
+{% endblock %}
+
+{% block content %}
+  <main class="main-content">
+    <section class="container privacy-container">
+      <h1 class="page-title">Privacy Policy</h1>
+      <div class="last-updated">Last Updated: April 15, 2025</div>
+      
+      <div class="privacy-section">
+        <h2>Introduction</h2>
+        <p>
+          Welcome to UniCentral. We respect your privacy and are committed to protecting your personal data.
+          This privacy policy will inform you about how we look after your personal data when you visit our website
+          and tell you about your privacy rights and how the law protects you.
+        </p>
+      </div>
+      
+      <div class="privacy-section">
+        <h2>The Data We Collect</h2>
+        <p>We may collect, use, store and transfer different kinds of personal data about you which we have grouped together as follows:</p>
+        <ul>
+          <li><strong>Identity Data</strong> includes first name, last name, username or similar identifier.</li>
+          <li><strong>Contact Data</strong> includes email address.</li>
+          <li><strong>Technical Data</strong> includes internet protocol (IP) address, browser type and version, time zone setting and location, browser plug-in types and versions, operating system and platform, and other technology on the devices you use to access this website.</li>
+          <li><strong>Usage Data</strong> includes information about how you use our website and services.</li>
+        </ul>
+      </div>
+      
+      <div class="privacy-section">
+        <h2>How We Use Your Data</h2>
+        <p>We will only use your personal data when the law allows us to. Most commonly, we will use your personal data in the following circumstances:</p>
+        <ul>
+          <li>To register you as a new user</li>
+          <li>To provide and improve our services to you</li>
+          <li>To manage our relationship with you</li>
+          <li>To administer and protect our business and this website</li>
+        </ul>
+      </div>
+      
+      <div class="privacy-section">
+        <h2>Data Security</h2>
+        <p>
+          We have put in place appropriate security measures to prevent your personal data from being accidentally lost, used, 
+          or accessed in an unauthorized way, altered, or disclosed. In addition, we limit access to your personal data to those 
+          employees, agents, contractors, and other third parties who have a business need to know.
+        </p>
+      </div>
+      
+      <div class="privacy-section">
+        <h2>Your Rights</h2>
+        <p>Under certain circumstances, you have rights under data protection laws in relation to your personal data, including the right to:</p>
+        <ul>
+          <li>Request access to your personal data</li>
+          <li>Request correction of your personal data</li>
+          <li>Request erasure of your personal data</li>
+          <li>Object to processing of your personal data</li>
+          <li>Request restriction of processing your personal data</li>
+          <li>Request transfer of your personal data</li>
+          <li>Right to withdraw consent</li>
+        </ul>
+      </div>
+      
+      <div class="privacy-section">
+        <h2>Contact Us</h2>
+        <p>
+          If you have any questions about this privacy policy or our privacy practices, please contact us at:
+          <a href="mailto:unicentralutah@gmail.com">unicentralutah@gmail.com</a>
+        </p>
+      </div>
+      
+      <div class="back-button-container">
+        <a href="{% url 'home' %}" class="back-button">Back to Home</a>
+      </div>
+    </section>
+  </main>
+{% endblock %} 
