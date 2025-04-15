@@ -136,58 +136,100 @@ body {
 /* Team Section                                  */
 /* ============================================= */
 .team {
+  background-color: #f8f8f8;
+  padding: 3rem 0;
   text-align: center;
-  padding: 3rem 2rem;
-  background-color: #e8f5e9;
 }
 
 .team h2 {
-  font-size: 2rem;
+  font-family: 'Agrandir', sans-serif;
+  font-size: 2.5rem;
   color: #005a5b;
   margin-bottom: 1.5rem;
 }
 
-.team-members {
-  display: flex;
-  justify-content: center;
-  flex-wrap: wrap;
-  gap: 2rem;
+.team-description {
+  max-width: 800px;
+  margin: 0 auto 2rem;
+  font-size: 1.1rem;
+  line-height: 1.6;
+  color: #444;
+  padding: 0 1rem;
 }
 
-/* Team Member Cards */
-.member {
-  background-color: #fff;
-  padding: 1.5rem;
-  border-radius: 12px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  width: 250px;
-  text-align: center;
+.team-preview {
   display: flex;
   flex-direction: column;
   align-items: center;
+  max-width: 900px;
+  margin: 0 auto;
 }
 
-/* Team Member Images */
-.member img {
+.preview-images {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.preview-images img {
   width: 120px;
   height: 120px;
   border-radius: 50%;
   object-fit: cover;
-  margin-bottom: 1rem;
-  border: 3px solid #fa743e;
+  border: 3px solid white;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease;
 }
 
-/* Team Member Name */
-.member h3 {
-  font-size: 1.5rem;
-  color: #fa743e;
-  margin-bottom: 0.5rem;
+.preview-images img:hover {
+  transform: scale(1.1);
 }
 
-/* Team Member Role */
-.member p {
-  font-size: 1.1rem;
-  color: #333;
+.team-button {
+  display: inline-block;
+  padding: 12px 28px;
+  background-color: #ff743e;
+  color: white;
+  font-weight: 600;
+  border-radius: 30px;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.team-button:hover {
+  background-color: #e05a20;
+  transform: translateY(-3px);
+  box-shadow: 0 6px 15px rgba(250, 116, 62, 0.3);
+}
+
+@media (max-width: 768px) {
+  .team h2 {
+    font-size: 2rem;
+  }
+  
+  .preview-images img {
+    width: 100px;
+    height: 100px;
+  }
+}
+
+@media (max-width: 480px) {
+  .team h2 {
+    font-size: 1.75rem;
+  }
+  
+  .preview-images img {
+    width: 80px;
+    height: 80px;
+  }
+  
+  .team-button {
+    padding: 10px 20px;
+    font-size: 0.9rem;
+  }
 }
 
 /* ============================================= */

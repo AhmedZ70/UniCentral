@@ -68,6 +68,9 @@ from .views import (
     SendStudyBuddyMessageView,
     MarkMessagesAsReadView,
     MessageUpdatesSSEView,
+    privacy_policy,
+    help_feedback,
+    team_members,
 )
 
 urlpatterns = [
@@ -76,6 +79,9 @@ urlpatterns = [
     path('login/', login_page, name='login'),
     path('courses/', courses, name='courses'),  # Render courses.html (user-facing view)
     path('courses/<int:course_id>/', course_detail, name='course-detail'), 
+    path('privacy-policy/', privacy_policy, name='privacy_policy'),
+    path('help-feedback/', help_feedback, name='help_feedback'),
+    path('team-members/', team_members, name='team_members'),
 
     path(
         'courses/<int:context_id>/review/',
