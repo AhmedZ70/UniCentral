@@ -1,0 +1,110 @@
+/* ============================================= */
+/* Dropdown Menu Styles                           */
+/* ============================================= */
+.dropdown-menu {
+    position: relative;
+    font-size: 16px;
+    margin-left: 1rem;
+    cursor: pointer;
+    width: 50px;
+    height: 80px;
+  }
+  
+  .dropdown-menu-btn {
+    color: black;
+    background-color: #FAF8F0;
+    padding: 0; 
+    margin-top: 13px;
+    font-size: 40px;
+    border: none;
+    border-radius: 4px;
+  }
+  
+  .dropdown-menu-content {
+    display: none;
+    position: absolute;
+    font-size: 23px;
+    background-color: #f1f1f1;
+    min-width: 250px;
+    min-height: 350px;
+    box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.2);
+    z-index: 100;
+    top: 100%;
+    right: 0;
+    list-style: none;
+    padding: 10px 20px;
+    font-weight: bold;
+    border: 3px solid black;
+    border-radius: 4px;
+  }
+  
+  .dropdown-menu.active .dropdown-menu-content {
+    display: block;
+  }
+  
+  .dropdown-menu-btn:focus + .dropdown-menu-content,
+  .dropdown-menu:hover .dropdown-menu-content {
+    display: block;
+  }
+  
+  .dropdown-menu-btn:focus,
+  .dropdown-menu:hover .dropdown-menu-btn {
+    color: #313131;
+  }
+  
+  .dropdown-menu-content a {
+    display: block;
+    text-decoration: none;
+    color: black;
+  }
+  
+  .dropdown-menu-content a:hover {
+    color: #3c3c3c;
+  }
+  
+  .dropdown-menu-btn:hover + .dropdown-menu-content {
+    display: block;
+  }
+  
+  .dropdown-menu:hover .dropdown-menu-btn {
+    color: #3c3c3c;
+  }
+  
+  /* ============================================= */
+  /* Icon Styles                                    */
+  /* ============================================= */
+  .icons {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 15px;
+  }
+  
+  .icons img {
+    width: 35px;
+  }
+  
+  .icons a {
+    text-decoration: none;
+    color: black;
+    font-weight: bold;
+  }
+  
+  /* ============================================= */
+  /* Button Styles                                  */
+  /* ============================================= */
+  .logout-btn, .login-btn {
+    color: black;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 23px;
+    font-weight: bold;
+    cursor: pointer;
+  }
+  
+  .logout-btn:hover, .login-btn:hover {
+    color: #3c3c3c;
+  }
+  

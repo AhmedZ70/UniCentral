@@ -1,0 +1,337 @@
+/* ===========================
+   Base Resets and Fonts
+   =========================== */
+*,
+*::before,
+*::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body,
+html {
+  width: 100%;
+  height: 100%;
+  font-family: 'Montserrat', sans-serif;
+  background-color: #faf8f0;
+  line-height: 1.6;
+}
+
+@font-face {
+  font-family: 'Agrandir';
+  src: url('../assets/fonts/Agrandir-Regular.otf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+/* ===========================
+      Hero Section
+      =========================== */
+.hero {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-left: 6rem;
+}
+
+.text-content {
+  max-width: 100%;
+  font-family: 'Agrandir', sans-serif;
+}
+
+.text-content h1 {
+  font-family: 'Agrandir', sans-serif;
+  font-weight: 100;
+  font-size: 65px;
+  color: #ff743e;
+  margin-bottom: 0.5rem;
+}
+
+.text-content p {
+  font-family: 'Poppins-light', sans-serif;
+  font-weight: 50;
+  font-size: 25px;
+  color: black;
+  margin-top: 1rem;
+}
+
+/* ===========================
+      Filter and Sort Section
+      =========================== */
+.filter-sort-container {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  padding: 1rem 2rem;
+  background-color: #ffffff;
+  border-radius: 8px;
+  margin: 1rem auto;
+  max-width: 1400px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  border: 3px solid black;
+}
+
+.filter-sort-container input[type="text"]::placeholder {
+  font-family: 'Agrandir', sans-serif;
+  font-size: 20px;
+  line-height: 1;
+  vertical-align: middle;
+}
+
+.search-input {
+  padding: 8px 12px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 14px;
+  flex: 1;
+  padding: 10px 15px;
+}
+
+.search-input::placeholder {
+  font-family: 'Agrandir', sans-serif;
+  font-size: 20px;
+  line-height: normal;
+}
+
+.search-input:focus {
+  border-color: #005a5b;
+  outline: none;
+}
+
+.sort-by {
+  padding: 8px 12px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 14px;
+  background-color: #fff;
+  cursor: pointer;
+}
+
+.sort-by:hover {
+  border-color: #005a5b;
+}
+
+#sort-by {
+  font-family: 'Agrandir', sans-serif;
+  font-size: 20px;
+  padding: 4px 6px;
+}
+
+/* ===========================
+      Professor Cards
+=========================== */
+.professor-cards-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+  gap: 20px;
+  padding: 1rem 2rem;
+  max-width: 1464px;
+  margin: 0 auto;
+}
+
+.professor-card {
+  background-color: #ffffff;
+  border: 3px solid black;
+  border-radius: 8px;
+  padding: 1.5rem;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-decoration: none;
+  color: inherit;
+}
+
+.professor-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+  border-color: #005a5b;
+}
+
+.professor-info {
+  flex: 1;
+}
+
+.professor-info h3 {
+  font-size: 24px;
+  margin: 0 0 10px;
+  color: #005a5b;
+}
+
+.professor-info p {
+  font-size: 16px;
+  margin: 8px 0;
+  color: #333;
+}
+
+.rating-container,
+.difficulty-container {
+  margin: 15px 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.rating-stars {
+  display: flex;
+  gap: 5px;
+}
+
+.star {
+  font-size: 20px;
+  color: #ccc;
+  /* Default color for empty stars */
+}
+
+.star.filled {
+  color: #ffd700;
+  /* Gold color for filled stars */
+}
+
+.star.partial {
+  position: relative;
+}
+
+.star.partial .filled {
+  position: absolute;
+  overflow: hidden;
+}
+
+.difficulty-rating {
+  display: flex;
+  gap: 5px;
+}
+
+.difficulty-circle {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background-color: #e0e0e0;
+  /* Default color for empty circles */
+}
+
+.difficulty-circle.filled {
+  background-color: var(--color, #4caf50);
+  /* Green for low difficulty */
+}
+
+.difficulty-circle.filled.yellow {
+  background-color: #ffc107;
+  /* Yellow for medium difficulty */
+}
+
+.difficulty-circle.filled.red {
+  background-color: #f44336;
+  /* Red for high difficulty */
+}
+
+.difficulty-circle.partial {
+  background: conic-gradient(var(--color, #4caf50) 0% calc(var(--percentage, 0) * 1%),
+      #e0e0e0 calc(var(--percentage, 0) * 1%) 100%);
+}
+
+/* ===========================
+      Professor Actions (Remove Button)
+      =========================== */
+.professor-actions {
+  margin-top: 15px;
+  text-align: right;
+}
+
+.remove-professor-btn {
+  background-color: #f44336;
+  color: #fff;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 4px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.remove-professor-btn:hover {
+  background-color: #d32f2f;
+}
+
+/* ===========================
+      No Professors Message
+      =========================== */
+#no-professors-added-message {
+  text-align: center;
+  font-size: 1.25rem;
+  color: #666;
+  padding: 2rem;
+}
+
+#no-professors-match-search-message {
+  text-align: center;
+  font-size: 1.25rem;
+  color: #666;
+  padding: 2rem;
+}
+
+/* ===========================
+      Responsive Queries
+      =========================== */
+@media (max-width: 768px) {
+  .hero {
+    flex-direction: column;
+    text-align: center;
+    padding: 2rem 1rem;
+  }
+
+  .text-content h1 {
+    font-size: 45px;
+    margin-left: 0;
+  }
+
+  .text-content p {
+    font-size: 20px;
+  }
+
+  .filter-sort-container {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 1rem;
+  }
+
+  .professor-cards-container {
+    grid-template-columns: 1fr;
+    padding: 1rem;
+  }
+
+  .professor-card {
+    padding: 1rem;
+  }
+
+  .professor-info h3 {
+    font-size: 20px;
+  }
+
+  .professor-info p {
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 480px) {
+  .text-content h1 {
+    font-size: 35px;
+  }
+
+  .text-content p {
+    font-size: 18px;
+  }
+
+  .professor-info h3 {
+    font-size: 18px;
+  }
+
+  .professor-info p {
+    font-size: 12px;
+  }
+}
