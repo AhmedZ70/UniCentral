@@ -141,7 +141,7 @@ body {
 .search-bar {
   display: flex;
   align-items: center;
-  gap: 20px; /* Spacing between elements */
+  gap: 20px; 
   position: relative;
   padding: 0.5rem;
   z-index: 1;
@@ -154,8 +154,8 @@ body {
   font-family: 'Agrandir', sans-serif;
   font-size: 35px;
   color: black;
-  white-space: nowrap; /* Prevents text from wrapping */
-  margin-left: -60px; /* Remove default paragraph margins */
+  white-space: nowrap; 
+  margin-left: -60px; 
 }
 
 .search-input {
@@ -314,9 +314,8 @@ body {
   transition: background-color 0.3s ease;
 }
 
-/* When message button is present, move study buddy button to the left */
 .classmate-card .message-buddy-btn ~ .study-buddy-btn {
-  right: 110px; /* Position to the left of the message button */
+  right: 110px;
 }
 
 .study-buddy-btn:hover {
@@ -447,7 +446,6 @@ body {
   font-weight: bold;
 }
 
-/* Response Modal Specific Styles */
 .response-content {
   display: flex;
   flex-direction: column;
@@ -488,7 +486,6 @@ body {
   background-color: #d32f2f;
 }
 
-/* Messaging Interface */
 .messaging-modal {
   display: none;
   position: fixed;
@@ -618,7 +615,6 @@ body {
   scroll-behavior: smooth;
 }
 
-/* Ensure messages appear on different sides */
 .message-group {
   display: flex;
   flex-direction: column;
@@ -665,7 +661,6 @@ body {
   to { transform: translateY(0); opacity: 1; }
 }
 
-/* Style group positions */
 .message.first-in-group {
   border-bottom-left-radius: 6px;
   border-bottom-right-radius: 6px;
@@ -680,7 +675,6 @@ body {
   border-radius: 6px;
 }
 
-/* Adjust sent message bubble shape */
 .message-sent.first-in-group {
   border-bottom-right-radius: 4px;
 }
@@ -693,7 +687,6 @@ body {
   border-bottom-right-radius: 4px;
 }
 
-/* Adjust received message bubble shape */
 .message-received.first-in-group {
   border-bottom-left-radius: 4px;
 }
@@ -706,7 +699,6 @@ body {
   border-bottom-left-radius: 4px;
 }
 
-/* Read receipts and time styling */
 .message-status {
   font-size: 0.7rem;
   color: rgba(255, 255, 255, 0.8);
@@ -846,7 +838,6 @@ body {
   z-index: 0;
 }
 
-/* Typing indicator */
 .message-typing-indicator {
   display: none;
   align-items: flex-end;
@@ -893,7 +884,6 @@ body {
   }
 }
 
-/* Enhanced message button with notifications */
 .message-buddy-btn {
   position: absolute;
   bottom: 15px;
@@ -914,7 +904,6 @@ body {
   transform: translateY(-2px);
 }
 
-/* Animated unread badge */
 .unread-badge {
   position: absolute;
   top: -5px;
@@ -947,7 +936,6 @@ body {
   }
 }
 
-/* Loading indicator for messages */
 .loading-messages {
   text-align: center;
   color: #888;

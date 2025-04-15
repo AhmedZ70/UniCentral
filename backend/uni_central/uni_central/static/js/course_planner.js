@@ -1111,7 +1111,6 @@ class TranscriptParser {
             }
         });
         
-        // Process each semester's courses
         Object.entries(coursesBySemester).forEach(([semesterName, courses]) => {
             let semester;
             
@@ -1121,28 +1120,24 @@ class TranscriptParser {
                 [term, year] = semesterName.split(' ');
                 year = parseInt(year);
                 
-                // Validate year
                 if (isNaN(year)) {
                     const currentYear = new Date().getFullYear();
                     year = currentYear;
                     console.log(`Invalid year in semester "${semesterName}", using current year: ${year}`);
                 }
                 
-                // Validate term
                 const validTerms = ['Spring', 'Summer', 'Fall', 'Winter'];
                 if (!validTerms.includes(term)) {
                     term = 'Fall';  // Default to Fall if invalid term
                     console.log(`Invalid term "${term}" in semester "${semesterName}", using default: Fall`);
                 }
             } else {
-                // Handle case where semester name doesn't split properly
                 const currentYear = new Date().getFullYear();
                 term = 'Fall';
                 year = currentYear;
                 console.log(`Invalid semester format "${semesterName}", using default: ${term} ${year}`);
             }
             
-            // Find existing semester or create new one
             semester = coursePlan.semesters.find(s => 
                 s.term.toLowerCase() === term.toLowerCase() && s.year === year
             );
@@ -1182,30 +1177,21 @@ class TranscriptParser {
             });
         });
         
-        // Show loading message
         this.updateProgressDisplay("Saving your course selections...");
         
-        // Sort semesters by year and term
         const termOrder = { 'spring': 0, 'summer': 1, 'fall': 2, 'winter': 3 };
         coursePlan.semesters.sort((a, b) => {
             if (a.year !== b.year) return a.year - b.year;
             return termOrder[a.term.toLowerCase()] - termOrder[b.term.toLowerCase()];
         });
         
-        // Save the updated course plan
         saveCoursePlan()
             .then(() => {
-                // Reset uploader
                 this.resetUploader();
-                
-                // Show success message
-                alert('Selected courses have been added to your course plan.');
-                
-                // Refresh the course plan display
+                alert('Selected courses have been added to your course plan.');                
                 renderSemesters();
             })
             .catch(error => {
-                // Hide the progress display
                 this.hideProgressDisplay();
                 
                 console.error('Error saving course plan:', error);
@@ -1214,19 +1200,16 @@ class TranscriptParser {
     }
     
     updateProgressDisplay(message) {
-        // Show progress container
         this.progressContainer.classList.remove('hidden');
         this.progressBar.style.width = '50%';
         this.progressText.textContent = message;
     }
     
     hideProgressDisplay() {
-        // Hide progress container
         this.progressContainer.classList.add('hidden');
     }
 }
 
-// Helper function to get CSRF token
 function getCookie(name) {
     let cookieValue = null;
     if (document.cookie && document.cookie !== '') {
@@ -1346,7 +1329,6 @@ class CoursePlan {
     }
 }
 
-// Add a new function to handle course enrollment
 async function enrollInCourse(courseCode) {
     try {
         const user = auth.currentUser;
@@ -1383,23 +1365,19 @@ async function enrollInCourse(courseCode) {
     }
 }
 
-// Function to show course suggestions when no exact match is found
 function showCourseSuggestions(courses, originalCode, originalName, originalCredits) {
     const popup = document.getElementById('course-popup');
     const content = popup.querySelector('.semester-popup-content');
     const originalContent = content.innerHTML;
     
-    // Save original content
     popup.dataset.originalContent = originalContent;
     
-    // Create suggestion list
     let suggestionsHTML = `
         <button class="close-popup" onclick="closeCoursePopup()">&times;</button>
         <h2 class="semester-popup-title">Similar Courses</h2>
         <div class="course-suggestions">
     `;
     
-    // Add up to 5 most relevant courses
     const displayCourses = courses.slice(0, 5);
     displayCourses.forEach(course => {
         suggestionsHTML += `
@@ -1411,7 +1389,6 @@ function showCourseSuggestions(courses, originalCode, originalName, originalCred
         `;
     });
     
-    // Add option to use original input
     suggestionsHTML += `
         <div class="course-suggestion custom" onclick="selectSuggestedCourse('custom-${Date.now()}', '${originalCode}', '${originalName.replace(/'/g, "\\'")}', ${originalCredits}, 0, 0)">
             <div class="suggestion-code">${originalCode}</div>
@@ -1431,7 +1408,6 @@ function showCourseSuggestions(courses, originalCode, originalName, originalCred
     content.innerHTML = suggestionsHTML;
 }
 
-// Function to restore original course popup after showing suggestions
 function restoreOriginalCoursePopup() {
     const popup = document.getElementById('course-popup');
     const content = popup.querySelector('.semester-popup-content');
@@ -1442,11 +1418,9 @@ function restoreOriginalCoursePopup() {
     }
 }
 
-// Function to select a suggested course
 function selectSuggestedCourse(id, code, name, credits, rating, difficulty) {
     const currentSemesterId = document.getElementById('course-popup').dataset.semesterId;
     
-    // Add course with the selected data
     const course = {
         id: id,
         courseCode: code,
@@ -1456,7 +1430,6 @@ function selectSuggestedCourse(id, code, name, credits, rating, difficulty) {
         difficulty: difficulty || 0
     };
 
-    // Find the semester and add the course
     const semester = coursePlan.semesters.find(s => s.id === currentSemesterId);
     if (!semester) {
         alert('Semester not found');
@@ -1464,7 +1437,6 @@ function selectSuggestedCourse(id, code, name, credits, rating, difficulty) {
         return;
     }
 
-    // Check for duplicate course
     const existingCourse = semester.courses.find(c => c.courseCode.toLowerCase() === course.courseCode.toLowerCase());
     if (existingCourse) {
         alert('This course is already in this semester.');
@@ -1485,7 +1457,6 @@ function selectSuggestedCourse(id, code, name, credits, rating, difficulty) {
         });
 }
 
-// Function to remove a course
 function removeCourse(semesterId, courseId) {
     if (!confirm('Are you sure you want to remove this course?')) {
         return;
@@ -1497,25 +1468,21 @@ function removeCourse(semesterId, courseId) {
         return;
     }
     
-    // First try to find the course by ID
     let courseIndex = semester.courses.findIndex(course => course.id === courseId);
     
     // If not found by ID, try to find it by custom ID formats that might be used by transcript parsing
     if (courseIndex === -1) {
-        // For transcript-parsed courses, they might use different ID formats
         courseIndex = semester.courses.findIndex(course => {
-            // Try different possible ID formats or properties
             return (course.id && course.id.toString() === courseId.toString()) || 
                    (course.course_id && course.course_id.toString() === courseId.toString()) ||
                    (course.courseId && course.courseId.toString() === courseId.toString());
         });
     }
     
-    // If still not found, as a last resort, try by courseCode
+    // If still not found, try by courseCode
     if (courseIndex === -1) {
         console.log("Attempting to find course by additional properties...");
         
-        // Get the course element from DOM to extract additional info
         const courseElement = document.querySelector(`[data-course-id="${courseId}"]`);
         if (courseElement) {
             const courseCode = courseElement.getAttribute('data-course-code');
@@ -1528,7 +1495,6 @@ function removeCourse(semesterId, courseId) {
         }
     }
     
-    // If we still can't find the course, log detailed info to help debug
     if (courseIndex === -1) {
         console.error(`Failed to find course with ID: ${courseId} in semester ${semesterId}`);
         console.log("Available courses in this semester:", semester.courses);
@@ -1536,17 +1502,13 @@ function removeCourse(semesterId, courseId) {
         return;
     }
     
-    // Store course info for confirmation message
     const course = semester.courses[courseIndex];
     
-    // Get display name (either courseName or name property)
     const courseName = course.courseName || course.name || "this course";
     const courseCode = course.courseCode || course.code || "";
     
-    // Remove the course
     semester.courses.splice(courseIndex, 1);
     
-    // Update UI and save changes
     renderSemesters();
     saveCoursePlan()
         .then(() => {
@@ -1559,9 +1521,7 @@ function removeCourse(semesterId, courseId) {
         });
 }
 
-// Function to show notification
 function showNotification(message) {
-    // Create notification element if it doesn't exist
     let notification = document.getElementById('planner-notification');
     if (!notification) {
         notification = document.createElement('div');
@@ -1570,17 +1530,14 @@ function showNotification(message) {
         document.body.appendChild(notification);
     }
     
-    // Set message and show
     notification.textContent = message;
     notification.classList.add('show');
     
-    // Hide after 3 seconds
     setTimeout(() => {
         notification.classList.remove('show');
     }, 3000);
 }
 
-// Function to set up star rating functionality
 function setupStarRating() {
     const starRating = document.getElementById('min-rating');
     const stars = starRating.querySelectorAll('.star');
@@ -1598,16 +1555,13 @@ function setupStarRating() {
             const value = parseInt(this.getAttribute('data-value'));
             console.log(`Star clicked: ${value}`);
             
-            // Toggle selection
             if (this.classList.contains('active') && 
                 !this.nextElementSibling?.classList.contains('active')) {
-                // If clicking on the last active star, deselect all
                 starRating.querySelectorAll('.star').forEach(s => {
                     s.classList.remove('active');
                 });
                 console.log('All stars deselected');
             } else {
-                // Select up to this star
                 starRating.querySelectorAll('.star').forEach(s => {
                     const starValue = parseInt(s.getAttribute('data-value'));
                     if (starValue <= value) {
@@ -1622,34 +1576,28 @@ function setupStarRating() {
     });
 }
 
-// Function to set up difficulty rating functionality
 function setupDifficultyRating() {
     const difficultyRating = document.getElementById('max-difficulty');
     const dots = difficultyRating.querySelectorAll('.difficulty-dot');
     
-    // Remove existing event listeners by cloning and replacing each dot
     dots.forEach(dot => {
         const newDot = dot.cloneNode(true);
         dot.parentNode.replaceChild(newDot, dot);
     });
     
-    // Get the fresh dots and add new event listeners
     const freshDots = difficultyRating.querySelectorAll('.difficulty-dot');
     freshDots.forEach(dot => {
         dot.addEventListener('click', function() {
             const value = parseInt(this.getAttribute('data-value'));
             console.log(`Difficulty dot clicked: ${value}`);
             
-            // Toggle selection
             if (this.classList.contains('active') && 
                 !this.previousElementSibling?.classList.contains('active')) {
-                // If clicking on the first active dot, deselect all
                 difficultyRating.querySelectorAll('.difficulty-dot').forEach(d => {
                     d.classList.remove('active');
                 });
                 console.log('All difficulty dots deselected');
             } else {
-                // Select up to this dot
                 difficultyRating.querySelectorAll('.difficulty-dot').forEach(d => {
                     const dotValue = parseInt(d.getAttribute('data-value'));
                     if (dotValue <= value) {
@@ -1664,9 +1612,7 @@ function setupDifficultyRating() {
     });
 }
 
-// Function to search for courses
 async function searchCourses(semesterId) {
-    // Make sure we have the current semester ID
     if (!semesterId && currentSemesterId) {
         semesterId = currentSemesterId;
     }
@@ -1680,17 +1626,14 @@ async function searchCourses(semesterId) {
     const professor = document.getElementById('professor-filter').value.trim();
     const credits = document.getElementById('credits-filter').value.trim();
     
-    // Get rating value (count active stars)
     const activeStars = document.querySelectorAll('.star-rating .star.active');
     const minRating = activeStars.length > 0 ? activeStars.length : '';
     console.log(`Min rating filter: ${minRating}`);
     
-    // Get difficulty value (count active dots)
     const activeDots = document.querySelectorAll('.difficulty-rating .difficulty-dot.active');
     const maxDifficulty = activeDots.length > 0 ? activeDots.length : '';
     console.log(`Max difficulty filter: ${maxDifficulty}`);
     
-    // Build filter parameters
     const filters = {};
     if (department) filters.department = department;
     if (title) filters.title = title;
@@ -1703,7 +1646,6 @@ async function searchCourses(semesterId) {
     
     console.log('Search filters:', filters);
     
-    // Show loading state
     document.getElementById('course-results').innerHTML = `
         <div class="empty-results">
             <p>Searching for courses...</p>
@@ -1712,10 +1654,8 @@ async function searchCourses(semesterId) {
     document.getElementById('result-count').textContent = 'Searching...';
     
     try {
-        // Convert filters to query string
         const queryString = new URLSearchParams(filters).toString();
         
-        // Make API request
         const response = await fetch(`/api/filter-courses/?${queryString}`, {
             method: 'GET',
             headers: { 'Content-Type': 'application/json' }
@@ -1733,30 +1673,24 @@ async function searchCourses(semesterId) {
         
         // If min rating is set, ensure we also consider it for semester courses
         if (semesterId) {
-            // Get the semester and its courses
             const allSemesters = coursePlan.semesters;
             console.log(`Total semesters in plan: ${allSemesters.length}`);
             
-            // Find current semester
             const semester = allSemesters.find(s => s.id === semesterId);
             
             if (semester) {
                 console.log(`Found semester: ${semester.term} ${semester.year} with ${semester.courses.length} courses`);
                 
                 if (semester.courses.length > 0) {
-                    // Log all semester courses to check their format
                     console.log('Semester courses:', JSON.stringify(semester.courses.slice(0, 3)));
                     
-                    // Check which courses should be included based on filters
                     let includedSemesterCourses = [...semester.courses];
                     
-                    // Apply min rating filter if set
                     if (minRating) {
                         const minRatingValue = parseFloat(minRating);
                         console.log(`Filtering semester courses by min rating: ${minRatingValue}`);
                         
                         includedSemesterCourses = includedSemesterCourses.filter(course => {
-                            // Handle different property names for rating
                             const courseRating = parseFloat(course.rating || course.avg_rating || 0);
                             const included = courseRating >= minRatingValue;
                             
@@ -1774,19 +1708,15 @@ async function searchCourses(semesterId) {
                         console.log(`Filtering semester courses by max difficulty: ${maxDifficultyValue}`);
                         
                         includedSemesterCourses = includedSemesterCourses.filter(course => {
-                            // Handle different property names for difficulty
                             const courseDifficulty = parseFloat(course.difficulty || course.avg_difficulty || 0);
                             return courseDifficulty <= maxDifficultyValue;
                         });
                     }
                     
-                    // Add semester courses to results if they meet criteria
                     console.log(`${includedSemesterCourses.length} semester courses match the filter criteria`);
                     
                     includedSemesterCourses.forEach(semesterCourse => {
-                        // Skip if this course is already in our results
                         const alreadyInResults = filteredCourses.some(c => {
-                            // Try different ways to match courses
                             const idMatch = c.id === semesterCourse.id;
                             const codeMatch = (c.subject && semesterCourse.courseCode) ? 
                                 `${c.subject} ${c.number}` === semesterCourse.courseCode : false;
@@ -1797,7 +1727,6 @@ async function searchCourses(semesterId) {
                         if (!alreadyInResults) {
                             console.log(`Adding semester course to results: ${semesterCourse.courseCode || semesterCourse.code || 'Unknown'}`);
                             
-                            // Format semester course to match API course format
                             const courseCode = semesterCourse.courseCode || semesterCourse.code || '';
                             const [subject, number] = courseCode.split(' ');
                             
@@ -1820,7 +1749,6 @@ async function searchCourses(semesterId) {
             }
         }
         
-        // Apply any additional client-side filters
         if (department) {
             const deptLower = department.toLowerCase();
             filteredCourses = filteredCourses.filter(course => {
@@ -1851,7 +1779,6 @@ async function searchCourses(semesterId) {
     }
 }
 
-// Function to display search results
 function displaySearchResults(courses) {
     const resultsContainer = document.getElementById('course-results');
     
@@ -1865,18 +1792,13 @@ function displaySearchResults(courses) {
         return;
     }
     
-    // Update result count
-    document.getElementById('result-count').textContent = `${courses.length} courses found`;
-    
-    // Clear existing results
+    document.getElementById('result-count').textContent = `${courses.length} courses found`;    
     resultsContainer.innerHTML = '';
     
     // Generate HTML for each course result
     courses.forEach(course => {
-        // Check if course is already selected
         const isSelected = selectedCourses.some(selected => selected.id === course.id);
         
-        // Determine course code and title based on available properties
         const courseCode = course.is_semester_course ? 
             course.courseCode || `${course.subject} ${course.number}` : 
             `${course.subject} ${course.number}`;
@@ -1887,17 +1809,14 @@ function displaySearchResults(courses) {
             
         const credits = course.credits || 3;
         
-        // Get rating and difficulty values
         const rating = parseFloat(course.avg_rating || course.rating || 0);
         const difficulty = parseFloat(course.avg_difficulty || course.difficulty || 0);
         
-        // Create the result item element
         const resultItem = document.createElement('div');
         resultItem.className = 'course-result-item';
         resultItem.setAttribute('data-id', course.id);
         resultItem.setAttribute('data-source', course.is_semester_course ? 'semester' : 'api');
         
-        // Create and configure the checkbox
         const checkbox = document.createElement('input');
         checkbox.type = 'checkbox';
         checkbox.className = 'course-checkbox';
@@ -1911,7 +1830,6 @@ function displaySearchResults(courses) {
             checkbox.checked = true;
         }
         
-        // Add checkbox change event listener
         checkbox.addEventListener('change', function() {
             const courseId = this.getAttribute('data-id');
             const courseCode = this.getAttribute('data-code');
@@ -1921,7 +1839,6 @@ function displaySearchResults(courses) {
             const difficulty = parseFloat(this.getAttribute('data-difficulty'));
             
             if (this.checked) {
-                // Add to selected courses
                 selectedCourses.push({
                     id: courseId,
                     courseCode: courseCode,
@@ -1931,34 +1848,28 @@ function displaySearchResults(courses) {
                     difficulty: difficulty
                 });
             } else {
-                // Remove from selected courses
                 selectedCourses = selectedCourses.filter(course => course.id !== courseId);
             }
             
             updateSelectedCoursesList();
         });
         
-        // Create the course info container
         const courseInfo = document.createElement('div');
         courseInfo.className = 'course-info-preview';
         
-        // Add course code
         const codeEl = document.createElement('div');
         codeEl.className = 'course-code-preview';
         codeEl.textContent = courseCode;
         courseInfo.appendChild(codeEl);
         
-        // Add course title
         const titleEl = document.createElement('div');
         titleEl.className = 'course-title-preview';
         titleEl.textContent = courseTitle;
         courseInfo.appendChild(titleEl);
         
-        // Create metadata container
         const metaEl = document.createElement('div');
         metaEl.className = 'course-meta-preview';
         
-        // Add credits info
         const creditsEl = document.createElement('div');
         creditsEl.className = 'course-credits-preview';
         
@@ -1969,7 +1880,6 @@ function displaySearchResults(courses) {
         creditsEl.appendChild(document.createTextNode(` ${credits} Credits`));
         metaEl.appendChild(creditsEl);
         
-        // Add rating info
         const ratingEl = document.createElement('div');
         ratingEl.className = 'course-rating-preview';
         
@@ -1980,7 +1890,6 @@ function displaySearchResults(courses) {
         ratingEl.appendChild(document.createTextNode(` ${rating ? rating.toFixed(1) : 'N/A'}`));
         metaEl.appendChild(ratingEl);
         
-        // Add difficulty info
         const difficultyEl = document.createElement('div');
         difficultyEl.className = 'course-difficulty-preview';
         
@@ -1990,11 +1899,9 @@ function displaySearchResults(courses) {
         
         difficultyEl.appendChild(document.createTextNode(' Difficulty: '));
         
-        // Add difficulty indicator
         const indicatorEl = document.createElement('span');
         indicatorEl.className = 'difficulty-indicator';
         
-        // Determine difficulty level for display
         const difficultyLevel = Math.floor(difficulty) || 0;
         if (difficultyLevel <= 2) {
             indicatorEl.classList.add('difficulty-level-1');
@@ -2018,7 +1925,6 @@ function displaySearchResults(courses) {
     });
 }
 
-// Function to update the selected courses list
 function updateSelectedCoursesList() {
     const selectedContainer = document.getElementById('selected-courses');
     document.getElementById('selected-count').textContent = `${selectedCourses.length} courses selected`;
@@ -2047,7 +1953,6 @@ function updateSelectedCoursesList() {
     
     selectedContainer.innerHTML = selectedHTML;
     
-    // Add event listeners to remove buttons
     const removeButtons = document.querySelectorAll('.remove-selected');
     removeButtons.forEach(button => {
         button.addEventListener('click', function() {
@@ -2067,7 +1972,6 @@ function updateSelectedCoursesList() {
     });
 }
 
-// Function to add selected courses to the semester
 async function addSelectedCourses() {
     if (selectedCourses.length === 0) {
         alert('Please select at least one course to add');
@@ -2075,40 +1979,29 @@ async function addSelectedCourses() {
     }
     
     try {
-        // Find the semester
         const semester = coursePlan.semesters.find(s => s.id === currentSemesterId);
         if (!semester) {
             throw new Error('Semester not found');
         }
         
-        // Track added and duplicate courses
         let addedCount = 0;
         let duplicateCount = 0;
         
-        // Add each selected course
         selectedCourses.forEach(course => {
-            // Check for duplicates
             const existingCourse = semester.courses.find(c => c.id === course.id);
             if (existingCourse) {
                 duplicateCount++;
-                return; // Skip this course
+                return; 
             }
             
-            // Add course to the semester
             semester.courses.push(course);
             addedCount++;
         });
         
-        // Save the updated course plan
         await saveCoursePlan();
-        
-        // Update the UI
         renderSemesters();
-        
-        // Close the popup
         closeCoursePopup();
         
-        // Show confirmation message
         let message = '';
         if (addedCount > 0) {
             message = `Added ${addedCount} course${addedCount !== 1 ? 's' : ''} to ${semester.term} ${semester.year}`;
@@ -2127,7 +2020,6 @@ async function addSelectedCourses() {
     }
 }
 
-// Add these window-level functions so they can be called from HTML
 window.submitSemester = submitSemester;
 window.closeSemesterPopup = closeSemesterPopup;
 window.showSemesterPopup = showSemesterPopup;

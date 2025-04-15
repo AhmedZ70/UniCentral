@@ -33,7 +33,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
             document.getElementById("course-subject").textContent = course.subject || "N/A";
             document.getElementById("course-credits").textContent = course.credits || "N/A";
-            document.getElementById("course-grade").textContent = course.grade || "N/A";
+            document.getElementById("course-grade").textContent = course.avg_grade || "N/A";
+
+            console.log("Full course data:", course);
 
             const reviews = data.reviews || [];
             if (reviews.length === 0) {
@@ -130,7 +132,6 @@ document.addEventListener("DOMContentLoaded", () => {
                     setupThumbsButtons(review.id, li);
                 });
             }
-            // 6. Handle Grade Distribution Chart
             let gradeChart = null;
 
             const gradeData = { A: 0, B: 0, C: 0, D: 0, E: 0 };
@@ -212,13 +213,10 @@ document.addEventListener("DOMContentLoaded", () => {
         });
 
     if (enrollBtn) {
-        // Use onAuthStateChanged to track the user's authentication state
         onAuthStateChanged(auth, (user) => {
             if (user) {
-                // User is signed in
                 const emailAddress = user.email;
 
-                // Check if the user is already enrolled
                 fetch(`/api/my_courses/${emailAddress}/`)
                     .then((response) => response.json())
                     .then((data) => {

@@ -750,7 +750,6 @@ function createAnonymousReviewOption() {
     
     const submitBtnParent = submitBtn.parentNode;
     
-    // Check if separator already exists, if not add it
     if (!document.querySelector('hr.anon-separator')) {
         const separator = document.createElement('hr');
         separator.className = 'mt-3 mb-3 anon-separator';

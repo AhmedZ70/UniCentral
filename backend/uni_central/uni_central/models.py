@@ -1,5 +1,7 @@
 from django.db import models
-from django.db.models import Avg
+from django.db.models import Avg, Count
+from django.db.models.signals import post_save, post_delete
+from django.dispatch import receiver
 
 
 ##############
@@ -62,7 +64,7 @@ class Course(models.Model):
     avg_difficulty = models.FloatField(default=0)
     avg_rating = models.FloatField(default=0)
     credits = models.PositiveIntegerField()
-    semester = models.CharField(max_length=100, blank=True, null=True)
+    avg_grade = models.CharField(max_length=2, null=True, blank=True)
     professors = models.ManyToManyField('Professor', related_name='courses')
 
     class Meta:
@@ -73,17 +75,22 @@ class Course(models.Model):
 
     def update_averages(self):
         """Recalculate and update the average rating and difficulty."""
-        # Calculate averages from related reviews
         averages = Review.objects.filter(course=self).aggregate(
             avg_rating=Avg('rating'),
-            avg_difficulty=Avg('difficulty')
+            avg_difficulty=Avg('difficulty'),
         )
-        self.avg_rating = averages['avg_rating'] or 0  # Default to 0 if no reviews
-        self.avg_difficulty = averages['avg_difficulty'] or 0  # Default to 0 if no reviews
+        self.avg_rating = averages['avg_rating'] or 0  
+        self.avg_difficulty = averages['avg_difficulty'] or 0 
+
+        grade_distribution = Review.objects.filter(course=self, grade__isnull=False).values('grade').annotate(
+        count=Count('grade')
+        ).order_by('-count')
+        
+        if grade_distribution.exists():
+            self.avg_grade = grade_distribution[0]['grade']
+        else:
+            self.avg_grade = None
         self.save()
-
-
-
 
 ###################
 # PROFESSOR MODEL #
@@ -404,4 +411,3 @@ class StudyBuddyMessage(models.Model):
         
     def __str__(self):
         return f"Message from {self.sender.fname} to {self.receiver.fname} at {self.created_at}"
-    

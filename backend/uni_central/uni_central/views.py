@@ -2,7 +2,7 @@ from django.shortcuts import render, get_object_or_404
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.views import APIView
-from .models import Comment
+from .models import Comment, Course
 from .services import (
     UserService,
     DepartmentService,
@@ -198,7 +198,6 @@ class DepartmentListView(APIView):
 # Course-Related Views and APIs #
 #################################
 
-# API View for Getting Courses in a Specific Department
 class DepartmentCoursesView(APIView):
     """
     Retrieves courses for a specific department by ID.
@@ -217,7 +216,6 @@ class CourseReviewListView(APIView):
     API View to fetch details of a course and its reviews.
     """
     def get(self, request, course_id):
-        # Use service layer to retrieve data
         course = CourseService.get_course(course_id)
         reviews = ReviewService.get_reviews_by_course_sorted(course_id)
 
@@ -248,7 +246,7 @@ class ProfessorCoursesAPIView(APIView):
         except Exception as e:
             # Handle cases like invalid professor_id
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
-        
+            
 ####################################
 # Review-Related Views and APIs #
 ####################################
@@ -322,10 +320,8 @@ class UpdateReviewAPIView(APIView):
             import logging
             logging.warning(f"Received update request for review {review_id} with data: {request.data}")
             
-            # Ensure review text is being sent in the request data
             review = ReviewService.get_review_by_id(review_id)
             if review and 'review' not in request.data and review.review:
-                # If review text is not in the request data, use the existing review text
                 modified_data = dict(request.data)
                 modified_data['review'] = review.review
                 result = ReviewService.update_review(review_id, modified_data)
@@ -340,7 +336,6 @@ class UpdateReviewAPIView(APIView):
                     status=status.HTTP_200_OK
                 )
             else:
-                # Get the error message - content moderation errors are already standardized in the service
                 error_msg = result["error"]
                 return Response(
                     {"error": error_msg},
@@ -361,10 +356,8 @@ class DeleteReviewAPIView(APIView):
         """
         Calls the ReviewService to delete a review.
         """
-        # Get the review_id from the URL parameter instead of request body
         review = ReviewService.get_review_by_id(review_id)
         
-        # Check if the review exists
         if not review:
             return Response(
                 {"success": False, "error": "Review not found"},
@@ -1376,15 +1369,11 @@ class GetReviewAPIView(APIView):
                     status=status.HTTP_404_NOT_FOUND
                 )
             
-            # Check if the requesting user is the author of the review
-            # Get email from URL param for GET requests
             email = request.GET.get('email')
             
-            # Debug info
             print(f"GetReviewAPIView - Email from request: {email}")
             print(f"GetReviewAPIView - Review author: {review.user.email_address}")
             
-            # Only enforce permission check if email is provided (to allow public viewing)
             if email and email != "null" and email != review.user.email_address:
                 return Response(
                     {"error": "You don't have permission to access this review"},
@@ -1405,7 +1394,6 @@ class GetReviewAPIView(APIView):
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
 
-# Study Buddy Views and APIs
 class CreateStudyBuddyRequestView(APIView):
     """
     API View to create a new study buddy request.
@@ -1639,29 +1627,21 @@ class MessageUpdatesSSEView(APIView):
         last_status_update = 0
         
         try:
-            # Mark this user as online when they connect
             user = UserService.get_user(email_address)
             if user:
                 user_id = user.id
-                # In a production app, we'd store user online status in Redis/DB
-                # For now, we'll just send the notification
-                
-                # Add timestamp for ping events
                 last_ping = time.time()
                 
                 while True:
                     current_time = time.time()
                     
-                    # Check for new unread messages
                     result = StudyBuddyService.get_unread_message_count(email_address)
                     
                     if result["success"]:
-                        # Only send update if there's a change
                         current_state = json.dumps(result["unread_counts"])
                         if current_state != last_check.get('unread_counts'):
                             last_check['unread_counts'] = current_state
                             
-                            # Format the data for SSE
                             data = {
                                 'event': 'message_update',
                                 'unread_counts': result["unread_counts"],
@@ -1669,10 +1649,8 @@ class MessageUpdatesSSEView(APIView):
                                 'timestamp': int(current_time)
                             }
                             
-                            # Yield the SSE formatted event
                             yield f"event: message_update\ndata: {json.dumps(data)}\n\n"
                     
-                    # Send periodic ping events to keep connection alive
                     if current_time - last_ping > 15:  # Every 15 seconds
                         ping_data = {
                             'timestamp': int(current_time)
@@ -1680,16 +1658,11 @@ class MessageUpdatesSSEView(APIView):
                         yield f"event: ping\ndata: {json.dumps(ping_data)}\n\n"
                         last_ping = current_time
                     
-                    # Update user statuses every 30 seconds
                     if current_time - last_status_update > 30:
-                        # In a production app, we'd get buddy statuses from Redis/DB
-                        # For now just send random statuses
-                        # Get study buddies
                         buddy_requests = StudyBuddyService.get_buddy_status_updates(email_address)
                         if buddy_requests["success"]:
                             statuses = {}
                             for buddy in buddy_requests.get("buddies", []):
-                                # Normally we'd get real status, for demo just random
                                 import random
                                 status = "online" if random.random() > 0.3 else "offline"
                                 statuses[buddy["id"]] = {
@@ -1704,11 +1677,9 @@ class MessageUpdatesSSEView(APIView):
                             yield f"event: status_update\ndata: {json.dumps(status_data)}\n\n"
                             last_status_update = current_time
                     
-                    # Sleep to avoid excessive server load
                     time.sleep(3)
                 
         except Exception as e:
             print(f"SSE connection closed: {str(e)}")
             
-            # Send an error event
             yield f"event: error\ndata: Connection closed\n\n"
