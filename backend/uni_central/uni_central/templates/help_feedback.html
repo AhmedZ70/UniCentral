@@ -1,0 +1,150 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}UniCentral - Help & Feedback{% endblock %}
+
+{% block extra_css %}
+  <link rel="stylesheet" href="{% static 'css/help_feedback.css' %}">
+{% endblock %}
+
+{% block content %}
+  <main class="main-content">
+    <section class="container help-container">
+      <h1 class="page-title">Help & Feedback</h1>
+      
+      <div class="help-section">
+        <h2>Frequently Asked Questions</h2>
+        
+        <div class="faq-item">
+          <h3>How do I create an account?</h3>
+          <p>
+            To create an account, click on the "Sign Up" button in the top right corner of any page. 
+            You'll need to provide your email address and create a password. Once you verify your email, 
+            you'll have full access to all features.
+          </p>
+        </div>
+        
+        <div class="faq-item">
+          <h3>How do I add courses to my profile?</h3>
+          <p>
+            You can add courses to your profile by visiting the "Courses" page, finding a course you're taking,
+            and clicking the "Add to My Courses" button. You can also manage your courses from the "My Courses" page.
+          </p>
+        </div>
+        
+        <div class="faq-item">
+          <h3>How do I connect with classmates?</h3>
+          <p>
+            Once you've added courses to your profile, you can visit the "My Classmates" page to see other students
+            who are taking the same courses. From there, you can send study buddy requests to connect with them.
+          </p>
+        </div>
+        
+        <div class="faq-item">
+          <h3>How do I write a review?</h3>
+          <p>
+            To write a review, navigate to the course or professor page you want to review. Click the "Write a Review" 
+            button and fill out the review form. Your review will be posted once submitted and will help other students
+            make informed decisions.
+          </p>
+        </div>
+        
+        <div class="faq-item">
+          <h3>How do I plan my courses?</h3>
+          <p>
+            Use the "Course Planner" feature to plan your academic journey. You can add courses to different semesters,
+            track your progress, and ensure you're meeting all your degree requirements.
+          </p>
+        </div>
+      </div>
+      
+      <div class="help-section">
+        <h2>Provide Feedback</h2>
+        <p>We're always looking to improve UniCentral. Share your thoughts, suggestions, or report any issues you encounter.</p>
+        
+        <div class="feedback-form">
+          <form id="feedbackForm">
+            <div class="form-group">
+              <label for="feedbackName">Name</label>
+              <input type="text" id="feedbackName" name="name" placeholder="Your name (optional)">
+            </div>
+            
+            <div class="form-group">
+              <label for="feedbackEmail">Email*</label>
+              <input type="email" id="feedbackEmail" name="email" placeholder="Your email address" required>
+            </div>
+            
+            <div class="form-group">
+              <label for="feedbackType">Feedback Type*</label>
+              <select id="feedbackType" name="feedbackType" required>
+                <option value="">Select an option</option>
+                <option value="suggestion">Suggestion</option>
+                <option value="bug">Bug Report</option>
+                <option value="question">Question</option>
+                <option value="other">Other</option>
+              </select>
+            </div>
+            
+            <div class="form-group">
+              <label for="feedbackMessage">Message*</label>
+              <textarea id="feedbackMessage" name="message" rows="5" placeholder="Please provide details of your feedback or question" required></textarea>
+            </div>
+            
+            <div class="form-group">
+              <button type="button" id="submitFeedback" class="submit-button">Submit Feedback</button>
+            </div>
+          </form>
+          <div id="feedbackResponse" class="feedback-response"></div>
+        </div>
+      </div>
+      
+      <div class="help-section">
+        <h2>Contact Us</h2>
+        <p>
+          If you need direct assistance, you can reach us at:
+          <a href="mailto:unicentralutah@gmail.com">unicentralutah@gmail.com</a>
+        </p>
+        <p>We aim to respond to all inquiries within 48 hours.</p>
+      </div>
+      
+      <div class="back-button-container">
+        <a href="{% url 'home' %}" class="back-button">Back to Home</a>
+      </div>
+    </section>
+  </main>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  // Simple form handling
+  document.addEventListener('DOMContentLoaded', function() {
+    const feedbackForm = document.getElementById('feedbackForm');
+    const feedbackResponse = document.getElementById('feedbackResponse');
+    const submitButton = document.getElementById('submitFeedback');
+    
+    if (submitButton) {
+      submitButton.addEventListener('click', function() {
+        // Check form validity
+        const email = document.getElementById('feedbackEmail').value;
+        const message = document.getElementById('feedbackMessage').value;
+        const feedbackType = document.getElementById('feedbackType').value;
+        
+        if (!email || !message || !feedbackType) {
+          feedbackResponse.innerHTML = '<div class="error-message">Please fill out all required fields.</div>';
+          return;
+        }
+        
+        // In a real app, you would send this data to your backend
+        // For now, we'll just show a success message
+        feedbackForm.reset();
+        feedbackResponse.innerHTML = '<div class="success-message">Thank you for your feedback! We appreciate your input and will review it soon.</div>';
+        
+        // Hide the success message after 5 seconds
+        setTimeout(() => {
+          feedbackResponse.innerHTML = '';
+        }, 5000);
+      });
+    }
+  });
+</script>
+{% endblock %} 
