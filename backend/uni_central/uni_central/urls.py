@@ -71,6 +71,7 @@ from .views import (
     privacy_policy,
     help_feedback,
     team_members,
+    user_tutorial,
 )
 
 urlpatterns = [
@@ -82,6 +83,7 @@ urlpatterns = [
     path('privacy-policy/', privacy_policy, name='privacy_policy'),
     path('help-feedback/', help_feedback, name='help_feedback'),
     path('team-members/', team_members, name='team_members'),
+    path('user-tutorial/', user_tutorial, name='user_tutorial'),
 
     path(
         'courses/<int:context_id>/review/',

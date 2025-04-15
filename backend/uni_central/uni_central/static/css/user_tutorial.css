@@ -1,0 +1,260 @@
+/* General Styles */
+body {
+  font-family: 'Montserrat', sans-serif;
+  margin: 0;
+  padding: 0;
+  color: #333;
+  background-color: #f9f9f9;
+  line-height: 1.6;
+}
+
+.main-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+/* Hero Section */
+.hero {
+  text-align: center;
+  padding: 40px 20px;
+  margin-bottom: 40px;
+  background-color: #005a5b;
+  color: white;
+  border-radius: 8px;
+}
+
+.hero h1 {
+  font-family: 'Corben', cursive;
+  font-size: 2.8rem;
+  margin-bottom: 20px;
+}
+
+.hero p {
+  font-size: 1.2rem;
+  max-width: 800px;
+  margin: 0 auto;
+  line-height: 1.6;
+}
+
+/* Tutorial Navigation */
+.tutorial-nav {
+  position: sticky;
+  top: 20px;
+  background-color: white;
+  border-radius: 8px;
+  padding: 15px;
+  margin-bottom: 40px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  z-index: 100;
+}
+
+.tutorial-nav ul {
+  display: flex;
+  justify-content: center;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  flex-wrap: wrap;
+  gap: 15px;
+}
+
+.tutorial-nav a {
+  color: #333;
+  text-decoration: none;
+  padding: 10px 15px;
+  border-radius: 30px;
+  font-weight: 600;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+}
+
+.tutorial-nav a:hover, .tutorial-nav a.active {
+  background-color: #005a5b;
+  color: white;
+}
+
+/* Tutorial Sections */
+.tutorial-section {
+  background-color: white;
+  border-radius: 8px;
+  padding: 40px;
+  margin-bottom: 40px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.tutorial-section h2 {
+  color: #005a5b;
+  font-family: 'Corben', cursive;
+  font-size: 2rem;
+  margin-bottom: 30px;
+  border-bottom: 2px solid #ff743e;
+  padding-bottom: 10px;
+}
+
+.tutorial-step {
+  display: flex;
+  gap: 40px;
+  margin-bottom: 30px;
+}
+
+.step-content {
+  flex: 1;
+}
+
+.step-content h3 {
+  color: #ff743e;
+  font-size: 1.5rem;
+  margin-bottom: 15px;
+}
+
+.step-content p {
+  font-size: 1.1rem;
+  margin-bottom: 20px;
+}
+
+.step-content ol {
+  padding-left: 25px;
+}
+
+.step-content li {
+  margin-bottom: 10px;
+  font-size: 1.05rem;
+}
+
+.step-image {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.step-image img {
+  max-width: 100%;
+  border-radius: 8px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+  transition: transform 0.3s ease;
+}
+
+.step-image img:hover {
+  transform: scale(1.02);
+}
+
+/* Help Section */
+.help-section {
+  background-color: white;
+  border-radius: 8px;
+  padding: 40px;
+  margin-bottom: 40px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  text-align: center;
+}
+
+.help-section h2 {
+  color: #005a5b;
+  font-family: 'Corben', cursive;
+  font-size: 2rem;
+  margin-bottom: 20px;
+}
+
+.help-section p {
+  font-size: 1.1rem;
+  max-width: 700px;
+  margin: 0 auto 30px;
+}
+
+.help-options {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  margin-bottom: 40px;
+}
+
+.help-button, .top-button {
+  display: inline-block;
+  background-color: #005a5b;
+  color: white;
+  font-weight: 600;
+  padding: 12px 25px;
+  border-radius: 30px;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(0, 90, 91, 0.2);
+}
+
+.help-button:hover, .top-button:hover {
+  background-color: #004445;
+  transform: translateY(-3px);
+  box-shadow: 0 8px 20px rgba(0, 90, 91, 0.3);
+}
+
+.back-to-top {
+  margin-top: 30px;
+}
+
+.top-button {
+  background-color: #ff743e;
+  box-shadow: 0 4px 12px rgba(255, 116, 62, 0.2);
+}
+
+.top-button:hover {
+  background-color: #e05a20;
+  box-shadow: 0 8px 20px rgba(255, 116, 62, 0.3);
+}
+
+/* Footer */
+footer {
+  background-color: #333;
+  color: white;
+  text-align: center;
+  padding: 20px;
+  margin-top: 50px;
+}
+
+/* Responsive Styles */
+@media (max-width: 900px) {
+  .tutorial-step {
+    flex-direction: column;
+  }
+  
+  .step-image {
+    order: -1;
+    margin-bottom: 20px;
+  }
+  
+  .tutorial-section {
+    padding: 30px;
+  }
+  
+  .help-section {
+    padding: 30px;
+  }
+}
+
+@media (max-width: 600px) {
+  .hero h1 {
+    font-size: 2.2rem;
+  }
+  
+  .tutorial-section h2 {
+    font-size: 1.7rem;
+  }
+  
+  .tutorial-nav {
+    padding: 10px;
+  }
+  
+  .tutorial-nav a {
+    padding: 8px 12px;
+    font-size: 0.9rem;
+  }
+  
+  .help-options {
+    flex-direction: column;
+    gap: 15px;
+  }
+  
+  .tutorial-section, .help-section {
+    padding: 20px;
+  }
+} 

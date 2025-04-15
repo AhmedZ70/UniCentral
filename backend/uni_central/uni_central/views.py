@@ -190,6 +190,10 @@ def team_members(request):
     """Render the team members page."""
     return render(request, 'team_members.html')
 
+def user_tutorial(request):
+    """Render the user tutorial page."""
+    return render(request, 'user_tutorial.html')
+
 #####################################
 # Department-Related Views and APIs #
 #####################################
