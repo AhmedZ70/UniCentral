@@ -57,8 +57,8 @@ html {
 }
 
 /* ===========================
-      Filter and Sort Section
-      =========================== */
+    Filter and Sort Section
+=========================== */
 .filter-sort-container {
   display: flex;
   flex-wrap: wrap;
@@ -71,22 +71,6 @@ html {
   max-width: 1400px;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
   border: 3px solid black;
-}
-
-.filter-sort-container input[type="text"]::placeholder {
-  font-family: 'Agrandir', sans-serif;
-  font-size: 20px;
-  line-height: 1;
-  vertical-align: middle;
-}
-
-.search-input {
-  padding: 8px 12px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  font-size: 14px;
-  flex: 1;
-  padding: 10px 15px;
 }
 
 .search-input::placeholder {
