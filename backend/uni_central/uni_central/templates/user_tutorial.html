@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  {% load static %}
+  <meta charset="UTF-8">
+  <link rel="icon" href="{% static 'assets/logo_black.png' %}">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>UniCentral User Tutorial</title>
+  <!-- Page-Specific Styles -->
+  <link rel="stylesheet" href="{% static 'css/user_tutorial.css' %}">
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Corben:wght@400;700&family=Montserrat:ital,wght@0,100..900;1,100..900&family=Sigmar&family=Sniglet:wght@400;800&display=swap" rel="stylesheet">
+  <script type="module" src="{% static 'js/auth.js' %}"></script>
+</head>
+<body>
+
+  <!-- Navbar -->
+  {% include 'partials/navbar.html' %}
+
+  <!-- Main Content -->
+  <main class="main-content">
+    <section class="hero">
+      <div class="text-content">
+        <h1>User Tutorial</h1>
+        <p>Get started with UniCentral in under 5 minutes! This quick guide will help you make the most of our platform's features.</p>
+      </div>
+    </section>
+    
+    <!-- Tutorial Navigation -->
+    <nav class="tutorial-nav">
+      <ul>
+        <li><a href="#getting-started">Getting Started</a></li>
+        <li><a href="#finding-courses">Finding Courses</a></li>
+        <li><a href="#course-reviews">Course Reviews</a></li>
+        <li><a href="#study-buddies">Study Buddies</a></li>
+        <li><a href="#course-planner">Course Planner</a></li>
+      </ul>
+    </nav>
+    
+    <!-- Getting Started Section -->
+    <section id="getting-started" class="tutorial-section">
+      <h2>1. Getting Started</h2>
+      
+      <div class="tutorial-step">
+        <div class="step-content">
+          <h3>Create Your Account</h3>
+          <p>Sign up with your university email to access all features of UniCentral.</p>
+          <ol>
+            <li>Click "Register" in the top navigation bar</li>
+            <li>Enter your email address</li>
+            <li>Fill in your name and set a password</li>
+          </ol>
+        </div>
+        <div class="step-image">
+          <img src="{% static 'assets/screenshots/tutorial/signup_screen.jpg' %}" alt="Signup Screen">
+        </div>
+      </div>
+    </section>
+    
+    <!-- Finding Courses Section -->
+    <section id="finding-courses" class="tutorial-section">
+      <h2>2. Finding Courses</h2>
+      
+      <div class="tutorial-step">
+        <div class="step-content">
+          <h3>Browse & Filter Courses</h3>
+          <p>UniCentral makes it easy to find the perfect courses for your needs.</p>
+          <ol>
+            <li>Navigate to the "Courses" page from the main menu</li>
+            <li>Browse courses by department or use the search function</li>
+            <li>Apply filters to narrow down results by difficulty, rating, or credits</li>
+            <li>Click on any course to view detailed information</li>
+          </ol>
+        </div>
+        <div class="step-image">
+          <img src="{% static 'assets/screenshots/courese_filtring.jpg' %}" alt="Course Filtering">
+        </div>
+      </div>
+    </section>
+    
+    <!-- Course Reviews Section -->
+    <section id="course-reviews" class="tutorial-section">
+      <h2>3. Course Reviews</h2>
+      
+      <div class="tutorial-step">
+        <div class="step-content">
+          <h3>Read & Write Course Reviews</h3>
+          <p>Get insights from peers and share your own experiences.</p>
+          <ol>
+            <li>On any course page, scroll down to see reviews</li>
+            <li>Click "Write a Review" to share your experience</li>
+            <li>Rate the course on difficulty, workload, and overall quality</li>
+            <li>Add detailed comments to help other students</li>
+            <li>Optionally submit anonymously for privacy</li>
+          </ol>
+        </div>
+        <div class="step-image">
+          <img src="{% static 'assets/screenshots/course_reviews.jpg' %}" alt="Course Reviews">
+        </div>
+      </div>
+    </section>
+    
+    <!-- Study Buddies Section -->
+    <section id="study-buddies" class="tutorial-section">
+      <h2>4. Study Buddies</h2>
+      
+      <div class="tutorial-step">
+        <div class="step-content">
+          <h3>Connect with Classmates</h3>
+          <p>Find and message classmates to form study groups or get help.</p>
+          <ol>
+            <li>Navigate to "My Classmates" from your dashboard</li>
+            <li>Browse students in your enrolled courses</li>
+            <li>Click "Connect" to send a study buddy request</li>
+            <li>Once connected, exchange messages through the built-in chat</li>
+          </ol>
+        </div>
+        <div class="step-image">
+          <img src="{% static 'assets/screenshots/study_buddies.jpg' %}" alt="Study Buddies">
+        </div>
+      </div>
+    </section>
+    
+    <!-- Course Planning Section -->
+    <section id="course-planner" class="tutorial-section">
+      <h2>5. Course Planner</h2>
+      
+      <div class="tutorial-step">
+        <div class="step-content">
+          <h3>Plan Your Academic Journey</h3>
+          <p>Map out your entire degree program with our semester planner.</p>
+          <ol>
+            <li>Go to "Course Planner" from your dashboard</li>
+            <li>Create semesters by clicking "Add Semester"</li>
+            <li>Search for courses and add them into your plan</li>
+            <li>The planner will show credit totals</li>
+            <li>Optionally upload your transcript to import past courses</li>
+          </ol>
+        </div>
+        <div class="step-image">
+          <img src="{% static 'assets/screenshots/course_planner.jpg' %}" alt="Course Planner">
+        </div>
+      </div>
+    </section>
+    
+    <!-- Discussion Boards Section -->
+    <section id="discussion-boards" class="tutorial-section">
+      <h2>6. Discussion Boards</h2>
+      
+      <div class="tutorial-step">
+        <div class="step-content">
+          <h3>Participate in Course Discussions</h3>
+          <p>Ask questions and share insights with the entire class community.</p>
+          <ol>
+            <li>From any course page, click on the "Discussions" tab</li>
+            <li>Browse existing threads or create a new topic</li>
+            <li>Reply to questions from other students</li>
+          </ol>
+        </div>
+        <div class="step-image">
+          <img src="{% static 'assets/screenshots/discuusion_boards.jpg' %}" alt="Discussion Boards">
+        </div>
+      </div>
+    </section>
+    
+    <!-- Need More Help Section -->
+    <section class="help-section">
+      <h2>Need More Help?</h2>
+      <p>We're here to support you! If you have any questions or need assistance, please reach out:</p>
+      <div class="help-options">
+        <a href="{% url 'help_feedback' %}" class="help-button">Visit Help Center</a>
+        <a href="mailto:unicentralutah@gmail.com" class="help-button">Email Support</a>
+      </div>
+      
+      <div class="back-to-top">
+        <a href="#" class="top-button">Back to Top</a>
+      </div>
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <footer>
+    <p>&copy; 2025 UniCentral. All Rights Reserved.</p>
+  </footer>
+
+  <script>
+    // Smooth scrolling for anchor links
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+      anchor.addEventListener('click', function (e) {
+        e.preventDefault();
+        const targetId = this.getAttribute('href');
+        if (targetId === '#') {
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        } else {
+          document.querySelector(targetId).scrollIntoView({
+            behavior: 'smooth'
+          });
+        }
+      });
+    });
+    
+    // Highlight current section in navigation
+    window.addEventListener('scroll', function() {
+      const sections = document.querySelectorAll('.tutorial-section');
+      const navLinks = document.querySelectorAll('.tutorial-nav a');
+      
+      let currentSection = '';
+      
+      sections.forEach(section => {
+        const sectionTop = section.offsetTop;
+        const sectionHeight = section.clientHeight;
+        
+        if (pageYOffset >= (sectionTop - 100)) {
+          currentSection = section.getAttribute('id');
+        }
+      });
+      
+      navLinks.forEach(link => {
+        link.classList.remove('active');
+        if (link.getAttribute('href') === `#${currentSection}`) {
+          link.classList.add('active');
+        }
+      });
+    });
+  </script>
+</body>
+</html> 

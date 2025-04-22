@@ -1,0 +1,746 @@
+/* ============================================= */
+/* General                                       */
+/* ============================================= */
+body, html, ul, li, p, h1, h2, select {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Montserrat', sans-serif;
+  line-height: 1.6;
+  background-color: #FAF8F0;
+}
+
+@font-face {
+  font-family: 'Agrandir';
+  src: url('../assets/fonts/Agrandir-Regular.otf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+/* ============================================= */
+/* Navbar Styles                                 */
+/* ============================================= */
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 2rem;
+  font-weight: 100;
+  font-size: 20px;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: #333333;
+}
+
+.logo img {
+  width: 200px;
+  margin-right: 8px;
+}
+
+.logo-home-btn {
+  border: none;
+  background-color: #FAF8F0;
+}
+
+.nav-links {
+  display: flex;
+  list-style: none;
+}
+
+.nav-links li {
+  margin-left: 2rem;
+}
+
+.nav-links a {
+  text-decoration: none;
+  color: #333333;
+  font-weight: bold;
+}
+
+.nav-links a:hover {
+  color: #005a5b;
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+}
+
+.register-btn {
+  background-color: #005a5b;
+  color: #FAF8F0;
+  border: none;
+  font-family: 'Agrandir', sans-serif;
+  font-size: 20px;
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.register-btn:hover {
+  background-color: #007d7d;
+}
+
+.welcome-message {
+  color: #005a5b;
+  font-weight: bold;
+  margin-right: 1rem;
+  display: inline-block;
+  font-family: 'Montserrat', sans-serif;
+}
+
+/* ============================================= */
+/* Hero Section                                   */
+/* ============================================= */
+.hero {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 3rem 2rem;
+}
+
+.text-container {
+  position: relative;
+  z-index: 1;
+}
+
+.text-content {
+  max-width: 50%;
+  font-family: 'Agrandir', sans-serif;
+}
+
+.text-content h1 {
+  font-size: 2.5rem;
+  font-family: 'Agrandir', sans-serif;
+  font-size: 75px;
+  color: #005a5b;
+  margin-left: 75px;
+  margin-right: -60px;
+}
+
+.text-content p:first-of-type {
+  margin-top: 0.5rem;
+  font-family: 'Poppins-light', sans-serif;
+  font-weight: 50;
+  font-size: 25px;
+  color: black;
+  margin-left: 75px;
+}
+
+.orange-arrow {
+  position: absolute;
+  top: 90px;
+  left: 30px;
+  width: 150px;
+  height: auto;
+  z-index: 0;
+}
+
+/* ============================================= */
+/* Search Bar                                     */
+/* ============================================= */
+.search-bar {
+  display: flex;
+  align-items: center;
+  height: 10px;
+  gap: 10px;
+  position: relative;
+  padding: 0.5rem;
+  z-index: 1;
+  margin-left: 65px;
+  margin-top: 100px;
+  margin-bottom: 40px;
+}
+
+.search-input {
+  font-family: 'Agrandir', sans-serif;
+  font-size: 25px;
+  color: #02634f;
+  padding: 0.5rem 1rem;
+  width: 400px;
+  flex: none;
+  border-radius: 12px;
+  border: 3px solid #005a5b;
+  z-index: 2;
+}
+
+.search-input::placeholder {
+  font-family: 'Agrandir', sans-serif;
+  font-size: 25px;
+  color: #02634f;
+}
+
+.search-btn {
+  background-color: #005a5b;
+  font-family: 'Agrandir', sans-serif;
+  font-size: 30px;
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: bold;
+  z-index: 2;
+}
+
+.search-btn:hover {
+  background-color: #007d7d;
+}
+
+.text-content p:last-of-type {
+  margin-top: 0.5rem;
+  font-family: 'Poppins-light', sans-serif;
+  font-weight: 50;
+  font-size: 25px;
+  color: white;
+  margin-left: 60px;
+  margin-bottom: 20px;
+}
+
+/* Illustration */
+.illustrations img {
+  width: 525px;
+  height: auto;
+  margin-right: 50px;
+  margin-bottom: 180px;
+}
+
+
+
+/* ============================================= */
+/* Active Link Styling                            */
+/* ============================================= */
+.nav-links a.active {
+  color: #005a5b;
+  font-weight: bold;
+  position: relative;
+}
+
+.nav-links a.active::after {
+  content: "";
+  display: block;
+  width: 100%;
+  height: 2px;
+  background-color: #005a5b;
+  margin-top: 5px;
+}
+
+/* ============================================= */
+/* Professor Page Styles                            */
+/* ============================================= */
+
+/* Base Styles for Containers */
+#departments-title, #professors-title {
+  margin-top: 2rem;
+  font-size: 1.5rem;
+  font-weight: bold;
+  padding-left: 50px; /* Ensure proper spacing from the left */
+}
+
+/* Visibility Classes */
+.hidden {
+  visibility: hidden;
+  opacity: 0;
+  display: none;
+  transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+.visible {
+  visibility: visible;
+  opacity: 1;
+  display: block;
+  transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+/* Fade Transitions */
+.fade-in {
+  opacity: 1;
+  transition: opacity 0.3s ease;
+}
+
+.fade-out {
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+/* Letter Headers */
+.letter-header {
+  display: block;
+  font-weight: bold;
+  font-size: 1.2rem;
+  margin-bottom: 10px;
+  color: #fa743e;
+}
+
+/* Letter Group */
+.letter-group {
+  margin-bottom: 0;
+}
+
+/* Breadcrumb Link Styles */
+#breadcrumb {
+  display: flex;
+  align-items: center;
+  font-size: 1.1rem;
+  margin: 1rem 0;
+  padding-left: 50px;
+  color: #333;
+}
+
+.breadcrumb-link {
+  color: #fa743e;
+  text-decoration: none;
+  font-weight: bold;
+  margin-right: 5px;
+  position: relative;
+  transition: color 0.2s ease;
+}
+
+.breadcrumb-link:hover {
+  color: #e05a20;
+}
+
+.breadcrumb-link::after {
+  content: "";
+  position: absolute;
+  width: 100%;
+  height: 2px;
+  bottom: -2px;
+  left: 0;
+  background-color: #fa743e;
+  transform: scaleX(0);
+  transition: transform 0.2s ease;
+  transform-origin: bottom left;
+}
+
+.breadcrumb-link:hover::after {
+  transform: scaleX(1);
+}
+
+/* Course Item Styles */
+.professor-item {
+  border: 2px solid #fa743e;
+  border-radius: 8px;
+  padding: 10px;
+  margin-bottom: 20px; /* Consistent bottom margin */
+  color: #333;
+  transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease, font-weight 0.3s ease;
+  background-color: #fff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+}
+
+.professor-item:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 12px rgba(0, 90, 91, 0.15);
+  font-weight: bold;
+  border-color: #005a5b;
+}
+
+/* Courses Header */
+.professors-header {
+  display: flex;
+  justify-content: center;
+  align-items: baseline;
+  gap: 10px;
+  margin-top: 2rem;
+}
+
+.professors-header h1 {
+  font-size: 2.5rem;
+  color: #fa743e;
+  margin: 0;
+  line-height: 1;
+}
+
+/* University Select Dropdown */
+.university-select {
+  padding: 0.5rem 1rem;
+  font-size: 1rem;
+  border: 2px solid #fa743e;
+  border-radius: 5px;
+  max-width: 300px;
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* Section Headers */
+.professors-page h1 {
+  font-size: 2.5rem;
+  color: #fa743e;
+  margin-bottom: 1rem;
+}
+
+.professors-page h2 {
+  font-size: 1.8rem;
+  color: #333;
+  margin: 2rem 0 1rem 0;
+}
+
+/* Department Link Styling */
+.department-link {
+  text-decoration: none;
+  color: inherit;
+}
+
+.department-link:hover .department {
+  background-color: #e8f5e9;
+  cursor: pointer;
+}
+
+/* Departments Container */
+.departments {
+  max-width: 100%;
+  margin: 2rem auto;
+  padding: 1rem 20px;
+  padding-left: 50px;
+}
+
+/* Departments Grouping */
+.department-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: flex-start;
+  margin-left: 0;
+}
+
+/* Department Card */
+.department {
+  width: 160px;
+  height: 130px;
+  padding: 10px;
+  border: 2px solid #218a67;
+  border-radius: 8px;
+  text-align: center;
+  font-size: 18px;
+  color: #218a67;
+  background-color: #fff;
+  cursor: pointer;
+  transition: transform 0.3s ease, background-color 0.3s ease, font-weight 0.3s ease, box-shadow 0.3s ease;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.department:hover {
+  transform: translateY(-5px);
+  font-weight: bold;
+  box-shadow: 0 8px 16px rgba(33, 138, 103, 0.2);
+}
+
+/* ============================================= */
+/* Footer                                         */
+/* ============================================= */
+footer {
+  margin-top: 2rem;
+  padding: 1rem;
+  font-size: 0.9rem;
+  background-color: #fafafa;
+  color: #333333;
+}
+
+/* ============================================= */
+/* Courses Container                              */
+/* ============================================= */
+.professors {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 0 20px;
+  overflow: hidden;
+}
+
+/* ============================================= */
+/* Courses List                                   */
+/* ============================================= */
+.professors-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 20px; /* Creates a 20px gap between each .course-item */
+}
+
+.professor-link {
+  text-decoration: none;
+  color: #333;
+  padding-bottom: 1em;
+}
+
+.professor-link:hover {
+  color: inherit;
+  box-shadow: none;
+  margin: 0;
+}
+
+.professor-item h4 {
+  margin-bottom: 0.5rem;
+  font-size: 1.25rem;
+  color: #005a5b;
+}
+
+.professor-item p {
+  font-size: 1rem;
+  color: #666;
+}
+
+.alphabet-navigation {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  padding: 10px 0;
+  background-color: #FAF8F0;
+  position: sticky;
+  top: 0;
+  z-index: 75;
+  margin-bottom: 20px;
+  font-size: 1.2rem;
+}
+
+.alphabet-link {
+  display: inline-block;
+  padding: 5px 10px;
+  border-radius: 4px;
+  color: #005a5b;
+  text-decoration: none;
+  font-weight: bold;
+  transition: background-color 0.2s;
+}
+
+.alphabet-link:hover {
+  transform: scale(1.3); 
+}
+
+/* Additional Responsive Styles */
+@media (max-width: 768px) {
+  .navbar {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .logo img {
+    width: 150px;
+  }
+
+  .nav-links {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .nav-links li {
+    margin-left: 0;
+    margin-top: 1rem;
+  }
+
+  .hero {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .text-content {
+    max-width: 100%;
+  }
+
+  .illustrations img {
+    width: 100%;
+  }
+
+  .department-container {
+    justify-content: center;
+  }
+
+  .professors-header {
+    flex-direction: column;
+  }
+}
+
+/* Fix for professor/department containers to enable transitions */
+#departments, #professors {
+  min-height: 200px;
+  position: relative;
+  width: 100%;
+}
+
+/* Loading spinner */
+.loading-spinner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  color: #005a5b;
+}
+
+.spinner {
+  width: 50px;
+  height: 50px;
+  border: 5px solid #f3f3f3;
+  border-top: 5px solid #005a5b;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 1rem;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Error and no results messages */
+.error-message, .no-results {
+  text-align: center;
+  padding: 2rem;
+  background-color: #f8f8f8;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  margin: 1rem 0;
+}
+
+.error-message {
+  border-left: 4px solid #e53935;
+  color: #e53935;
+}
+
+.no-results {
+  border-left: 4px solid #fb8c00;
+  color: #fb8c00;
+}
+
+.retry-button {
+  background-color: #005a5b;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 4px;
+  margin-top: 1rem;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.retry-button:hover {
+  background-color: #007d7d;
+}
+
+/* Breadcrumb styles */
+#breadcrumb {
+  display: flex;
+  align-items: center;
+  font-size: 1.1rem;
+  margin: 1rem 0;
+  padding-left: 50px;
+  color: #333;
+}
+
+.breadcrumb-link {
+  color: #fa743e;
+  text-decoration: none;
+  font-weight: bold;
+  margin-right: 5px;
+  position: relative;
+  transition: color 0.2s ease;
+  display: flex;
+  align-items: center;
+}
+
+.back-arrow {
+  margin-right: 5px;
+  font-size: 1.2em;
+}
+
+.breadcrumb-separator {
+  margin: 0 10px;
+  color: #666;
+}
+
+.current-department {
+  font-weight: 600;
+  color: #005a5b;
+}
+
+.breadcrumb-link:hover {
+  color: #e05a20;
+}
+
+/* Animations for list items - make them visible by default */
+.department-link, .professor-link {
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 0.4s ease, transform 0.4s ease;
+}
+
+/* Only apply transition effects for appear class */
+.department-link.fade, .professor-link.fade {
+  opacity: 0;
+  transform: translateY(20px);
+}
+
+.department-link.appear, .professor-link.appear {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Empty letter state in alphabet navigation */
+.alphabet-link.empty-letter {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.alphabet-link.empty-letter:hover {
+  transform: none;
+}
+
+/* Professor search container and input */
+.professor-search-container {
+  margin: 20px auto;
+  width: 100%; 
+  max-width: 800px;
+  position: relative;
+  padding: 0 20px;
+  display: flex;
+  justify-content: center; 
+}
+
+.professor-search-input {
+  width: 100%;
+  padding: 12px 20px;
+  box-sizing: border-box;
+  font-size: 16px;
+  border: 2px solid #005a5b;
+  border-radius: 20px;
+  font-family: 'Montserrat', sans-serif;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+}
+
+.professor-search-input:focus {
+  outline: none;
+  border-color: #4a90e2;
+  box-shadow: 0 2px 10px rgba(74, 144, 226, 0.2);
+}
+
+.professor-search-input::placeholder {
+  color: #999;
+}
+
+.no-search-results {
+  padding: 20px;
+  text-align: center;
+  color: #666;
+  font-size: 16px;
+  background-color: #f8f8f8;
+  border-radius: 8px;
+  margin: 20px 0;
+  max-width: 800px;
+  margin-left: auto;
+  margin-right: auto;
+}

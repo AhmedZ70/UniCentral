@@ -178,6 +178,22 @@ def professors(request):
     """
     return render(request, 'professors.html')
 
+def privacy_policy(request):
+    """Render the privacy policy page."""
+    return render(request, 'privacy_policy.html')
+
+def help_feedback(request):
+    """Render the help and feedback page."""
+    return render(request, 'help_feedback.html')
+
+def team_members(request):
+    """Render the team members page."""
+    return render(request, 'team_members.html')
+
+def user_tutorial(request):
+    """Render the user tutorial page."""
+    return render(request, 'user_tutorial.html')
+
 #####################################
 # Department-Related Views and APIs #
 #####################################

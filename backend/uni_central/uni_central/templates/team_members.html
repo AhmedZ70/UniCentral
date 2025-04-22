@@ -1,0 +1,117 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}UniCentral - Team Members{% endblock %}
+
+{% block extra_css %}
+  <!-- Page-specific CSS -->
+  <link rel="stylesheet" href="{% static 'css/team_members.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="team-page">
+  <h1 class="page-title">Meet Our Team</h1>
+  
+  <div class="team-introduction">
+    <p>UniCentral was developed by a dedicated team of Computer Science students at the University of Utah. 
+    Our diverse skills and shared commitment to improving the student experience have resulted in this comprehensive 
+    platform designed to help you navigate your academic journey.</p>
+  </div>
+  
+  <!-- Joe Corbeil -->
+  <div class="team-member">
+    <div class="member-image">
+      <img src="{% static 'assets/team/joe.JPG' %}" alt="Joe Corbeil">
+    </div>
+    <div class="member-content">
+      <h2 class="member-name">Joe Corbeil</h2>
+      <div class="member-contact">
+        <a href="mailto:josephcorbeil2@gmail.com">
+          <span class="contact-icon">✉️</span>josephcorbeil2@gmail.com
+        </a>
+        <a href="https://www.linkedin.com/in/josephcorbeil/" target="_blank">
+          <span class="contact-icon">🔗</span>linkedin.com/in/josephcorbeil
+        </a>
+      </div>
+      <div class="member-bio">
+        <p>I am a senior Computer Science major at the University of Utah with interests in Computer Graphics, Visual Computing, 
+        Image Processing, AI, and Machine Learning. Proficient in Python, Java, C#, C++, and Bash. As a member of SHPE, I 
+        collaborate on projects promoting STEM diversity. Outside academics, I enjoy working on cars, skiing, snowboarding, 
+        and weightlifting.</p>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Victoria Locke -->
+  <div class="team-member">
+    <div class="member-image">
+      <img src="{% static 'assets/team/tori.JPG' %}" alt="Victoria Locke">
+    </div>
+    <div class="member-content">
+      <h2 class="member-name">Victoria Locke</h2>
+      <div class="member-contact">
+        <a href="mailto:victoriajlocke614@gmail.com">
+          <span class="contact-icon">✉️</span>victoriajlocke614@gmail.com
+        </a>
+        <a href="https://www.linkedin.com/in/victorialocke0/" target="_blank">
+          <span class="contact-icon">🔗</span>linkedin.com/in/victorialocke0
+        </a>
+      </div>
+      <div class="member-bio">
+        <p>Senior Computer Science major at the University of Utah. Skilled in source control, teamwork, and rapid learning. 
+        Passionate about creating intuitive software solutions. When not coding, I hike with my dogs and explore Utah's outdoors.</p>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Raj Reddy -->
+  <div class="team-member">
+    <div class="member-image">
+      <img src="{% static 'assets/team/raj.jpg' %}" alt="Raj Reddy">
+    </div>
+    <div class="member-content">
+      <h2 class="member-name">Raj Reddy</h2>
+      <div class="member-contact">
+        <a href="mailto:rajreddy23@outlook.com">
+          <span class="contact-icon">✉️</span>rajreddy23@outlook.com
+        </a>
+        <a href="https://www.linkedin.com/in/raj-reddy1/" target="_blank">
+          <span class="contact-icon">🔗</span>linkedin.com/in/raj-reddy1
+        </a>
+      </div>
+      <div class="member-bio">
+        <p>Senior CS student at the University of Utah specializing in AI, Machine Learning, and Computer Vision. 
+        Proficient in Python, C/C++, Java, and web technologies (JS/HTML/CSS). An avid soccer player, guitarist, and 
+        reader who balances tech with creativity.</p>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Ahmed Zahran -->
+  <div class="team-member">
+    <div class="member-image">
+      <img src="{% static 'assets/team/ahmed.JPG' %}" alt="Ahmed Zahran">
+    </div>
+    <div class="member-content">
+      <h2 class="member-name">Ahmed Zahran</h2>
+      <div class="member-contact">
+        <a href="mailto:ahmedemzahran@gmail.com">
+          <span class="contact-icon">✉️</span>ahmedemzahran@gmail.com
+        </a>
+        <a href="https://www.linkedin.com/in/ahmed-zahran7/" target="_blank">
+          <span class="contact-icon">🔗</span>linkedin.com/in/ahmed-zahran7
+        </a>
+      </div>
+      <div class="member-bio">
+        <p>Senior CS major at the University of Utah with expertise in C/C++, Python, and image processing. 
+        Founder/president of ColorStack at the U, fostering community for underrepresented CS students. 
+        Enjoys snowboarding, weightlifting, and rock climbing.</p>
+      </div>
+    </div>
+  </div>
+  
+  <div class="text-center">
+    <a href="{% url 'about' %}" class="back-button">Back to About Page</a>
+  </div>
+</div>
+{% endblock %} 
