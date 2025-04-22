@@ -5,46 +5,48 @@
   <meta charset="UTF-8">
   <link rel="icon" href="{% static 'assets/logo_black.png' %}">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>UniCentral - My Classmates</title>
-  
-  <!-- Custom CSS -->
+  <title>My Classmates</title>
   <link rel="stylesheet" href="{% static 'css/my_classmates.css' %}">
-  
-  <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Corben:wght@400;700&family=Montserrat:ital,wght@0,100..900;1,100..900&family=Sigmar&family=Sniglet:wght@400;800&display=swap" rel="stylesheet">
-  
-  <!-- Firebase Auth and Custom JS Modules -->
-  <script type="module" src="{% static 'js/auth.js' %}"></script>
-  <script type="module" src="{% static 'js/my_classmates.js' %}"></script>
+    <script type="module" src="{% static 'js/my_classmates.js' %}"></script>
 </head>
 <body>
   {% include 'partials/navbar.html' %}
   <main class="main-content">
     <section class="hero">
       <div class="text-content">
-        <div class="text-container">
-          <h1>My Classmates</h1>
-        </div>
-        <div class="search-bar">
-          <p>Search for a classmate</p>
-          <input type="text" class="search-input" placeholder="Type a name or class">
-          <button class="search-btn">SEARCH &#10140;</button>
-        </div>
+        <h1>My Classmates</h1>
       </div>
     </section>
-    <div class="my-classmates">
-      <div class="search-add-classmate">
-        <select class="classmate-filter">
-          <option value="a-z">A - Z</option>
-          <option value="newest-oldest">Newest - Oldest</option>
-          <option value="oldest-newest">Oldest - Newest</option>    
-        </select>
-      </div>
+
+    <div class="filter-sort-container">
+      <input
+        type="text"
+        id="search-input"
+        class="search-input"
+        placeholder="Search by classmate's name..."
+      />
+      <label for="sort-by">Sort by:</label>
+      <select id="sort-by" class="classmate-filter">
+        <option value="a-z">Name (A-Z)</option>
+        <option value="newest-oldest">Newest - Oldest</option>
+        <option value="oldest-newest">Oldest - Newest</option>
+      </select>
+    </div>
+
+    <div class="classmate-grid-container">
       <div class="classmate-grid">
-        <!-- Classmate cards will be dynamically injected here by my_classmates.js -->
       </div>
+    </div>
+
+    <div id="no-classmates-added-message" style="display: none;">
+      <p>You haven't added any courses with classmates yet. Add courses to find classmates.</p>
+    </div>
+
+    <div id="no-classmates-match-search-message" style="display: none;">
+      <p>No classmates match your search criteria.</p>
     </div>
   </main>
   
@@ -71,12 +73,5 @@
       </form>
     </div>
   </div>
-  
-  <!-- 
-    IMPORTANT: The JS file fetches classmates from the endpoint
-    /api/my_classmates/<user_email>/.
-    If you see a 404 error in your logs (as with /api/my_classmates/joedoe@gmail.com/),
-    ensure that your backend defines this route or update the fetch URL in my_classmates.js accordingly.
-  -->
 </body>
 </html>

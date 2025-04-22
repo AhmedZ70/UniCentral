@@ -65,7 +65,9 @@
     transform: translateY(-3px);
     font-weight: bold;
     border-color: #005a5b;
-    box-shadow: 0 6px 12px rgba(0, 90, 91, 0.15);
+    box-shadow: 0 6px 12px 0 rgba(0, 90, 91, 0.15);
+    position: relative;
+    z-index: 1;
   }
   
   .courses-header {
@@ -190,6 +192,10 @@
   .course-item p {
     font-size: 1rem;
     color: #666;
+  }
+
+  .courses.visible {
+    padding-top: 3px;
   }
 
   .alphabet-navigation {

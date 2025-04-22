@@ -494,6 +494,10 @@ footer {
   color: #666;
 }
 
+.professors.visible {
+  padding-top: 3px;
+}
+
 .alphabet-navigation {
   display: flex;
   justify-content: center;

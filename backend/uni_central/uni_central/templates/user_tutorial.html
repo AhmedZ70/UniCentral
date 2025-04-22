@@ -6,20 +6,16 @@
   <link rel="icon" href="{% static 'assets/logo_black.png' %}">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>UniCentral User Tutorial</title>
-  <!-- Page-Specific Styles -->
   <link rel="stylesheet" href="{% static 'css/user_tutorial.css' %}">
-  <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Corben:wght@400;700&family=Montserrat:ital,wght@0,100..900;1,100..900&family=Sigmar&family=Sniglet:wght@400;800&display=swap" rel="stylesheet">
-  <script type="module" src="{% static 'js/auth.js' %}"></script>
+  <script type="module" src="{% static 'js/user_tutorial.js' %}"></script>
 </head>
 <body>
 
-  <!-- Navbar -->
   {% include 'partials/navbar.html' %}
 
-  <!-- Main Content -->
   <main class="main-content">
     <section class="hero">
       <div class="text-content">
@@ -28,7 +24,6 @@
       </div>
     </section>
     
-    <!-- Tutorial Navigation -->
     <nav class="tutorial-nav">
       <ul>
         <li><a href="#getting-started">Getting Started</a></li>
@@ -39,7 +34,6 @@
       </ul>
     </nav>
     
-    <!-- Getting Started Section -->
     <section id="getting-started" class="tutorial-section">
       <h2>1. Getting Started</h2>
       
@@ -59,7 +53,6 @@
       </div>
     </section>
     
-    <!-- Finding Courses Section -->
     <section id="finding-courses" class="tutorial-section">
       <h2>2. Finding Courses</h2>
       
@@ -75,12 +68,11 @@
           </ol>
         </div>
         <div class="step-image">
-          <img src="{% static 'assets/screenshots/courese_filtring.jpg' %}" alt="Course Filtering">
+          <img src="{% static 'assets/screenshots/course_filtering.jpg' %}" alt="Course Filtering">
         </div>
       </div>
     </section>
     
-    <!-- Course Reviews Section -->
     <section id="course-reviews" class="tutorial-section">
       <h2>3. Course Reviews</h2>
       
@@ -102,7 +94,6 @@
       </div>
     </section>
     
-    <!-- Study Buddies Section -->
     <section id="study-buddies" class="tutorial-section">
       <h2>4. Study Buddies</h2>
       
@@ -123,7 +114,6 @@
       </div>
     </section>
     
-    <!-- Course Planning Section -->
     <section id="course-planner" class="tutorial-section">
       <h2>5. Course Planner</h2>
       
@@ -145,7 +135,6 @@
       </div>
     </section>
     
-    <!-- Discussion Boards Section -->
     <section id="discussion-boards" class="tutorial-section">
       <h2>6. Discussion Boards</h2>
       
@@ -165,7 +154,6 @@
       </div>
     </section>
     
-    <!-- Need More Help Section -->
     <section class="help-section">
       <h2>Need More Help?</h2>
       <p>We're here to support you! If you have any questions or need assistance, please reach out:</p>
@@ -180,50 +168,8 @@
     </section>
   </main>
 
-  <!-- Footer -->
   <footer>
     <p>&copy; 2025 UniCentral. All Rights Reserved.</p>
   </footer>
-
-  <script>
-    // Smooth scrolling for anchor links
-    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-      anchor.addEventListener('click', function (e) {
-        e.preventDefault();
-        const targetId = this.getAttribute('href');
-        if (targetId === '#') {
-          window.scrollTo({ top: 0, behavior: 'smooth' });
-        } else {
-          document.querySelector(targetId).scrollIntoView({
-            behavior: 'smooth'
-          });
-        }
-      });
-    });
-    
-    // Highlight current section in navigation
-    window.addEventListener('scroll', function() {
-      const sections = document.querySelectorAll('.tutorial-section');
-      const navLinks = document.querySelectorAll('.tutorial-nav a');
-      
-      let currentSection = '';
-      
-      sections.forEach(section => {
-        const sectionTop = section.offsetTop;
-        const sectionHeight = section.clientHeight;
-        
-        if (pageYOffset >= (sectionTop - 100)) {
-          currentSection = section.getAttribute('id');
-        }
-      });
-      
-      navLinks.forEach(link => {
-        link.classList.remove('active');
-        if (link.getAttribute('href') === `#${currentSection}`) {
-          link.classList.add('active');
-        }
-      });
-    });
-  </script>
 </body>
 </html> 

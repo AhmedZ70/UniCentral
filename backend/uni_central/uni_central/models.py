@@ -1,6 +1,7 @@
 from django.db import models
-from django.db.models import Avg
-
+from django.db.models import Avg, Count
+from django.db.models.signals import post_save, post_delete
+from django.dispatch import receiver
 
 ##############
 # USER MODEL #
@@ -62,7 +63,7 @@ class Course(models.Model):
     avg_difficulty = models.FloatField(default=0)
     avg_rating = models.FloatField(default=0)
     credits = models.PositiveIntegerField()
-    semester = models.CharField(max_length=100, blank=True, null=True)
+    avg_grade = models.CharField(max_length=2, null=True, blank=True)
     professors = models.ManyToManyField('Professor', related_name='courses')
 
     class Meta:
@@ -72,18 +73,42 @@ class Course(models.Model):
         return f"{self.title} ({self.subject} {self.number})"
 
     def update_averages(self):
-        """Recalculate and update the average rating and difficulty."""
-        # Calculate averages from related reviews
-        averages = Review.objects.filter(course=self).aggregate(
+        """Recalculate and update the average rating, difficulty, and grade."""
+        reviews = Review.objects.filter(course=self)
+        
+        # Calculate average rating and difficulty
+        averages = reviews.aggregate(
             avg_rating=Avg('rating'),
-            avg_difficulty=Avg('difficulty')
+            avg_difficulty=Avg('difficulty'),
         )
-        self.avg_rating = averages['avg_rating'] or 0  # Default to 0 if no reviews
-        self.avg_difficulty = averages['avg_difficulty'] or 0  # Default to 0 if no reviews
+        self.avg_rating = averages['avg_rating'] or 0
+        self.avg_difficulty = averages['avg_difficulty'] or 0
+        
+        grade_counts = {}
+        for review in reviews.filter(grade__isnull=False):
+            if review.grade:
+                grade_counts[review.grade] = grade_counts.get(review.grade, 0) + 1
+        
+        if grade_counts:
+            max_count = max(grade_counts.values())
+            most_common_grades = [g for g, count in grade_counts.items() if count == max_count]
+            
+            grade_priority = {
+                'A': 1, 'A-': 2, 
+                'B+': 3, 'B': 4, 'B-': 5, 
+                'C+': 6, 'C': 7, 'C-': 8, 
+                'D+': 9, 'D': 10, 'D-': 11, 
+                'F': 12
+            }
+            
+            if len(most_common_grades) > 1:
+                self.avg_grade = sorted(most_common_grades, key=lambda g: grade_priority.get(g, 999))[0]
+            else:
+                self.avg_grade = most_common_grades[0]
+        else:
+            self.avg_grade = None
+            
         self.save()
-
-
-
 
 ###################
 # PROFESSOR MODEL #
@@ -117,16 +142,15 @@ class Professor(models.Model):
     def update_averages(self):
         """Recalculate and update the average rating and difficulty for the professor."""
         from .models import Review
-        # Calculate averages from related reviews
         averages = Review.objects.filter(professor=self).aggregate(
             avg_rating=Avg('rating'),
             avg_difficulty=Avg('difficulty')
         )
 
-        # Update the professor's fields with calculated averages
         self.avg_rating = averages['avg_rating'] or 0  # Default to 0 if no reviews
         self.avg_difficulty = averages['avg_difficulty'] or 0  # Default to 0 if no reviews
         self.save()
+
 ####################
 # DEPARTMENT MODEL #
 ####################
@@ -404,4 +428,3 @@ class StudyBuddyMessage(models.Model):
         
     def __str__(self):
         return f"Message from {self.sender.fname} to {self.receiver.fname} at {self.created_at}"
-    
