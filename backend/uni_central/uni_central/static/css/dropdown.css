@@ -94,7 +94,7 @@
   /* ============================================= */
   /* Button Styles                                  */
   /* ============================================= */
-  .logout-btn, .login-btn {
+  .logout-btn, .login-btn, .links {
     color: black;
     border: none;
     padding: 0.5rem 1rem;
