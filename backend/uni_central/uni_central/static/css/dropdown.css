@@ -8,6 +8,7 @@
     cursor: pointer;
     width: 50px;
     height: 80px;
+    z-index: 999;
   }
   
   .dropdown-menu-btn {
@@ -28,7 +29,7 @@
     min-width: 250px;
     min-height: 350px;
     box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.2);
-    z-index: 100;
+    z-index: 1000;
     top: 100%;
     right: 0;
     list-style: none;
