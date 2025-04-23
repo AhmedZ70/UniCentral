@@ -23,6 +23,7 @@ function handleAuthStateChange() {
     const registerLinkAndBtn = document.querySelector('.actions a');
     const welcomeMessage = document.querySelector('.welcome-message');
     const logoutBtn = document.querySelector('.logout-btn');
+    const urlPath = window.location.pathname;
 
     if (user) {
       // User is signed in
@@ -30,7 +31,7 @@ function handleAuthStateChange() {
       if (registerLinkAndBtn && actionsDiv) {
         if (logoutBtn) {
           logoutBtn.addEventListener('click', (event) => {
-            event.preventDefault(); // Prevent default link behavior
+            event.preventDefault(); 
             signOut(auth)
               .then(() => {
                 console.log('User signed out successfully');
@@ -42,11 +43,10 @@ function handleAuthStateChange() {
         }
         const welcomeText = document.createElement('div');
         welcomeText.className = 'welcome-message';
-        if (currentUrl != "http://127.0.0.1:8000/") {
-          welcomeText.textContent = `${user.displayName}`;
-        }
-        else {
+        if (urlPath === '/') {
           welcomeText.textContent = `Welcome, ${user.displayName}`;
+        } else {
+          welcomeText.textContent = `${user.displayName}`;
         }
         registerLinkAndBtn.replaceWith(welcomeText);
       }
