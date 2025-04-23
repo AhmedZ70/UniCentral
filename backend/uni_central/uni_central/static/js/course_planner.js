@@ -73,6 +73,9 @@ document.addEventListener('DOMContentLoaded', () => {
             if (addSemesterBtn) {
                 addSemesterBtn.addEventListener('click', showSemesterPopup);
             }
+            
+            // Setup a mutation observer to handle dynamically added upload buttons
+            setupUploadButtonObserver();
         } else {
             console.log("No user signed in, redirecting to login");
             window.location.href = '/login/';
@@ -780,11 +783,17 @@ class TranscriptParser {
         // Add click event to the upload box
         const uploadButton = this.uploadBox.querySelector('.upload-button');
         if (uploadButton) {
-            uploadButton.addEventListener('click', () => {
+            uploadButton.addEventListener('click', (e) => {
                 console.debug("Upload button clicked");
-                // Reset file input before opening it to ensure change event fires
-                this.fileInput.value = '';
-                this.fileInput.click();
+                e.preventDefault();
+                e.stopPropagation();
+                
+                // Use setTimeout to prevent immediate double file dialog issues
+                setTimeout(() => {
+                    // Reset file input before opening it to ensure change event fires
+                    this.fileInput.value = '';
+                    this.fileInput.click();
+                }, 50);
             });
         }
         
@@ -799,9 +808,47 @@ class TranscriptParser {
     // New method to reset the uploader after cancel
     resetUploader() {
         console.debug("Resetting uploader");
+        // Hide results and progress containers
         this.resultsContainer.classList.add('hidden');
         this.resultsContainer.style.display = 'none';
         this.progressContainer.classList.add('hidden');
+        this.progressContainer.style.display = 'none';
+        
+        // Reset upload box to original state
+        if (this.uploadBox) {
+            const uploadText = this.uploadBox.querySelector('.upload-text');
+            if (uploadText) {
+                uploadText.innerHTML = `
+                    <p>Drag & drop your transcript here or</p>
+                    <button class="upload-button" id="default-upload-button">Choose File</button>
+                `;
+                
+                // Add event listener to the button
+                const newButton = uploadText.querySelector('#default-upload-button');
+                if (newButton) {
+                    newButton.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        
+                        setTimeout(() => {
+                            if (this.fileInput) {
+                                this.fileInput.value = '';
+                                this.fileInput.click();
+                            }
+                        }, 50);
+                    });
+                }
+            }
+            
+            // Reset upload icon
+            const uploadIcon = this.uploadBox.querySelector('.upload-icon');
+            if (uploadIcon) {
+                uploadIcon.innerHTML = '<i class="fas fa-file-upload"></i>';
+            }
+            
+            // Remove any success or error styles
+            this.uploadBox.classList.remove('upload-error', 'upload-success');
+        }
         
         // Reset file input to allow reselecting the same file
         if (this.fileInput) {
@@ -915,7 +962,47 @@ class TranscriptParser {
                     this.updateProgress(0, 'Error processing file');
                     setTimeout(() => {
                         this.hideProgress();
-                        alert('Error processing file: ' + error.message);
+                        
+                        // Update upload box to show error
+                        if (this.uploadBox) {
+                            const uploadText = this.uploadBox.querySelector('.upload-text');
+                            if (uploadText) {
+                                uploadText.innerHTML = `
+                                    <p style="color: #F44336; font-weight: bold;">Error processing file: ${error.message}</p>
+                                    <p>Please try again with a clearer image or a different file</p>
+                                    <button class="upload-button" id="error-choose-another-file">Choose Another File</button>
+                                `;
+                                
+                                // Add event listener to the new button
+                                const newButton = uploadText.querySelector('#error-choose-another-file');
+                                if (newButton) {
+                                    newButton.addEventListener('click', (e) => {
+                                        e.preventDefault();
+                                        e.stopPropagation();
+                                        
+                                        setTimeout(() => {
+                                            if (this.fileInput) {
+                                                this.fileInput.value = '';
+                                                this.fileInput.click();
+                                            }
+                                        }, 50);
+                                    });
+                                }
+                            }
+                            
+                            // Change icon to error icon
+                            const uploadIcon = this.uploadBox.querySelector('.upload-icon');
+                            if (uploadIcon) {
+                                uploadIcon.innerHTML = '<i class="fas fa-exclamation-circle" style="color: #F44336;"></i>';
+                            }
+                            
+                            // Make sure supported formats section remains visible
+                            const formatsSection = this.uploadBox.querySelector('.supported-formats');
+                            if (formatsSection) {
+                                formatsSection.style.display = 'block';
+                            }
+                        }
+                        
                         // Reset file input
                         this.fileInput.value = '';
                     }, 1000);
@@ -1187,9 +1274,71 @@ class TranscriptParser {
         
         saveCoursePlan()
             .then(() => {
-                this.resetUploader();
-                alert('Selected courses have been added to your course plan.');                
+                // First, hide the progress and results containers
+                this.hideProgressDisplay();
+                this.resultsContainer.classList.add('hidden');
+                this.resultsContainer.style.display = 'none';
+                
+                // Update the upload box to show success
+                if (this.uploadBox) {
+                    const totalCourses = Object.values(coursesBySemester).flat().length;
+                    const uploadText = this.uploadBox.querySelector('.upload-text');
+                    if (uploadText) {
+                        uploadText.innerHTML = `
+                            <p class="success-text" style="color: #4CAF50; font-weight: bold;">
+                                Successfully added ${totalCourses} course${totalCourses !== 1 ? 's' : ''} to your plan!
+                            </p>
+                            <p>Upload another transcript or <a href="#course-planner-container" style="color: #005a5b; text-decoration: underline;">view your plan below</a></p>
+                            <button class="upload-button" id="choose-another-file">Choose Another File</button>
+                        `;
+                        
+                        // Get the new button and add a proper event listener
+                        const newButton = uploadText.querySelector('#choose-another-file');
+                        if (newButton) {
+                            newButton.addEventListener('click', (e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                
+                                setTimeout(() => {
+                                    if (this.fileInput) {
+                                        this.fileInput.value = '';
+                                        this.fileInput.click();
+                                    }
+                                }, 50);
+                            });
+                        }
+                    }
+                    
+                    // Change upload icon to success icon
+                    const uploadIcon = this.uploadBox.querySelector('.upload-icon');
+                    if (uploadIcon) {
+                        uploadIcon.innerHTML = '<i class="fas fa-check-circle" style="color: #4CAF50;"></i>';
+                    }
+                    
+                    // Make sure supported formats section remains visible
+                    const formatsSection = this.uploadBox.querySelector('.supported-formats');
+                    if (formatsSection) {
+                        formatsSection.style.display = 'block';
+                    }
+                }
+                
+                // Reset file input to allow new uploads
+                if (this.fileInput) {
+                    this.fileInput.value = '';
+                }
+                
+                // Show notification
+                showNotification('Courses have been added to your plan');
+                
+                // Render the updated semesters
                 renderSemesters();
+                
+                // Scroll to course planner container after short delay
+                setTimeout(() => {
+                    document.getElementById('course-planner-container').scrollIntoView({ 
+                        behavior: 'smooth' 
+                    });
+                }, 500);
             })
             .catch(error => {
                 this.hideProgressDisplay();
@@ -2029,3 +2178,64 @@ window.searchCourses = searchCourses;
 window.addSelectedCourses = addSelectedCourses;
 window.removeSemester = removeSemester;
 window.removeCourse = removeCourse;
+
+// Function to set up a mutation observer for upload buttons
+function setupUploadButtonObserver() {
+    // Select the upload container that will contain dynamically added buttons
+    const uploadContainer = document.querySelector('.upload-container');
+    if (!uploadContainer) return;
+    
+    // Create a configuration for the observer (what to observe)
+    const config = { childList: true, subtree: true };
+    
+    // Create an observer instance
+    const observer = new MutationObserver((mutations) => {
+        mutations.forEach((mutation) => {
+            // Check if nodes were added
+            if (mutation.addedNodes.length) {
+                // Check each added node for upload-button class
+                mutation.addedNodes.forEach((node) => {
+                    if (node.nodeType === 1) { // Element node
+                        // Check the node itself
+                        if (node.classList && node.classList.contains('upload-button')) {
+                            // Prevent the default click behavior to stop immediate file browser popup
+                            node.addEventListener('click', (e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                
+                                // Set a small timeout to prevent double file dialogs
+                                setTimeout(() => {
+                                    const fileInput = document.getElementById('transcript-file');
+                                    if (fileInput) {
+                                        fileInput.click();
+                                    }
+                                }, 50);
+                            });
+                        }
+                        
+                        // Also check children for upload-button class
+                        const buttons = node.querySelectorAll('.upload-button');
+                        buttons.forEach(button => {
+                            // Prevent the default click behavior
+                            button.addEventListener('click', (e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                
+                                // Set a small timeout to prevent double file dialogs
+                                setTimeout(() => {
+                                    const fileInput = document.getElementById('transcript-file');
+                                    if (fileInput) {
+                                        fileInput.click();
+                                    }
+                                }, 50);
+                            });
+                        });
+                    }
+                });
+            }
+        });
+    });
+    
+    // Start observing the upload container
+    observer.observe(uploadContainer, config);
+}
