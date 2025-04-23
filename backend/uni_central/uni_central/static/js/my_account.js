@@ -18,140 +18,174 @@ const auth = getAuth(app);
 let userEmail = null;
 let isEditing = false;
 
-document.addEventListener("DOMContentLoaded", () => {
-    const editButton = document.getElementById('edit-button');
-    const passwordModal = document.getElementById('password-modal');
-    const updatePasswordBtn = document.querySelector('.update-password');
-    const confirmPasswordBtn = document.getElementById('confirm-password-change');
-    const cancelPasswordBtn = document.getElementById('cancel-password-change');
-    const passwordError = document.getElementById('password-error');
-    
-    if (updatePasswordBtn) {
-        updatePasswordBtn.addEventListener('click', () => {
-            passwordModal.style.display = 'block';
-            passwordError.style.display = 'none';
-            document.getElementById('new-password').value = '';
-            document.getElementById('confirm-password').value = '';
-        });
-    }
+function checkAuthAndRedirect() {
+    return new Promise((resolve, reject) => {
+        const unsubscribe = onAuthStateChanged(auth, (user) => {
+            unsubscribe();
 
-    if (cancelPasswordBtn) {
-        cancelPasswordBtn.addEventListener('click', () => {
-            passwordModal.style.display = 'none';
+            if (!user) {
+                // User is not logged in, redirect to login page
+                console.log("User not logged in. Redirecting to login page...");
+                window.location.href = '/login/';
+                reject(new Error("User not authenticated"));
+            } else {
+                // User is logged in
+                console.log("User is authenticated:", user.email);
+                userEmail = user.email;
+                resolve(user);
+            }
+        }, (error) => {
+            console.error("Auth error:", error);
+            reject(error);
         });
-    }
+    });
+}
 
-    if (confirmPasswordBtn) {
-        confirmPasswordBtn.addEventListener('click', () => {
-            const newPassword = document.getElementById('new-password').value;
-            const confirmPassword = document.getElementById('confirm-password').value;
-    
-            if (newPassword !== confirmPassword) {
-                passwordError.textContent = 'Passwords do not match';
-                passwordError.style.display = 'block';
-                return;
-            }
-    
-            if (newPassword.length < 6) {
-                passwordError.textContent = 'Password must be at least 6 characters';
-                passwordError.style.display = 'block';
-                return;
-            }
-    
-            updateUserPassword(newPassword)
-                .then((result) => {
-                    passwordModal.style.display = 'none';
-                    showAlert(result.message + '!<br><br>You will need to log in again with your new password to confirm changes.');
-                    
-                    document.getElementById('alertClose').onclick = function() {
-                        document.getElementById('alertBox').style.display = 'none';
-                        logoutUser();
-                    };
-                })
-                .catch((error) => {
-                    passwordError.textContent = error.message;
+document.addEventListener("DOMContentLoaded", async () => {
+    try {
+        // Check authentication first before proceeding
+        await checkAuthAndRedirect();
+
+        const editButton = document.getElementById('edit-button');
+        const passwordModal = document.getElementById('password-modal');
+        const updatePasswordBtn = document.querySelector('.update-password');
+        const confirmPasswordBtn = document.getElementById('confirm-password-change');
+        const cancelPasswordBtn = document.getElementById('cancel-password-change');
+        const passwordError = document.getElementById('password-error');
+
+        if (updatePasswordBtn) {
+            updatePasswordBtn.addEventListener('click', () => {
+                passwordModal.style.display = 'block';
+                passwordError.style.display = 'none';
+                document.getElementById('new-password').value = '';
+                document.getElementById('confirm-password').value = '';
+            });
+        }
+
+        if (cancelPasswordBtn) {
+            cancelPasswordBtn.addEventListener('click', () => {
+                passwordModal.style.display = 'none';
+            });
+        }
+
+        if (confirmPasswordBtn) {
+            confirmPasswordBtn.addEventListener('click', () => {
+                const newPassword = document.getElementById('new-password').value;
+                const confirmPassword = document.getElementById('confirm-password').value;
+
+                if (newPassword !== confirmPassword) {
+                    passwordError.textContent = 'Passwords do not match';
                     passwordError.style.display = 'block';
-                    console.error('Error updating password:', error);
-                    
-                    if (error.message.includes('log out')) {
-                        if (confirm('You need to log in again to change your password. Would you like to log out now?')) {
+                    return;
+                }
+
+                if (newPassword.length < 6) {
+                    passwordError.textContent = 'Password must be at least 6 characters';
+                    passwordError.style.display = 'block';
+                    return;
+                }
+
+                updateUserPassword(newPassword)
+                    .then((result) => {
+                        passwordModal.style.display = 'none';
+                        showAlert(result.message + '!<br><br>You will need to log in again with your new password to confirm changes.');
+
+                        document.getElementById('alertClose').onclick = function () {
+                            document.getElementById('alertBox').style.display = 'none';
                             logoutUser();
+                        };
+                    })
+                    .catch((error) => {
+                        passwordError.textContent = error.message;
+                        passwordError.style.display = 'block';
+                        console.error('Error updating password:', error);
+
+                        if (error.message.includes('log out')) {
+                            if (confirm('You need to log in again to change your password. Would you like to log out now?')) {
+                                logoutUser();
+                            }
                         }
-                    }
-                });
+                    });
+            });
+        }
+
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                const email = document.getElementById('user-email');
+                const fNameDisplay = document.getElementById('fNameDisplay');
+                const lNameDisplay = document.getElementById('lNameDisplay');
+                const universityDisplay = document.getElementById('universityDisplay');
+                const majorDisplay = document.getElementById('majorDisplay');
+                const gradYearDisplay = document.getElementById('yearDisplay');
+
+                email.textContent = user.email;
+
+                fetch(`/api/users/${user.email}/details/`)
+                    .then((response) => {
+                        if (!response.ok) {
+                            throw new Error(`Failed to load user data (status ${response.status})`);
+                        }
+                        return response.json();
+                    })
+                    .then((data) => {
+                        fNameDisplay.textContent = data.fname || '';
+                        lNameDisplay.textContent = data.lname || '';
+                        universityDisplay.textContent = data.university || '';
+                        majorDisplay.textContent = data.major || '';
+                        gradYearDisplay.textContent = data.year || '';
+
+                        document.getElementById('university').value = data.university || '';
+                        document.getElementById('major').value = data.major || '';
+                        document.getElementById('year').value = data.year || '';
+                        console.log("Raw API response:", data);
+                        console.log("Fetching user data: fname: ", data.fname, " lname: ", data.lname, " university", data.university, "major: ", data.major, " year: ", data.year);
+                    })
+                    .catch((error) => {
+                        console.error("Error fetching user data:", error);
+                    });
+            }
+            else {
+
+            }
+        });
+
+        editButton.addEventListener('click', function () {
+            isEditing = !isEditing;
+
+            if (isEditing) {
+                editButton.textContent = 'Save Changes';
+                editButton.classList.add('save-changes');
+
+                document.getElementById('university').style.display = 'inline-block';
+                document.getElementById('major').style.display = 'inline-block';
+                document.getElementById('year').style.display = 'inline-block';
+
+                document.getElementById('universityDisplay').style.display = 'none';
+                document.getElementById('majorDisplay').style.display = 'none';
+                document.getElementById('yearDisplay').style.display = 'none';
+            } else {
+                editButton.textContent = 'Edit Profile';
+                editButton.classList.remove('save-changes');
+
+                document.getElementById('universityDisplay').textContent = document.getElementById('university').value;
+                document.getElementById('majorDisplay').textContent = document.getElementById('major').value;
+                document.getElementById('yearDisplay').textContent = document.getElementById('year').value;
+
+                document.getElementById('university').style.display = 'none';
+                document.getElementById('major').style.display = 'none';
+                document.getElementById('year').style.display = 'none';
+
+                document.getElementById('universityDisplay').style.display = 'inline';
+                document.getElementById('majorDisplay').style.display = 'inline';
+                document.getElementById('yearDisplay').style.display = 'inline';
+
+                saveChanges(auth.currentUser.email);
+            }
         });
     }
-    
-    onAuthStateChanged(auth, (user) => {
-        if (user) {
-            const email = document.getElementById('user-email');
-            const fNameDisplay = document.getElementById('fNameDisplay');
-            const lNameDisplay = document.getElementById('lNameDisplay');
-            const universityDisplay = document.getElementById('universityDisplay');
-            const majorDisplay = document.getElementById('majorDisplay');
-            const gradYearDisplay = document.getElementById('yearDisplay');
-
-            email.textContent = user.email;
-
-            fetch(`/api/users/${user.email}/details/`)
-                .then((response) => {
-                    if (!response.ok) {
-                        throw new Error(`Failed to load user data (status ${response.status})`);
-                    }
-                    return response.json();
-                })
-                .then((data) => {
-                    fNameDisplay.textContent = data.fname || '';
-                    lNameDisplay.textContent = data.lname || '';
-                    universityDisplay.textContent = data.university || '';
-                    majorDisplay.textContent = data.major || '';
-                    gradYearDisplay.textContent = data.year || '';
-
-                    document.getElementById('university').value = data.university || '';
-                    document.getElementById('major').value = data.major || '';
-                    document.getElementById('year').value = data.year || '';
-                    console.log("Raw API response:", data); 
-                    console.log("Fetching user data: fname: ", data.fname, " lname: ", data.lname, " university", data.university, "major: ", data.major, " year: ", data.year);
-                })
-                .catch((error) => {
-                    console.error("Error fetching user data:", error);
-                });
-        }
-    });
-
-    editButton.addEventListener('click', function() {
-        isEditing = !isEditing;
-        
-        if (isEditing) {
-            editButton.textContent = 'Save Changes';
-            editButton.classList.add('save-changes');
-            
-            document.getElementById('university').style.display = 'inline-block';
-            document.getElementById('major').style.display = 'inline-block';
-            document.getElementById('year').style.display = 'inline-block';
-            
-            document.getElementById('universityDisplay').style.display = 'none';
-            document.getElementById('majorDisplay').style.display = 'none';
-            document.getElementById('yearDisplay').style.display = 'none';
-        } else {
-            editButton.textContent = 'Edit Profile';
-            editButton.classList.remove('save-changes');
-            
-            document.getElementById('universityDisplay').textContent = document.getElementById('university').value;
-            document.getElementById('majorDisplay').textContent = document.getElementById('major').value;
-            document.getElementById('yearDisplay').textContent = document.getElementById('year').value;
-            
-            document.getElementById('university').style.display = 'none';
-            document.getElementById('major').style.display = 'none';
-            document.getElementById('year').style.display = 'none';
-            
-            document.getElementById('universityDisplay').style.display = 'inline';
-            document.getElementById('majorDisplay').style.display = 'inline';
-            document.getElementById('yearDisplay').style.display = 'inline';
-            
-            saveChanges(auth.currentUser.email);
-        }
-    });
+    catch {
+        console.error("Authentication error:", error);
+    }
 });
 
 function showAlert(message, isSuccess = true) {
@@ -166,7 +200,7 @@ function showAlert(message, isSuccess = true) {
 
     alertBox.style.display = 'flex';
 
-    document.getElementById('alertClose').onclick = function() {
+    document.getElementById('alertClose').onclick = function () {
         alertBox.style.display = 'none';
     };
 }
@@ -188,27 +222,27 @@ function saveChanges(email) {
         },
         body: JSON.stringify(userData)
     })
-    .then(response => {
-        if (!response.ok) {
-            return response.json().then(errorData => {
-                console.error('Server error details:', errorData);
-                throw new Error(errorData.message || `Failed to update user data (status ${response.status})`);
-            }).catch(jsonError => {
-                throw new Error(`Failed to update user data (status ${response.status})`);
-            });
-        }
-        return response.json();
-    })
-    .then(data => {
-        console.log('Success:', data);
-        showAlert('Profile updated successfully!');
-        
-        document.getElementById('universityDisplay').textContent = userData.university;
-        document.getElementById('majorDisplay').textContent = userData.major;
-        document.getElementById('yearDisplay').textContent = userData.year;
-    })
-    .catch((error) => {
-        console.error('Error details:', error);
-        showAlert('Failed to update profile. Please try again.');
-    });
+        .then(response => {
+            if (!response.ok) {
+                return response.json().then(errorData => {
+                    console.error('Server error details:', errorData);
+                    throw new Error(errorData.message || `Failed to update user data (status ${response.status})`);
+                }).catch(jsonError => {
+                    throw new Error(`Failed to update user data (status ${response.status})`);
+                });
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log('Success:', data);
+            showAlert('Profile updated successfully!');
+
+            document.getElementById('universityDisplay').textContent = userData.university;
+            document.getElementById('majorDisplay').textContent = userData.major;
+            document.getElementById('yearDisplay').textContent = userData.year;
+        })
+        .catch((error) => {
+            console.error('Error details:', error);
+            showAlert('Failed to update profile. Please try again.');
+        });
 }
